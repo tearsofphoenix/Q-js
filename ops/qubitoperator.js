@@ -1,5 +1,6 @@
 
 // QubitOperator stores a sum of Pauli operators acting on qubits."""
+import {isNumeric} from '../utils/polyfill'
 
 const EQ_TOLERANCE = 1e-12
 
@@ -60,6 +61,25 @@ are sorted according to the qubit number they act on,
     starting from 0.
 **value**: Coefficient of this term as a (complex) float
  */
+
+function checkTerm(term) {
+  term.forEach(localOperator => {
+    if (!Array.isArray(localOperator) || localOperator.length !== 2) {
+      throw new Error('term specified incorrectly')
+    }
+    const [qubitNum, action] = localOperator
+    if (typeof action !== 'string' || 'XYZ'.indexOf(action) === -1) {
+      throw new Error('Invalid action provided: must be string \'X\', \'Y\', or \'Z\'.')
+    }
+    if (typeof qubitNum !== 'number' || qubitNum < 0) {
+      throw new Error("Invalid qubit number " +
+          "provided to QubitTerm: " +
+          "must be a non-negative " +
+          "int.")
+    }
+  })
+}
+
 export class QubitOperator {
     /*
     Inits a QubitOperator.
@@ -107,79 +127,64 @@ QubitOperatorError: Invalid operators provided to QubitOperator.
     constructor(term, coefficient = 1.) {
         // TODO assert coefficient as numeric
         this.terms = {}
+        if (!isNumeric(coefficient)) {
+            throw new Error('Coefficient must be a numeric type.')
+        }
+
+        if (!term) {
+            return
+        } else if (Array.isArray(term)) {
+            if (term.length === 0) {
+              this.terms[[]] = coefficient
+            } else {
+
+                checkTerm(term)
+              term = term.sort((a, b) => a[0] - b[0])
+              this.terms[term] = coefficient
+            }
+        } else if (typeof term === 'string') {
+            const listOPs = []
+          const parts = term.split(/\s+/)
+          parts.forEach(el => {
+              if (el.length < 2) {
+                  throw new Error('term specified incorrectly.')
+              }
+              listOPs.push([parseInt(el.substring(1)), el[0]])
+          })
+
+          checkTerm(listOPs)
+
+          term = term.sort((a, b) => a[0] - b[0])
+          this.terms[term] = coefficient
+        } else {
+            throw new Error('term specified incorrectly.')
+        }
     }
-}
 
-if not isinstance(coefficient, (int, float, complex)):
-raise ValueError('Coefficient must be a numeric type.')
-self.terms = {}
-if term is None:
-    return
-elif isinstance(term, tuple):
-if term is ():
-self.terms[()] = coefficient
-else:
-# Test that input is a tuple of tuples and correct action
-for local_operator in term:
-if (not isinstance(local_operator, tuple) or
-len(local_operator) != 2):
-raise ValueError("term specified incorrectly.")
-qubit_num, action = local_operator
-if not isinstance(action, str) or action not in 'XYZ':
-raise ValueError("Invalid action provided: must be "
-"string 'X', 'Y', or 'Z'.")
-if not (isinstance(qubit_num, int) and qubit_num >= 0):
-raise QubitOperatorError("Invalid qubit number "
-"provided to QubitTerm: "
-"must be a non-negative "
-"int.")
-# Sort and add to self.terms:
-term = list(term)
-term.sort(key=lambda loc_operator: loc_operator[0])
-self.terms[tuple(term)] = coefficient
-elif isinstance(term, str):
-list_ops = []
-for el in term.split():
-if len(el) < 2:
-raise ValueError('term specified incorrectly.')
-list_ops.append((int(el[1:]), el[0]))
-# Test that list_ops has correct format of tuples
-for local_operator in list_ops:
-qubit_num, action = local_operator
-if not isinstance(action, str) or action not in 'XYZ':
-raise ValueError("Invalid action provided: must be "
-"string 'X', 'Y', or 'Z'.")
-if not (isinstance(qubit_num, int) and qubit_num >= 0):
-raise QubitOperatorError("Invalid qubit number "
-"provided to QubitTerm: "
-"must be a non-negative "
-"int.")
-# Sort and add to self.terms:
-list_ops.sort(key=lambda loc_operator: loc_operator[0])
-self.terms[tuple(list_ops)] = coefficient
-else:
-raise ValueError('term specified incorrectly.')
-
-def compress(self, abs_tol=1e-12):
-"""
-Eliminates all terms with coefficients close to zero and removes
+    /*
+    Eliminates all terms with coefficients close to zero and removes
 imaginary parts of coefficients that are close to zero.
 
     Args:
 abs_tol(float): Absolute tolerance, must be at least 0.0
-"""
-new_terms = {}
-for term in self.terms:
-coeff = self.terms[term]
-if abs(coeff.imag) <= abs_tol:
-coeff = coeff.real
-if abs(coeff) > abs_tol:
-new_terms[term] = coeff
-self.terms = new_terms
+     */
+    compress(absTolerance = 1e-12) {
 
-def isclose(self, other, rel_tol=1e-12, abs_tol=1e-12):
-"""
-Returns True if other (QubitOperator) is close to self.
+      const new_terms = {}
+      Object.keys(this.terms).forEach(key => {
+          let coeff = this.terms[key]
+        if (Math.abs(coeff.imag) <= absTolerance) {
+              coeff = coeff.real
+        }
+        if (Math.abs(coeff) > absTolerance) {
+              new_terms[key] = coeff
+        }
+      })
+      this.terms = new_terms
+    }
+
+    /*
+    Returns True if other (QubitOperator) is close to self.
 
     Comparison is done for each term individually. Return True
 if the difference between each term in self and other is
@@ -191,22 +196,29 @@ tolerance.
 other(QubitOperator): QubitOperator to compare against.
 rel_tol(float): Relative tolerance, must be greater than 0.0
 abs_tol(float): Absolute tolerance, must be at least 0.0
-"""
-# terms which are in both:
-for term in set(self.terms).intersection(set(other.terms)):
-a = self.terms[term]
-b = other.terms[term]
-# math.isclose does this in Python >=3.5
-if not abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol):
-return False
-# terms only in one (compare to 0.0 so only abs_tol)
-for term in set(self.terms).symmetric_difference(set(other.terms)):
-if term in self.terms:
-if not abs(self.terms[term]) <= abs_tol:
-return False
-elif not abs(other.terms[term]) <= abs_tol:
-return False
-return True
+     */
+    isClose(other, realTolerance = 1e-12, absTolerance = 1e-12) {
+      // terms which are in both:
+      const intersection = new Set([...this.terms].filter(x => other.terms.has(x)))
+      for (let term of intersection) {
+          const a = this.terms[term]
+        const b = this.terms[term]
+        //
+        if (!(Math.abs(a - b) <= Math.max(realTolerance * Math.max(Math.abs(a), Math.abs(b), absTolerance)))) {
+              return false
+        }
+      }
+      // terms only in one (compare to 0.0 so only abs_tol)
+      for term in set(self.terms).symmetric_difference(set(other.terms)):
+      if term in self.terms:
+      if not abs(self.terms[term]) <= abs_tol:
+      return False
+      elif not abs(other.terms[term]) <= abs_tol:
+      return False
+      return True
+    }
+}
+
 
 def __imul__(self, multiplier):
 """
