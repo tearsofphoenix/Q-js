@@ -16,7 +16,7 @@ Gate | (qubit,)
 This means that for more than one quantum argument (right side of | ), a tuple
 needs to be made explicitely, while for one argument it is optional.
 */
-
+import math from 'mathjs'
 import { BasicQubit, Qureg } from '../types/qubit'
 import {Command, applyCommand} from './command'
 
@@ -65,11 +65,15 @@ self.set_interchangeable_qubit_indices([[0,1],[2,3,4]])
   }
 
   getInverse() {
-    throw new Error('BasicGate: No get_inverse() implemented.')
+    throw new Error('BasicGate: No getInverse() implemented.')
   }
 
   getMerged() {
-    throw new Error('BasicGate: No get_merged() implemented.')
+    throw new Error('BasicGate: No getMerged() implemented.')
+  }
+
+  toString() {
+    throw new Error('BasicGate: No toString() implemented.')
   }
 
   /*
@@ -177,7 +181,9 @@ Automatic implementation of the get_inverse-member function for self-
  */
 export class SelfInverseGate extends BasicGate {
   getInverse() {
-    return this
+    const copy = Object.create(this.__proto__)
+    Object.assign(copy, this)
+    return copy
   }
 }
 
@@ -203,7 +209,7 @@ angle (float): Angle of rotation (saved modulo 4 * pi)
   constructor(angle, ...args) {
     super(...args)
 
-    let rounded_angle = Math.floor(angle % (4.0 * Math.PI), ANGLE_PRECISION)
+    let rounded_angle = math.round(math.mod(angle, 4.0 * Math.PI), ANGLE_PRECISION)
     if (rounded_angle > 4 * Math.PI - ANGLE_TOLERANCE) {
       rounded_angle = 0.0
     }
@@ -244,6 +250,17 @@ New object representing the merged gates.
     }
     throw new Error('Can\'t merge different types of rotation gates.')
   }
+
+  toString() {
+    return `BasicRotationGate(${this.angle})`
+  }
+
+  equal(other) {
+    if (other instanceof BasicRotationGate) {
+      return this.angle == other.angle
+    }
+    return false
+  }
 }
 
 /*
@@ -265,7 +282,7 @@ angle (float): Angle of rotation (saved modulo 2 * pi)
      */
   constructor(angle, ...args) {
     super(...args)
-    let rounded_angle = Math.floor(angle % (2.0 * Math.PI), ANGLE_PRECISION)
+    let rounded_angle = math.round(math.mod(angle, 2.0 * Math.PI), ANGLE_PRECISION)
     if (rounded_angle > 2 * Math.PI - ANGLE_TOLERANCE) {
       rounded_angle = 0.0
     }
@@ -305,6 +322,17 @@ New object representing the merged gates.
       return new BasicPhaseGate(this.angle + other.angle)
     }
     throw new Error('Can\'t merge different types of rotation gates.')
+  }
+
+  toString() {
+    return `BasicPhaseGate(${this.angle})`
+  }
+
+  equal(other) {
+    if (other instanceof BasicPhaseGate) {
+      return this.angle === other.angle
+    }
+    return false
   }
 }
 
@@ -409,7 +437,7 @@ return math_fun
      */
   constructor(mathFunc, ...args) {
     super(...args)
-    this.mathFunc = x => [mathFunc(x)]
+    this.mathFunc = x => Array.from(mathFunc(...x))
   }
 
   /*
@@ -426,5 +454,9 @@ gate. (See BasicMathGate.__init__ for an example).
      */
   getMathFunction(qubits) {
     return this.mathFunc
+  }
+
+  toString() {
+    return 'MATH'
   }
 }

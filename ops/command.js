@@ -255,7 +255,6 @@ engine: New owner of qubits and owner of this Command object
       const t1 = arrayEqual(this.tags, other.tags)
       const e1 = this.engine === other.engine
       const b = arrayEqual(this.allQubits, other.allQubits)
-      console.log(259, f1, t1, e1, b)
       return  f1 && t1 && e1 && b
     }
     return false
