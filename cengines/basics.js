@@ -105,7 +105,7 @@ Returns:
   allocateQureg(n) {
     const array = []
     for (let i = 0; i < n; ++i) {
-      let q = this.allocateQubit().at(0)
+      let q = this.allocateQubit()[0]
       array.push(q)
     }
     return new Qureg(array)

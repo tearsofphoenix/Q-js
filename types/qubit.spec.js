@@ -22,8 +22,8 @@ describe('Qubit test', () => {
 
   it('should test basic qubit measurement', () => {
     const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])
-    const qubit0 = eng.allocateQubit().at(0)
-    const qubit1 = eng.allocateQubit().at(0)
+    const qubit0 = eng.allocateQubit()[0]
+    const qubit1 = eng.allocateQubit()[0]
     eng.setMeasurementResult(qubit0, false)
     eng.setMeasurementResult(qubit1, true)
 
@@ -90,7 +90,7 @@ describe('Qubit test', () => {
   it('should test qureg str', () => {
     const eng = new MainEngine(new DummyEngine(), [])
     const reg = new Qureg()
-    assert(reg.toString() === 'Qureg[]')
+    expect(reg.toString()).to.equal('Qureg[]')
 
     const a = eng.allocateQureg(10)
     const b = eng.allocateQureg(50)
@@ -117,8 +117,8 @@ describe('Qubit test', () => {
     const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])
     const qureg0 = new Qureg(eng.allocateQubit())
     const qureg1 = new Qureg(eng.allocateQubit())
-    eng.setMeasurementResult(qureg0.at(0), false)
-    eng.setMeasurementResult(qureg1.at(0), true)
+    eng.setMeasurementResult(qureg0[0], false)
+    eng.setMeasurementResult(qureg1[0], true)
 
     expect(qureg0.toBoolean()).to.equal(false)
     expect(qureg1.toBoolean()).to.equal(true)
@@ -141,13 +141,13 @@ describe('Qubit test', () => {
     const qureg = new Qureg([new Qubit(eng1, 0), new Qubit(eng1, 1)])
     expect(eng1).to.equal(qureg.engine)
     qureg.engine = eng2
-    expect(qureg.at(0).engine == eng2 && qureg.at(1).engine == eng2).to.equal(true)
+    expect(qureg[0].engine == eng2 && qureg[1].engine == eng2).to.equal(true)
   });
 
   it('should idempotent del', () => {
     const rec = new DummyEngine(true)
     const eng = new MainEngine(rec, [])
-    const q = eng.allocateQubit().at(0)
+    const q = eng.allocateQubit()[0]
     rec.receivedCommands = []
     assert(rec.receivedCommands.length === 0)
     q.deallocate()
@@ -168,7 +168,7 @@ describe('Qubit test', () => {
     }
 
     const eng = new MainEngine(new InjectedBugEngine(), [])
-    const q = eng.allocateQubit().at(0)
+    const q = eng.allocateQubit()[0]
 
     // First call to __del__ triggers the bug.
     try {

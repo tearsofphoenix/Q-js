@@ -159,97 +159,71 @@ Simplifies accessing measured values for single-qubit registers (no []-
 (call Qureg.__str__(qureg)).
 
  */
-export class Qureg {
-  constructor(...args) {
-    const arg0 = args[0]
-    if (Array.isArray(arg0)) {
-      this._imp = Array.from(arg0)
-    } else if (arg0 instanceof Qureg) {
-      this._imp = Array.from(arg0._imp)
-    } else {
-      this._imp = new Array(...args)
-    }
+export function Qureg(...args) {
+  const arg0 = args[0]
+  let inst
+  if (Array.isArray(arg0)) {
+    inst = Array.from(arg0)
+  } else {
+    inst = new Array(...args)
   }
+  inst.__proto__ = Qureg.prototype
+  return inst
+}
 
-  forEach(callbackFunc) {
-    this._imp.forEach(callbackFunc)
-  }
+Qureg.prototype = Object.create(Array.prototype)
 
-  map(callbackFunc) {
-    return this._imp.map(callbackFunc)
-  }
-
-  at(index) {
-    return this._imp[index]
-  }
-
-  assign(index, value) {
-    this._imp[index] = value
-  }
-
-  /*
+/*
 Return measured value if Qureg consists of 1 qubit only.
 
     Raises:
 Exception if more than 1 qubit resides in this register (then you
 need to specify which value to get using qureg[???])
      */
-  toBoolean() {
-    if (this.length === 1) {
-      return this.at(0).toBoolean()
-    }
-    throw new Error('__bool__(qureg): Quantum register contains more "\n'
-            + '"than 1 qubit. Use __bool__(qureg[idx]) instead.')
+Qureg.prototype.toBoolean = function () {
+  if (this.length === 1) {
+    return this[0].toBoolean()
   }
+  throw new Error('__bool__(qureg): Quantum register contains more "\n'
+    + '"than 1 qubit. Use __bool__(qureg[idx]) instead.')
+}
 
-  slice(start, end) {
-    return this._imp.slice(start, end)
-  }
+Qureg.prototype.toString = function() {
+  if (this.length === 0) return 'Qureg[]'
+  const ids = this.slice(1).map(({id}) => id)
+  ids.push(null) // Forces a flush on last loop iteration.
 
-  toString() {
-    if (this.length === 0) return 'Qureg[]'
-    const ids = this.slice(1).map(({id}) => id)
-    ids.push(null) // Forces a flush on last loop iteration.
-
-    const out_list = []
-    let start_id = this.at(0).id
-    let count = 1
-    ids.forEach((qubit_id) => {
-      if (qubit_id === start_id + count) {
-        count += 1
+  const out_list = []
+  let start_id = this[0].id
+  let count = 1
+  ids.forEach((qubit_id) => {
+    if (qubit_id === start_id + count) {
+      count += 1
+    } else {
+      // TODO
+      if (count > 1) {
+        out_list.push(`${start_id}-${start_id + count - 1}`)
       } else {
-        // TODO
-        if (count > 1) {
-          out_list.push(`${start_id}-${start_id + count - 1}`)
-        } else {
-          out_list.push(`${start_id}`)
-        }
-        start_id = qubit_id
-        count = 1
+        out_list.push(`${start_id}`)
       }
-    })
+      start_id = qubit_id
+      count = 1
+    }
+  })
 
-    return `Qureg[${out_list.join(', ')}]`
-  }
+  return `Qureg[${out_list.join(', ')}]`
+}
 
-  add(other) {
-    const array = this._imp.concat(other._imp)
-    return new Qureg(array)
-  }
+Qureg.prototype.add = function(other) {
+  const array = this.concat(other)
+  return new Qureg(array)
+}
 
-  push(value) {
-    this._imp.push(value)
-  }
-
-  get length() {
-    return this._imp.length
-  }
-
-  get engine() {
-    return this.at(0).engine
-  }
-
-  set engine(newEngine) {
+Object.defineProperty(Qureg.prototype, 'engine', {
+  get() {
+    return this[0].engine
+  },
+  set(newEngine) {
     this.forEach(looper => looper.engine = newEngine)
   }
-}
+})
