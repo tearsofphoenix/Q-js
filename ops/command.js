@@ -23,8 +23,7 @@ Swap | (qubit2, qubit1)
 The command then gets sent to the MainEngine via the
 apply wrapper (apply_command).
 */
-
-import {WeakQubitRef} from '../types/qubit'
+import {arrayEqual} from '../utils/polyfill'
 import Cycle from './_cycle'
 
 /*
@@ -91,7 +90,7 @@ Tags associated with the command.
 
      */
   constructor(engine, gate, qubits, controls = [], tags = []) {
-    const qs = qubits.map(qreg => qreg.map(qubit => new WeakQubitRef(qubit.engine, qubit.id)))
+    const qs = qubits
     this.gate = gate
     this._qubits = qs
     this._controlQubits = controls
@@ -252,7 +251,12 @@ engine: New owner of qubits and owner of this Command object
 
   equal(other) {
     if (other instanceof Command) {
-      return this.gate.equal(other.gate) && this.tags == other.tags && this.engine === other.engine && this.allQubits == other.allQubits
+      const f1 = this.gate.equal(other.gate)
+      const t1 = arrayEqual(this.tags, other.tags)
+      const e1 = this.engine === other.engine
+      const b = arrayEqual(this.allQubits, other.allQubits)
+      console.log(259, f1, t1, e1, b)
+      return  f1 && t1 && e1 && b
     }
     return false
   }

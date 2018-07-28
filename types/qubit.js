@@ -19,7 +19,7 @@ qubit goes out of scope.
     WeakQubit are used inside the Command object and are not automatically
 deallocated.
 */
-
+import {arrayEqual} from '../utils/polyfill'
 /*
 BasicQubit objects represent qubits.
 
@@ -173,6 +173,13 @@ export function Qureg(...args) {
 
 Qureg.prototype = Object.create(Array.prototype)
 
+Qureg.prototype.equal = function(other) {
+  console.log(177)
+  if (other instanceof Qureg) {
+    return arrayEqual(this, other, (x, y) => x.equal(y))
+  }
+  return false
+}
 /*
 Return measured value if Qureg consists of 1 qubit only.
 

@@ -153,8 +153,8 @@ Args:
     applyCommand(cmd)
   }
 
-  equal() {
-
+  equal(other) {
+    return this.__proto__ === other.__proto__
   }
 }
 
