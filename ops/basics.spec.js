@@ -35,7 +35,7 @@ describe('basics test', () => {
     expect(case3).to.deep.equal([qureg])
     const case4 = BasicGate.makeTupleOfQureg([qubit0])
     expect(case4).to.deep.equal([[qubit0]])
-    const case5 = BasicGate.makeTupleOfQureg([qureg, qubit0], true)
+    const case5 = BasicGate.makeTupleOfQureg([qureg, qubit0])
     expect(case5).to.deep.equal([qureg, [qubit0]])
   });
 
@@ -47,20 +47,16 @@ describe('basics test', () => {
     const qubit3 = new Qubit(engine, 3)
     const qureg = new Qureg([qubit2, qubit3])
     const basic_gate = new BasicGate()
-    const command1 = basic_gate.generateCommand(qubit0)
-    expect(command1.equal(new Command(engine, basic_gate, [[qubit0]]))).to.equal(true)
-  // command2 = basic_gate.generate_command([qubit0, qubit1])
-  // assert command2 == Command(main_engine, basic_gate,
-  //     ([qubit0, qubit1],))
-  // command3 = basic_gate.generate_command(qureg)
-  // assert command3 == Command(main_engine, basic_gate,
-  //     (qureg,))
-  // command4 = basic_gate.generate_command((qubit0,))
-  // assert command4 == Command(main_engine, basic_gate,
-  //     ([qubit0],))
-  // command5 = basic_gate.generate_command((qureg, qubit0))
-  // assert command5 == Command(main_engine, basic_gate,
-
+    // const command1 = basic_gate.generateCommand(qubit0)
+    // expect(command1.equal(new Command(engine, basic_gate, [[qubit0]]))).to.equal(true)
+    // const command2 = basic_gate.generateCommand([qubit0, qubit1])
+    // expect(command2.equal(new Command(engine, basic_gate, [[qubit0, qubit1]]))).to.equal(true)
+    // const command3 = basic_gate.generateCommand(qureg)
+    // expect(command3.equal(new Command(engine, basic_gate, [qureg]))).to.equal(true)
+    // const command4 = basic_gate.generateCommand([qubit0])
+    // expect(command4.equal(new Command(engine, basic_gate, [[qubit0]]))).to.equal(true)
+    const command5 = basic_gate.generateCommand([qureg, qubit0])
+    expect(command5.equal(new Command(engine, basic_gate, [qureg, [qubit0]]))).to.equal(true)
   });
   //   def test_basic_gate_generate_command(main_engine):
 //       (qureg, [qubit0]))

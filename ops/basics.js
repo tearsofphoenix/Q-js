@@ -17,7 +17,7 @@ This means that for more than one quantum argument (right side of | ), a tuple
 needs to be made explicitely, while for one argument it is optional.
 */
 
-import {BasicQubit} from '../types/qubit'
+import { BasicQubit, Qureg } from '../types/qubit'
 import {Command, applyCommand} from './command'
 
 const ANGLE_PRECISION = 12
@@ -102,7 +102,11 @@ Returns:
     Canonical representation (tuple<qureg>): A tuple containing Qureg
 (or list of Qubits) objects.
      */
-  static makeTupleOfQureg(qubits, isTuple = false) {
+  static makeTupleOfQureg(qubits) {
+    let isTuple = false
+    if (Array.isArray(qubits)) {
+      isTuple = qubits.some(item => item instanceof Qureg)
+    }
     if (!isTuple) {
       qubits = [qubits]
     }
