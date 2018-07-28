@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "test": "mocha 'types/**/*.spec.js'"
+    "test": "mocha --require babel-register ./ops/*.spec.js"
   },
   "dependencies": {
     "mathjs": "^5.0.4"

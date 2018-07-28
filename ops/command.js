@@ -160,7 +160,7 @@ Returns: Ordered tuple of quantum registers
     iqi.forEach((old_positions) => {
       const new_positions = old_positions.sort((a, b) => orderedQubits[a][0].id - orderedQubits[b][0].id)
       const qubits_new_order = []
-      new_positions.forEach(l => qubits_new_order.push(orderedQubits[i]))
+      new_positions.forEach(l => qubits_new_order.push(orderedQubits[l]))
 
       old_positions.forEach((v, i) => {
         orderedQubits[v] = qubits_new_order[i]
@@ -248,5 +248,12 @@ engine: New owner of qubits and owner of this Command object
       })
     })
     this._controlQubits.forEach(qubit => qubit.engine = ng)
+  }
+
+  equal(other) {
+    if (other instanceof Command) {
+      return this.gate.equal(other.gate) && this.tags == other.tags && this.engine === other.engine && this.allQubits == other.allQubits
+    }
+    return false
   }
 }

@@ -20,8 +20,8 @@ needs to be made explicitely, while for one argument it is optional.
 import {BasicQubit} from '../types/qubit'
 import {Command, applyCommand} from './command'
 
-const ANGLE_PRECISION = 12;
-const ANGLE_TOLERANCE = 10 ** -ANGLE_PRECISION;
+const ANGLE_PRECISION = 12
+const ANGLE_TOLERANCE = 10 ** -ANGLE_PRECISION
 
 // Base class of all gates.
 export class BasicGate {
@@ -61,15 +61,15 @@ self.set_interchangeable_qubit_indices([[0,1],[2,3,4]])
 
      */
   constructor() {
-    this.interchangeableQubitIndices = [];
+    this.interchangeableQubitIndices = []
   }
 
   getInverse() {
-    throw new Error('BasicGate: No get_inverse() implemented.');
+    throw new Error('BasicGate: No get_inverse() implemented.')
   }
 
   getMerged() {
-    throw new Error('BasicGate: No get_merged() implemented.');
+    throw new Error('BasicGate: No get_merged() implemented.')
   }
 
   /*
@@ -102,17 +102,16 @@ Returns:
     Canonical representation (tuple<qureg>): A tuple containing Qureg
 (or list of Qubits) objects.
      */
-  static makeTupleOfQureg(qubits) {
-    if (!Array.isArray(qubits)) {
-      qubits = [qubits];
+  static makeTupleOfQureg(qubits, isTuple = false) {
+    if (!isTuple) {
+      qubits = [qubits]
     }
-
     qubits.forEach((looper, idx) => {
       if (looper instanceof BasicQubit) {
-        qubits[idx] = [looper];
+        qubits[idx] = [looper]
       }
-    });
-    return qubits.slice(0);
+    })
+    return qubits.slice(0)
   }
 
   /*
@@ -126,13 +125,13 @@ Returns:
     A Command object containing the gate and the qubits.
      */
   generateCommand(qubits) {
-    const qs = BasicGate.makeTupleOfQureg(qubits);
-    const engines = [];
+    const qs = BasicGate.makeTupleOfQureg(qubits)
+    const engines = []
     qs.forEach((reg) => {
-      reg.forEach(q => engines.push(q.engine));
-    });
-    const eng = engines[0];
-    return new Command(eng, this, qs);
+      reg.forEach(q => engines.push(q.engine))
+    })
+    const eng = engines[0]
+    return new Command(eng, this, qs)
   }
 
   /*
@@ -150,8 +149,12 @@ Args:
     or a tuple of Qubit or Qureg objects (can be mixed).
      */
   or(qubits) {
-    const cmd = this.generateCommand(qubits);
-    applyCommand(cmd);
+    const cmd = this.generateCommand(qubits)
+    applyCommand(cmd)
+  }
+
+  equal() {
+
   }
 }
 
@@ -170,7 +173,7 @@ Automatic implementation of the get_inverse-member function for self-
  */
 export class SelfInverseGate extends BasicGate {
   getInverse() {
-    return this;
+    return this
   }
 }
 
@@ -194,13 +197,13 @@ angle (float): Angle of rotation (saved modulo 4 * pi)
 
      */
   constructor(angle, ...args) {
-    super(...args);
+    super(...args)
 
-    let rounded_angle = Math.floor(angle % (4.0 * Math.PI), ANGLE_PRECISION);
+    let rounded_angle = Math.floor(angle % (4.0 * Math.PI), ANGLE_PRECISION)
     if (rounded_angle > 4 * Math.PI - ANGLE_TOLERANCE) {
-      rounded_angle = 0.0;
+      rounded_angle = 0.0
     }
-    this.angle = rounded_angle;
+    this.angle = rounded_angle
   }
 
   /*
@@ -209,9 +212,9 @@ object).
      */
   getInverse() {
     if (this.angle == 0) {
-      return new BasicRotationGate(0);
+      return new BasicRotationGate(0)
     } else {
-      return new BasicRotationGate(-this.angle + 4 * Math.PI);
+      return new BasicRotationGate(-this.angle + 4 * Math.PI)
     }
   }
 
@@ -233,9 +236,9 @@ New object representing the merged gates.
      */
   getMerged(other) {
     if (other instanceof BasicRotationGate) {
-      return new BasicRotationGate(this.angle + other.angle);
+      return new BasicRotationGate(this.angle + other.angle)
     }
-    throw new Error('Can\'t merge different types of rotation gates.');
+    throw new Error('Can\'t merge different types of rotation gates.')
   }
 }
 
@@ -257,12 +260,12 @@ export class BasicPhaseGate extends BasicGate {
 angle (float): Angle of rotation (saved modulo 2 * pi)
      */
   constructor(angle, ...args) {
-    super(...args);
-    let rounded_angle = Math.floor(angle % (2.0 * Math.PI), ANGLE_PRECISION);
+    super(...args)
+    let rounded_angle = Math.floor(angle % (2.0 * Math.PI), ANGLE_PRECISION)
     if (rounded_angle > 2 * Math.PI - ANGLE_TOLERANCE) {
-      rounded_angle = 0.0;
+      rounded_angle = 0.0
     }
-    this.angle = rounded_angle;
+    this.angle = rounded_angle
   }
 
   /*
@@ -271,9 +274,9 @@ object).
      */
   getInverse() {
     if (this.angle == 0) {
-      return new BasicPhaseGate(0);
+      return new BasicPhaseGate(0)
     } else {
-      return new BasicPhaseGate(-this.angle + 2 * Math.PI);
+      return new BasicPhaseGate(-this.angle + 2 * Math.PI)
     }
   }
 
@@ -295,9 +298,9 @@ New object representing the merged gates.
      */
   getMerged(other) {
     if (other instanceof BasicPhaseGate) {
-      return new BasicPhaseGate(this.angle + other.angle);
+      return new BasicPhaseGate(this.angle + other.angle)
     }
-    throw new Error('Can\'t merge different types of rotation gates.');
+    throw new Error('Can\'t merge different types of rotation gates.')
   }
 }
 
@@ -401,8 +404,8 @@ return (int(scal * (math.sin(math.pi * a / scal))),)
 return math_fun
      */
   constructor(mathFunc, ...args) {
-    super(...args);
-    this.mathFunc = x => [mathFunc(x)];
+    super(...args)
+    this.mathFunc = x => [mathFunc(x)]
   }
 
   /*
@@ -418,6 +421,6 @@ math_fun (function): Python function describing the action of this
 gate. (See BasicMathGate.__init__ for an example).
      */
   getMathFunction(qubits) {
-    return this.mathFunc;
+    return this.mathFunc
   }
 }
