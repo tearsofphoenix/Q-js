@@ -92,10 +92,10 @@ Tags associated with the command.
   constructor(engine, gate, qubits, controls = [], tags = []) {
     const qs = qubits
     this.gate = gate
-    this._qubits = qs
-    this._controlQubits = controls
-    this._engine = engine
     this.tags = tags
+    this.qubits = qs
+    this.controlQubits = controls
+    this.engine = engine
   }
 
   get qubits() {
@@ -157,7 +157,7 @@ Returns: Ordered tuple of quantum registers
     const orderedQubits = qubits.slice(0)
     const iqi = this.interchangeableQubitIndices
     iqi.forEach((old_positions) => {
-      const new_positions = old_positions.sort((a, b) => orderedQubits[a][0].id - orderedQubits[b][0].id)
+      const new_positions = old_positions.sort((a, b) => orderedQubits[b][0].id - orderedQubits[a][0].id)
       const qubits_new_order = []
       new_positions.forEach(l => qubits_new_order.push(orderedQubits[l]))
 

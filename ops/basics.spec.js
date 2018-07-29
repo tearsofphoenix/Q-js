@@ -12,6 +12,7 @@ import {arrayEqual} from '../utils/polyfill'
 function mainEngine() {
   return new MainEngine(new DummyEngine(), [new DummyEngine()])
 }
+
 describe('basics test', () => {
   it('should basic gate init', () => {
     const basicGate = new BasicGate()

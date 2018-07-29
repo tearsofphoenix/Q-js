@@ -91,7 +91,7 @@ export class ZGate extends SelfInverseGate {
 export const Z = new ZGate()
 
 // S gate class
-class SGate extends BasicGate {
+export class SGate extends SelfInverseGate {
   toString() {
     return 'S'
   }
@@ -277,7 +277,9 @@ on the MainEngine `eng`.
 
  */
 export class FlushGate extends FastForwardingGate {
-
+  toString() {
+    return ''
+  }
 }
 
 // Measurement gate class (for single qubits).
