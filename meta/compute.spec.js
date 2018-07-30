@@ -6,7 +6,9 @@ import {
 // import {} from '../ops/metagates'
 import {MainEngine} from '../cengines/main'
 import {DummyEngine} from '../cengines/testengine'
-import {ComputeEngine} from './compute'
+import {
+  ComputeEngine, UncomputeEngine, Compute, Uncompute, CustomUncompute
+} from './compute'
 
 describe('compute test', () => {
   it('should test compute tag', () => {
@@ -71,91 +73,101 @@ describe('compute test', () => {
     expect(backend.receivedCommands[9].gate.equal(Deallocate)).to.equal(true)
     expect(backend.receivedCommands[9].tags).to.deep.equal([UncomputeTag])
   });
+
+  it('should test uncompute engine', () => {
+    const backend = new DummyEngine(true)
+    const uncompute_engine = new UncomputeEngine()
+    const eng = new MainEngine(backend, [uncompute_engine])
+    const qubit = eng.allocateQubit()
+    H.or(qubit)
+    expect(backend.receivedCommands[0].gate.equal(Allocate)).to.equal(true)
+    expect(backend.receivedCommands[0].tags).to.deep.equal([UncomputeTag])
+    expect(backend.receivedCommands[1].gate.equal(H)).to.equal(true)
+    expect(backend.receivedCommands[1].tags).to.deep.equal([UncomputeTag])
+  });
+
+  it('should test outside qubit deallocated in compute', () => {
+    // Test that there is an error if a qubit is deallocated which has
+    // not been allocated within the with Compute(eng) context
+    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])
+    const qubit = eng.allocateQubit()
+    expect(() => Compute(eng, () => qubit[0].deallocate())).to.throw()
+  });
+
+  it('should test deallocation using custom uncompute', () => {
+    // Test that qubits allocated within Compute and Uncompute
+    // section have all been deallocated
+    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])
+    // # Allowed versions:
+    Compute(eng, () => {
+      const ancilla = eng.allocateQubit()
+      ancilla[0].deallocate()
+    })
+    CustomUncompute(eng, () => {
+      const a2 = eng.allocateQubit()
+      a2[0].deallocate()
+    })
+    Compute(eng, () => {
+      const a3 = eng.allocateQubit()
+      CustomUncompute(eng, () => {
+        a3[0].deallocate()
+      })
+    })
+  });
+
+  it('should test deallocation using custom uncompute2', () => {
+    // Test not allowed version:
+    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])
+    Compute(eng, () => {
+      const a = eng.allocateQubit()
+      expect(() => {
+        CustomUncompute(eng, () => {
+
+        })
+      }).to.throw()
+      H.or(a)
+    })
+  });
+
+  it('should test deallocation using custom uncompute3', () => {
+    // Test not allowed version:
+    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])
+    Compute(eng, () => {
+
+    })
+    let a = null
+    expect(() => {
+      CustomUncompute(eng, () => {
+        a = eng.allocateQubit()
+      })
+    }).to.throw()
+    H.or(a)
+  });
+
+  it('should test automatic deallocation of qubit in uncompute', () => {
+    // Test that automatic uncomputation deallocates qubit
+    // which was created during compute context.
+    const backend = new DummyEngine(true)
+    const eng = new MainEngine(backend, [new DummyEngine()])
+    Compute(eng, () => {
+      const ancilla = eng.allocateQubit()
+      expect(ancilla[0].id).not.to.equal(-1)
+      new Rx(0.6).or(ancilla)
+      // Test that ancilla qubit has been registered in MainEngine.active_qubits
+      expect(eng.activeQubits.has(ancilla[0])).to.equal(true)
+      Uncompute(eng)
+      // Test that ancilla id has been set to -1
+      expect(ancilla[0].id).to.equal(-1)
+      // Test that ancilla is not anymore in active qubits
+      expect(eng.activeQubits.has(ancilla[0])).to.equal(false)
+      expect(backend.receivedCommands[1].gate.equal(new Rx(0.6))).to.equal(true)
+      expect(backend.receivedCommands[2].gate.equal(new Rx(-0.6))).to.equal(true)
+      // Test that there are no additional deallocate gates
+      expect(backend.receivedCommands.length).to.equal(4)
+    })
+  });
 })
 
-// def test_uncompute_engine():
-// backend = DummyEngine(save_commands=True)
-// uncompute_engine = _compute.UncomputeEngine()
-// eng = MainEngine(backend=backend, engine_list=[uncompute_engine])
-// qubit = eng.allocate_qubit()
-// H | qubit
-// assert backend.received_commands[0].gate == Allocate
-// assert backend.received_commands[0].tags == [UncomputeTag]
-// assert backend.received_commands[1].gate == H
-// assert backend.received_commands[1].tags == [UncomputeTag]
-//
-//
-// def test_outside_qubit_deallocated_in_compute():
-// # Test that there is an error if a qubit is deallocated which has
-// # not been allocated within the with Compute(eng) context
-// eng = MainEngine(backend=DummyEngine(), engine_list=[DummyEngine()])
-// qubit = eng.allocate_qubit()
-// with pytest.raises(_compute.QubitManagementError):
-// with _compute.Compute(eng):
-// qubit[0].__del__()
-//
-//
-// def test_deallocation_using_custom_uncompute():
-// # Test that qubits allocated within Compute and Uncompute
-// # section have all been deallocated
-// eng = MainEngine(backend=DummyEngine(), engine_list=[DummyEngine()])
-// # Allowed versions:
-//     with _compute.Compute(eng):
-// ancilla = eng.allocate_qubit()
-// ancilla[0].__del__()
-// with _compute.CustomUncompute(eng):
-// ancilla2 = eng.allocate_qubit()
-// ancilla2[0].__del__()
-// with _compute.Compute(eng):
-// ancilla3 = eng.allocate_qubit()
-// with _compute.CustomUncompute(eng):
-// ancilla3[0].__del__()
-//
-//
-// def test_deallocation_using_custom_uncompute2():
-// # Test not allowed version:
-//     eng = MainEngine(backend=DummyEngine(), engine_list=[DummyEngine()])
-// with _compute.Compute(eng):
-// ancilla = eng.allocate_qubit()
-// with pytest.raises(_compute.QubitManagementError):
-// with _compute.CustomUncompute(eng):
-// pass
-// H | ancilla
-//
-//
-// def test_deallocation_using_custom_uncompute3():
-// # Test not allowed version:
-//     eng = MainEngine(backend=DummyEngine(), engine_list=[DummyEngine()])
-// with _compute.Compute(eng):
-// pass
-// with pytest.raises(_compute.QubitManagementError):
-// with _compute.CustomUncompute(eng):
-// ancilla = eng.allocate_qubit()
-// H | ancilla
-//
-//
-// def test_automatic_deallocation_of_qubit_in_uncompute():
-// # Test that automatic uncomputation deallocates qubit
-// # which was created during compute context.
-//     backend = DummyEngine(save_commands=True)
-// eng = MainEngine(backend=backend, engine_list=[DummyEngine()])
-// with _compute.Compute(eng):
-// ancilla = eng.allocate_qubit()
-// assert ancilla[0].id != -1
-// Rx(0.6) | ancilla
-// # Test that ancilla qubit has been registered in MainEngine.active_qubits
-// assert ancilla[0] in eng.active_qubits
-// _compute.Uncompute(eng)
-// # Test that ancilla id has been set to -1
-// assert ancilla[0].id == -1
-// # Test that ancilla is not anymore in active qubits
-// assert not ancilla[0] in eng.active_qubits
-// assert backend.received_commands[1].gate == Rx(0.6)
-// assert backend.received_commands[2].gate == Rx(-0.6)
-// # Test that there are no additional deallocate gates
-// assert len(backend.received_commands) == 4
-//
-//
 // def test_compute_uncompute_no_additional_qubits():
 // # No ancilla qubit created in compute section
 // backend0 = DummyEngine(save_commands=True)

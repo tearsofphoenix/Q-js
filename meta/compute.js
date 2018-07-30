@@ -341,11 +341,11 @@ export function CustomUncompute(engine, func) {
     }
     // Make copy so there is not reference to compute_eng anymore
     // after __enter__
-    allocatedQubitIDs = compute_eng.allocatedQubitIDs.copy()
-    deallocatedQubitIDs = compute_eng.deallocatedQubitIDs.copy()
+    allocatedQubitIDs = new Set(compute_eng.allocatedQubitIDs)
+    deallocatedQubitIDs = new Set(compute_eng.deallocatedQubitIDs)
     dropEngineAfter(engine)
     // Now add uncompute engine
-    uncomputeEngine = UncomputeEngine()
+    uncomputeEngine = new UncomputeEngine()
     insertEngine(engine, uncomputeEngine)
   }
 
