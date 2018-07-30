@@ -66,3 +66,23 @@ export function arrayEqual(a1, a2, itemCompareFunc) {
   }
   return false
 }
+
+Array.prototype.rforEach = function (callbackFunc) {
+  if (typeof callbackFunc === 'function') {
+    const count = this.length
+    for (let i = count - 1; i >= 0; --i) {
+      callbackFunc(this[i])
+    }
+  }
+}
+
+Array.prototype.rmap = function (callbackFunc) {
+  let result = []
+  if (typeof callbackFunc === 'function') {
+    const count = this.length
+    for (let i = count - 1; i >= 0; --i) {
+      result.push(callbackFunc(this[i]))
+    }
+  }
+  return result
+}

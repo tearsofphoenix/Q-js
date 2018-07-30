@@ -53,7 +53,7 @@ uncompute.
   runUnCompute() {
     // No qubits allocated during Compute section -> do standard uncompute
     if (this.allocatedQubitIDs.size === 0) {
-      const cmds = this._l.reverse().map(cmd => this.addUnComputeTag(cmd.getInverse()))
+      const cmds = this._l.rmap(cmd => this.addUnComputeTag(cmd.getInverse()))
       this.send(cmds)
     }
 
@@ -69,7 +69,7 @@ uncompute.
     // Don't inspect each command as below -> faster uncompute
     // Just find qubits which have been allocated and deallocate them
     if (ids_local_to_compute.size === 0) {
-      this._l.reverse().forEach((cmd) => {
+      this._l.rforEach((cmd) => {
         if (cmd.gate.equal(Allocate)) {
           const qubit_id = cmd.qubits[0][0].id
           // Remove this qubit from MainEngine.active_qubits and
@@ -100,7 +100,7 @@ uncompute.
     // There was at least one qubit allocated and deallocated within
     // compute section. Handle uncompute in most general case
     const new_local_id = {}
-    this._l.reverse().forEach((cmd) => {
+    this._l.rforEach((cmd) => {
       if (cmd.gate.equal(Deallocate)) {
         assert(ids_local_to_compute.has(cmd.qubits[0][0].id))
         // Create new local qubit which lives within uncompute section

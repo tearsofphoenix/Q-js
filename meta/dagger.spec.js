@@ -25,7 +25,7 @@ describe('dagger test', () => {
       CNOT.or(makeTuple(ancilla, qubit))
       H.or(qubit)
       new Rx(-0.6).or(ancilla)
-      delete ancilla[0]
+      ancilla[0].deallocate()
     })
 
     eng.flush(true)

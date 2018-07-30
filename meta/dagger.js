@@ -11,6 +11,7 @@ Rz(0.5) | qubit2
 import {BasicEngine} from '../cengines/basics'
 import {Allocate, Deallocate} from '../ops/gates'
 import {insertEngine, dropEngineAfter} from './util'
+import {setEqual} from '../utils/polyfill';
 
 // Stores all commands and, when done, inverts the circuit & runs it.
 export class DaggerEngine extends BasicEngine {
@@ -26,7 +27,19 @@ export class DaggerEngine extends BasicEngine {
 have been deallocated.
      */
   run() {
-    this.commands.reverse().forEach((cmd) => {
+    if (!setEqual(this.deallocateQubitIDs, this.allocateQubitIDs)) {
+      throw new Error(
+        "\n Error. Qubits have been allocated in 'with "
+          + "Dagger(eng)' context,\n which have not explicitely "
+          + 'been deallocated.\n'
+          + 'Correct usage:\n'
+          + 'with Dagger(eng):\n'
+          + '    qubit = eng.allocate_qubit()\n'
+          + '    ...\n'
+          + '    del qubit[0]\n'
+      )
+    }
+    this.commands.rforEach((cmd) => {
       this.send(cmd.getInverse())
     })
   }
