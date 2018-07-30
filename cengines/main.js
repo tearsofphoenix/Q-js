@@ -2,7 +2,7 @@
 import {BasicEngine} from './basics'
 import {FlushGate} from '../ops/gates'
 import {WeakQubitRef} from '../types/qubit'
-import {BasicMapperEngine} from './basicmapper'
+import BasicMapperEngine from './basicmapper'
 
 /*
 The MainEngine class provides all functionality of the main compiler

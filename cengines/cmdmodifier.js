@@ -11,7 +11,7 @@ CommandModifier is a compiler engine which applies a function to all
 incoming commands, sending on the resulting command instead of the
 original one.
  */
-export class CommandModifier extends BasicEngine {
+export default class CommandModifier extends BasicEngine {
   /*
   Initialize the CommandModifier.
 

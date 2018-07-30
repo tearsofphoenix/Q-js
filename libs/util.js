@@ -17,8 +17,18 @@ export function zeros(n) {
 
 export function arrayIsTuple(value) {
   let isTuple = false
+  if (value.$$__tuple) {
+    isTuple = value.$$__tuple
+    return isTuple
+  }
   if (Array.isArray(value)) {
     isTuple = value.some(item => item instanceof Array)
   }
   return isTuple
+}
+
+export function makeTuple(...args) {
+  const result = new Array(...args)
+  result.$$__tuple = true
+  return result
 }

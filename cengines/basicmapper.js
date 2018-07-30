@@ -8,10 +8,11 @@ logical qubit ids to mapped ids.
 
 import {BasicEngine} from './basics'
 import {LogicalQubitIDTag} from '../meta/logicalqubit'
-import {dropEngineAfter, insertEngine} from "../meta/util"
+import {dropEngineAfter, insertEngine} from '../meta/util'
 import {MeasureGate} from '../ops/gates'
+import {CommandModifier} from './cmdmodifier'
 
-export class BasicMapperEngine extends BasicEngine {
+export default class BasicMapperEngine extends BasicEngine {
   /*
   Parent class for all Mappers.
 
@@ -43,19 +44,21 @@ cmd: Command object with logical qubit ids.
   sendCMDWithMappedIDs(cmd) {
     const newCMD = cmd.copy()
     const qubits = newCMD.qubits
-    qubits.forEach(qureg => {
-      qureg.forEach(qubit => {
+    qubits.forEach((qureg) => {
+      qureg.forEach((qubit) => {
         if (qubit.id !== -1) {
           qubit.id = this.currentMapping[qubit.id]
         }
       })
     })
     const controlQubits = newCMD.controlQubits()
-    controlQubits.forEach(qubit => {
+    controlQubits.forEach((qubit) => {
       qubit.id = this.currentMapping[qubit.id]
     })
     if (newCMD.gate instanceof MeasureGate) {
-      assert(newCMD.qubits.length === 1 && newCMD.qubits[0] === 1)
+      if (!(newCMD.qubits.length === 1 && newCMD.qubits[0] === 1)) {
+        throw new Error('assert error')
+      }
       // Add LogicalQubitIDTag to MeasureGate
       const add_logical_id = function (command, old_tags = cmd.tags) {
         command.tags = (old_tags.push(new LogicalQubitIDTag(cmd.qubits[0][0].id)))

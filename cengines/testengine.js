@@ -1,5 +1,5 @@
 import {BasicEngine} from './basics'
-import {FlushGate} from "../ops/gates";
+import {FlushGate} from '../ops/gates';
 
 /*
 CompareEngine is an engine which saves all commands. It is only intended
@@ -20,7 +20,7 @@ export class CompareEngine extends BasicEngine {
   cacheCMD(cmd) {
     // are there qubit ids that haven't been added to the list?
     const allQubitIDList = []
-    cmd.allQubits.forEach(qureg => {
+    cmd.allQubits.forEach((qureg) => {
       qureg.forEach(qubit => allQubitIDList.push(qubit.id))
     })
     let maxidx = 0
@@ -38,7 +38,7 @@ export class CompareEngine extends BasicEngine {
   }
 
   receive(commandList) {
-    commandList.forEach(cmd => {
+    commandList.forEach((cmd) => {
       if (cmd.gate !== FlushGate) {
         this.cacheCMD(cmd)
       }
