@@ -16,7 +16,7 @@ and upon failure returns a DaggeredGate)
 import math from 'mathjs'
 import {BasicGate} from './basics'
 import {Control} from '../meta/control'
-import {getInverse} from './_cycle'
+import Cycle, {getInverse} from './_cycle'
 
 /*
 Wrapper class allowing to execute the inverse of a gate, even when it does
@@ -50,11 +50,26 @@ gate: Any gate object of which to represent the inverse.
   constructor(gate) {
     super()
     this.gate = gate
-    this.matrix = math.ctranspose(gate.matrix)
+    try {
+      this._matrix = math.ctranspose(gate.matrix)
+    } catch (e) {
+
+    }
   }
 
   getInverse() {
     return this.gate
+  }
+
+  get matrix() {
+    if (!this._matrix) {
+      throw new Error('No this attribute')
+    }
+    return this._matrix
+  }
+
+  toString() {
+    return `${this.gate.toString()}^\dagger`
   }
 }
 
@@ -137,13 +152,21 @@ the gate.
 
     // # Test that there were enough control quregs and that that
     // # the last control qubit was the last qubit in a qureg.
-    if (ctrl.length != this.n) {
+    if (ctrl.length !== this.n) {
       throw new Error('Wrong number of control qubits. '
             + 'First qureg(s) need to contain exactly '
             + 'the required number of control quregs.')
     }
 
     Control(gateQuregs[0][0].engine, ctrl, () => this.gate.or([gateQuregs]))
+  }
+
+  toString() {
+    let prefix = ''
+    for (let i = 0; i < this.n; ++i) {
+      prefix += 'C'
+    }
+    return `${prefix}${this.gate.toString()}`
   }
 }
 

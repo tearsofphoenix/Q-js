@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 import math from 'mathjs'
-import {
+import Gates, {
   HGate,
   H,
   XGate,
@@ -13,8 +13,6 @@ import {
   S,
   TGate,
   T,
-  Tdag,
-  Tdagger,
   SqrtXGate,
   SqrtX,
   Swap,
@@ -38,8 +36,9 @@ import {
   AllocateDirtyQubitGate, AllocateDirty, BarrierGate,
   MeasureGate
 } from './gates'
-import { getInverse } from './metagates'
-
+import './metagates'
+import {getInverse} from './_cycle'
+const {Tdag, Tdagger} = Gates
 const np = math
 const mm = math.matrix
 const mc = math.complex

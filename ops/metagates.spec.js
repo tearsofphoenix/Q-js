@@ -2,10 +2,16 @@ import {expect} from 'chai'
 import math from 'mathjs'
 import { MainEngine } from '../cengines/main'
 import {DummyEngine} from '../cengines/testengine'
+import {Command} from './command'
 
-import { Rx } from './gates'
-import { C, All } from './metagates'
+import {
+  Rx, T, Y, Entangle
+} from './gates'
+import {
+  C, All, DaggeredGate, ControlledGate
+} from './metagates'
 import {Qubit} from '../types/qubit'
+import {getInverse} from './_cycle';
 
 const np = math
 const mm = math.matrix
@@ -20,130 +26,107 @@ describe('metagates test', () => {
     const qubit1 = new Qubit(main_engine, 1)
     const qubit2 = new Qubit(main_engine, 2)
     const target_qubits = [qubit1, qubit2]
-    C(new All(gate)).or(qubit0, target_qubits)
+    C(new All(gate)).or([qubit0, target_qubits])
 
     const array = saving_backend.receivedCommands
     const last = array[array.length - 1]
     console.log(array)
     expect(last.gate.equal(gate)).to.equal(true)
     expect(last.controlQubits.length).to.equal(1)
+  })
+
+  it('should test daggered gate init', () => {
+    // Choose gate which does not have an inverse gate:
+    const not_invertible_gate = T
+    expect(() => not_invertible_gate.getInverse()).to.throw()
+
+    // Choose gate which does have an inverse defined:
+    const invertible_gate = Y
+    expect(invertible_gate.getInverse().equal(Y)).to.equal(true)
+    // Test init and matrix
+    const dagger_inv = new DaggeredGate(not_invertible_gate)
+    expect(dagger_inv.gate.equal(not_invertible_gate)).to.equal(true)
+    const m = mm([[1, 0],
+      [0, np.exp(mc(0, -math.pi / 4))]
+    ])
+    expect(math.deepEqual(dagger_inv.matrix, m)).to.equal(true)
+    const inv = new DaggeredGate(invertible_gate)
+    expect(inv.gate.equal(invertible_gate)).to.equal(true)
+    const m2 = mm([[0, mc(0, -1)], [mc(0, 1), 0]])
+    expect(math.deepEqual(inv.matrix, m2)).to.equal(true)
+    // Test matrix
+    const no_matrix_gate = Entangle
+    expect(() => no_matrix_gate.matrix).to.throw()
+    const inv_no_matrix_gate = new DaggeredGate(no_matrix_gate)
+    expect(() => inv_no_matrix_gate.matrix).to.throw()
+  });
+
+  it('should test daggered gate string', () => {
+    const daggered_gate = new DaggeredGate(Y)
+    expect(daggered_gate.toString()).to.equal(`${Y.toString()}^\dagger`)
+  });
+
+  it('should test daggered gate get inverse', () => {
+    const daggered_gate = new DaggeredGate(Y)
+    expect(daggered_gate.getInverse().equal(Y)).to.equal(true)
+  });
+
+  it('should test daggered gate comparison', () => {
+    const daggered_gate = new DaggeredGate(Y)
+    const daggered_gate2 = new DaggeredGate(Y)
+    expect(daggered_gate.equal(daggered_gate2)).to.equal(true)
+  });
+
+  it('should test get inverse', () => {
+    // Choose gate which does not have an inverse gate:
+    const not_invertible_gate = T
+    expect(() => not_invertible_gate.getInverse()).to.throw()
+    // Choose gate which does have an inverse defined:
+    const invertible_gate = Y
+    expect(invertible_gate.getInverse().equal(Y)).to.equal(true)
+    // Check get_inverse(gate)
+    const inv = getInverse(not_invertible_gate)
+    expect(inv instanceof DaggeredGate && inv.gate.equal(not_invertible_gate)).to.equal(true)
+    const inv2 = getInverse(invertible_gate)
+    expect(inv2.equal(Y)).to.equal(true)
+  });
+
+  it('should test controlled gate init', () => {
+    const one_control = new ControlledGate(Y, 1)
+    const two_control = new ControlledGate(Y, 2)
+    const three_control = new ControlledGate(one_control, 2)
+    expect(one_control.gate.equal(Y)).to.equal(true)
+    expect(one_control.n).to.equal(1)
+    expect(two_control.gate.equal(Y)).to.equal(true)
+    expect(two_control.n).to.equal(2)
+    expect(three_control.gate.equal(Y)).to.equal(true)
+    expect(three_control.n).to.equal(3)
+  });
+
+  it('should test controlled gate string', () => {
+    const c = new ControlledGate(Y, 2)
+    expect(c.toString()).to.equal(`CC${Y.toString()}`)
+  });
+
+  it('should test controlled gate get inverse', () => {
+    const one_control = new ControlledGate(new Rx(0.5), 1)
+    const expected = new ControlledGate(new Rx(-0.5 + 4 * math.pi), 1)
+    expect(one_control.getInverse().equal(expected)).to.equal(true)
+  });
+
+  it('should test controlled gate empty controls', () => {
+    const rec = new DummyEngine(true)
+    const eng = new MainEngine(rec, [])
+
+    const a = eng.allocateQureg(1)
+    new ControlledGate(Y, 0).or([[], a])
+    const cmds = rec.receivedCommands
+    const last = cmds[cmds.length - 1]
+    expect(last.equal(new Command(eng, Y, [a]))).to.equal(true)
   });
 })
 
-//
-// def test_tensored_controlled_gate():
-//
-//
-// def test_daggered_gate_init():
-// # Choose gate which does not have an inverse gate:
-//   not_invertible_gate = T
-// with pytest.raises(NotInvertible):
-// not_invertible_gate.get_inverse()
-// # Choose gate which does have an inverse defined:
-//   invertible_gate = Y
-// assert invertible_gate.get_inverse() == Y
-// # Test init and matrix
-// dagger_inv = _metagates.DaggeredGate(not_invertible_gate)
-// assert dagger_inv._gate == not_invertible_gate
-// assert np.array_equal(dagger_inv.matrix,
-//   np.matrix([[1, 0],
-//     [0, cmath.exp(-1j * cmath.pi / 4)]]))
-// inv = _metagates.DaggeredGate(invertible_gate)
-// assert inv._gate == invertible_gate
-// assert np.array_equal(inv.matrix, np.matrix([[0, -1j], [1j, 0]]))
-// # Test matrix
-// no_matrix_gate = Entangle
-// with pytest.raises(AttributeError):
-// no_matrix_gate.matrix
-// inv_no_matrix_gate = _metagates.DaggeredGate(no_matrix_gate)
-// with pytest.raises(AttributeError):
-// inv_no_matrix_gate.matrix
-//
-//
-// def test_daggered_gate_str():
-// daggered_gate = _metagates.DaggeredGate(Y)
-// assert str(daggered_gate) == str(Y) + "^\dagger"
-//
-//
-// def test_daggered_gate_hashable():
-// daggered_gate1 = _metagates.DaggeredGate(Y)
-// daggered_gate2 = _metagates.DaggeredGate(T)
-// d = {daggered_gate1: 1, daggered_gate2: 3}
-// assert len(d) == 2
-// # for efficiency reasons the following should be true:
-// assert hash(daggered_gate1) != hash(daggered_gate2)
-//
-//
-// def test_daggered_gate_tex_str():
-// daggered_gate = _metagates.DaggeredGate(Y)
-// str_Y = Y.tex_str() if hasattr(Y, 'tex_str') else str(Y)
-// assert daggered_gate.tex_str() == str_Y + "${}^\dagger$"
-//
-// # test for a gate with tex_str method
-// rx = Rx(0.5)
-// daggered_rx = _metagates.DaggeredGate(rx)
-// str_rx = rx.tex_str() if hasattr(rx, 'tex_str') else str(rx)
-// assert daggered_rx.tex_str() == str_rx + "${}^\dagger$"
-//
-//
-// def test_daggered_gate_get_inverse():
-// daggered_gate = _metagates.DaggeredGate(Y)
-// assert daggered_gate.get_inverse() == Y
-//
-//
-// def test_daggered_gate_comparison():
-// daggered_gate = _metagates.DaggeredGate(Y)
-// daggered_gate2 = _metagates.DaggeredGate(Y)
-// assert daggered_gate == daggered_gate2
-//
-//
-// def test_get_inverse():
-// # Choose gate which does not have an inverse gate:
-//   not_invertible_gate = T
-// with pytest.raises(NotInvertible):
-// not_invertible_gate.get_inverse()
-// # Choose gate which does have an inverse defined:
-//   invertible_gate = Y
-// assert invertible_gate.get_inverse() == Y
-// # Check get_inverse(gate)
-// inv = _metagates.get_inverse(not_invertible_gate)
-// assert (isinstance(inv, _metagates.DaggeredGate) and
-// inv._gate == not_invertible_gate)
-// inv2 = _metagates.get_inverse(invertible_gate)
-// assert inv2 == Y
-//
-//
-// def test_controlled_gate_init():
-// one_control = _metagates.ControlledGate(Y, 1)
-// two_control = _metagates.ControlledGate(Y, 2)
-// three_control = _metagates.ControlledGate(one_control, 2)
-// assert one_control._gate == Y
-// assert one_control._n == 1
-// assert two_control._gate == Y
-// assert two_control._n == 2
-// assert three_control._gate == Y
-// assert three_control._n == 3
-//
-//
-// def test_controlled_gate_str():
-// one_control = _metagates.ControlledGate(Y, 2)
-// assert str(one_control) == "CC" + str(Y)
-//
-//
-// def test_controlled_gate_get_inverse():
-// one_control = _metagates.ControlledGate(Rx(0.5), 1)
-// expected = _metagates.ControlledGate(Rx(-0.5 + 4 * math.pi), 1)
-// assert one_control.get_inverse() == expected
-//
-//
 // def test_controlled_gate_empty_controls():
-// rec = DummyEngine(save_commands=True)
-// eng = MainEngine(backend=rec, engine_list=[])
-//
-// a = eng.allocate_qureg(1)
-// _metagates.ControlledGate(Y, 0) | ((), a)
-// assert rec.received_commands[-1] == Command(eng, Y, [a])
-//
 //
 // def test_controlled_gate_or():
 // saving_backend = DummyEngine(save_commands=True)
@@ -158,17 +141,17 @@ describe('metagates test', () => {
 //   controls=[qubit0, qubit1, qubit2])
 // received_commands = []
 // # Option 1:
-// _metagates.ControlledGate(gate, 3) | ([qubit1], [qubit0],
+// new ControlledGate(gate, 3) | ([qubit1], [qubit0],
 //   [qubit2], [qubit3])
 // # Option 2:
-// _metagates.ControlledGate(gate, 3) | (qubit1, qubit0, qubit2, qubit3)
+// new ControlledGate(gate, 3) | (qubit1, qubit0, qubit2, qubit3)
 // # Option 3:
-// _metagates.ControlledGate(gate, 3) | ([qubit1, qubit0], qubit2, qubit3)
+// new ControlledGate(gate, 3) | ([qubit1, qubit0], qubit2, qubit3)
 // # Option 4:
-// _metagates.ControlledGate(gate, 3) | (qubit1, [qubit0, qubit2], qubit3)
+// new ControlledGate(gate, 3) | (qubit1, [qubit0, qubit2], qubit3)
 // # Wrong option 5:
 // with pytest.raises(_metagates.ControlQubitError):
-// _metagates.ControlledGate(gate, 3) | (qubit1, [qubit0, qubit2, qubit3])
+// new ControlledGate(gate, 3) | (qubit1, [qubit0, qubit2, qubit3])
 // # Remove Allocate and Deallocate gates
 // for cmd in saving_backend.received_commands:
 // if not (isinstance(cmd.gate, FastForwardingGate) or
@@ -180,17 +163,17 @@ describe('metagates test', () => {
 //
 //
 // def test_controlled_gate_comparison():
-// gate1 = _metagates.ControlledGate(Y, 1)
-// gate2 = _metagates.ControlledGate(Y, 1)
-// gate3 = _metagates.ControlledGate(T, 1)
-// gate4 = _metagates.ControlledGate(Y, 2)
+// gate1 = new ControlledGate(Y, 1)
+// gate2 = new ControlledGate(Y, 1)
+// gate3 = new ControlledGate(T, 1)
+// gate4 = new ControlledGate(Y, 2)
 // assert gate1 == gate2
 // assert not gate1 == gate3
 // assert gate1 != gate4
 //
 //
 // def test_c():
-// expected = _metagates.ControlledGate(Y, 2)
+// expected = new ControlledGate(Y, 2)
 // assert _metagates.C(Y, 2) == expected
 //
 //

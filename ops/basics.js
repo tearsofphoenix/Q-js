@@ -109,7 +109,7 @@ Returns:
   static makeTupleOfQureg(qubits) {
     let isTuple = false
     if (Array.isArray(qubits)) {
-      isTuple = qubits.some(item => item instanceof Qureg)
+      isTuple = qubits.some(item => item instanceof Array)
     }
     if (!isTuple) {
       qubits = [qubits]

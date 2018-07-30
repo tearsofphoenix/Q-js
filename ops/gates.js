@@ -109,10 +109,6 @@ export class SGate extends SelfInverseGate {
 
 // Shortcut (instance of) :class:`projectq.ops.SGate`
 export const S = new SGate()
-// Shortcut (instance of) :class:`projectq.ops.SGate`
-export const Sdag = getInverse(S)
-
-export const Sdagger = Sdag
 
 // T gate class
 export class TGate extends BasicGate {
@@ -130,10 +126,6 @@ export class TGate extends BasicGate {
 
 // Shortcut (instance of) :class:`projectq.ops.TGate`
 export const T = new TGate()
-// Shortcut (instance of) :class:`projectq.ops.TGate`
-export const Tdag = getInverse(T)
-
-export const Tdagger = Tdag
 
 // Square-root X gate class
 export class SqrtXGate extends BasicGate {
@@ -208,6 +200,10 @@ other qubits).
 export class EntangleGate extends BasicGate {
   toString() {
     return 'Entangle'
+  }
+
+  get matrix() {
+    throw new Error('No Attribute')
   }
 }
 
@@ -370,3 +366,37 @@ export class BarrierGate extends BasicGate {
 
 // Shortcut (instance of) :class:`projectq.ops.BarrierGate`
 Barrier = new BarrierGate()
+
+const obj = {}
+let _sdag = null
+let _tdag = null
+Object.defineProperties(obj, {
+  Sdag: {
+    get() {
+      if (!_sdag) {
+        _sdag = getInverse(S)
+      }
+      return _sdag
+    }
+  },
+  Sdagger: {
+    get() {
+      return obj.Sdag
+    }
+  },
+  Tdag: {
+    get() {
+      if (!_tdag) {
+        _tdag = getInverse(T)
+      }
+      return _tdag
+    }
+  },
+  Tdagger: {
+    get() {
+      return obj.Tdag
+    }
+  }
+})
+
+export default obj
