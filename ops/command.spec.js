@@ -8,6 +8,9 @@ import {
 import {Qubit, Qureg} from '../types/qubit'
 import { Command } from './command'
 import {arrayEqual} from '../utils/polyfill'
+import {makeTuple} from '../libs/util';
+import {Rx} from './gates'
+import {ComputeTag} from '../meta/tag'
 
 
 function mainEngine() {
@@ -15,7 +18,7 @@ function mainEngine() {
 }
 
 describe('command test', () => {
-  it('should command init', function () {
+  it('should command init', () => {
     const main_engine = mainEngine()
     const qureg0 = new Qureg([new Qubit(main_engine, 0)])
     const qureg1 = new Qureg([new Qubit(main_engine, 1)])
@@ -46,182 +49,192 @@ describe('command test', () => {
     })
     expect(symmetric_cmd.engine === main_engine).to.equal(true)
   });
-})
 
-//
-// def test_command_deepcopy(main_engine):
-// qureg0 = Qureg([Qubit(main_engine, 0)])
-// qureg1 = Qureg([Qubit(main_engine, 1)])
-// gate = BasicGate()
-// cmd = _command.Command(main_engine, gate, (qureg0,))
-// cmd.add_control_qubits(qureg1)
-// cmd.tags.append("MyTestTag")
-// copied_cmd = deepcopy(cmd)
-// # Test that deepcopy gives same cmd
-// assert copied_cmd.gate == gate
-// assert copied_cmd.tags == ["MyTestTag"]
-// assert len(copied_cmd.qubits) == 1
-// assert copied_cmd.qubits[0][0].id == qureg0[0].id
-// assert len(copied_cmd.control_qubits) == 1
-// assert copied_cmd.control_qubits[0].id == qureg1[0].id
-// # Engine should not be deepcopied but a reference:
-//   assert id(copied_cmd.engine) == id(main_engine)
-// # Test that deepcopy is actually a deepcopy
-// cmd.tags = ["ChangedTag"]
-// assert copied_cmd.tags == ["MyTestTag"]
-// cmd.control_qubits[0].id == 10
-// assert copied_cmd.control_qubits[0].id == qureg1[0].id
-// cmd.gate = "ChangedGate"
-// assert copied_cmd.gate == gate
-//
-//
-// def test_command_get_inverse(main_engine):
-// qubit = main_engine.allocate_qubit()
-// ctrl_qubit = main_engine.allocate_qubit()
-// cmd = _command.Command(main_engine, Rx(0.5), (qubit,))
-// cmd.add_control_qubits(ctrl_qubit)
-// cmd.tags = [ComputeTag()]
-// inverse_cmd = cmd.get_inverse()
-// assert inverse_cmd.gate == Rx(-0.5 + 4 * math.pi)
-// assert len(cmd.qubits) == len(inverse_cmd.qubits)
-// assert cmd.qubits[0][0].id == inverse_cmd.qubits[0][0].id
-// assert id(cmd.qubits[0][0]) != id(inverse_cmd.qubits[0][0])
-// assert len(cmd.control_qubits) == len(inverse_cmd.control_qubits)
-// assert cmd.control_qubits[0].id == inverse_cmd.control_qubits[0].id
-// assert id(cmd.control_qubits[0]) != id(inverse_cmd.control_qubits[0])
-// assert cmd.tags == inverse_cmd.tags
-// assert id(cmd.tags[0]) != id(inverse_cmd.tags[0])
-// assert id(cmd.engine) == id(inverse_cmd.engine)
-//
-//
-// def test_command_get_merged(main_engine):
-// qubit = main_engine.allocate_qubit()
-// ctrl_qubit = main_engine.allocate_qubit()
-// cmd = _command.Command(main_engine, Rx(0.5), (qubit,))
-// cmd.tags = ["TestTag"]
-// cmd.add_control_qubits(ctrl_qubit)
-// # Merge two commands
-// cmd2 = _command.Command(main_engine, Rx(0.5), (qubit,))
-// cmd2.add_control_qubits(ctrl_qubit)
-// cmd2.tags = ["TestTag"]
-// merged_cmd = cmd.get_merged(cmd2)
-// expected_cmd = _command.Command(main_engine, Rx(1.0), (qubit,))
-// expected_cmd.add_control_qubits(ctrl_qubit)
-// expected_cmd.tags = ["TestTag"]
-// # Don't merge commands as different control qubits
-// cmd3 = _command.Command(main_engine, Rx(0.5), (qubit,))
-// cmd3.tags = ["TestTag"]
-// with pytest.raises(NotMergeable):
-// cmd.get_merged(cmd3)
-// # Don't merge commands as different tags
-// cmd4 = _command.Command(main_engine, Rx(0.5), (qubit,))
-// cmd4.add_control_qubits(ctrl_qubit)
-// with pytest.raises(NotMergeable):
-// cmd.get_merged(cmd4)
-//
-//
-// def test_command_order_qubits(main_engine):
-// qubit0 = Qureg([Qubit(main_engine, 0)])
-// qubit1 = Qureg([Qubit(main_engine, 1)])
-// qubit2 = Qureg([Qubit(main_engine, 2)])
-// qubit3 = Qureg([Qubit(main_engine, 3)])
-// qubit4 = Qureg([Qubit(main_engine, 4)])
-// qubit5 = Qureg([Qubit(main_engine, 5)])
-// gate = BasicGate()
-// gate.interchangeable_qubit_indices = [[0, 4, 5], [1, 2]]
-// input_tuple = (qubit4, qubit5, qubit3, qubit2, qubit1, qubit0)
-// expected_tuple = (qubit0, qubit3, qubit5, qubit2, qubit1, qubit4)
-// cmd = _command.Command(main_engine, gate, input_tuple)
-// for ordered_qubit, expected_qubit in zip(cmd.qubits, expected_tuple):
-// assert ordered_qubit[0].id == expected_qubit[0].id
-//
-//
-// def test_command_interchangeable_qubit_indices(main_engine):
-// gate = BasicGate()
-// gate.interchangeable_qubit_indices = [[0, 4, 5], [1, 2]]
-// qubit0 = Qureg([Qubit(main_engine, 0)])
-// qubit1 = Qureg([Qubit(main_engine, 1)])
-// qubit2 = Qureg([Qubit(main_engine, 2)])
-// qubit3 = Qureg([Qubit(main_engine, 3)])
-// qubit4 = Qureg([Qubit(main_engine, 4)])
-// qubit5 = Qureg([Qubit(main_engine, 5)])
-// input_tuple = (qubit4, qubit5, qubit3, qubit2, qubit1, qubit0)
-// cmd = _command.Command(main_engine, gate, input_tuple)
-// assert (cmd.interchangeable_qubit_indices == [[0, 4, 5], [1, 2]] or
-// cmd.interchangeable_qubit_indices == [[1, 2], [0, 4, 5]])
-//
-//
-// def test_commmand_add_control_qubits(main_engine):
-// qubit0 = Qureg([Qubit(main_engine, 0)])
-// qubit1 = Qureg([Qubit(main_engine, 1)])
-// qubit2 = Qureg([Qubit(main_engine, 2)])
-// cmd = _command.Command(main_engine, Rx(0.5), (qubit0,))
-// cmd.add_control_qubits(qubit2 + qubit1)
-// assert cmd.control_qubits[0].id == 1
-// assert cmd.control_qubits[1].id == 2
-//
-//
-// def test_command_all_qubits(main_engine):
-// qubit0 = Qureg([Qubit(main_engine, 0)])
-// qubit1 = Qureg([Qubit(main_engine, 1)])
-// cmd = _command.Command(main_engine, Rx(0.5), (qubit0,))
-// cmd.add_control_qubits(qubit1)
-// all_qubits = cmd.all_qubits
-// assert all_qubits[0][0].id == 1
-// assert all_qubits[1][0].id == 0
-//
-//
-// def test_command_engine(main_engine):
-// qubit0 = Qureg([Qubit("fake_engine", 0)])
-// qubit1 = Qureg([Qubit("fake_engine", 1)])
-// cmd = _command.Command("fake_engine", Rx(0.5), (qubit0,))
-// cmd.add_control_qubits(qubit1)
-// assert cmd.engine == "fake_engine"
-// cmd.engine = main_engine
-// assert id(cmd.engine) == id(main_engine)
-// assert id(cmd.control_qubits[0].engine) == id(main_engine)
-// assert id(cmd.qubits[0][0].engine) == id(main_engine)
-//
-//
-// def test_command_comparison(main_engine):
-// qubit = Qureg([Qubit(main_engine, 0)])
-// ctrl_qubit = Qureg([Qubit(main_engine, 1)])
-// cmd1 = _command.Command(main_engine, Rx(0.5), (qubit,))
-// cmd1.tags = ["TestTag"]
-// cmd1.add_control_qubits(ctrl_qubit)
-// # Test equality
-// cmd2 = _command.Command(main_engine, Rx(0.5), (qubit,))
-// cmd2.tags = ["TestTag"]
-// cmd2.add_control_qubits(ctrl_qubit)
-// assert cmd2 == cmd1
-// # Test not equal because of tags
-// cmd3 = _command.Command(main_engine, Rx(0.5), (qubit,))
-// cmd3.tags = ["TestTag", "AdditionalTag"]
-// cmd3.add_control_qubits(ctrl_qubit)
-// assert not cmd3 == cmd1
-// # Test not equal because of control qubit
-// cmd4 = _command.Command(main_engine, Rx(0.5), (qubit,))
-// cmd4.tags = ["TestTag"]
-// assert not cmd4 == cmd1
-// # Test not equal because of qubit
-// qubit2 = Qureg([Qubit(main_engine, 2)])
-// cmd5 = _command.Command(main_engine, Rx(0.5), (qubit2,))
-// cmd5.tags = ["TestTag"]
-// cmd5.add_control_qubits(ctrl_qubit)
-// assert cmd5 != cmd1
-// # Test not equal because of engine
-// cmd6 = _command.Command("FakeEngine", Rx(0.5), (qubit,))
-// cmd6.tags = ["TestTag"]
-// cmd6.add_control_qubits(ctrl_qubit)
-// assert cmd6 != cmd1
-//
-//
-// def test_command_str():
-// qubit = Qureg([Qubit(main_engine, 0)])
-// ctrl_qubit = Qureg([Qubit(main_engine, 1)])
-// cmd = _command.Command(main_engine, Rx(0.5), (qubit,))
-// cmd.tags = ["TestTag"]
-// cmd.add_control_qubits(ctrl_qubit)
-// assert str(cmd) == "CRx(0.5) | ( Qureg[1], Qureg[0] )"
-// cmd2 = _command.Command(main_engine, Rx(0.5), (qubit,))
-// assert str(cmd2) == "Rx(0.5) | Qureg[0]"
+  it('should command deepcopy', () => {
+    const main_engine = mainEngine()
+    const qureg0 = new Qureg([new Qubit(main_engine, 0)])
+    const qureg1 = new Qureg([new Qubit(main_engine, 1)])
+    const gate = new BasicGate()
+    const cmd = new Command(main_engine, gate, makeTuple(qureg0))
+    cmd.addControlQubits(qureg1)
+    cmd.tags.push('MyTestTag')
+    const copied_cmd = Object.create(cmd.__proto__)
+    Object.assign(copied_cmd, cmd)
+    // # Test that deepcopy gives same cmd
+    expect(copied_cmd.gate.equal(gate)).to.equal(true)
+    expect(copied_cmd.tags).to.deep.equal(['MyTestTag'])
+    expect(copied_cmd.qubits.length).to.equal(1)
+    expect(copied_cmd.qubits[0][0].id).to.equal(qureg0[0].id)
+    expect(copied_cmd.controlQubits.length).to.equal(1)
+    expect(copied_cmd.controlQubits[0].id).to.equal(qureg1[0].id)
+    // # Engine should not be deepcopied but a reference:
+    expect(copied_cmd.engine === main_engine).to.equal(true)
+    // # Test that deepcopy is actually a deepcopy
+    cmd.tags = ['ChangedTag']
+    expect(copied_cmd.tags).to.deep.equal(['MyTestTag'])
+    cmd.controlQubits[0].id == 10
+    expect(copied_cmd.controlQubits[0].id).to.equal(qureg1[0].id)
+    cmd.gate = 'ChangedGate'
+    expect(copied_cmd.gate.equal(gate)).to.equal(true)
+  });
+
+  it('should test command get inverse', () => {
+    const main_engine = mainEngine()
+    const qubit = main_engine.allocateQubit()
+    const ctrl_qubit = main_engine.allocateQubit()
+    const cmd = new Command(main_engine, new Rx(0.5), makeTuple(qubit))
+    cmd.addControlQubits(ctrl_qubit)
+    cmd.tags = [ComputeTag]
+    const inverse_cmd = cmd.getInverse()
+    expect(inverse_cmd.gate.equal(new Rx(-0.5 + 4 * math.pi))).to.equal(true)
+    expect(cmd.qubits.length).to.equal(inverse_cmd.qubits.length)
+    expect(cmd.qubits[0][0].id).to.equal(inverse_cmd.qubits[0][0].id)
+    expect(cmd.controlQubits.length).to.equal(inverse_cmd.controlQubits.length)
+    expect(cmd.controlQubits[0].id).to.equal(inverse_cmd.controlQubits[0].id)
+    expect(cmd.tags).to.deep.equal(inverse_cmd.tags)
+    expect(cmd.engine === inverse_cmd.engine).to.equal(true)
+  });
+
+  it('should test command merge', () => {
+    const main_engine = mainEngine()
+    const qubit = main_engine.allocateQubit()
+    const ctrl_qubit = main_engine.allocateQubit()
+    const cmd = new Command(main_engine, new Rx(0.5), makeTuple(qubit))
+    cmd.tags = ['TestTag']
+    cmd.addControlQubits(ctrl_qubit)
+    // # Merge two commands
+    const cmd2 = new Command(main_engine, new Rx(0.5), makeTuple(qubit))
+    cmd2.addControlQubits(ctrl_qubit)
+    cmd2.tags = ['TestTag']
+    const merged_cmd = cmd.getMerged(cmd2)
+    const expected_cmd = new Command(main_engine, new Rx(1.0), makeTuple(qubit))
+    expected_cmd.addControlQubits(ctrl_qubit)
+    expected_cmd.tags = ['TestTag']
+    expect(merged_cmd.equal(expected_cmd)).to.equal(true)
+
+    // # Don't merge commands as different control qubits
+    const cmd3 = new Command(main_engine, new Rx(0.5), makeTuple(qubit))
+    cmd3.tags = ['TestTag']
+    expect(() => cmd.getMerged(cmd3)).to.throw()
+    // # Don't merge commands as different tags
+    const cmd4 = new Command(main_engine, new Rx(0.5), makeTuple(qubit))
+    cmd4.addControlQubits(ctrl_qubit)
+    expect(() => cmd.getMerged(cmd4)).to.throw()
+  });
+
+  it('should test command order qubits', () => {
+    const main_engine = mainEngine()
+    const qubit0 = new Qureg([new Qubit(main_engine, 0)])
+    const qubit1 = new Qureg([new Qubit(main_engine, 1)])
+    const qubit2 = new Qureg([new Qubit(main_engine, 2)])
+    const qubit3 = new Qureg([new Qubit(main_engine, 3)])
+    const qubit4 = new Qureg([new Qubit(main_engine, 4)])
+    const qubit5 = new Qureg([new Qubit(main_engine, 5)])
+    const gate = new BasicGate()
+    gate.interchangeableQubitIndices = [[0, 4, 5], [1, 2]]
+    const input_tuple = makeTuple(qubit4, qubit5, qubit3, qubit2, qubit1, qubit0)
+    const expected_tuple = makeTuple(qubit0, qubit3, qubit5, qubit2, qubit1, qubit4)
+    const cmd = new Command(main_engine, gate, input_tuple)
+    cmd.qubits.forEach((ordered_qubit, idx) => {
+      const expected_qubit = expected_tuple[idx]
+      expect(ordered_qubit[0].id).to.equal(expected_qubit[0].id)
+    })
+  });
+
+  it('should test command interchangeable_qubit_indices', () => {
+    const main_engine = mainEngine()
+    const gate = new BasicGate()
+    gate.interchangeableQubitIndices = [[0, 4, 5], [1, 2]]
+    const qubit0 = new Qureg([new Qubit(main_engine, 0)])
+    const qubit1 = new Qureg([new Qubit(main_engine, 1)])
+    const qubit2 = new Qureg([new Qubit(main_engine, 2)])
+    const qubit3 = new Qureg([new Qubit(main_engine, 3)])
+    const qubit4 = new Qureg([new Qubit(main_engine, 4)])
+    const qubit5 = new Qureg([new Qubit(main_engine, 5)])
+    const input_tuple = makeTuple(qubit4, qubit5, qubit3, qubit2, qubit1, qubit0)
+    const cmd = new Command(main_engine, gate, input_tuple)
+    expect(cmd.interchangeableQubitIndices).to.deep.equal([[0, 4, 5], [1, 2]])
+  });
+
+  it('should test command add control qubits', () => {
+    const main_engine = mainEngine()
+    const qubit0 = new Qureg([new Qubit(main_engine, 0)])
+    const qubit1 = new Qureg([new Qubit(main_engine, 1)])
+    const qubit2 = new Qureg([new Qubit(main_engine, 2)])
+    const cmd = new Command(main_engine, new Rx(0.5), makeTuple(qubit0))
+    cmd.addControlQubits(qubit2.concat(qubit1))
+    expect(cmd.controlQubits[0].id).to.equal(1)
+    expect(cmd.controlQubits[1].id).to.equal(2)
+  });
+
+  it('should test command all qubits', () => {
+    const main_engine = mainEngine()
+    const qubit0 = new Qureg([new Qubit(main_engine, 0)])
+    const qubit1 = new Qureg([new Qubit(main_engine, 1)])
+    const cmd = new Command(main_engine, new Rx(0.5), makeTuple(qubit0))
+    cmd.addControlQubits(qubit1)
+    const all_qubits = cmd.allQubits
+    expect(all_qubits[0][0].id).to.equal(1)
+    expect(all_qubits[1][0].id).to.equal(0)
+  });
+
+  it('should test command engine', () => {
+    const main_engine = mainEngine()
+    const qubit0 = new Qureg([new Qubit('fake_engine', 0)])
+    const qubit1 = new Qureg([new Qubit('fake_engine', 1)])
+    const cmd = new Command('fake_engine', new Rx(0.5), makeTuple(qubit0))
+    cmd.addControlQubits(qubit1)
+    expect(cmd.engine).to.equal('fake_engine')
+    cmd.engine = main_engine
+    expect(cmd.engine === main_engine).to.equal(true)
+    expect(cmd.controlQubits[0].engine === main_engine).to.equal(true)
+    expect(cmd.qubits[0][0].engine === main_engine).to.equal(true)
+  });
+
+  it('should test command comparison', () => {
+    const main_engine = mainEngine()
+    const qubit = new Qureg([new Qubit(main_engine, 0)])
+    const ctrl_qubit = new Qureg([new Qubit(main_engine, 1)])
+    const cmd1 = new Command(main_engine, new Rx(0.5), makeTuple(qubit))
+    cmd1.tags = ['TestTag']
+    cmd1.addControlQubits(ctrl_qubit)
+    // Test equality
+    const cmd2 = new Command(main_engine, new Rx(0.5), makeTuple(qubit))
+    cmd2.tags = ['TestTag']
+    cmd2.addControlQubits(ctrl_qubit)
+
+    expect(cmd2.equal(cmd1)).to.equal(true)
+    // Test not equal because of tags
+    const cmd3 = new Command(main_engine, new Rx(0.5), makeTuple(qubit))
+    cmd3.tags = ['TestTag', 'AdditionalTag']
+    cmd3.addControlQubits(ctrl_qubit)
+    expect(cmd3.equal(cmd1)).to.equal(false)
+
+    // Test not equal because of control qubit
+    const cmd4 = new Command(main_engine, new Rx(0.5), makeTuple(qubit))
+    cmd4.tags = ['TestTag']
+    expect(cmd4.equal(cmd1)).to.equal(false)
+    // Test not equal because of qubit
+    const qubit2 = new Qureg([new Qubit(main_engine, 2)])
+    const cmd5 = new Command(main_engine, new Rx(0.5), makeTuple(qubit2))
+    cmd5.tags = ['TestTag']
+    cmd5.addControlQubits(ctrl_qubit)
+    expect(cmd5.equal(cmd1)).to.equal(false)
+    // Test not equal because of engine
+    const cmd6 = new Command('FakeEngine', new Rx(0.5), makeTuple(qubit))
+    cmd6.tags = ['TestTag']
+    cmd6.addControlQubits(ctrl_qubit)
+    expect(cmd6.equal(cmd1)).to.equal(false)
+  });
+  it('should test command string', () => {
+    const main_engine = mainEngine()
+    const qubit = new Qureg([new Qubit(main_engine, 0)])
+    const ctrl_qubit = new Qureg([new Qubit(main_engine, 1)])
+    const cmd = new Command(main_engine, new Rx(0.5), makeTuple(qubit))
+    cmd.tags = ['TestTag']
+    cmd.addControlQubits(ctrl_qubit)
+    expect(cmd.toString()).to.equal('CRx(0.5) | ( Qureg[1], Qureg[0] )')
+    const cmd2 = new Command(main_engine, new Rx(0.5), makeTuple(qubit))
+    expect(cmd2.toString()).to.equal('Rx(0.5) | Qureg[0]')
+  });
+})

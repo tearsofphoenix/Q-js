@@ -49,7 +49,7 @@ cmd (Command object): a command object.
     if (!this.hasComputeUnComputeTag(cmd) && !(cmd.gate instanceof ClassicalInstructionGate)) {
       cmd.addControlQubits(this.qubits)
     }
-    this.send(cmd)
+    this.send([cmd])
   }
 
   receive(commandList) {

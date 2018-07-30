@@ -7,10 +7,10 @@ logical qubit ids to mapped ids.
 */
 
 import {BasicEngine} from './basics'
-import {LogicalQubitIDTag} from '../meta/logicalqubit'
+import {LogicalQubitIDTag} from '../meta/tag'
 import {dropEngineAfter, insertEngine} from '../meta/util'
 import {MeasureGate} from '../ops/gates'
-import {CommandModifier} from './cmdmodifier'
+import CommandModifier from './cmdmodifier'
 
 export default class BasicMapperEngine extends BasicEngine {
   /*

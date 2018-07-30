@@ -5,11 +5,15 @@ annotate Compute / Action / Uncompute sections, facilitating the conditioning
 of the entire operation on the value of a qubit / register (only Action needs
 controls). This file also defines the corresponding meta tags.
 */
+import assert from 'assert'
 import {BasicEngine} from '../cengines/basics'
+import CommandModifier from '../cengines/cmdmodifier'
 import {ComputeTag, UncomputeTag} from './tag'
 import {dropEngineAfter, insertEngine} from './util';
 import {Allocate, Deallocate} from '../ops/gates';
-import {unionSet, setEqual, setIsSuperSet} from '../utils/polyfill'
+import {
+  unionSet, setEqual, setIsSuperSet, intersection, symmetricDifference
+} from '../utils/polyfill'
 
 /*
 Adds Compute-tags to all commands and stores them (to later uncompute them
@@ -52,6 +56,116 @@ uncompute.
       const cmds = this._l.reverse().map(cmd => this.addUnComputeTag(cmd.getInverse()))
       this.send(cmds)
     }
+
+
+    // qubits ids which were allocated and deallocated in Compute section
+    const ids_local_to_compute = intersection(this.allocatedQubitIDs, this.deallocatedQubitIDs)
+    // qubit ids which were allocated but not yet deallocated in
+    // Compute section
+    // TODO: why need to calculate this???
+    // const ids_still_alive = symmetricDifference(this.allocatedQubitIDs, this.deallocatedQubitIDs)
+
+    // No qubits allocated and already deallocated during compute.
+    // Don't inspect each command as below -> faster uncompute
+    // Just find qubits which have been allocated and deallocate them
+    if (ids_local_to_compute.size === 0) {
+      this._l.reverse().forEach((cmd) => {
+        if (cmd.gate.equal(Allocate)) {
+          const qubit_id = cmd.qubits[0][0].id
+          // Remove this qubit from MainEngine.active_qubits and
+          // set qubit.id to = -1 in Qubit object such that it won't
+          // send another deallocate when it goes out of scope
+          let qubit_found = false
+          for (const active_qubit of this.main.activeQubits) {
+            if (active_qubit.id === qubit_id) {
+              active_qubit.id = -1
+              active_qubit.deallocate()
+              qubit_found = true
+              break
+            }
+          }
+
+          if (!qubit_found) {
+            throw new Error('\nQubit was not found in '
+                + 'MainEngine.active_qubits.\n')
+          }
+          this.send([this.addUnComputeTag(cmd.getInverse())])
+        } else {
+          this.send([this.addUnComputeTag(cmd.getInverse())])
+        }
+      })
+      return
+    }
+
+    // There was at least one qubit allocated and deallocated within
+    // compute section. Handle uncompute in most general case
+    const new_local_id = {}
+    this._l.reverse().forEach((cmd) => {
+      if (cmd.gate.equal(Deallocate)) {
+        assert(ids_local_to_compute.has(cmd.qubits[0][0].id))
+        // Create new local qubit which lives within uncompute section
+
+        // Allocate needs to have old tags + uncompute tag
+        const add_uncompute = (command, old_tags = cmd.tags.slice(0)) => {
+          command.tags = old_tags.push(UncomputeTag)
+          return command
+        }
+        const tagger_eng = new CommandModifier(add_uncompute)
+        insertEngine(this, tagger_eng)
+        const new_local_qb = this.allocateQubit()
+        dropEngineAfter(this)
+
+        new_local_id[cmd.qubits[0][0].id] = new_local_qb[0].id
+        // Set id of new_local_qb to -1 such that it doesn't send a
+        // deallocate gate
+        new_local_qb[0].id = -1
+      } else if (cmd.gate.equal(Allocate)) {
+        // Deallocate qubit
+        if (ids_local_to_compute.has(cmd.qubits[0][0].id)) {
+          // Deallocate local qubit and remove id from new_local_id
+          const old_id = cmd.qubits[0][0].id
+          cmd.qubits[0][0].id = new_local_id[cmd.qubits[0][0].id]
+          delete new_local_id[old_id]
+          this.send([this.addUnComputeTag(cmd.getInverse())])
+        } else {
+          // Deallocate qubit which was allocated in compute section:
+          const qubit_id = cmd.qubits[0][0].id
+          // Remove this qubit from MainEngine.active_qubits and
+          // set qubit.id to = -1 in Qubit object such that it won't
+          // send another deallocate when it goes out of scope
+          let qubit_found = false
+          for (const active_qubit of this.main.activeQubits) {
+            if (active_qubit.id === qubit_id) {
+              active_qubit.id = -1
+              active_qubit.deallocate()
+              qubit_found = true
+              break
+            }
+          }
+          if (!qubit_found) {
+            throw new Error(
+              '\nQubit was not found in '
+            + 'MainEngine.active_qubits.\n'
+            )
+          }
+          this.send([this.addUnComputeTag(cmd.getInverse())])
+        }
+      } else {
+        // Process commands by replacing each local qubit from
+        // compute section with new local qubit from the uncompute
+        // section
+        if (Object.keys(new_local_id).length > 0) { // Only if we still have local qubits
+          cmd.allQubits.forEach((qureg) => {
+            qureg.forEach((qubit) => {
+              if (new_local_id[qubit.id]) {
+                qubit.id = new_local_id[qubit.id]
+              }
+            })
+          })
+        }
+        this.send([this.addUnComputeTag(cmd.getInverse())])
+      }
+    })
   }
 
   /*
@@ -98,104 +212,6 @@ command_list (list<Command>): List of commands to receive.
     this.send(commandList)
   }
 }
-//
-// # qubits ids which were allocated and deallocated in Compute section
-// ids_local_to_compute = self._allocated_qubit_ids.intersection(
-//     self._deallocated_qubit_ids)
-// # qubit ids which were allocated but not yet deallocated in
-// # Compute section
-// ids_still_alive = self._allocated_qubit_ids.difference(
-//     self._deallocated_qubit_ids)
-//
-// # No qubits allocated and already deallocated during compute.
-//     # Don't inspect each command as below -> faster uncompute
-// # Just find qubits which have been allocated and deallocate them
-// if len(ids_local_to_compute) == 0:
-// for cmd in reversed(self._l):
-// if cmd.gate == Allocate:
-// qubit_id = cmd.qubits[0][0].id
-// # Remove this qubit from MainEngine.active_qubits and
-// # set qubit.id to = -1 in Qubit object such that it won't
-// # send another deallocate when it goes out of scope
-// qubit_found = False
-// for active_qubit in self.main_engine.active_qubits:
-// if active_qubit.id == qubit_id:
-// active_qubit.id = -1
-// active_qubit.__del__()
-// qubit_found = True
-// break
-// if not qubit_found:
-//     raise QubitManagementError(
-//     "\nQubit was not found in " +
-//     "MainEngine.active_qubits.\n")
-// self.send([self._add_uncompute_tag(cmd.get_inverse())])
-// else:
-// self.send([self._add_uncompute_tag(cmd.get_inverse())])
-// return
-// # There was at least one qubit allocated and deallocated within
-// # compute section. Handle uncompute in most general case
-// new_local_id = dict()
-// for cmd in reversed(self._l):
-// if cmd.gate == Deallocate:
-// assert (cmd.qubits[0][0].id) in ids_local_to_compute
-// # Create new local qubit which lives within uncompute section
-//
-// # Allocate needs to have old tags + uncompute tag
-// def add_uncompute(command, old_tags=deepcopy(cmd.tags)):
-// command.tags = old_tags + [UncomputeTag()]
-// return command
-// tagger_eng = projectq.cengines.CommandModifier(add_uncompute)
-// insert_engine(self, tagger_eng)
-// new_local_qb = self.allocate_qubit()
-// drop_engine_after(self)
-//
-// new_local_id[cmd.qubits[0][0].id] = deepcopy(
-//     new_local_qb[0].id)
-// # Set id of new_local_qb to -1 such that it doesn't send a
-// # deallocate gate
-// new_local_qb[0].id = -1
-//
-// elif cmd.gate == Allocate:
-// # Deallocate qubit
-// if cmd.qubits[0][0].id in ids_local_to_compute:
-// # Deallocate local qubit and remove id from new_local_id
-// old_id = deepcopy(cmd.qubits[0][0].id)
-// cmd.qubits[0][0].id = new_local_id[cmd.qubits[0][0].id]
-// del new_local_id[old_id]
-// self.send([self._add_uncompute_tag(cmd.get_inverse())])
-//
-// else:
-// # Deallocate qubit which was allocated in compute section:
-//     qubit_id = cmd.qubits[0][0].id
-// # Remove this qubit from MainEngine.active_qubits and
-// # set qubit.id to = -1 in Qubit object such that it won't
-// # send another deallocate when it goes out of scope
-// qubit_found = False
-// for active_qubit in self.main_engine.active_qubits:
-// if active_qubit.id == qubit_id:
-// active_qubit.id = -1
-// active_qubit.__del__()
-// qubit_found = True
-// break
-// if not qubit_found:
-//     raise QubitManagementError(
-//     "\nQubit was not found in " +
-//     "MainEngine.active_qubits.\n")
-// self.send([self._add_uncompute_tag(cmd.get_inverse())])
-//
-// else:
-// # Process commands by replacing each local qubit from
-// # compute section with new local qubit from the uncompute
-// # section
-// if new_local_id:  # Only if we still have local qubits
-// for qureg in cmd.all_qubits:
-// for qubit in qureg:
-// if qubit.id in new_local_id:
-// qubit.id = new_local_id[qubit.id]
-//
-// self.send([self._add_uncompute_tag(cmd.get_inverse())])
-//
-
 
 export class UncomputeEngine extends BasicEngine {
   constructor() {

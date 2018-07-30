@@ -256,7 +256,7 @@ New object representing the merged gates.
   }
 
   toString() {
-    return `BasicRotationGate(${this.angle})`
+    return `${this.constructor.name}(${this.angle})`
   }
 
   equal(other) {

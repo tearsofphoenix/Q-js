@@ -25,6 +25,7 @@ apply wrapper (apply_command).
 */
 import {arrayEqual} from '../utils/polyfill'
 import {getInverse} from './_cycle'
+import {Qureg} from '../types/qubit';
 
 /*
 Apply a command.
@@ -136,7 +137,7 @@ Raises:
 or can't be merged for other reasons.
      */
   getMerged(other) {
-    if (this.tags == other.tags && this.allQubits == other.allQubits && this.engine == other.engine) {
+    if (arrayEqual(this.tags, other.tags) && arrayEqual(this.allQubits, other.allQubits) && this.engine === other.engine) {
       return new Command(this.engine, this.gate.getMerged(other.gate), this.qubits, this.controlQubits, this.tags.slice(0))
     }
 
@@ -224,7 +225,7 @@ WeakQubitRef objects) containing the control qubits and T[1:] contains
 the quantum registers to which the gate is applied.
      */
   get allQubits() {
-    return [this._controlQubits, this.qubits]
+    return [this._controlQubits].concat(this.qubits)
   }
 
   get engine() {
@@ -257,5 +258,30 @@ engine: New owner of qubits and owner of this Command object
       return f1 && t1 && e1 && b
     }
     return false
+  }
+
+  toString() {
+    let {qubits} = this
+    const ctrlqubits = this.controlQubits
+
+    if (ctrlqubits.length > 0) {
+      qubits = [ctrlqubits].concat(qubits)
+    }
+    let qs = ''
+    if (qubits.length === 1) {
+      qs = new Qureg(qubits[0]).toString()
+    } else {
+      qs = '( '
+      qubits.forEach((qreg) => {
+        qs += new Qureg(qreg).toString()
+        qs += ', '
+      })
+      qs = `${qs.substring(0, qs.length - 2)} )`
+    }
+    let cs = ''
+    for (let i = 0; i < ctrlqubits.length; ++i) {
+      cs += 'C'
+    }
+    return `${cs}${this.gate.toString()} | ${qs}`
   }
 }
