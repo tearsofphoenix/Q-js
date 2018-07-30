@@ -1,4 +1,1 @@
-
-export const DirtyQubitTag = 'DirtyQubitTag'
-
-export default DirtyQubitTag
+// leave it empty

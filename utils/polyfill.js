@@ -11,8 +11,11 @@ export function intersection(s1, s2) {
   return new Set([...s1].filter(x => s2.has(x)))
 }
 
-export function union(s1, s2) {
-
+export function unionSet(s1, s2) {
+  const s = [...s2].filter(x => !s1.has(x))
+  const result = new Set(s1)
+  s.forEach(x => result.add(x))
+  return result
 }
 
 export function symmetricDifference(s1, s2) {
@@ -20,6 +23,15 @@ export function symmetricDifference(s1, s2) {
   const a = [...s1].filter(x => !inset.has(x))
   const b = [...s2].filter(x => !inset.has(x))
   return new Set([...a, ...b])
+}
+
+export function setEqual(s1, s2) {
+  return symmetricDifference(s1, s2).size === 0
+}
+
+export function setIsSuperSet(superset, s) {
+  const result = [...s].filter(x => !superset.has(x))
+  return result.length === 0
 }
 
 export function arrayEqual(a1, a2, itemCompareFunc) {

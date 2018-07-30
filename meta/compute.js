@@ -6,14 +6,10 @@ of the entire operation on the value of a qubit / register (only Action needs
 controls). This file also defines the corresponding meta tags.
 */
 import {BasicEngine} from '../cengines/basics'
-
-export class ComputeTag {
-
-}
-
-export class UncomputeTag {
-
-}
+import {ComputeTag, UncomputeTag} from './tag'
+import {dropEngineAfter, insertEngine} from './util';
+import {Allocate, Deallocate} from '../ops/gates';
+import {unionSet, setEqual, setIsSuperSet} from '../utils/polyfill'
 
 /*
 Adds Compute-tags to all commands and stores them (to later uncompute them
@@ -25,8 +21,8 @@ export class ComputeEngine extends BasicEngine {
     this._l = []
     this._compute = true
     // Save all qubit ids from qubits which are created or destroyed.
-    this._allocatedQubitIDS = new Set()
-    this._deallocatedQubitIDS = new Set()
+    this.allocatedQubitIDs = new Set()
+    this.deallocatedQubitIDs = new Set()
   }
 
   /*
@@ -36,7 +32,7 @@ export class ComputeEngine extends BasicEngine {
 cmd (Command): Command to modify.
      */
   addUnComputeTag(cmd) {
-    cmd.tags.push(new UncomputeTag())
+    cmd.tags.push(UncomputeTag)
     return cmd
   }
 
@@ -52,10 +48,54 @@ uncompute.
      */
   runUnCompute() {
     // No qubits allocated during Compute section -> do standard uncompute
-    if (this._allocatedQubitIDS.size === 0) {
+    if (this.allocatedQubitIDs.size === 0) {
       const cmds = this._l.reverse().map(cmd => this.addUnComputeTag(cmd.getInverse()))
       this.send(cmds)
     }
+  }
+
+  /*
+End the compute step (exit the with Compute() - statement).
+
+Will tell the Compute-engine to stop caching. It then waits for the
+    uncompute instruction, which is when it sends all cached commands
+inverted and in reverse order down to the next compiler engine.
+
+    Raises:
+QubitManagementError: If qubit has been deallocated in Compute
+section which has not been allocated in Compute section
+*/
+  endCompute() {
+    this._compute = false
+    if (!setIsSuperSet(this.allocatedQubitIDs, this.deallocatedQubitIDs)) {
+      throw new Error(
+        '\nQubit has been deallocated in with Compute(eng) context \n'
+    + 'which has not been allocated within this Compute section'
+      )
+    }
+  }
+
+  /*
+  If in compute-mode: Receive commands and store deepcopy of each cmd.
+    Add ComputeTag to received cmd and send it on.
+    Otherwise: send all received commands directly to next_engine.
+
+    Args:
+command_list (list<Command>): List of commands to receive.
+   */
+  receive(commandList) {
+    if (this._compute) {
+      commandList.forEach((cmd) => {
+        if (cmd.gate.equal(Allocate)) {
+          this.allocatedQubitIDs.add(cmd.qubits[0][0].id)
+        } else if (cmd.gate.equal(Deallocate)) {
+          this.deallocatedQubitIDs.add(cmd.qubits[0][0].id)
+        }
+        this._l.push(cmd.copy())
+        cmd.tags.push(ComputeTag)
+      })
+    }
+    this.send(commandList)
   }
 }
 //
@@ -155,236 +195,187 @@ uncompute.
 //
 // self.send([self._add_uncompute_tag(cmd.get_inverse())])
 //
-// def end_compute(self):
-// """
-// End the compute step (exit the with Compute() - statement).
-//
-// Will tell the Compute-engine to stop caching. It then waits for the
-//     uncompute instruction, which is when it sends all cached commands
-// inverted and in reverse order down to the next compiler engine.
-//
-//     Raises:
-// QubitManagementError: If qubit has been deallocated in Compute
-// section which has not been allocated in Compute section
-// """
-// self._compute = False
-// if not self._allocated_qubit_ids.issuperset(
-//     self._deallocated_qubit_ids):
-// raise QubitManagementError(
-//     "\nQubit has been deallocated in with Compute(eng) context \n"
-// "which has not been allocated within this Compute section")
-//
-// def receive(self, command_list):
-// """
-// If in compute-mode: Receive commands and store deepcopy of each cmd.
-//     Add ComputeTag to received cmd and send it on.
-//     Otherwise: send all received commands directly to next_engine.
-//
-//     Args:
-// command_list (list<Command>): List of commands to receive.
-// """
-// if self._compute:
-// for cmd in command_list:
-// if cmd.gate == Allocate:
-// self._allocated_qubit_ids.add(cmd.qubits[0][0].id)
-// elif cmd.gate == Deallocate:
-// self._deallocated_qubit_ids.add(cmd.qubits[0][0].id)
-// self._l.append(deepcopy(cmd))
-// tags = cmd.tags
-// tags.append(ComputeTag())
-// self.send(command_list)
-// else:
-// self.send(command_list)
-//
-//
-// class UncomputeEngine(BasicEngine):
-// """
-// Adds Uncompute-tags to all commands.
-// """
-// def __init__(self):
-// """
-// Initialize a UncomputeEngine.
-// """
-// BasicEngine.__init__(self)
-// # Save all qubit ids from qubits which are created or destroyed.
-//     self._allocated_qubit_ids = set()
-// self._deallocated_qubit_ids = set()
-//
-// def receive(self, command_list):
-// """
-// Receive commands and add an UncomputeTag to their tags.
-//
-//     Args:
-// command_list (list<Command>): List of commands to handle.
-// """
-// for cmd in command_list:
-// if cmd.gate == Allocate:
-// self._allocated_qubit_ids.add(cmd.qubits[0][0].id)
-// elif cmd.gate == Deallocate:
-// self._deallocated_qubit_ids.add(cmd.qubits[0][0].id)
-// tags = cmd.tags
-// tags.append(UncomputeTag())
-// self.send([cmd])
-//
-//
-// class Compute(object):
-// """
-// Start a compute-section.
-//
-//     Example:
-// .. code-block:: python
-//
-// with Compute(eng):
-// do_something(qubits)
-// action(qubits)
-// Uncompute(eng) # runs inverse of the compute section
-//
-// Warning:
-//     If qubits are allocated within the compute section, they must either be
-// uncomputed and deallocated within that section or, alternatively,
-//     uncomputed and deallocated in the following uncompute section.
-//
-//     This means that the following examples are valid:
-//
-//     .. code-block:: python
-//
-// with Compute(eng):
-// anc = eng.allocate_qubit()
-// do_something_with_ancilla(anc)
-// ...
-// uncompute_ancilla(anc)
-// del anc
-//
-// do_something_else(qubits)
-//
-// Uncompute(eng)  # will allocate a new ancilla (with a different id)
-// # and then deallocate it again
-//
-//     .. code-block:: python
-//
-// with Compute(eng):
-// anc = eng.allocate_qubit()
-// do_something_with_ancilla(anc)
-// ...
-//
-// do_something_else(qubits)
-//
-// Uncompute(eng)  # will deallocate the ancilla!
-//
-//     After the uncompute section, ancilla qubits allocated within the
-// compute section will be invalid (and deallocated). The same holds when
-// using CustomUncompute.
-//
-//     Failure to comply with these rules results in an exception being
-// thrown.
-// """
-//
-// def __init__(self, engine):
-// """
-// Initialize a Compute context.
-//
-//     Args:
-// engine (BasicEngine): Engine which is the first to receive all
-// commands (normally: MainEngine).
-// """
-// self.engine = engine
-// self._compute_eng = None
-//
-// def __enter__(self):
-// self._compute_eng = ComputeEngine()
-// insert_engine(self.engine, self._compute_eng)
-//
-// def __exit__(self, type, value, traceback):
-// # notify ComputeEngine that the compute section is done
-// self._compute_eng.end_compute()
-// self._compute_eng = None
-//
-//
-// class CustomUncompute(object):
-// """
-// Start a custom uncompute-section.
-//
-//     Example:
-// .. code-block:: python
-//
-// with Compute(eng):
-// do_something(qubits)
-// action(qubits)
-// with CustomUncompute(eng):
-// do_something_inverse(qubits)
-//
-// Raises:
-//     QubitManagementError: If qubits are allocated within Compute or within
-// CustomUncompute context but are not deallocated.
-// """
-//
-// def __init__(self, engine):
-// """
-// Initialize a CustomUncompute context.
-//
-//     Args:
-// engine (BasicEngine): Engine which is the first to receive all
-// commands (normally: MainEngine).
-// """
-// self.engine = engine
-// # Save all qubit ids from qubits which are created or destroyed.
-//     self._allocated_qubit_ids = set()
-// self._deallocated_qubit_ids = set()
-//
-// def __enter__(self):
-// # first, remove the compute engine
-// compute_eng = self.engine.next_engine
-// if not isinstance(compute_eng, ComputeEngine):
-// raise NoComputeSectionError(
-//     "Invalid call to CustomUncompute: No corresponding"
-// "'with Compute' statement found.")
-// # Make copy so there is not reference to compute_eng anymore
-// # after __enter__
-// self._allocated_qubit_ids = compute_eng._allocated_qubit_ids.copy()
-// self._deallocated_qubit_ids = compute_eng._deallocated_qubit_ids.copy()
-// drop_engine_after(self.engine)
-//
-// # Now add uncompute engine
-// self._uncompute_eng = UncomputeEngine()
-// insert_engine(self.engine, self._uncompute_eng)
-//
-// def __exit__(self, type, value, traceback):
-// # If an error happens in this context, qubits might not have been
-// # deallocated because that code section was not yet executed,
-//     # so don't check and raise an additional error.
-// if type is not None:
-//     return
-// # Check that all qubits allocated within Compute or within
-// # CustomUncompute have been deallocated.
-//     all_allocated_qubits = self._allocated_qubit_ids.union(
-//     self._uncompute_eng._allocated_qubit_ids)
-// all_deallocated_qubits = self._deallocated_qubit_ids.union(
-//     self._uncompute_eng._deallocated_qubit_ids)
-// if len(all_allocated_qubits.difference(all_deallocated_qubits)) != 0:
-// raise QubitManagementError(
-//     "\nError. Not all qubits have been deallocated which have \n" +
-//     "been allocated in the with Compute(eng) or with " +
-//     "CustomUncompute(eng) context.")
-// # remove uncompute engine
-// drop_engine_after(self.engine)
-//
-//
-// def Uncompute(engine):
-// """
-// Uncompute automatically.
-//
-//     Example:
-// .. code-block:: python
-//
-// with Compute(eng):
-// do_something(qubits)
-// action(qubits)
-// Uncompute(eng) # runs inverse of the compute section
-// """
-// compute_eng = engine.next_engine
-// if not isinstance(compute_eng, ComputeEngine):
-// raise NoComputeSectionError("Invalid call to Uncompute: No "
-// "corresponding 'with Compute' statement "
-// "found.")
-// compute_eng.run_uncompute()
-// drop_engine_after(engine)
+
+
+export class UncomputeEngine extends BasicEngine {
+  constructor() {
+    super()
+    // Save all qubit ids from qubits which are created or destroyed.
+    this.allocatedQubitIDs = new Set()
+    this.deallocatedQubitIDs = new Set()
+  }
+
+  /*
+  Receive commands and add an UncomputeTag to their tags.
+
+    Args:
+command_list (list<Command>): List of commands to handle.
+   */
+  receive(commandList) {
+    commandList.forEach((cmd) => {
+      if (cmd.gate.equal(Allocate)) {
+        this.allocatedQubitIDs.add(cmd.qubits[0][0].id)
+      } else if (cmd.gate.equal(Deallocate)) {
+        this.deallocatedQubitIDs.add(cmd.qubits[0][0].id)
+      }
+      cmd.tags.push(UncomputeTag)
+      this.send([cmd])
+    })
+  }
+}
+
+/*
+Start a compute-section.
+
+    Example:
+.. code-block:: python
+
+with Compute(eng):
+do_something(qubits)
+action(qubits)
+Uncompute(eng) # runs inverse of the compute section
+
+Warning:
+    If qubits are allocated within the compute section, they must either be
+uncomputed and deallocated within that section or, alternatively,
+    uncomputed and deallocated in the following uncompute section.
+
+    This means that the following examples are valid:
+
+    .. code-block:: python
+
+with Compute(eng):
+anc = eng.allocate_qubit()
+do_something_with_ancilla(anc)
+...
+uncompute_ancilla(anc)
+del anc
+
+do_something_else(qubits)
+
+Uncompute(eng)  # will allocate a new ancilla (with a different id)
+# and then deallocate it again
+
+    .. code-block:: python
+
+with Compute(eng):
+anc = eng.allocate_qubit()
+do_something_with_ancilla(anc)
+...
+
+do_something_else(qubits)
+
+Uncompute(eng)  # will deallocate the ancilla!
+
+    After the uncompute section, ancilla qubits allocated within the
+compute section will be invalid (and deallocated). The same holds when
+using CustomUncompute.
+
+    Failure to comply with these rules results in an exception being
+thrown.
+ */
+export function Compute(engine, func) {
+  let computeEngine = null
+  const enter = () => {
+    computeEngine = new ComputeEngine()
+    insertEngine(engine, computeEngine)
+  }
+
+  const exit = () => {
+    computeEngine.endCompute()
+    computeEngine = null
+  }
+
+  if (typeof func === 'function') {
+    enter()
+    func()
+    exit()
+  }
+}
+
+/*
+Start a custom uncompute-section.
+
+    Example:
+.. code-block:: python
+
+with Compute(eng):
+do_something(qubits)
+action(qubits)
+with CustomUncompute(eng):
+do_something_inverse(qubits)
+
+Raises:
+    QubitManagementError: If qubits are allocated within Compute or within
+CustomUncompute context but are not deallocated.
+ */
+export function CustomUncompute(engine, func) {
+  let allocatedQubitIDs = new Set()
+  let deallocatedQubitIDs = new Set()
+  let uncomputeEngine = null
+
+  const enter = () => {
+    // first, remove the compute engine
+    const compute_eng = engine.next
+    if (!(compute_eng instanceof ComputeEngine)) {
+      throw new Error(
+        'Invalid call to CustomUncompute: No corresponding'
+        + "'with Compute' statement found."
+      )
+    }
+    // Make copy so there is not reference to compute_eng anymore
+    // after __enter__
+    allocatedQubitIDs = compute_eng.allocatedQubitIDs.copy()
+    deallocatedQubitIDs = compute_eng.deallocatedQubitIDs.copy()
+    dropEngineAfter(engine)
+    // Now add uncompute engine
+    uncomputeEngine = UncomputeEngine()
+    insertEngine(engine, uncomputeEngine)
+  }
+
+  const exit = () => {
+    // If an error happens in this context, qubits might not have been
+    // deallocated because that code section was not yet executed,
+    // so don't check and raise an additional error.
+
+    // Check that all qubits allocated within Compute or within
+    // CustomUncompute have been deallocated.
+    const all_allocated_qubits = unionSet(allocatedQubitIDs, uncomputeEngine.allocatedQubitIDs)
+    const all_deallocated_qubits = unionSet(deallocatedQubitIDs, uncomputeEngine.deallocatedQubitIDs)
+    if (!setEqual(all_allocated_qubits, all_deallocated_qubits)) {
+      throw new Error('\nError. Not all qubits have been deallocated which have \n'
+               + 'been allocated in the with Compute(eng) or with '
+               + 'CustomUncompute(eng) context.')
+    }
+    // remove uncompute engine
+    dropEngineAfter(engine)
+  }
+
+  if (typeof func === 'function') {
+    enter()
+    func()
+    exit()
+  }
+}
+
+/*
+Uncompute automatically.
+
+    Example:
+.. code-block:: python
+
+with Compute(eng):
+do_something(qubits)
+action(qubits)
+Uncompute(eng) # runs inverse of the compute section
+ */
+export function Uncompute(engine) {
+  const compute_eng = engine.next
+  if (!(compute_eng instanceof ComputeEngine)) {
+    throw new Error('Invalid call to Uncompute: No '
+    + "corresponding 'with Compute' statement "
+    + 'found.')
+  }
+  compute_eng.runUnCompute()
+  dropEngineAfter(engine)
+}

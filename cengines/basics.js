@@ -16,7 +16,7 @@ is_last_engine (bool): True for the last engine, which is the back-end.
 import {Qureg, Qubit} from '../types/qubit'
 import {Command} from '../ops/command'
 import {Allocate, Deallocate} from '../ops/gates'
-import {DirtyQubitTag} from '../meta/dirtyqubit'
+import {DirtyQubitTag} from '../meta/tag'
 
 export class BasicEngine {
   /*
@@ -164,6 +164,10 @@ returns True.
      */
   send(commandList) {
     this.next.receive(commandList)
+  }
+
+  receive() {
+    // TODO
   }
 }
 

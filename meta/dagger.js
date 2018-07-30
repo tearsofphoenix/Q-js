@@ -40,9 +40,9 @@ store.
      */
   receive(cmdList) {
     cmdList.forEach((cmd) => {
-      if (cmd.gate == Allocate) {
+      if (cmd.gate.equal(Allocate)) {
         this.allocateQubitIDs.add(cmd.qubits[0][0].id)
-      } else if (cmd.gate == Deallocate) {
+      } else if (cmd.gate.equal(Deallocate)) {
         this.deallocateQubitIDs.add(cmd.qubits[0][0].id)
       }
     })
@@ -82,7 +82,7 @@ qb = eng.allocate_qubit()
 del qb # sends deallocate gate (which becomes an allocate)
 
  */
-export class Dagger {
+export function Dagger(engine, func) {
   /*
     Enter an inverted section.
 
@@ -96,19 +96,23 @@ Example (executes an inverse QFT):
 with Dagger(eng):
 QFT | qubits
      */
-  constructor(engine) {
-    this.engine = engine
-    this.daggerEngine = null
+
+  let daggerEngine = null
+
+  const enter = () => {
+    daggerEngine = new DaggerEngine()
+    insertEngine(engine, daggerEngine)
   }
 
-  enter() {
-    this.daggerEngine = new DaggerEngine()
-    insertEngine(this.engine, this.daggerEngine)
+  const exit = () => {
+    daggerEngine.run()
+    daggerEngine = null
+    dropEngineAfter(engine)
   }
 
-  exit(type, value, traceback) {
-    this.daggerEngine.run()
-    this.daggerEngine = null
-    dropEngineAfter(this.engine)
+  if (typeof func === 'function') {
+    enter()
+    func()
+    exit()
   }
 }

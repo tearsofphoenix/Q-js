@@ -14,7 +14,7 @@ import {ClassicalInstructionGate} from '../ops/basics'
 import {BasicQubit} from '../types/qubit'
 import {BasicEngine} from '../cengines/basics'
 import {dropEngineAfter, insertEngine} from './util'
-import {UncomputeTag, ComputeTag} from './compute'
+import {UncomputeTag, ComputeTag} from './tag'
 
 export class ControlEngine extends BasicEngine {
   /*
@@ -36,9 +36,9 @@ following operations are executed.
 cmd (Command object): a command object.
      */
   hasComputeUnComputeTag(cmd) {
-    const tags = [new UncomputeTag(), new ComputeTag()]
+    const tags = [UncomputeTag, ComputeTag]
     for (let i = 0; i < cmd.tags.length; ++i) {
-      if (tags.contains(cmd.tags[i])) {
+      if (tags.includes(cmd.tags[i])) {
         return true
       }
     }
