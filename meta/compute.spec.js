@@ -5,7 +5,7 @@ import {
 } from '../ops/gates'
 // import {} from '../ops/metagates'
 import {MainEngine} from '../cengines/main'
-import {DummyEngine} from '../cengines/testengine'
+import {DummyEngine, CompareEngine} from '../cengines/testengine'
 import {
   ComputeEngine, UncomputeEngine, Compute, Uncompute, CustomUncompute
 } from './compute'
@@ -40,7 +40,7 @@ describe('compute test', () => {
     // this one does need to make a deepcopy and not store a reference.
     expect(backend.receivedCommands[1].gate.equal(H)).to.equal(true)
     backend.receivedCommands[1].tags.push('TagAddedLater')
-    const tags = backend.receivedCommands[1].tags
+    const {tags} = backend.receivedCommands[1]
     expect(tags[tags.length - 1]).equal('TagAddedLater')
     compute_engine.endCompute()
     const new_qubit = eng.allocateQubit()
@@ -166,153 +166,206 @@ describe('compute test', () => {
       expect(backend.receivedCommands.length).to.equal(4)
     })
   });
+
+  it('should test compute uncompute no additional qubits', () => {
+    // No ancilla qubit created in compute section
+    const backend0 = new DummyEngine(true)
+    const compare_engine0 = new CompareEngine()
+    const eng0 = new MainEngine(backend0, [compare_engine0])
+    let qubit = eng0.allocateQubit()
+    Compute(eng0, () => {
+      new Rx(0.5).or(qubit)
+      H.or(qubit)
+    })
+    Uncompute(eng0)
+    eng0.flush(true)
+    expect(backend0.receivedCommands[0].gate.equal(Allocate)).to.equal(true)
+    expect(backend0.receivedCommands[1].gate.equal(new Rx(0.5))).to.equal(true)
+    expect(backend0.receivedCommands[2].gate.equal(H)).to.equal(true)
+    expect(backend0.receivedCommands[3].gate.equal(new Rx(-0.5))).to.equal(true)
+    expect(backend0.receivedCommands[4].gate.equal(Deallocate)).to.equal(true)
+
+    expect(backend0.receivedCommands[0].tags).to.deep.equal([])
+    expect(backend0.receivedCommands[1].tags).to.deep.equal([ComputeTag])
+    expect(backend0.receivedCommands[2].tags).to.deep.equal([])
+    expect(backend0.receivedCommands[3].tags).to.deep.equal([UncomputeTag])
+    expect(backend0.receivedCommands[4].tags).to.deep.equal([])
+
+    // Same using CustomUncompute and test using CompareEngine
+    const backend1 = new DummyEngine(true)
+    const compare_engine1 = new CompareEngine()
+    const eng1 = new MainEngine(backend1, [compare_engine1])
+    qubit = eng1.allocateQubit()
+    Compute(eng1, () => {
+      new Rx(0.5).or(qubit)
+      H.or(qubit)
+    })
+    CustomUncompute(eng1, () => {
+      new Rx(-0.5).or(qubit)
+    })
+    eng1.flush(true)
+    expect(compare_engine0 === compare_engine1).to.equal(true)
+  });
+
+  it('should test compute uncompute with statement', () => {
+    // # Allocating and deallocating qubit within Compute
+    // backend = DummyEngine(save_commands=True)
+    // compare_engine0 = CompareEngine()
+    // # Allow dirty qubits
+    // dummy_cengine = DummyEngine()
+    //
+    // def allow_dirty_qubits(self, meta_tag):
+    // return meta_tag == DirtyQubitTag
+    // dummy_cengine.is_meta_tag_handler = types.MethodType(allow_dirty_qubits,
+    //     dummy_cengine)
+    // eng = MainEngine(backend=backend,
+    //     engine_list=[compare_engine0, dummy_cengine])
+    // qubit = eng.allocate_qubit()
+    // with _compute.Compute(eng):
+    // Rx(0.9) | qubit
+    // ancilla = eng.allocate_qubit(dirty=True)
+    // # ancilla2 will be deallocated in Uncompute section:
+    //     ancilla2 = eng.allocate_qubit()
+    // # Test that ancilla is registered in MainEngine.active_qubits:
+    // assert ancilla[0] in eng.active_qubits
+    // H | qubit
+    // Rx(0.5) | ancilla
+    // CNOT | (ancilla, qubit)
+    // Rx(0.7) | qubit
+    // Rx(-0.5) | ancilla
+    // ancilla[0].__del__()
+    // H | qubit
+    // _compute.Uncompute(eng)
+    // eng.flush(deallocate_qubits=True)
+    // assert len(backend.received_commands) == 22
+    // # Test each Command has correct gate
+    // assert backend.received_commands[0].gate == Allocate
+    // assert backend.received_commands[1].gate == Rx(0.9)
+    // assert backend.received_commands[2].gate == Allocate
+    // assert backend.received_commands[3].gate == Allocate
+    // assert backend.received_commands[4].gate == H
+    // assert backend.received_commands[5].gate == Rx(0.5)
+    // assert backend.received_commands[6].gate == NOT
+    // assert backend.received_commands[7].gate == Rx(0.7)
+    // assert backend.received_commands[8].gate == Rx(-0.5)
+    // assert backend.received_commands[9].gate == Deallocate
+    // assert backend.received_commands[10].gate == H
+    // assert backend.received_commands[11].gate == Allocate
+    // assert backend.received_commands[12].gate == Rx(0.5)
+    // assert backend.received_commands[13].gate == Rx(-0.7)
+    // assert backend.received_commands[14].gate == NOT
+    // assert backend.received_commands[15].gate == Rx(-0.5)
+    // assert backend.received_commands[16].gate == H
+    // assert backend.received_commands[17].gate == Deallocate
+    // assert backend.received_commands[18].gate == Deallocate
+    // assert backend.received_commands[19].gate == Rx(-0.9)
+    // assert backend.received_commands[20].gate == Deallocate
+    // assert backend.received_commands[21].gate == FlushGate()
+    // # Test that each command has correct tags
+    // assert backend.received_commands[0].tags == []
+    // assert backend.received_commands[1].tags == [ComputeTag]
+    // assert backend.received_commands[2].tags == [DirtyQubitTag(),
+    //   ComputeTag]
+    // for cmd in backend.received_commands[3:9]:
+    // assert cmd.tags == [ComputeTag]
+    // assert backend.received_commands[9].tags == [DirtyQubitTag(),
+    //   ComputeTag]
+    // assert backend.received_commands[10].tags == []
+    // assert backend.received_commands[11].tags == [DirtyQubitTag(),
+    //   UncomputeTag]
+    // for cmd in backend.received_commands[12:18]:
+    // assert cmd.tags == [UncomputeTag]
+    // assert backend.received_commands[18].tags == [DirtyQubitTag(),
+    //   UncomputeTag]
+    // assert backend.received_commands[19].tags == [UncomputeTag]
+    // assert backend.received_commands[20].tags == []
+    // assert backend.received_commands[21].tags == []
+    // # Test that each command has correct qubits
+    // # Note that ancilla qubit in compute should be
+    // # different from ancilla qubit in uncompute section
+    // qubit_id = backend.received_commands[0].qubits[0][0].id
+    // ancilla_compt_id = backend.received_commands[2].qubits[0][0].id
+    // ancilla_uncompt_id = backend.received_commands[11].qubits[0][0].id
+    // ancilla2_id = backend.received_commands[3].qubits[0][0].id
+    // assert backend.received_commands[1].qubits[0][0].id == qubit_id
+    // assert backend.received_commands[4].qubits[0][0].id == qubit_id
+    // assert backend.received_commands[5].qubits[0][0].id == ancilla_compt_id
+    // assert backend.received_commands[6].qubits[0][0].id == qubit_id
+    // assert (backend.received_commands[6].control_qubits[0].id ==
+    //     ancilla_compt_id)
+    // assert backend.received_commands[7].qubits[0][0].id == qubit_id
+    // assert backend.received_commands[8].qubits[0][0].id == ancilla_compt_id
+    // assert backend.received_commands[9].qubits[0][0].id == ancilla_compt_id
+    // assert backend.received_commands[10].qubits[0][0].id == qubit_id
+    // assert backend.received_commands[12].qubits[0][0].id == ancilla_uncompt_id
+    // assert backend.received_commands[13].qubits[0][0].id == qubit_id
+    // assert backend.received_commands[14].qubits[0][0].id == qubit_id
+    // assert (backend.received_commands[14].control_qubits[0].id ==
+    //     ancilla_uncompt_id)
+    // assert backend.received_commands[15].qubits[0][0].id == ancilla_uncompt_id
+    // assert backend.received_commands[16].qubits[0][0].id == qubit_id
+    // assert backend.received_commands[17].qubits[0][0].id == ancilla2_id
+    // assert backend.received_commands[18].qubits[0][0].id == ancilla_uncompt_id
+    // assert backend.received_commands[19].qubits[0][0].id == qubit_id
+    // assert backend.received_commands[20].qubits[0][0].id == qubit_id
+    // # Test that ancilla qubits should have seperate ids
+    // assert ancilla_uncompt_id != ancilla_compt_id
+    //
+    // # Do the same thing with CustomUncompute and compare using the
+    // # CompareEngine:
+    // backend1 = DummyEngine(save_commands=True)
+    // compare_engine1 = CompareEngine()
+    // # Allow dirty qubits
+    // dummy_cengine1 = DummyEngine()
+  });
+
+  it('should only single error in custom uncompute', () => {
+    const eng = new MainEngine(new DummyEngine(), [])
+    Compute(eng, () => {
+      const qb = eng.allocateQubit()
+      // Tests that QubitManagementError is not sent in addition
+      expect(() => {
+        CustomUncompute(eng, () => {})
+        throw new Error('RuntimeError')
+      }).to.throw()
+    })
+  });
+
+  it('should qubit management error', () => {
+    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])
+    Compute(eng, () => {
+      const ancilla = eng.allocateQubit()
+      eng.active_qubits = new Set()
+      expect(() => Uncompute(eng)).to.throw()
+    })
+  });
+  it('should qubit management error2', () => {
+    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])
+    Compute(eng, () => {
+      const ancilla = eng.allocateQubit()
+      const local_ancilla = eng.allocateQubit()
+      local_ancilla[0].deallocate()
+      eng.active_qubits = new Set()
+      expect(() => {
+        Uncompute(eng)
+      }).to.throw()
+    })
+  });
+
+  it('should test exception if no compute but uncompute', () => {
+    const eng = MainEngine(new DummyEngine(), [new DummyEngine()])
+    expect(() => CustomUncompute(eng, () => {})).to.throw()
+  });
+  it('should test exception if no compute but uncompute 2', () => {
+    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])
+    expect(() => Uncompute(eng)).to.throw()
+  });
+
+  it('should allow dirty qubits', function () {
+    
+  });
 })
 
-// def test_compute_uncompute_no_additional_qubits():
-// # No ancilla qubit created in compute section
-// backend0 = DummyEngine(save_commands=True)
-// compare_engine0 = CompareEngine()
-// eng0 = MainEngine(backend=backend0, engine_list=[compare_engine0])
-// qubit = eng0.allocate_qubit()
-// with _compute.Compute(eng0):
-// Rx(0.5) | qubit
-// H | qubit
-// _compute.Uncompute(eng0)
-// eng0.flush(deallocate_qubits=True)
-// assert backend0.received_commands[0].gate == Allocate
-// assert backend0.received_commands[1].gate == Rx(0.5)
-// assert backend0.received_commands[2].gate == H
-// assert backend0.received_commands[3].gate == Rx(-0.5)
-// assert backend0.received_commands[4].gate == Deallocate
-// assert backend0.received_commands[0].tags == []
-// assert backend0.received_commands[1].tags == [ComputeTag]
-// assert backend0.received_commands[2].tags == []
-// assert backend0.received_commands[3].tags == [UncomputeTag]
-// assert backend0.received_commands[4].tags == []
-// # Same using CustomUncompute and test using CompareEngine
-// backend1 = DummyEngine(save_commands=True)
-// compare_engine1 = CompareEngine()
-// eng1 = MainEngine(backend=backend1, engine_list=[compare_engine1])
-// qubit = eng1.allocate_qubit()
-// with _compute.Compute(eng1):
-// Rx(0.5) | qubit
-// H | qubit
-// with _compute.CustomUncompute(eng1):
-// Rx(-0.5) | qubit
-// eng1.flush(deallocate_qubits=True)
-// assert compare_engine0 == compare_engine1
-//
-//
-// def test_compute_uncompute_with_statement():
-// # Allocating and deallocating qubit within Compute
-// backend = DummyEngine(save_commands=True)
-// compare_engine0 = CompareEngine()
-// # Allow dirty qubits
-// dummy_cengine = DummyEngine()
-//
-// def allow_dirty_qubits(self, meta_tag):
-// return meta_tag == DirtyQubitTag
-// dummy_cengine.is_meta_tag_handler = types.MethodType(allow_dirty_qubits,
-//     dummy_cengine)
-// eng = MainEngine(backend=backend,
-//     engine_list=[compare_engine0, dummy_cengine])
-// qubit = eng.allocate_qubit()
-// with _compute.Compute(eng):
-// Rx(0.9) | qubit
-// ancilla = eng.allocate_qubit(dirty=True)
-// # ancilla2 will be deallocated in Uncompute section:
-//     ancilla2 = eng.allocate_qubit()
-// # Test that ancilla is registered in MainEngine.active_qubits:
-// assert ancilla[0] in eng.active_qubits
-// H | qubit
-// Rx(0.5) | ancilla
-// CNOT | (ancilla, qubit)
-// Rx(0.7) | qubit
-// Rx(-0.5) | ancilla
-// ancilla[0].__del__()
-// H | qubit
-// _compute.Uncompute(eng)
-// eng.flush(deallocate_qubits=True)
-// assert len(backend.received_commands) == 22
-// # Test each Command has correct gate
-// assert backend.received_commands[0].gate == Allocate
-// assert backend.received_commands[1].gate == Rx(0.9)
-// assert backend.received_commands[2].gate == Allocate
-// assert backend.received_commands[3].gate == Allocate
-// assert backend.received_commands[4].gate == H
-// assert backend.received_commands[5].gate == Rx(0.5)
-// assert backend.received_commands[6].gate == NOT
-// assert backend.received_commands[7].gate == Rx(0.7)
-// assert backend.received_commands[8].gate == Rx(-0.5)
-// assert backend.received_commands[9].gate == Deallocate
-// assert backend.received_commands[10].gate == H
-// assert backend.received_commands[11].gate == Allocate
-// assert backend.received_commands[12].gate == Rx(0.5)
-// assert backend.received_commands[13].gate == Rx(-0.7)
-// assert backend.received_commands[14].gate == NOT
-// assert backend.received_commands[15].gate == Rx(-0.5)
-// assert backend.received_commands[16].gate == H
-// assert backend.received_commands[17].gate == Deallocate
-// assert backend.received_commands[18].gate == Deallocate
-// assert backend.received_commands[19].gate == Rx(-0.9)
-// assert backend.received_commands[20].gate == Deallocate
-// assert backend.received_commands[21].gate == FlushGate()
-// # Test that each command has correct tags
-// assert backend.received_commands[0].tags == []
-// assert backend.received_commands[1].tags == [ComputeTag]
-// assert backend.received_commands[2].tags == [DirtyQubitTag(),
-//   ComputeTag]
-// for cmd in backend.received_commands[3:9]:
-// assert cmd.tags == [ComputeTag]
-// assert backend.received_commands[9].tags == [DirtyQubitTag(),
-//   ComputeTag]
-// assert backend.received_commands[10].tags == []
-// assert backend.received_commands[11].tags == [DirtyQubitTag(),
-//   UncomputeTag]
-// for cmd in backend.received_commands[12:18]:
-// assert cmd.tags == [UncomputeTag]
-// assert backend.received_commands[18].tags == [DirtyQubitTag(),
-//   UncomputeTag]
-// assert backend.received_commands[19].tags == [UncomputeTag]
-// assert backend.received_commands[20].tags == []
-// assert backend.received_commands[21].tags == []
-// # Test that each command has correct qubits
-// # Note that ancilla qubit in compute should be
-// # different from ancilla qubit in uncompute section
-// qubit_id = backend.received_commands[0].qubits[0][0].id
-// ancilla_compt_id = backend.received_commands[2].qubits[0][0].id
-// ancilla_uncompt_id = backend.received_commands[11].qubits[0][0].id
-// ancilla2_id = backend.received_commands[3].qubits[0][0].id
-// assert backend.received_commands[1].qubits[0][0].id == qubit_id
-// assert backend.received_commands[4].qubits[0][0].id == qubit_id
-// assert backend.received_commands[5].qubits[0][0].id == ancilla_compt_id
-// assert backend.received_commands[6].qubits[0][0].id == qubit_id
-// assert (backend.received_commands[6].control_qubits[0].id ==
-//     ancilla_compt_id)
-// assert backend.received_commands[7].qubits[0][0].id == qubit_id
-// assert backend.received_commands[8].qubits[0][0].id == ancilla_compt_id
-// assert backend.received_commands[9].qubits[0][0].id == ancilla_compt_id
-// assert backend.received_commands[10].qubits[0][0].id == qubit_id
-// assert backend.received_commands[12].qubits[0][0].id == ancilla_uncompt_id
-// assert backend.received_commands[13].qubits[0][0].id == qubit_id
-// assert backend.received_commands[14].qubits[0][0].id == qubit_id
-// assert (backend.received_commands[14].control_qubits[0].id ==
-//     ancilla_uncompt_id)
-// assert backend.received_commands[15].qubits[0][0].id == ancilla_uncompt_id
-// assert backend.received_commands[16].qubits[0][0].id == qubit_id
-// assert backend.received_commands[17].qubits[0][0].id == ancilla2_id
-// assert backend.received_commands[18].qubits[0][0].id == ancilla_uncompt_id
-// assert backend.received_commands[19].qubits[0][0].id == qubit_id
-// assert backend.received_commands[20].qubits[0][0].id == qubit_id
-// # Test that ancilla qubits should have seperate ids
-// assert ancilla_uncompt_id != ancilla_compt_id
-//
-// # Do the same thing with CustomUncompute and compare using the
-// # CompareEngine:
-// backend1 = DummyEngine(save_commands=True)
-// compare_engine1 = CompareEngine()
-// # Allow dirty qubits
-// dummy_cengine1 = DummyEngine()
 //
 // def allow_dirty_qubits(self, meta_tag):
 // return meta_tag == DirtyQubitTag
@@ -348,45 +401,3 @@ describe('compute test', () => {
 // Rx(-0.9) | qubit
 // eng1.flush(deallocate_qubits=True)
 // assert compare_engine0 == compare_engine1
-//
-//
-// def test_exception_if_no_compute_but_uncompute():
-// eng = MainEngine(backend=DummyEngine(), engine_list=[DummyEngine()])
-// with pytest.raises(_compute.NoComputeSectionError):
-// with _compute.CustomUncompute(eng): pass
-//
-//
-// def test_exception_if_no_compute_but_uncompute2():
-// eng = MainEngine(backend=DummyEngine(), engine_list=[DummyEngine()])
-// with pytest.raises(_compute.NoComputeSectionError):
-// _compute.Uncompute(eng)
-//
-//
-// def test_qubit_management_error():
-// eng = MainEngine(backend=DummyEngine(), engine_list=[DummyEngine()])
-// with _compute.Compute(eng):
-// ancilla = eng.allocate_qubit()
-// eng.active_qubits = weakref.WeakSet()
-// with pytest.raises(_compute.QubitManagementError):
-// _compute.Uncompute(eng)
-//
-//
-// def test_qubit_management_error2():
-// eng = MainEngine(backend=DummyEngine(), engine_list=[DummyEngine()])
-// with _compute.Compute(eng):
-// ancilla = eng.allocate_qubit()
-// local_ancilla = eng.allocate_qubit()
-// local_ancilla[0].__del__()
-// eng.active_qubits = weakref.WeakSet()
-// with pytest.raises(_compute.QubitManagementError):
-// _compute.Uncompute(eng)
-//
-//
-// def test_only_single_error_in_costum_uncompute():
-// eng = MainEngine(backend=DummyEngine(), engine_list=[])
-// with _compute.Compute(eng):
-// qb = eng.allocate_qubit()
-// # Tests that QubitManagementError is not sent in addition
-// with pytest.raises(RuntimeError):
-// with _compute.CustomUncompute(eng):
-// raise RuntimeError

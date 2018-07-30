@@ -149,7 +149,7 @@ describe('metagates test', () => {
     expect(() => new ControlledGate(gate, 3).or([qubit1, [qubit0, qubit2, qubit3]])).to.throw()
     // Remove Allocate and Deallocate gates
     saving_backend.receivedCommands.forEach((cmd) => {
-      if (!(cmd.gate instanceof FastForwardingGate) || cmd.gate instanceof ClassicalInstructionGate) {
+      if (!(cmd.gate instanceof FastForwardingGate || cmd.gate instanceof ClassicalInstructionGate)) {
         received_commands.push(cmd)
       }
     })
@@ -212,7 +212,7 @@ describe('metagates test', () => {
     const received_commands = []
     // Remove Allocate and Deallocate gates
     saving_backend.receivedCommands.forEach((cmd) => {
-      if (!(cmd.gate instanceof FastForwardingGate) || cmd.gate instanceof ClassicalInstructionGate) {
+      if (!(cmd.gate instanceof FastForwardingGate || cmd.gate instanceof ClassicalInstructionGate)) {
         received_commands.push(cmd)
       }
     })

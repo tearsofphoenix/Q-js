@@ -51,17 +51,19 @@ cmd: Command object with logical qubit ids.
         }
       })
     })
-    const controlQubits = newCMD.controlQubits()
+    const controlQubits = newCMD.controlQubits
     controlQubits.forEach((qubit) => {
       qubit.id = this.currentMapping[qubit.id]
     })
     if (newCMD.gate instanceof MeasureGate) {
-      if (!(newCMD.qubits.length === 1 && newCMD.qubits[0] === 1)) {
+      if (!(newCMD.qubits.length === 1 && newCMD.qubits[0].length === 1)) {
         throw new Error('assert error')
       }
       // Add LogicalQubitIDTag to MeasureGate
-      const add_logical_id = function (command, old_tags = cmd.tags) {
-        command.tags = (old_tags.push(new LogicalQubitIDTag(cmd.qubits[0][0].id)))
+      const add_logical_id = function (command, old_tags = cmd.tags.slice(0)) {
+        old_tags.push(LogicalQubitIDTag)
+        console.log(65, old_tags)
+        command.tags = old_tags
         return command
       }
 
