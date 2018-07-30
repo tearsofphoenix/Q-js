@@ -162,6 +162,12 @@ Args:
   equal(other) {
     return this.__proto__ === other.__proto__
   }
+
+  copy() {
+    const copy = Object.create(this.__proto__)
+    Object.assign(copy, this)
+    return copy
+  }
 }
 
 /*

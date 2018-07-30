@@ -135,21 +135,6 @@ copyable!
   }
 }
 
-
-/*
-WeakQubitRef objects are used inside the Command object.
-
-    Qubits feature automatic deallocation when destroyed. WeakQubitRefs, on
-the other hand, do not share this feature, allowing to copy them and pass
-them along the compiler pipeline, while the actual qubit objects may be
-garbage-collected (and, thus, cleaned up early). Otherwise there is no
-difference between a WeakQubitRef and a Qubit object.
-
- */
-export class WeakQubitRef extends BasicQubit {
-
-}
-
 /*
 
 Quantum register class.

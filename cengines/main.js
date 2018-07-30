@@ -1,8 +1,9 @@
 // Contains the main engine of every compiler engine pipeline, called MainEngine.
 import {BasicEngine} from './basics'
 import {FlushGate} from '../ops/gates'
-import {WeakQubitRef} from '../types/qubit'
 import BasicMapperEngine from './basicmapper'
+import {Command} from '../ops/command'
+import {BasicQubit} from "../types/qubit";
 
 /*
 The MainEngine class provides all functionality of the main compiler
@@ -245,6 +246,6 @@ id to -1).
       this.activeQubits = new Set()
     }
 
-    this.receive([new Command(this, new FlushGate(), [[new WeakQubitRef(this, -1)]])])
+    this.receive([new Command(this, new FlushGate(), [[new BasicQubit(this, -1)]])])
   }
 }

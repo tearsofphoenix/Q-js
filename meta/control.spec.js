@@ -1,12 +1,12 @@
 import {expect} from 'chai'
 
-import math from 'mathjs'
 import { MainEngine } from '../cengines/main'
 import {DummyEngine} from '../cengines/testengine'
-import { H } from '../ops/gates'
+import { H, Rx } from '../ops/gates'
 import {Command} from '../ops/command'
 import {ComputeTag, UncomputeTag, DirtyQubitTag} from './tag'
 import {Control, ControlEngine} from './control'
+import {Compute, Uncompute} from './compute'
 
 describe('control test', () => {
   it('should control engine has compute tag', () => {
@@ -24,30 +24,37 @@ describe('control test', () => {
     expect(control_eng.hasComputeUnComputeTag(test_cmd2)).to.equal(false)
   });
 
-  it('should test control', function () {
+  it('should test control', () => {
     const backend = new DummyEngine(true)
-    const eng = MainEngine(backend, [new DummyEngine()])
+    const eng = new MainEngine(backend, [new DummyEngine()])
     const qureg = eng.allocateQureg(2)
     let qubit
-    Control(eng, qureg, () => qubit = eng.allocateQubit())
-    with Compute(eng):
-    Rx(0.5) | qubit
-    H | qubit
-    Uncompute(eng)
-    with _control.Control(eng, qureg[0]):
-    H | qubit
+    Control(eng, qureg, () => {
+      qubit = eng.allocateQubit()
+      Compute(eng, () => {
+        new Rx(0.5).or(qubit)
+      })
+      H.or(qubit)
+      Uncompute(eng)
+    })
+
+    Control(eng, qureg[0], () => {
+      H.or(qubit)
+    })
+
     eng.flush()
-    assert len(backend.received_commands) == 8
-    assert len(backend.received_commands[0].control_qubits) == 0
-    assert len(backend.received_commands[1].control_qubits) == 0
-    assert len(backend.received_commands[2].control_qubits) == 0
-    assert len(backend.received_commands[3].control_qubits) == 0
-    assert len(backend.received_commands[4].control_qubits) == 2
-    assert len(backend.received_commands[5].control_qubits) == 0
-    assert len(backend.received_commands[6].control_qubits) == 1
-    assert len(backend.received_commands[7].control_qubits) == 0
-    assert backend.received_commands[4].control_qubits[0].id == qureg[0].id
-    assert backend.received_commands[4].control_qubits[1].id == qureg[1].id
-    assert backend.received_commands[6].control_qubits[0].id == qureg[0].id
+    expect(backend.receivedCommands.length).to.equal(8)
+    expect(backend.receivedCommands[0].controlQubits.length).to.equal(0)
+    expect(backend.receivedCommands[1].controlQubits.length).to.equal(0)
+    expect(backend.receivedCommands[2].controlQubits.length).to.equal(0)
+    expect(backend.receivedCommands[3].controlQubits.length).to.equal(0)
+    expect(backend.receivedCommands[4].controlQubits.length).to.equal(2)
+    expect(backend.receivedCommands[5].controlQubits.length).to.equal(0)
+    expect(backend.receivedCommands[6].controlQubits.length).to.equal(1)
+    expect(backend.receivedCommands[7].controlQubits.length).to.equal(0)
+
+    expect(backend.receivedCommands[4].controlQubits[0].id).to.equal(qureg[0].id)
+    expect(backend.receivedCommands[4].controlQubits[1].id).to.equal(qureg[1].id)
+    expect(backend.receivedCommands[6].controlQubits[0].id).to.equal(qureg[0].id)
   });
 })
