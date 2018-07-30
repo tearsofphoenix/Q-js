@@ -43,7 +43,6 @@ describe('command test', () => {
     expect(symmetric_cmd.gate.equal(symmetric_gate)).to.equal(true)
     expect(symmetric_cmd.tags).to.deep.equal([])
     const expected_ordered_tuple = [qureg1, qureg2, qureg0]
-    console.log(43, symmetric_cmd.qubits)
     symmetric_cmd.qubits.forEach((looper, idx) => {
       expect(looper[0].id).to.equal(expected_ordered_tuple[idx][0].id)
     })

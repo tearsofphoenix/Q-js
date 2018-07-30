@@ -17,7 +17,7 @@ export function zeros(n) {
 
 export function arrayIsTuple(value) {
   let isTuple = false
-  if (value.$$__tuple) {
+  if (typeof value.$$__tuple !== 'undefined') {
     isTuple = value.$$__tuple
     return isTuple
   }
@@ -27,8 +27,12 @@ export function arrayIsTuple(value) {
   return isTuple
 }
 
+export function markTuple(value) {
+  value.$$__tuple = true
+}
+
 export function makeTuple(...args) {
   const result = new Array(...args)
-  result.$$__tuple = true
+  markTuple(result)
   return result
 }

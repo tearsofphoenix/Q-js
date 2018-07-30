@@ -33,7 +33,6 @@ describe('metagates test', () => {
 
     const array = saving_backend.receivedCommands
     const last = array[array.length - 1]
-    console.log(array)
     expect(last.gate.equal(gate)).to.equal(true)
     expect(last.controlQubits.length).to.equal(1)
   })

@@ -26,6 +26,7 @@ apply wrapper (apply_command).
 import {arrayEqual} from '../utils/polyfill'
 import {getInverse} from './_cycle'
 import {Qureg} from '../types/qubit';
+import {markTuple} from "../libs/util";
 
 /*
 Apply a command.
@@ -157,7 +158,7 @@ Returns: Ordered tuple of quantum registers
     const orderedQubits = qubits.slice(0)
     const iqi = this.interchangeableQubitIndices
     iqi.forEach((old_positions) => {
-      const new_positions = old_positions.sort((a, b) => orderedQubits[b][0].id - orderedQubits[a][0].id)
+      const new_positions = old_positions.slice(0).sort((a, b) => orderedQubits[a][0].id - orderedQubits[b][0].id)
       const qubits_new_order = []
       new_positions.forEach(l => qubits_new_order.push(orderedQubits[l]))
 
@@ -166,7 +167,8 @@ Returns: Ordered tuple of quantum registers
       })
     })
 
-    return orderedQubits.slice(0)
+    markTuple(orderedQubits)
+    return orderedQubits
   }
 
   /*
