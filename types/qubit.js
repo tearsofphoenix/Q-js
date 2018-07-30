@@ -174,7 +174,6 @@ export function Qureg(...args) {
 Qureg.prototype = Object.create(Array.prototype)
 
 Qureg.prototype.equal = function(other) {
-  console.log(177)
   if (other instanceof Qureg) {
     return arrayEqual(this, other, (x, y) => x.equal(y))
   }

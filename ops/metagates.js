@@ -17,6 +17,8 @@ import math from 'mathjs'
 import {BasicGate} from './basics'
 import {Control} from '../meta/control'
 import Cycle, {getInverse} from './_cycle'
+import { Y } from './gates'
+import { arrayIsTuple } from '../libs/util'
 
 /*
 Wrapper class allowing to execute the inverse of a gate, even when it does
@@ -158,7 +160,7 @@ the gate.
             + 'the required number of control quregs.')
     }
 
-    Control(gateQuregs[0][0].engine, ctrl, () => this.gate.or([gateQuregs]))
+    Control(gateQuregs[0][0].engine, ctrl, () => this.gate.or(gateQuregs))
   }
 
   toString() {
@@ -215,16 +217,24 @@ export class Tensor extends BasicGate {
   }
 
   or(qubits) {
-    if (qubits.length === 1) {
-      const q = qubits[0]
-      if (Array.isArray(q)) {
-        q.forEach(looper => this.gate.or(looper))
-      } else {
-        throw new Error('wrong type')
+    const isTuple = arrayIsTuple(qubits)
+    let array = null
+    if (isTuple) {
+      if (qubits.length !== 1) {
+        throw new Error('wrong length')
       }
+      array = qubits[0]
     } else {
-      throw new Error('wrong length')
+      array = qubits
     }
+    if (!Array.isArray(array)) {
+      throw new Error('should be array type!')
+    }
+    array.forEach(q => this.gate.or(q))
+  }
+
+  toString() {
+    return `Tensor(${this.gate.toString()})`
   }
 }
 

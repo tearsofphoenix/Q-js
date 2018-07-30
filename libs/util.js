@@ -1,20 +1,3 @@
-import math from 'mathjs'
-
-math.import('cones', (n) => {
-  const array = new Array(n)
-  for (let i = 0; i < n; ++i) {
-    array.push(math.complex(1, 1))
-  }
-  return math.matrix(array)
-})
-
-math.import('czeros', (n) => {
-  const array = new Array(n)
-  for (let i = 0; i < n; ++i) {
-    array.push(math.complex(0, 0))
-  }
-  return math.matrix(array)
-})
 
 /*
  */
@@ -30,4 +13,12 @@ export function zeros(n) {
     array.push(0)
   }
   return array
+}
+
+export function arrayIsTuple(value) {
+  let isTuple = false
+  if (Array.isArray(value)) {
+    isTuple = value.some(item => item instanceof Array)
+  }
+  return isTuple
 }

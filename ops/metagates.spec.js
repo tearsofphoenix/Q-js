@@ -3,6 +3,7 @@ import math from 'mathjs'
 import { MainEngine } from '../cengines/main'
 import {DummyEngine} from '../cengines/testengine'
 import {Command} from './command'
+import {Tensor} from './metagates'
 
 import {
   Rx, T, Y, Entangle
@@ -12,6 +13,7 @@ import {
 } from './metagates'
 import {Qubit} from '../types/qubit'
 import {getInverse} from './_cycle';
+import { ClassicalInstructionGate, FastForwardingGate } from './basics'
 
 const np = math
 const mm = math.matrix
@@ -124,106 +126,105 @@ describe('metagates test', () => {
     const last = cmds[cmds.length - 1]
     expect(last.equal(new Command(eng, Y, [a]))).to.equal(true)
   });
-})
 
-// def test_controlled_gate_empty_controls():
-//
-// def test_controlled_gate_or():
-// saving_backend = DummyEngine(save_commands=True)
-// main_engine = MainEngine(backend=saving_backend,
-//   engine_list=[DummyEngine()])
-// gate = Rx(0.6)
-// qubit0 = Qubit(main_engine, 0)
-// qubit1 = Qubit(main_engine, 1)
-// qubit2 = Qubit(main_engine, 2)
-// qubit3 = Qubit(main_engine, 3)
-// expected_cmd = Command(main_engine, gate, ([qubit3],),
-//   controls=[qubit0, qubit1, qubit2])
-// received_commands = []
-// # Option 1:
-// new ControlledGate(gate, 3) | ([qubit1], [qubit0],
-//   [qubit2], [qubit3])
-// # Option 2:
-// new ControlledGate(gate, 3) | (qubit1, qubit0, qubit2, qubit3)
-// # Option 3:
-// new ControlledGate(gate, 3) | ([qubit1, qubit0], qubit2, qubit3)
-// # Option 4:
-// new ControlledGate(gate, 3) | (qubit1, [qubit0, qubit2], qubit3)
-// # Wrong option 5:
-// with pytest.raises(_metagates.ControlQubitError):
-// new ControlledGate(gate, 3) | (qubit1, [qubit0, qubit2, qubit3])
-// # Remove Allocate and Deallocate gates
-// for cmd in saving_backend.received_commands:
-// if not (isinstance(cmd.gate, FastForwardingGate) or
-// isinstance(cmd.gate, ClassicalInstructionGate)):
-// received_commands.append(cmd)
-// assert len(received_commands) == 4
-// for cmd in received_commands:
-// assert cmd == expected_cmd
-//
-//
-// def test_controlled_gate_comparison():
-// gate1 = new ControlledGate(Y, 1)
-// gate2 = new ControlledGate(Y, 1)
-// gate3 = new ControlledGate(T, 1)
-// gate4 = new ControlledGate(Y, 2)
-// assert gate1 == gate2
-// assert not gate1 == gate3
-// assert gate1 != gate4
-//
-//
-// def test_c():
-// expected = new ControlledGate(Y, 2)
-// assert _metagates.C(Y, 2) == expected
-//
-//
-// def test_tensor_init():
-// gate = _metagates.Tensor(Y)
-// assert gate._gate == Y
-//
-//
-// def test_tensor_str():
-// gate = _metagates.Tensor(Y)
-// assert str(gate) == "Tensor(" + str(Y) + ")"
-//
-//
-// def test_tensor_get_inverse():
-// gate = _metagates.Tensor(Rx(0.6))
-// inverse = gate.get_inverse()
-// assert isinstance(inverse, _metagates.Tensor)
-// assert inverse._gate == Rx(-0.6 + 4 * math.pi)
-//
-//
-// def test_tensor_comparison():
-// gate1 = _metagates.Tensor(Rx(0.6))
-// gate2 = _metagates.Tensor(Rx(0.6 + 4 * math.pi))
-// assert gate1 == gate2
-// assert gate1 != Rx(0.6)
-//
-//
-// def test_tensor_or():
-// saving_backend = DummyEngine(save_commands=True)
-// main_engine = MainEngine(backend=saving_backend,
-//   engine_list=[DummyEngine()])
-// gate = Rx(0.6)
-// qubit0 = Qubit(main_engine, 0)
-// qubit1 = Qubit(main_engine, 1)
-// qubit2 = Qubit(main_engine, 2)
-// # Option 1:
-// _metagates.Tensor(gate) | ([qubit0, qubit1, qubit2],)
-// # Option 2:
-// _metagates.Tensor(gate) | [qubit0, qubit1, qubit2]
-// received_commands = []
-// # Remove Allocate and Deallocate gates
-// for cmd in saving_backend.received_commands:
-// if not (isinstance(cmd.gate, FastForwardingGate) or
-// isinstance(cmd.gate, ClassicalInstructionGate)):
-// received_commands.append(cmd)
-// # Check results
-// assert len(received_commands) == 6
-// qubit_ids = []
-// for cmd in received_commands:
-// assert len(cmd.qubits) == 1
-// assert cmd.gate == gate
-// qubit_ids.append(cmd.qubits[0][0].id)
-// assert sorted(qubit_ids) == [0, 0, 1, 1, 2, 2]
+  it('should test controlled gate or', () => {
+    const saving_backend = new DummyEngine(true)
+    const main_engine = new MainEngine(saving_backend, [new DummyEngine()])
+    const gate = new Rx(0.6)
+    const qubit0 = new Qubit(main_engine, 0)
+    const qubit1 = new Qubit(main_engine, 1)
+    const qubit2 = new Qubit(main_engine, 2)
+    const qubit3 = new Qubit(main_engine, 3)
+    const expected_cmd = new Command(main_engine, gate, [[qubit3]], [qubit0, qubit1, qubit2])
+    const received_commands = []
+    // Option 1:
+    new ControlledGate(gate, 3).or([[qubit1], [qubit0], [qubit2], [qubit3]])
+    // Option 2:
+    new ControlledGate(gate, 3).or([qubit1, qubit0, qubit2, qubit3])
+    // Option 3:
+    new ControlledGate(gate, 3).or([[qubit1, qubit0], qubit2, qubit3])
+    // Option 4:
+    new ControlledGate(gate, 3).or([qubit1, [qubit0, qubit2], qubit3])
+    // Wrong option 5:
+    expect(() => new ControlledGate(gate, 3).or([qubit1, [qubit0, qubit2, qubit3]])).to.throw()
+    // Remove Allocate and Deallocate gates
+    saving_backend.receivedCommands.forEach((cmd) => {
+      if (!(cmd.gate instanceof FastForwardingGate) || cmd.gate instanceof ClassicalInstructionGate) {
+        received_commands.push(cmd)
+      }
+    })
+    expect(received_commands.length).to.equal(4)
+    received_commands.forEach((cmd) => {
+      expect(cmd.equal(expected_cmd)).to.equal(true)
+    })
+  });
+
+  it('should test controlled gate comparison', () => {
+    const gate1 = new ControlledGate(Y, 1)
+    const gate2 = new ControlledGate(Y, 1)
+    const gate3 = new ControlledGate(T, 1)
+    const gate4 = new ControlledGate(Y, 2)
+    expect(gate1.equal(gate2)).to.equal(true)
+    expect(gate1.equal(gate3)).to.equal(false)
+    expect(gate1.equal(gate4)).to.equal(false)
+  });
+
+  it('should test c', () => {
+    const expected = new ControlledGate(Y, 2)
+    expect(C(Y, 2).equal(expected)).to.equal(true)
+  });
+
+  it('should test tensor init', () => {
+    const gate = new Tensor(Y)
+    expect(gate.gate.equal(Y)).to.equal(true)
+  });
+
+  it('should test tensor string', () => {
+    const gate = new Tensor(Y)
+    expect(gate.toString()).to.equal(`Tensor(${Y.toString()})`)
+  });
+
+  it('should test tensor get inverse', () => {
+    const gate = new Tensor(new Rx(0.6))
+    const inverse = gate.getInverse()
+    expect(inverse instanceof Tensor).to.equal(true)
+    expect(inverse.gate.equal(new Rx(-0.6 + 4 * math.pi))).to.equal(true)
+  });
+
+  it('should test tensor comparison', () => {
+    const gate1 = new Tensor(new Rx(0.6))
+    const gate2 = new Tensor(new Rx(0.6 + 4 * math.pi))
+    expect(gate1.equal(gate2)).to.equal(true)
+    expect(gate1.equal(new Rx(0.6))).to.equal(false)
+  });
+
+  it('should test tensor or', () => {
+    const saving_backend = new DummyEngine(true)
+    const main_engine = new MainEngine(saving_backend, [new DummyEngine()])
+    const gate = new Rx(0.6)
+    const qubit0 = new Qubit(main_engine, 0)
+    const qubit1 = new Qubit(main_engine, 1)
+    const qubit2 = new Qubit(main_engine, 2)
+    // Option 1:
+    new Tensor(gate).or([[qubit0, qubit1, qubit2]])
+    // Option 2:
+    new Tensor(gate).or([qubit0, qubit1, qubit2])
+    const received_commands = []
+    // Remove Allocate and Deallocate gates
+    saving_backend.receivedCommands.forEach((cmd) => {
+      if (!(cmd.gate instanceof FastForwardingGate) || cmd.gate instanceof ClassicalInstructionGate) {
+        received_commands.push(cmd)
+      }
+    })
+    // Check results
+    expect(received_commands.length).to.equal(6)
+    const qubit_ids = []
+    received_commands.forEach((cmd) => {
+      expect(cmd.qubits.length).to.equal(1)
+      expect(cmd.gate.equal(gate))
+      qubit_ids.push(cmd.qubits[0][0].id)
+    })
+
+    expect(qubit_ids.sort()).to.deep.equal([0, 0, 1, 1, 2, 2])
+  });
+})
