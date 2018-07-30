@@ -2,7 +2,7 @@ import {C} from './metagates'
 import {Rz, NOT, Z} from './gates'
 
 export function CRz(angle) {
-  return C(Rz(angle), 1)
+  return C(new Rz(angle), 1)
 }
 
 export const CNOT = C(NOT)

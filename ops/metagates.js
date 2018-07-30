@@ -138,12 +138,12 @@ the gate.
      */
   or(qubits) {
     qubits = BasicGate.makeTupleOfQureg(qubits)
-    const ctrl = []
+    let ctrl = []
     const gateQuregs = []
     let addingToControls = true
     qubits.forEach((reg) => {
       if (addingToControls) {
-        ctrl.push(reg)
+        ctrl = ctrl.concat(reg)
         addingToControls = ctrl.length < this.n
       } else {
         gateQuregs.push(reg)
@@ -167,6 +167,13 @@ the gate.
       prefix += 'C'
     }
     return `${prefix}${this.gate.toString()}`
+  }
+
+  equal(other) {
+    if (other instanceof this.__proto__.constructor) {
+      return this.gate.equal(other.gate) && this.n === other.n
+    }
+    return false
   }
 }
 
