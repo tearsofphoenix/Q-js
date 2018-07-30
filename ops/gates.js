@@ -15,8 +15,11 @@ and meta gates, i.e.,
 * Flush gate (end of circuit)
 */
 import mathjs from 'mathjs'
-import {SelfInverseGate, BasicPhaseGate, BasicRotationGate, BasicMathGate, BasicGate, FastForwardingGate, ClassicalInstructionGate} from './basics'
-import {getInverse} from './metagates'
+import {
+  SelfInverseGate, BasicPhaseGate, BasicRotationGate, BasicMathGate, BasicGate, FastForwardingGate, ClassicalInstructionGate
+} from './basics'
+
+import {getInverse} from './_cycle'
 import {applyCommand} from './command'
 
 const mc = mathjs.complex
@@ -187,7 +190,7 @@ export class SqrtSwapGate extends BasicGate {
 
   get matrix() {
     return mm([
-        [1, 0, 0, 0],
+      [1, 0, 0, 0],
       [0, mc(0.5, 0.5), mc(0.5, -0.5), 0],
       [0, mc(0.5, -0.5), mc(0.5, 0.5), 0],
       [0, 0, 0, 1]

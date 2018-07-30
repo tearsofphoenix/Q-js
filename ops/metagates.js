@@ -15,7 +15,8 @@ and upon failure returns a DaggeredGate)
 */
 import math from 'mathjs'
 import {BasicGate} from './basics'
-import Cycle from './_cycle'
+import {Control} from '../meta/control'
+import {getInverse} from './_cycle'
 
 /*
 Wrapper class allowing to execute the inverse of a gate, even when it does
@@ -57,29 +58,7 @@ gate: Any gate object of which to represent the inverse.
   }
 }
 
-/*
-Return the inverse of a gate.
-
-    Tries to call gate.get_inverse and, upon failure, creates a DaggeredGate
-instead.
-
-    Args:
-gate: Gate of which to get the inverse
-
-Example:
-    .. code-block:: python
-
-get_inverse(H) # returns a Hadamard gate (HGate object)
- */
-export function getInverse(gate) {
-  try {
-    return gate.getInverse()
-  } catch (e) {
-    return new DaggeredGate(gate)
-  }
-}
-
-Cycle.add('getInverse', getInverse)
+Cycle.add('DaggeredGate', DaggeredGate)
 
 /*
 
@@ -164,9 +143,7 @@ the gate.
             + 'the required number of control quregs.')
     }
 
-    // TODO
-    // with projectq.meta.Control(gate_quregs[0][0].engine, ctrl):
-    // self._gate | tuple(gate_quregs)
+    Control(gateQuregs[0][0].engine, ctrl, () => this.gate.or([gateQuregs]))
   }
 }
 

@@ -24,7 +24,7 @@ The command then gets sent to the MainEngine via the
 apply wrapper (apply_command).
 */
 import {arrayEqual} from '../utils/polyfill'
-import Cycle from './_cycle'
+import {getInverse} from './_cycle'
 
 /*
 Apply a command.
@@ -121,7 +121,6 @@ NotInvertible: If the gate does not provide an inverse (see
 BasicGate.get_inverse)
      */
   getInverse() {
-    const getInverse = Cycle.get('getInverse')
     return new Command(this.engine, getInverse(this.gate), this.qubits, this.controlQubits, this.tags.slice(0))
   }
 

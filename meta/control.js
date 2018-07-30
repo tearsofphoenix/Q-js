@@ -14,6 +14,7 @@ import {ClassicalInstructionGate} from '../ops/basics'
 import {BasicQubit} from '../types/qubit'
 import {BasicEngine} from '../cengines/basics'
 import {dropEngineAfter, insertEngine} from './util'
+import {UncomputeTag, ComputeTag} from './compute'
 
 export class ControlEngine extends BasicEngine {
   /*
@@ -35,7 +36,7 @@ following operations are executed.
 cmd (Command object): a command object.
      */
   hasComputeUnComputeTag(cmd) {
-    const tags = [UncomputeTag(), ComputeTag()]
+    const tags = [new UncomputeTag(), new ComputeTag()]
     for (let i = 0; i < cmd.tags.length; ++i) {
       if (tags.contains(cmd.tags[i])) {
         return true
@@ -65,7 +66,7 @@ Example:
 with Control(eng, ctrlqubits):
 do_something(otherqubits)
  */
-export class Control {
+export function Control(engine, qubits, func) {
   /*
     Enter a controlled section.
 
@@ -80,25 +81,29 @@ Enter the section using a with-statement:
 with Control(eng, ctrlqubits):
 ...
      */
-  constructor(engine, qubits) {
-    this.engine = engine
-    if (qubits instanceof BasicQubit) {
-      qubits = [qubits]
+
+  if (qubits instanceof BasicQubit) {
+    qubits = [qubits]
+  }
+  const qs = qubits
+
+  const enter = () => {
+    if (qs.length > 0) {
+      const ce = new ControlEngine(qs)
+      insertEngine(engine, ce)
     }
-    this.qubits = qubits
   }
 
-  enter() {
-    if (this.qubits.length > 0) {
-      const ce = new ControlEngine(this.qubits)
-      insertEngine(this.engine, ce)
+  const exit = () => {
+    if (qs.length > 0) {
+      dropEngineAfter(engine)
     }
   }
 
-  exit(type, value, traceback) {
-    if (this.qubits.length > 0) {
-      dropEngineAfter(this.engine)
-    }
+  if (typeof func === 'function') {
+    enter()
+    func()
+    exit()
   }
 }
 
