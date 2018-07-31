@@ -353,7 +353,7 @@ describe('compute test', () => {
   });
 
   it('should test exception if no compute but uncompute', () => {
-    const eng = MainEngine(new DummyEngine(), [new DummyEngine()])
+    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])
     expect(() => CustomUncompute(eng, () => {})).to.throw()
   });
   it('should test exception if no compute but uncompute 2', () => {
