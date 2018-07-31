@@ -69,11 +69,7 @@ idx: Unique index of the qubit referenced by this qubit
       other (BasicQubit): BasicQubit to which to compare this one
   */
   equal(other) {
-    if (this.id === -1) {
-      return this === other
-    } else {
-      return other instanceof BasicQubit && this.id === other.id && this.engine === other.engine
-    }
+    return other instanceof BasicQubit && this.id === other.id && this.engine === other.engine
   }
 
   /*

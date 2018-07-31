@@ -52,7 +52,7 @@ export class CompareEngine extends BasicEngine {
   }
 
   compareCMDs(c1, c2) {
-    const item = ObjectCopy(c2)
+    const item = c2.copy()
     item.engine = c1.engine
     return c1.equal(item)
   }

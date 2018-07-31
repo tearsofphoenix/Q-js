@@ -101,7 +101,7 @@ uncompute.
     // There was at least one qubit allocated and deallocated within
     // compute section. Handle uncompute in most general case
     const new_local_id = {}
-    this._l.rforEach((cmd) => {
+    this._l.slice(0).rforEach((cmd) => {
       if (cmd.gate.equal(Deallocate)) {
         assert(ids_local_to_compute.has(cmd.qubits[0][0].id))
         // Create new local qubit which lives within uncompute section
