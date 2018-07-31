@@ -19,7 +19,7 @@ needs to be made explicitely, while for one argument it is optional.
 import math from 'mathjs'
 import { BasicQubit } from '../types/qubit'
 import {Command, applyCommand} from './command'
-import {arrayIsTuple} from '../libs/util'
+import {arrayIsTuple, ObjectCopy} from '../libs/util'
 
 const ANGLE_PRECISION = 12
 const ANGLE_TOLERANCE = 10 ** -ANGLE_PRECISION
@@ -164,9 +164,7 @@ Args:
   }
 
   copy() {
-    const copy = Object.create(this.__proto__)
-    Object.assign(copy, this)
-    return copy
+    return ObjectCopy(this)
   }
 }
 
@@ -185,9 +183,7 @@ Automatic implementation of the get_inverse-member function for self-
  */
 export class SelfInverseGate extends BasicGate {
   getInverse() {
-    const copy = Object.create(this.__proto__)
-    Object.assign(copy, this)
-    return copy
+    return ObjectCopy(this)
   }
 }
 

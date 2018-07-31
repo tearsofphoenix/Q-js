@@ -1,5 +1,6 @@
 import {BasicEngine} from './basics'
 import {FlushGate} from '../ops/gates';
+import {ObjectCopy} from '../libs/util';
 
 /*
 CompareEngine is an engine which saves all commands. It is only intended
@@ -30,7 +31,7 @@ export class CompareEngine extends BasicEngine {
     const add = maxidx + 1 - this._l.length
     if (add > 0) {
       for (let i = 0; i < add; ++i) {
-        this._l.push([[]])
+        this._l.push([])
       }
     }
     // add gate command to each of the qubits involved
@@ -38,8 +39,9 @@ export class CompareEngine extends BasicEngine {
   }
 
   receive(commandList) {
+    const f = new FlushGate()
     commandList.forEach((cmd) => {
-      if (cmd.gate !== FlushGate) {
+      if (!cmd.gate.equal(f)) {
         this.cacheCMD(cmd)
       }
     })
@@ -50,7 +52,43 @@ export class CompareEngine extends BasicEngine {
   }
 
   compareCMDs(c1, c2) {
-    return c1 == c2
+    const item = ObjectCopy(c2)
+    item.engine = c1.engine
+    return c1.equal(item)
+  }
+
+  equal(engine) {
+    const len = this._l.length
+    if (!(engine instanceof CompareEngine) || len !== engine._l.length) {
+      return false
+    }
+
+    for (let i = 0; i < len; ++i) {
+      const item1 = this._l[i]
+      const item2 = engine._l[i]
+      if (item1.length !== item2.length) {
+        return false
+      }
+      const total = item1.length
+      for (let j = 0; j < total; ++j) {
+        if (!this.compareCMDs(item1[j], item2[j])) {
+          return false
+        }
+      }
+    }
+    return true
+  }
+
+  toString() {
+    let string = ''
+    this._l.forEach((cmds, qubit_id) => {
+      string += `Qubit ${qubit_id} : `
+      cmds.forEach((command) => {
+        string += `${command.toString()}, `
+      })
+      string = `${string.substring(0, string.length - 2)}\n`
+    })
+    return string
   }
 }
 

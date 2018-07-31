@@ -54,6 +54,10 @@ idx: Unique index of the qubit referenced by this qubit
     return this.engine.main.getMeasurementResult(this)
   }
 
+  toNumber() {
+    return this.toBoolean() ? 1 : 0
+  }
+
   valueOf() {
     return this.toBoolean()
   }
@@ -177,6 +181,10 @@ Qureg.prototype.toBoolean = function () {
   }
   throw new Error('__bool__(qureg): Quantum register contains more "\n'
     + '"than 1 qubit. Use __bool__(qureg[idx]) instead.')
+}
+
+Qureg.prototype.toNumber = function() {
+  return this.toBoolean() ? 1 : 0
 }
 
 Qureg.prototype.toString = function() {

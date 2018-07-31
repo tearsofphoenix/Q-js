@@ -108,7 +108,7 @@ eng = MainEngine(Simulator(), engines)
       throw new Error('The provided list of engines is not a list!')
     }
 
-    engineList.push(backend)
+    engineList = [...engineList, backend]
 
     this.backend = backend
 
@@ -223,9 +223,8 @@ then send on)
     } catch (e) {
       if (this.verbose) {
         console.log(e)
-      } else {
-        throw e
       }
+      throw e
     }
   }
 

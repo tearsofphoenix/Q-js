@@ -8,7 +8,7 @@ import {
 import {Qubit, Qureg} from '../types/qubit'
 import { Command } from './command'
 import {arrayEqual} from '../utils/polyfill'
-import {makeTuple} from '../libs/util';
+import {makeTuple, ObjectCopy} from '../libs/util';
 import {Rx} from './gates'
 import {ComputeTag} from '../meta/tag'
 
@@ -57,8 +57,7 @@ describe('command test', () => {
     const cmd = new Command(main_engine, gate, makeTuple(qureg0))
     cmd.addControlQubits(qureg1)
     cmd.tags.push('MyTestTag')
-    const copied_cmd = Object.create(cmd.__proto__)
-    Object.assign(copied_cmd, cmd)
+    const copied_cmd = ObjectCopy(cmd)
     // # Test that deepcopy gives same cmd
     expect(copied_cmd.gate.equal(gate)).to.equal(true)
     expect(copied_cmd.tags).to.deep.equal(['MyTestTag'])

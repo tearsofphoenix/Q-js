@@ -16,9 +16,9 @@ describe('testengine test', () => {
     H.or(qb0)
     CNOT.or(makeTuple(qb0, qb1))
     eng.flush()
-    const expected = ('Qubit 0 : Allocate.or(Qureg[0], H.or(Qureg[0], '
-      + 'CX.or(( Qureg[0], Qureg[1] )\nQubit 1 : Allocate.or(Qureg[1],'
-      + ' CX.or(( Qureg[0], Qureg[1] )\n')
+    const expected = ('Qubit 0 : Allocate | Qureg[0], H | Qureg[0], '
+      + 'CX | ( Qureg[0], Qureg[1] )\nQubit 1 : Allocate | Qureg[1],'
+      + ' CX | ( Qureg[0], Qureg[1] )\n')
 
     expect(compare_engine.toString()).to.equal(expected)
   });
@@ -92,8 +92,8 @@ describe('testengine test', () => {
 
     expect(compare_engine0.equal(compare_engine1)).to.equal(true)
     expect(compare_engine1.equal(compare_engine2)).to.equal(false)
-    expect(compare_engine1.equal(compare_engine3)).to.equal(true)
-    expect(compare_engine0.equal(new DummyEngine())).to.equal(true)
+    expect(compare_engine1.equal(compare_engine3)).to.equal(false)
+    expect(compare_engine0.equal(new DummyEngine())).to.equal(false)
   });
 
   it('should test dummy engine', () => {

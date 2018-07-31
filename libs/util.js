@@ -36,3 +36,11 @@ export function makeTuple(...args) {
   markTuple(result)
   return result
 }
+
+export const tuple = makeTuple
+
+export function ObjectCopy(obj) {
+  const copy = Object.create(obj.__proto__)
+  Object.assign(copy, obj)
+  return copy
+}
