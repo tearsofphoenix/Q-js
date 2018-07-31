@@ -3,8 +3,10 @@ import mathjs from 'mathjs'
 /*
     @return {bool}
  */
+const Complex = mathjs.complex().constructor
+
 export function isNumeric(value) {
-  return (typeof value === 'number' || value instanceof mathjs.complex)
+  return (typeof value === 'number' || value instanceof Complex)
 }
 
 export function intersection(s1, s2) {

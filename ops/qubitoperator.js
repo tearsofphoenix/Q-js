@@ -1,27 +1,32 @@
+import math from 'mathjs'
 
 // QubitOperator stores a sum of Pauli operators acting on qubits."""
 import {isNumeric, symmetricDifference} from '../utils/polyfill'
+
+const mc = math.complex
 
 const EQ_TOLERANCE = 1e-12
 
 
 // Define products of all Pauli operators for symbolic multiplication.
-// const  _PAULI_OPERATOR_PRODUCTS = {['I', 'I']: [1., 'I'],
-//     ['I', 'X']: [1., 'X'],
-//     ['X', 'I']: [1., 'X'],
-//     ['I', 'Y']: [1., 'Y'],
-//     ['Y', 'I']: [1., 'Y'],
-//     ['I', 'Z']: [1., 'Z'],
-//     ['Z', 'I']: [1., 'Z'],
-//     ['X', 'X']: [1., 'I'],
-//     ['Y', 'Y']: [1., 'I'],
-//     ['Z', 'Z']: [1., 'I'],
-//     ['X', 'Y']: [1.j, 'Z'],
-// ['X', 'Z']: [-1.j, 'Y'],
-// ['Y', 'X']: [-1.j, 'Z'],
-// ['Y', 'Z']: [1.j, 'X'],
-// ['Z', 'X']: [1.j, 'Y'],
-// ['Z', 'Y']: [-1.j, 'X']}
+export const PAULI_OPERATOR_PRODUCTS = {
+  [['I', 'I']]: [1.0, 'I'],
+  [['I', 'X']]: [1.0, 'X'],
+  [['X', 'I']]: [1.0, 'X'],
+  [['I', 'Y']]: [1.0, 'Y'],
+  [['Y', 'I']]: [1.0, 'Y'],
+  [['I', 'Z']]: [1.0, 'Z'],
+  [['Z', 'I']]: [1.0, 'Z'],
+  [['X', 'X']]: [1.0, 'I'],
+  [['Y', 'Y']]: [1.0, 'I'],
+  [['Z', 'Z']]: [1.0, 'I'],
+  [['X', 'Y']]: [mc(0, 1), 'Z'],
+  [['X', 'Z']]: [mc(0, -1), 'Y'],
+  [['Y', 'X']]: [mc(0, -1), 'Z'],
+  [['Y', 'Z']]: [mc(0, 1), 'X'],
+  [['Z', 'X']]: [mc(0, 1), 'Y'],
+  [['Z', 'Y']]: [mc(0, -1), 'X']
+}
 
 /*
 
@@ -80,7 +85,7 @@ function checkTerm(term) {
   })
 }
 
-export class QubitOperator {
+export default class QubitOperator {
   /*
     Inits a QubitOperator.
 
@@ -131,8 +136,8 @@ QubitOperatorError: Invalid operators provided to QubitOperator.
       throw new Error('Coefficient must be a numeric type.')
     }
 
-    if (!term) {
-
+    if (typeof term === 'undefined') {
+      // leave it empty
     } else if (Array.isArray(term)) {
       if (term.length === 0) {
         this.terms[[]] = coefficient
@@ -143,17 +148,17 @@ QubitOperatorError: Invalid operators provided to QubitOperator.
       }
     } else if (typeof term === 'string') {
       const listOPs = []
-      const parts = term.split(/\s+/)
+      const parts = term.split(/\s+/).filter(item => item.length > 0)
       parts.forEach((el) => {
         if (el.length < 2) {
           throw new Error('term specified incorrectly.')
         }
-        listOPs.push([parseInt(el.substring(1)), el[0]])
+        listOPs.push([parseInt(el.substring(1), 10), el[0]])
       })
 
       checkTerm(listOPs)
 
-      term = term.sort((a, b) => a[0] - b[0])
+      term = listOPs.sort((a, b) => a[0] - b[0])
       this.terms[term] = coefficient
     } else {
       throw new Error('term specified incorrectly.')
@@ -171,10 +176,10 @@ abs_tol(float): Absolute tolerance, must be at least 0.0
     const new_terms = {}
     Object.keys(this.terms).forEach((key) => {
       let coeff = this.terms[key]
-      if (Math.abs(coeff.imag) <= absTolerance) {
-        coeff = coeff.real
+      if (math.abs(math.im(coeff)) <= absTolerance) {
+        coeff = math.re(coeff)
       }
-      if (Math.abs(coeff) > absTolerance) {
+      if (math.abs(coeff) > absTolerance) {
         new_terms[key] = coeff
       }
     })
@@ -197,23 +202,27 @@ abs_tol(float): Absolute tolerance, must be at least 0.0
      */
   isClose(other, realTolerance = 1e-12, absTolerance = 1e-12) {
     // terms which are in both:
-    const intersection = new Set([...this.terms].filter(x => other.terms.has(x)))
+    const otherKeys = new Set(Object.keys(other.terms))
+    const myKeys = Object.keys(this.terms)
+    const intersection = new Set(myKeys.filter(x => otherKeys.has(x)))
     for (const term of intersection) {
       const a = this.terms[term]
-      const b = this.terms[term]
+      const b = other.terms[term]
       //
-      if (!(Math.abs(a - b) <= Math.max(realTolerance * Math.max(Math.abs(a), Math.abs(b), absTolerance)))) {
+      const tmp = math.multiply(realTolerance, math.max(math.abs(a), math.abs(b)))
+      if (math.abs(math.subtract(a, b)) > math.max(tmp, absTolerance)) {
         return false
       }
     }
-    const diff = symmetricDifference(this.terms, other.terms)
+    const diff = symmetricDifference(new Set(myKeys), otherKeys)
     // terms only in one (compare to 0.0 so only abs_tol)
     for (const term of diff) {
-      if (typeof this.terms[term] !== 'undefined') {
-        if (!(Math.abs(this.terms[term]) <= absTolerance)) {
+      const value = this.terms[term]
+      if (typeof value !== 'undefined') {
+        if (math.abs(value) > absTolerance) {
           return false
         }
-      } else if (!(Math.abs(other.terms[term]) <= absTolerance)) {
+      } else if (math.abs(other.terms[term]) > absTolerance) {
         return false
       }
     }
@@ -229,22 +238,134 @@ multiplier(complex float, or QubitOperator): multiplier
   imul(multiplier) {
     // Handle scalars.
     if (isNumeric(multiplier)) {
-      Object.keys(this.terms).forEach((term) => {
-        const value = this.terms[term]
-        this.terms[term] = value * multiplier
+      Object.keys(this.terms).forEach((key) => {
+        this.terms = math.multiply(this.terms[key], multiplier)
       })
       return this
-    } else if (multiplier instanceof QubitOperator) {
-      // Handle QubitOperator.
-      const result_terms = {}
-      Object.keys(this.terms).forEach((lterm) => {
-
-      })
-      // for left_term in self.terms:
-      // for right_term in multiplier.terms:
-      // new_coefficient = (self.terms[left_term] *
-      //   multiplier.terms[right_term])
     }
+
+    // Handle QubitOperator.
+    if (multiplier instanceof QubitOperator) {
+      const result_terms = {}
+      Object.keys(this.terms).forEach((left_term) => {
+        const leftKey = left_term.split(',')
+        Object.keys(multiplier.terms).forEach((right_term) => {
+          let new_coefficient = math.multiply(this.terms[left_term], multiplier.terms[right_term])
+          // Loop through local operators and create new sorted list
+          // of representing the product local operator:
+          let product_operators = []
+          let left_operator_index = 0
+          let right_operator_index = 0
+          const rightKey = right_term.split(',')
+          const n_operators_left = leftKey.length
+          const n_operators_right = rightKey.length
+
+          while (left_operator_index < n_operators_left && right_operator_index < n_operators_right) {
+            const [left_qubit, left_loc_op] = leftKey[left_operator_index]
+            const [right_qubit, right_loc_op] = rightKey[right_operator_index]
+
+            // Multiply local operators acting on the same qubit
+            if (left_qubit === right_qubit) {
+              left_operator_index += 1
+              right_operator_index += 1
+              const [scalar, loc_op] = PAULI_OPERATOR_PRODUCTS[[left_loc_op, right_loc_op]]
+
+              // Add new term.
+              if (loc_op !== 'I') {
+                product_operators.push([left_qubit, loc_op])
+                new_coefficient = math.multiply(new_coefficient, scalar)
+              }
+              // Note if loc_op == 'I', then scalar == 1.0
+
+              // If left_qubit > right_qubit, add right_loc_op; else,
+              // add left_loc_op.
+            } else if (left_qubit > right_qubit) {
+              product_operators.push([right_qubit, right_loc_op])
+              right_operator_index += 1
+            } else {
+              product_operators.push([left_qubit, left_loc_op])
+              left_operator_index += 1
+            }
+          }
+
+          // Finish the remainding operators:
+          if (left_operator_index === n_operators_left) {
+            product_operators = product_operators.concat(rightKey.slice(right_operator_index))
+          } else if (right_operator_index === n_operators_right) {
+            product_operators = product_operators.concat(leftKey.slice(left_operator_index))
+          }
+
+          // Add to result dict
+          const tmp_key = product_operators
+          if (tmp_key in result_terms) {
+            result_terms[tmp_key] += new_coefficient
+          } else {
+            result_terms[tmp_key] = new_coefficient
+          }
+        })
+      })
+      this.terms = result_terms
+      return this
+    } else {
+      throw new Error('Cannot in-place multiply term of invalid type '
+        + 'to QubitTerm.')
+    }
+  }
+
+  /*
+  Return self * multiplier for a scalar, or a QubitOperator.
+
+    Args:
+multiplier: A scalar, or a QubitOperator.
+
+    Returns:
+product: A QubitOperator.
+
+    Raises:
+TypeError: Invalid type cannot be multiply with QubitOperator.
+   */
+  mul(multiplier) {
+    if (isNumeric(multiplier) || multiplier instanceof QubitOperator) {
+      const product = this.copy()
+      return product.imul(multiplier)
+    }
+    throw new Error('Object of invalid type cannot multiply with QubitOperator.')
+  }
+
+  iadd(addend) {
+    if (addend instanceof QubitOperator) {
+      Object.keys(addend.terms).forEach((key) => {
+        const value = this.terms[key]
+        const ov = addend.terms[key]
+        if (typeof value !== 'undefined') {
+          const tmp = math.add(ov, value)
+          if (math.abs(tmp) > 0) {
+            this.terms[key] = tmp
+          } else {
+            delete this.terms[key]
+          }
+        } else {
+          this.terms[key] = ov
+        }
+      })
+    } else {
+      throw new Error('Cannot add invalid type to QubitOperator.')
+    }
+    return this
+  }
+
+  add(addend) {
+    const inst = this.copy()
+    inst.iadd(addend)
+    return inst
+  }
+
+  copy() {
+    const terms = {}
+    Object.assign(terms, this.terms)
+    const inst = new QubitOperator([])
+    inst.terms = terms
+    return inst
   }
 }
 
@@ -304,27 +425,7 @@ multiplier(complex float, or QubitOperator): multiplier
 // raise TypeError('Cannot in-place multiply term of invalid type ' +
 //     'to QubitTerm.')
 //
-// def __mul__(self, multiplier):
-// """
-// Return self * multiplier for a scalar, or a QubitOperator.
-//
-//     Args:
-// multiplier: A scalar, or a QubitOperator.
-//
-//     Returns:
-// product: A QubitOperator.
-//
-//     Raises:
-// TypeError: Invalid type cannot be multiply with QubitOperator.
-//     """
-// if (isinstance(multiplier, (int, float, complex)) or
-// isinstance(multiplier, QubitOperator)):
-// product = copy.deepcopy(self)
-// product *= multiplier
-// return product
-// else:
-// raise TypeError(
-//     'Object of invalid type cannot multiply with QubitOperator.')
+
 //
 // def __rmul__(self, multiplier):
 // """

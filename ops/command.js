@@ -26,8 +26,7 @@ apply wrapper (apply_command).
 import {arrayEqual} from '../utils/polyfill'
 import {getInverse} from './_cycle'
 import {Qureg} from '../types/qubit';
-import {markTuple} from "../libs/util"
-import deepEqual from 'deep-equal'
+import {markTuple} from '../libs/util'
 
 /*
 Apply a command.
@@ -257,7 +256,7 @@ engine: New owner of qubits and owner of this Command object
       const f1 = this.gate.equal(other.gate)
       const t1 = arrayEqual(this.tags, other.tags)
       const e1 = this.engine === other.engine
-      const b = deepEqual(this.allQubits, other.allQubits)
+      const b = arrayEqual(this.allQubits, other.allQubits)
       return f1 && t1 && e1 && b
     }
     return false
