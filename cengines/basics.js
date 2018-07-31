@@ -26,8 +26,6 @@ export class BasicEngine {
 None.
      */
   constructor() {
-    this.main = null
-    this.next = null
     this.isLastEngine = false
   }
 
