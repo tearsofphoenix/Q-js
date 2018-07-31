@@ -222,9 +222,9 @@ object).
      */
   getInverse() {
     if (this.angle == 0) {
-      return new BasicRotationGate(0)
+      return new this.constructor(0)
     } else {
-      return new BasicRotationGate(-this.angle + 4 * Math.PI)
+      return new this.constructor(-this.angle + 4 * Math.PI)
     }
   }
 

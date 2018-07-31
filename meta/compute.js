@@ -55,6 +55,7 @@ uncompute.
     if (this.allocatedQubitIDs.size === 0) {
       const cmds = this._l.rmap(cmd => this.addUnComputeTag(cmd.getInverse()))
       this.send(cmds)
+      return
     }
 
 

@@ -109,7 +109,7 @@ Tags associated with the command.
   }
 
   copy() {
-    return new Command(this.engine, this.gate.copy(), this.qubits, this.controlQubits, this.tags.slice(0))
+    return new Command(this.engine, this.gate.copy(), this.qubits.slice(0), this.controlQubits.slice(0), this.tags.slice(0))
   }
 
   /*
@@ -285,5 +285,20 @@ engine: New owner of qubits and owner of this Command object
       cs += 'C'
     }
     return `${cs}${this.gate.toString()} | ${qs}`
+  }
+
+  get description() {
+    return this.toString()
+  }
+
+  [Symbol.toStringTag]() {
+    return this.toString()
+  }
+
+  [Symbol.toPrimitive](hint) {
+    if (hint === 'string') {
+      return this.toString()
+    }
+    return true;
   }
 }
