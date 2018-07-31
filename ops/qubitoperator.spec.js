@@ -161,56 +161,61 @@ describe('qubit operator test', () => {
     expect(b.isClose(a, 1, 0.1)).to.equal(true)
   });
 
-  it('should test_isclose_zero_terms', function () {
+  it('should test_isclose_zero_terms', () => {
     const op = new QubitOperator(tuple([1, 'Y'], [0, 'X']), mc(0, -1)).mul(0)
     expect(op.isClose(new QubitOperator([], 0.0), 1e-12, 1e-12)).to.equal(true)
     expect(new QubitOperator([], 0.0).isClose(op, 1e-12, 1e-12)).to.equal(true)
   });
+
+  it('should test_isclose_different_terms', () => {
+    const a = new QubitOperator(tuple([1, 'Y']), mc(0, -0.1))
+    const b = new QubitOperator(tuple([1, 'X']), mc(0, -0.1))
+    expect(a.isClose(b, 1e-12, 0.2)).to.equal(true)
+    expect(a.isClose(b, 1e-12, 0.05)).to.equal(false)
+    expect(b.isClose(a, 1e-12, 0.2)).to.equal(true)
+    expect(b.isClose(a, 1e-12, 0.05)).to.equal(false)
+  });
+
+  it('should test_isclose_different_num_terms', () => {
+    const a = new QubitOperator(tuple([1, 'Y']), mc(0, -0.1))
+    a.iadd(new QubitOperator(tuple([2, 'Y']), mc(0, -0.1)))
+    const b = new QubitOperator(tuple([1, 'X']), mc(0, -0.1))
+
+    expect(a.isClose(b, 1e-12, 0.05)).to.equal(false)
+    expect(b.isClose(a, 1e-12, 0.05)).to.equal(false)
+  });
+
+  it('should test_imul_inplace', () => {
+    const qubit_op = new QubitOperator('X1')
+    const prev_id = qubit_op
+    qubit_op.imul(3)
+    expect(qubit_op === prev_id).to.equal(true)
+  });
+
+  it('should test_imul_scalar', () => {
+    const data = [0.5, mc(0, 0.6), 2.303, mc(0, -1)]
+    data.forEach((multiplier) => {
+      const loc_op = tuple([1, 'X'], [2, 'Y'])
+      const qubit_op = new QubitOperator(loc_op)
+      qubit_op.imul(multiplier)
+      const v = qubit_op.terms[loc_op]
+      expect(math.equal(v, multiplier)).to.equal(true)
+    })
+  });
+
+  it('should test_imul_qubit_op', () => {
+    const op1 = new QubitOperator(tuple([0, 'Y'], [3, 'X'], [8, 'Z'], [11, 'X']), mc(0, 3.0))
+    const op2 = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
+    op1.imul(op2)
+    const correct_coefficient = math.multiply(math.multiply(mc(0, 1.0), mc(0, 3.0)), 0.5)
+    const correct_term = tuple([0, 'Y'], [1, 'X'], [3, 'Z'], [11, 'X'])
+
+    expect(Object.keys(op1.terms).length).to.equal(1)
+    const v = op1.terms[correct_term]
+    expect(math.equal(v, correct_coefficient)).to.equal(true)
+  });
 })
 
-// def test_isclose_different_terms():
-// a = new QubitOperator(((1, 'Y'),), -0.1j)
-// b = new QubitOperator(((1, 'X'),), -0.1j)
-// assert a.isclose(b, rel_tol=1e-12, abs_tol=0.2)
-// assert not a.isclose(b, rel_tol=1e-12, abs_tol=0.05)
-// assert b.isclose(a, rel_tol=1e-12, abs_tol=0.2)
-// assert not b.isclose(a, rel_tol=1e-12, abs_tol=0.05)
-//
-//
-// def test_isclose_different_num_terms():
-// a = new QubitOperator(((1, 'Y'),), -0.1j)
-// a += new QubitOperator(((2, 'Y'),), -0.1j)
-// b = new QubitOperator(((1, 'X'),), -0.1j)
-// assert not b.isclose(a, rel_tol=1e-12, abs_tol=0.05)
-// assert not a.isclose(b, rel_tol=1e-12, abs_tol=0.05)
-//
-//
-// def test_imul_inplace():
-// qubit_op = new QubitOperator("X1")
-// prev_id = id(qubit_op)
-// qubit_op *= 3.
-// assert id(qubit_op) == prev_id
-//
-//
-// @pytest.mark.parametrize("multiplier", [0.5, 0.6j, numpy.float64(2.303),
-//   numpy.complex128(-1j)])
-// def test_imul_scalar(multiplier):
-// loc_op = ((1, 'X'), (2, 'Y'))
-// qubit_op = new QubitOperator(loc_op)
-// qubit_op *= multiplier
-// assert qubit_op.terms[loc_op] == pytest.approx(multiplier)
-//
-//
-// def test_imul_qubit_op():
-// op1 = new QubitOperator(((0, 'Y'), (3, 'X'), (8, 'Z'), (11, 'X')), 3.j)
-// op2 = new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5)
-// op1 *= op2
-// correct_coefficient = 1.j * 3.0j * 0.5
-// correct_term = ((0, 'Y'), (1, 'X'), (3, 'Z'), (11, 'X'))
-// assert len(op1.terms) == 1
-// assert correct_term in op1.terms
-//
-//
 // def test_imul_qubit_op_2():
 // op3 = new QubitOperator(((1, 'Y'), (0, 'X')), -1j)
 // op4 = new QubitOperator(((1, 'Y'), (0, 'X'), (2, 'Z')), -1.5)

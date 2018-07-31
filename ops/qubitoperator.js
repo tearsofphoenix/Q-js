@@ -236,14 +236,6 @@ abs_tol(float): Absolute tolerance, must be at least 0.0
 multiplier(complex float, or QubitOperator): multiplier
      */
   imul(multiplier) {
-    // Handle scalars.
-    if (isNumeric(multiplier)) {
-      Object.keys(this.terms).forEach((key) => {
-        this.terms = math.multiply(this.terms[key], multiplier)
-      })
-      return this
-    }
-
     // Handle QubitOperator.
     if (multiplier instanceof QubitOperator) {
       const result_terms = {}
@@ -305,6 +297,12 @@ multiplier(complex float, or QubitOperator): multiplier
         })
       })
       this.terms = result_terms
+      return this
+    } else // Handle scalars.
+    if (isNumeric(multiplier)) {
+      Object.keys(this.terms).forEach((key) => {
+        this.terms[key] = math.multiply(this.terms[key], multiplier)
+      })
       return this
     } else {
       throw new Error('Cannot in-place multiply term of invalid type '
