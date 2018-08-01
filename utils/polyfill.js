@@ -5,6 +5,10 @@ import mathjs from 'mathjs'
  */
 const Complex = mathjs.complex().constructor
 
+export function isComplex(value) {
+  return value instanceof Complex
+}
+
 export function isNumeric(value) {
   return (typeof value === 'number' || value instanceof Complex)
 }

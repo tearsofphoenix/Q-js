@@ -28,8 +28,7 @@ export const PAULI_OPERATOR_PRODUCTS = {
   [['Z', 'Y']]: [mc(0, -1), 'X']
 }
 
-
-function stringToArray(key) {
+export function stringToArray(key) {
   const parts = key.split(',').filter(item => item.length > 0)
   if (parts.length % 2 === 0) {
     const result = []
@@ -213,7 +212,7 @@ other(QubitOperator): QubitOperator to compare against.
 rel_tol(float): Relative tolerance, must be greater than 0.0
 abs_tol(float): Absolute tolerance, must be at least 0.0
      */
-  isClose(other, realTolerance = 1e-12, absTolerance = 1e-12) {
+  isClose(other, realTolerance = EQ_TOLERANCE, absTolerance = EQ_TOLERANCE) {
     // terms which are in both:
     const otherKeys = new Set(Object.keys(other.terms))
     const myKeys = Object.keys(this.terms)
