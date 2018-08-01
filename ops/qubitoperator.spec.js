@@ -214,254 +214,236 @@ describe('qubit operator test', () => {
     const v = op1.terms[correct_term]
     expect(math.equal(v, correct_coefficient)).to.equal(true)
   });
-})
 
-// def test_imul_qubit_op_2():
-// op3 = new QubitOperator(((1, 'Y'), (0, 'X')), -1j)
-// op4 = new QubitOperator(((1, 'Y'), (0, 'X'), (2, 'Z')), -1.5)
-// op3 *= op4
-// op4 *= op3
-// assert ((2, 'Z'),) in op3.terms
-// assert op3.terms[((2, 'Z'),)] == 1.5j
-//
-//
-// def test_imul_bidir():
-// op_a = new QubitOperator(((1, 'Y'), (0, 'X')), -1j)
-// op_b = new QubitOperator(((1, 'Y'), (0, 'X'), (2, 'Z')), -1.5)
-// op_a *= op_b
-// op_b *= op_a
-// assert ((2, 'Z'),) in op_a.terms
-// assert op_a.terms[((2, 'Z'),)] == 1.5j
-// assert ((0, 'X'), (1, 'Y')) in op_b.terms
-// assert op_b.terms[((0, 'X'), (1, 'Y'))] == -2.25j
-//
-//
-// def test_imul_bad_multiplier():
-// op = new QubitOperator(((1, 'Y'), (0, 'X')), -1j)
-// with pytest.raises(TypeError):
-// op *= "1"
-//
-//
-// def test_mul_by_scalarzero():
-// op = new QubitOperator(((1, 'Y'), (0, 'X')), -1j) * 0
-// assert ((0, 'X'), (1, 'Y')) in op.terms
-// assert op.terms[((0, 'X'), (1, 'Y'))] == pytest.approx(0.0)
-//
-//
-// def test_mul_bad_multiplier():
-// op = new QubitOperator(((1, 'Y'), (0, 'X')), -1j)
-// with pytest.raises(TypeError):
-// op = op * "0.5"
-//
-//
-// def test_mul_out_of_place():
-// op1 = new QubitOperator(((0, 'Y'), (3, 'X'), (8, 'Z'), (11, 'X')), 3.j)
-// op2 = new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5)
-// op3 = op1 * op2
-// correct_coefficient = 1.j * 3.0j * 0.5
-// correct_term = ((0, 'Y'), (1, 'X'), (3, 'Z'), (11, 'X'))
-// assert op1.isclose(new QubitOperator(
-//     ((0, 'Y'), (3, 'X'), (8, 'Z'), (11, 'X')), 3.j))
-// assert op2.isclose(new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5))
-// assert op3.isclose(new QubitOperator(correct_term, correct_coefficient))
-//
-//
-// def test_mul_npfloat64():
-// op = new QubitOperator(((1, 'X'), (3, 'Y')), 0.5)
-// res = op * numpy.float64(0.5)
-// assert res.isclose(new QubitOperator(((1, 'X'), (3, 'Y')), 0.5 * 0.5))
-//
-//
-// def test_mul_multiple_terms():
-// op = new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5)
-// op += new QubitOperator(((1, 'Z'), (3, 'X'), (8, 'Z')), 1.2)
-// op += new QubitOperator(((1, 'Z'), (3, 'Y'), (9, 'Z')), 1.4j)
-// res = op * op
-// correct = new QubitOperator((), 0.5**2 + 1.2**2 + 1.4j**2)
-// correct += new QubitOperator(((1, 'Y'), (3, 'Z')),
-//     2j * 1j * 0.5 * 1.2)
-// assert res.isclose(correct)
-//
-//
-// @pytest.mark.parametrize("multiplier", [0.5, 0.6j, numpy.float64(2.303),
-//   numpy.complex128(-1j)])
-// def test_rmul_scalar(multiplier):
-// op = new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5)
-// res1 = op * multiplier
-// res2 = multiplier * op
-// assert res1.isclose(res2)
-//
-//
-// def test_rmul_bad_multiplier():
-// op = new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5)
-// with pytest.raises(TypeError):
-// op = "0.5" * op
-//
-//
-// @pytest.mark.parametrize("divisor", [0.5, 0.6j, numpy.float64(2.303),
-//   numpy.complex128(-1j), 2])
-// def test_truediv_and_div(divisor):
-// op = new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5)
-// op2 = copy.deepcopy(op)
-// original = copy.deepcopy(op)
-// res = op / divisor
-// res2 = op2.__div__(divisor)  # To test python 2 version as well
-// correct = op * (1. / divisor)
-// assert res.isclose(correct)
-// assert res2.isclose(correct)
-// # Test if done out of place
-// assert op.isclose(original)
-// assert op2.isclose(original)
-//
-//
-// def test_truediv_bad_divisor():
-// op = new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5)
-// with pytest.raises(TypeError):
-// op = op / "0.5"
-//
-//
-// @pytest.mark.parametrize("divisor", [0.5, 0.6j, numpy.float64(2.303),
-//   numpy.complex128(-1j), 2])
-// def test_itruediv_and_idiv(divisor):
-// op = new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5)
-// op2 = copy.deepcopy(op)
-// original = copy.deepcopy(op)
-// correct = op * (1. / divisor)
-// op /= divisor
-// op2.__idiv__(divisor)  # To test python 2 version as well
-// assert op.isclose(correct)
-// assert op2.isclose(correct)
-// # Test if done in-place
-//   assert not op.isclose(original)
-// assert not op2.isclose(original)
-//
-//
-// def test_itruediv_bad_divisor():
-// op = new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5)
-// with pytest.raises(TypeError):
-// op /= "0.5"
-//
-//
-// def test_iadd_cancellation():
-// term_a = ((1, 'X'), (3, 'Y'), (8, 'Z'))
-// term_b = ((1, 'X'), (3, 'Y'), (8, 'Z'))
-// a = new QubitOperator(term_a, 1.0)
-// a += new QubitOperator(term_b, -1.0)
-// assert len(a.terms) == 0
-//
-//
-// def test_iadd_different_term():
-// term_a = ((1, 'X'), (3, 'Y'), (8, 'Z'))
-// term_b = ((1, 'Z'), (3, 'Y'), (8, 'Z'))
-// a = new QubitOperator(term_a, 1.0)
-// a += new QubitOperator(term_b, 0.5)
-// assert len(a.terms) == 2
-// assert a.terms[term_a] == pytest.approx(1.0)
-// assert a.terms[term_b] == pytest.approx(0.5)
-// a += new QubitOperator(term_b, 0.5)
-// assert len(a.terms) == 2
-// assert a.terms[term_a] == pytest.approx(1.0)
-// assert a.terms[term_b] == pytest.approx(1.0)
-//
-//
-// def test_iadd_bad_addend():
-// op = new QubitOperator((), 1.0)
-// with pytest.raises(TypeError):
-// op += "0.5"
-//
-//
-// def test_add():
-// term_a = ((1, 'X'), (3, 'Y'), (8, 'Z'))
-// term_b = ((1, 'Z'), (3, 'Y'), (8, 'Z'))
-// a = new QubitOperator(term_a, 1.0)
-// b = new QubitOperator(term_b, 0.5)
-// res = a + b + b
-// assert len(res.terms) == 2
-// assert res.terms[term_a] == pytest.approx(1.0)
-// assert res.terms[term_b] == pytest.approx(1.0)
-// # Test out of place
-// assert a.isclose(new QubitOperator(term_a, 1.0))
-// assert b.isclose(new QubitOperator(term_b, 0.5))
-//
-//
-// def test_add_bad_addend():
-// op = new QubitOperator((), 1.0)
-// with pytest.raises(TypeError):
-// op = op + "0.5"
-//
-//
-// def test_sub():
-// term_a = ((1, 'X'), (3, 'Y'), (8, 'Z'))
-// term_b = ((1, 'Z'), (3, 'Y'), (8, 'Z'))
-// a = new QubitOperator(term_a, 1.0)
-// b = new QubitOperator(term_b, 0.5)
-// res = a - b
-// assert len(res.terms) == 2
-// assert res.terms[term_a] == pytest.approx(1.0)
-// assert res.terms[term_b] == pytest.approx(-0.5)
-// res2 = b - a
-// assert len(res2.terms) == 2
-// assert res2.terms[term_a] == pytest.approx(-1.0)
-// assert res2.terms[term_b] == pytest.approx(0.5)
-//
-//
-// def test_sub_bad_subtrahend():
-// op = new QubitOperator((), 1.0)
-// with pytest.raises(TypeError):
-// op = op - "0.5"
-//
-//
-// def test_isub_different_term():
-// term_a = ((1, 'X'), (3, 'Y'), (8, 'Z'))
-// term_b = ((1, 'Z'), (3, 'Y'), (8, 'Z'))
-// a = new QubitOperator(term_a, 1.0)
-// a -= new QubitOperator(term_b, 0.5)
-// assert len(a.terms) == 2
-// assert a.terms[term_a] == pytest.approx(1.0)
-// assert a.terms[term_b] == pytest.approx(-0.5)
-// a -= new QubitOperator(term_b, 0.5)
-// assert len(a.terms) == 2
-// assert a.terms[term_a] == pytest.approx(1.0)
-// assert a.terms[term_b] == pytest.approx(-1.0)
-//
-//
-// def test_isub_bad_addend():
-// op = new QubitOperator((), 1.0)
-// with pytest.raises(TypeError):
-// op -= "0.5"
-//
-//
-// def test_neg():
-// op = new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5)
-//     -op
-// # out of place
-// assert op.isclose(new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5))
-// correct = -1.0 * op
-// assert correct.isclose(-op)
-//
-//
-// def test_str():
-// op = new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5)
-// assert str(op) == "0.5 X1 Y3 Z8"
-// op2 = new QubitOperator((), 2)
-// assert str(op2) == "2 I"
-//
-//
-// def test_str_empty():
-// op = new QubitOperator()
-// assert str(op) == '0'
-//
-//
-// def test_str_multiple_terms():
-// op = new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5)
-// op += new QubitOperator(((1, 'Y'), (3, 'Y'), (8, 'Z')), 0.6)
-// assert (str(op) == "0.5 X1 Y3 Z8 +\n0.6 Y1 Y3 Z8" or
-// str(op) == "0.6 Y1 Y3 Z8 +\n0.5 X1 Y3 Z8")
-// op2 = new QubitOperator((), 2)
-// assert str(op2) == "2 I"
-//
-//
-// def test_rep():
-// op = new QubitOperator(((1, 'X'), (3, 'Y'), (8, 'Z')), 0.5)
-// # Not necessary, repr could do something in addition
-//     assert repr(op) == str(op)
+  it('should test_imul_qubit_op_2', () => {
+    const op3 = new QubitOperator(tuple([1, 'Y'], [0, 'X']), mc(0, -1))
+    const op4 = new QubitOperator(tuple([1, 'Y'], [0, 'X'], [2, 'Z']), -1.5)
+
+    op3.imul(op4)
+    op4.imul(op3)
+    const v = op3.terms[[2, 'Z']]
+    expect(!!v).to.equal(true)
+    expect(math.equal(v, mc(0, 1.5))).to.equal(true)
+  });
+
+  it('should test_imul_bidir', () => {
+    const op_a = new QubitOperator(tuple([1, 'Y'], [0, 'X']), mc(0, -1))
+    const op_b = new QubitOperator(tuple([1, 'Y'], [0, 'X'], [2, 'Z']), -1.5)
+    op_a.imul(op_b)
+    op_b.imul(op_a)
+
+    const v = op_a.terms[[2, 'Z']]
+    expect(math.equal(v, mc(0, 1.5))).to.equal(true)
+    const c = op_b.terms[[[0, 'X'], [1, 'Y']]]
+    expect(math.equal(c, mc(0, -2.25))).to.equal(true)
+  });
+
+  it('should test_imul_bad_multiplier', () => {
+    const op = new QubitOperator(tuple([1, 'Y'], [0, 'X']), mc(0, -1))
+    expect(() => op.imul('1')).to.throw()
+  });
+
+  it('should test_mul_by_scalarzero', () => {
+    const op = new QubitOperator(tuple([1, 'Y'], [0, 'X']), mc(0, -1)).mul(0)
+    const key = [[0, 'X'], [1, 'Y']]
+    const v = op.terms[key]
+    expect(math.equal(v, mc(0, 0))).to.equal(true)
+  });
+
+  it('should test_mul_bad_multiplier', () => {
+    let op = new QubitOperator(tuple([1, 'Y'], [0, 'X']), mc(0, -1))
+    expect(() => op = op.mul('0.5')).to.throw()
+  });
+
+  it('should test_mul_out_of_place', () => {
+    const op1 = new QubitOperator(tuple([0, 'Y'], [3, 'X'], [8, 'Z'], [11, 'X']), mc(0, 3.0))
+    const op2 = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
+    const op3 = op1.mul(op2)
+    const correct_coefficient = math.multiply(math.multiply(mc(0, 1), mc(0, 3)), 0.5)
+    const correct_term = tuple([0, 'Y'], [1, 'X'], [3, 'Z'], [11, 'X'])
+
+    expect(op1.isClose(new QubitOperator(tuple([0, 'Y'], [3, 'X'], [8, 'Z'], [11, 'X']), mc(0, 3.0)))).to.equal(true)
+    expect(op2.isClose(new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5))).to.equal(true)
+    expect(op3.isClose(new QubitOperator(correct_term, correct_coefficient))).to.equal(true)
+  });
+
+  it('should test_mul_npfloat64', () => {
+    const op = new QubitOperator(tuple([1, 'X'], [3, 'Y']), 0.5)
+    const res = op.mul(0.5)
+    expect(res.isClose(new QubitOperator(tuple([1, 'X'], [3, 'Y']), 0.5 * 0.5))).to.equal(true)
+  });
+
+  it('should test_mul_multiple_terms', () => {
+    const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
+    op.iadd(new QubitOperator(tuple([1, 'Z'], [3, 'X'], [8, 'Z']), 1.2))
+    op.iadd(new QubitOperator(tuple([1, 'Z'], [3, 'Y'], [9, 'Z']), mc(0, 1.4)))
+    const res = op.mul(op)
+    const correct = new QubitOperator([], math.add((0.5 ** 2) + (1.2 ** 2), math.pow(mc(0, 1.4), 2)))
+    correct.iadd(new QubitOperator(tuple([1, 'Y'], [3, 'Z']), math.multiply(math.multiply(mc(0, 2), mc(0, 1)), 0.6)))
+    expect(res.isClose(correct)).to.equal(true)
+  });
+
+  it('should test_truediv_and_div', () => {
+    const divisors = [0.5, mc(0, 0.6), 2.303, mc(0, -1), 2]
+    divisors.forEach((divisor) => {
+      const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
+      const op2 = op.copy()
+      const original = op.copy()
+      const res = op.div(divisor)
+      const correct = op.mul(math.divide(1.0, divisor))
+
+      expect(res.isClose(correct)).to.equal(true)
+      // Test if done out of place
+      expect(op.isClose(original)).to.equal(true)
+      expect(op2.isClose(original)).to.equal(true)
+    })
+  });
+
+  it('should test_truediv_bad_divisor', () => {
+    const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
+    expect(() => op.div('0.5')).to.throw()
+  });
+
+  it('should test_itruediv_and_idiv', () => {
+    const divisors = [0.5, mc(0, 0.6), 2.303, mc(0, -1), 2]
+    divisors.forEach((divisor) => {
+      const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
+      const op2 = op.copy()
+      const original = op.copy()
+      const correct = op.mul(math.divide(1.0, divisor))
+
+      op.idiv(divisor)
+      op2.idiv(divisor)
+
+      expect(op.isClose(correct)).to.equal(true)
+      expect(op2.isClose(correct)).to.equal(true)
+
+      // Test if done out of place
+      expect(op.isClose(original)).to.equal(false)
+      expect(op2.isClose(original)).to.equal(false)
+    })
+  });
+
+  it('should test_itruediv_bad_divisor', () => {
+    const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
+    expect(() => op.idiv('0.5')).to.throw()
+  });
+
+  it('should test_iadd_cancellation', () => {
+    const term_a = tuple([1, 'X'], [3, 'Y'], [8, 'Z'])
+    const term_b = tuple([1, 'X'], [3, 'Y'], [8, 'Z'])
+    const a = new QubitOperator(term_a, 1.0)
+    a.iadd(new QubitOperator(term_b, -1.0))
+    expect(Object.keys(a.terms).length).to.equal(0)
+  });
+
+  it('should test_iadd_different_term', () => {
+    const term_a = tuple([1, 'X'], [3, 'Y'], [8, 'Z'])
+    const term_b = tuple([1, 'Z'], [3, 'Y'], [8, 'Z'])
+    const a = new QubitOperator(term_a, 1.0)
+    a.iadd(new QubitOperator(term_b, 0.5))
+    expect(Object.keys(a.terms).length).to.equal(2)
+    expect(a.terms[term_a]).to.be.closeTo(1.0, 1e-12)
+    expect(a.terms[term_b]).to.be.closeTo(0.5, 1e-12)
+
+    a.iadd(new QubitOperator(term_b, 0.5))
+
+    expect(Object.keys(a.terms).length).to.equal(2)
+    expect(a.terms[term_a]).to.be.closeTo(1.0, 1e-12)
+    expect(a.terms[term_b]).to.be.closeTo(1.0, 1e-12)
+  });
+
+  it('should test_iadd_bad_addend', () => {
+    const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
+    expect(() => op.iadd('0.5')).to.throw()
+  });
+
+  it('should test add', () => {
+    const term_a = tuple([1, 'X'], [3, 'Y'], [8, 'Z'])
+    const term_b = tuple([1, 'Z'], [3, 'Y'], [8, 'Z'])
+    const a = new QubitOperator(term_a, 1.0)
+    const b = new QubitOperator(term_b, 0.5)
+    const res = a.add(b).add(b)
+    expect(Object.keys(res.terms).length).to.equal(2)
+    expect(res.terms[term_a]).to.be.closeTo(1.0, 1e-12)
+    expect(res.terms[term_b]).to.be.closeTo(1.0, 1e-12)
+    // Test out of place
+    expect(a.isClose(new QubitOperator(term_a, 1.0))).to.equal(true)
+    expect(b.isClose(new QubitOperator(term_b, 0.5))).to.equal(true)
+  });
+
+  it('should test_add_bad_addend', () => {
+    const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
+    expect(() => op.add('0.5')).to.throw()
+  });
+
+  it('should test sub', () => {
+    const term_a = tuple([1, 'X'], [3, 'Y'], [8, 'Z'])
+    const term_b = tuple([1, 'Z'], [3, 'Y'], [8, 'Z'])
+    const a = new QubitOperator(term_a, 1.0)
+    const b = new QubitOperator(term_b, 0.5)
+    const res = a.sub(b)
+    expect(Object.keys(res.terms).length).to.equal(2)
+    expect(res.terms[term_a]).to.be.closeTo(1.0, 1e-12)
+    expect(res.terms[term_b]).to.be.closeTo(-0.5, 1e-12)
+
+    const res2 = b.sub(a)
+    expect(Object.keys(res2.terms).length).to.equal(2)
+    expect(res2.terms[term_a]).to.be.closeTo(-1.0, 1e-12)
+    expect(res2.terms[term_b]).to.be.closeTo(0.5, 1e-12)
+  });
+
+  it('should test_sub_bad_addend', () => {
+    const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
+    expect(() => op.sub('0.5')).to.throw()
+  });
+
+  it('should test_isub_different_term', () => {
+    const term_a = tuple([1, 'X'], [3, 'Y'], [8, 'Z'])
+    const term_b = tuple([1, 'Z'], [3, 'Y'], [8, 'Z'])
+    const a = new QubitOperator(term_a, 1.0)
+    a.isub(new QubitOperator(term_b, 0.5))
+    expect(Object.keys(a.terms).length).to.equal(2)
+    expect(a.terms[term_a]).to.be.closeTo(1.0, 1e-12)
+    expect(a.terms[term_b]).to.be.closeTo(-0.5, 1e-12)
+
+    a.isub(new QubitOperator(term_b, 0.5))
+    expect(Object.keys(a.terms).length).to.equal(2)
+    expect(a.terms[term_a]).to.be.closeTo(1.0, 1e-12)
+    expect(a.terms[term_b]).to.be.closeTo(-1, 1e-12)
+  });
+
+  it('should test_isub_bad_addend', () => {
+    const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
+    expect(() => op.isub('0.5')).to.throw()
+  });
+
+  it('should test_neg', () => {
+    const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
+    op.negative()
+    // out of place
+    expect(op.isClose(new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5))).to.equal(true)
+    const correct = op.mul(-1)
+    expect(correct.isClose(op.negative())).to.equal(true)
+  });
+
+  it('should test to string', () => {
+    const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
+    expect(op.toString()).to.equal('0.5 X1 Y3 Z8')
+    const op2 = new QubitOperator([], 2)
+    expect(op2.toString()).to.equal('2 I')
+  });
+
+  it('should test_str_empty', () => {
+    const op = new QubitOperator()
+    expect(op.toString()).to.equal('0')
+  });
+
+  it('should test_str_multiple_terms', () => {
+    const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
+    op.iadd(new QubitOperator(tuple([1, 'Y'], [3, 'Y'], [8, 'Z']), 0.6))
+    expect(op.toString() === '0.5 X1 Y3 Z8 +\n0.6 Y1 Y3 Z8' || op.toString() === '0.6 Y1 Y3 Z8 +\n0.5 X1 Y3 Z8').to.equal(true)
+    const op2 = new QubitOperator([], 2)
+    expect(op2.toString()).to.equal('2 I')
+  });
+})

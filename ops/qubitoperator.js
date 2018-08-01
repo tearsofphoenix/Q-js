@@ -28,6 +28,20 @@ export const PAULI_OPERATOR_PRODUCTS = {
   [['Z', 'Y']]: [mc(0, -1), 'X']
 }
 
+
+function stringToArray(key) {
+  const parts = key.split(',').filter(item => item.length > 0)
+  if (parts.length % 2 === 0) {
+    const result = []
+    for (let i = 0; i < parts.length; i += 2) {
+      result.push([parseInt(parts[i], 10), parts[i + 1]])
+    }
+    return result
+  } else {
+    throw new Error(`invalid key ${key}`)
+  }
+}
+
 /*
 
 A sum of terms acting on qubits, e.g., 0.5 * 'X0 X5' + 0.3 * 'Z1 Z2'.
@@ -66,7 +80,6 @@ are sorted according to the qubit number they act on,
     starting from 0.
 **value**: Coefficient of this term as a (complex) float
  */
-
 function checkTerm(term) {
   term.forEach((localOperator) => {
     if (!Array.isArray(localOperator) || localOperator.length !== 2) {
@@ -240,7 +253,7 @@ multiplier(complex float, or QubitOperator): multiplier
     if (multiplier instanceof QubitOperator) {
       const result_terms = {}
       Object.keys(this.terms).forEach((left_term) => {
-        const leftKey = left_term.split(',')
+        const leftKey = stringToArray(left_term)
         Object.keys(multiplier.terms).forEach((right_term) => {
           let new_coefficient = math.multiply(this.terms[left_term], multiplier.terms[right_term])
           // Loop through local operators and create new sorted list
@@ -248,7 +261,7 @@ multiplier(complex float, or QubitOperator): multiplier
           let product_operators = []
           let left_operator_index = 0
           let right_operator_index = 0
-          const rightKey = right_term.split(',')
+          const rightKey = stringToArray(right_term)
           const n_operators_left = leftKey.length
           const n_operators_right = rightKey.length
 
@@ -290,7 +303,7 @@ multiplier(complex float, or QubitOperator): multiplier
           // Add to result dict
           const tmp_key = product_operators
           if (tmp_key in result_terms) {
-            result_terms[tmp_key] += new_coefficient
+            result_terms[tmp_key] = math.add(result_terms[tmp_key], new_coefficient)
           } else {
             result_terms[tmp_key] = new_coefficient
           }
@@ -358,6 +371,52 @@ TypeError: Invalid type cannot be multiply with QubitOperator.
     return inst
   }
 
+  div(divisor) {
+    if (isNumeric(divisor)) {
+      return this.mul(math.divide(1.0, divisor))
+    } else {
+      throw new Error('Cannot divide QubitOperator by non-scalar type.')
+    }
+  }
+
+  idiv(divisor) {
+    if (isNumeric(divisor)) {
+      return this.imul(math.divide(1.0, divisor))
+    } else {
+      throw new Error('Cannot divide QubitOperator by non-scalar type.')
+    }
+  }
+
+  isub(subtrahend) {
+    if (subtrahend instanceof QubitOperator) {
+      Object.keys(subtrahend.terms).forEach((key) => {
+        const ov = subtrahend.terms[key]
+        const v = this.terms[key]
+        if (typeof v !== 'undefined') {
+          if (math.abs(math.subtract(v, ov)) > 0) {
+            this.terms[key] = math.subtract(v, ov)
+          } else {
+            delete this.terms[key]
+          }
+        } else {
+          this.terms[key] = math.subtract(0, ov)
+        }
+      })
+    } else {
+      throw new Error('Cannot subtract invalid type from QubitOperator.')
+    }
+    return this
+  }
+
+  sub(subtrahend) {
+    const ret = this.copy()
+    return ret.isub(subtrahend)
+  }
+
+  negative() {
+    return this.mul(-1.0)
+  }
+
   copy() {
     const terms = {}
     Object.assign(terms, this.terms)
@@ -365,202 +424,37 @@ TypeError: Invalid type cannot be multiply with QubitOperator.
     inst.terms = terms
     return inst
   }
+
+  toString() {
+    const keys = Object.keys(this.terms)
+    if (keys.length === 0) {
+      return '0'
+    }
+    let string_rep = ''
+    keys.forEach((term) => {
+      const parts = stringToArray(term)
+      const v = this.terms[term]
+      let tmp_string = `${v}`
+      if (parts.length === 0) {
+        tmp_string += ' I'
+      }
+      parts.forEach((operator) => {
+        switch (operator[1]) {
+          case 'X':
+          case 'Y':
+          case 'Z': {
+            tmp_string += ` ${operator[1]}${operator[0]}`
+            break
+          }
+          default: {
+            throw new Error('invalid operator')
+            break
+          }
+        }
+      })
+      string_rep += `${tmp_string} +\n`
+    })
+
+    return string_rep.substring(0, string_rep.length - 3)
+  }
 }
-
-//
-// # Loop through local operators and create new sorted list
-// # of representing the product local operator:
-//     product_operators = []
-// left_operator_index = 0
-// right_operator_index = 0
-// n_operators_left = len(left_term)
-// n_operators_right = len(right_term)
-// while (left_operator_index < n_operators_left and
-// right_operator_index < n_operators_right):
-// (left_qubit, left_loc_op) = (
-//     left_term[left_operator_index])
-// (right_qubit, right_loc_op) = (
-//     right_term[right_operator_index])
-//
-// # Multiply local operators acting on the same qubit
-// if left_qubit == right_qubit:
-// left_operator_index += 1
-// right_operator_index += 1
-// (scalar, loc_op) = _PAULI_OPERATOR_PRODUCTS[
-//     (left_loc_op, right_loc_op)]
-//
-// # Add new term.
-// if loc_op != 'I':
-// product_operators += [(left_qubit, loc_op)]
-// new_coefficient *= scalar
-// # Note if loc_op == 'I', then scalar == 1.0
-//
-// # If left_qubit > right_qubit, add right_loc_op; else,
-// # add left_loc_op.
-//     elif left_qubit > right_qubit:
-// product_operators += [(right_qubit, right_loc_op)]
-// right_operator_index += 1
-// else:
-// product_operators += [(left_qubit, left_loc_op)]
-// left_operator_index += 1
-//
-// # Finish the remainding operators:
-//     if left_operator_index == n_operators_left:
-// product_operators += right_term[
-//     right_operator_index::]
-// elif right_operator_index == n_operators_right:
-// product_operators += left_term[left_operator_index::]
-//
-// # Add to result dict
-// tmp_key = tuple(product_operators)
-// if tmp_key in result_terms:
-// result_terms[tmp_key] += new_coefficient
-// else:
-// result_terms[tmp_key] = new_coefficient
-// self.terms = result_terms
-// return self
-// else:
-// raise TypeError('Cannot in-place multiply term of invalid type ' +
-//     'to QubitTerm.')
-//
-
-//
-// def __rmul__(self, multiplier):
-// """
-// Return multiplier * self for a scalar.
-//
-//     We only define __rmul__ for scalars because the left multiply
-// exist for  QubitOperator and left multiply
-// is also queried as the default behavior.
-//
-//     Args:
-// multiplier: A scalar to multiply by.
-//
-//     Returns:
-// product: A new instance of QubitOperator.
-//
-//     Raises:
-// TypeError: Object of invalid type cannot multiply QubitOperator.
-// """
-// if not isinstance(multiplier, (int, float, complex)):
-// raise TypeError(
-//     'Object of invalid type cannot multiply with QubitOperator.')
-// return self * multiplier
-//
-// def __truediv__(self, divisor):
-// """
-// Return self / divisor for a scalar.
-//
-//     Note:
-// This is always floating point division.
-//
-//     Args:
-// divisor: A scalar to divide by.
-//
-//     Returns:
-// A new instance of QubitOperator.
-//
-//     Raises:
-// TypeError: Cannot divide local operator by non-scalar type.
-// """
-// if not isinstance(divisor, (int, float, complex)):
-// raise TypeError('Cannot divide QubitOperator by non-scalar type.')
-// return self * (1.0 / divisor)
-//
-// def __div__(self, divisor):
-// """ For compatibility with Python 2. """
-// return self.__truediv__(divisor)
-//
-// def __itruediv__(self, divisor):
-// if not isinstance(divisor, (int, float, complex)):
-// raise TypeError('Cannot divide QubitOperator by non-scalar type.')
-// self *= (1.0 / divisor)
-// return self
-//
-// def __idiv__(self, divisor):
-// """ For compatibility with Python 2. """
-// return self.__itruediv__(divisor)
-//
-// def __iadd__(self, addend):
-// """
-// In-place method for += addition of QubitOperator.
-//
-//     Args:
-// addend: A QubitOperator.
-//
-//     Raises:
-// TypeError: Cannot add invalid type.
-// """
-// if isinstance(addend, QubitOperator):
-// for term in addend.terms:
-// if term in self.terms:
-// if abs(addend.terms[term] + self.terms[term]) > 0.:
-// self.terms[term] += addend.terms[term]
-// else:
-// del self.terms[term]
-// else:
-// self.terms[term] = addend.terms[term]
-// else:
-// raise TypeError('Cannot add invalid type to QubitOperator.')
-// return self
-//
-// def __add__(self, addend):
-// """ Return self + addend for a QubitOperator. """
-// summand = copy.deepcopy(self)
-// summand += addend
-// return summand
-//
-// def __isub__(self, subtrahend):
-// """
-// In-place method for -= subtraction of QubitOperator.
-//
-//     Args:
-// subtrahend: A QubitOperator.
-//
-//     Raises:
-// TypeError: Cannot subtract invalid type from QubitOperator.
-// """
-// if isinstance(subtrahend, QubitOperator):
-// for term in subtrahend.terms:
-// if term in self.terms:
-// if abs(self.terms[term] - subtrahend.terms[term]) > 0.:
-// self.terms[term] -= subtrahend.terms[term]
-// else:
-// del self.terms[term]
-// else:
-// self.terms[term] = -subtrahend.terms[term]
-// else:
-// raise TypeError('Cannot subtract invalid type from QubitOperator.')
-// return self
-//
-// def __sub__(self, subtrahend):
-// """ Return self - subtrahend for a QubitOperator. """
-// minuend = copy.deepcopy(self)
-// minuend -= subtrahend
-// return minuend
-//
-// def __neg__(self):
-// return -1. * self
-//
-// def __str__(self):
-// """Return an easy-to-read string representation."""
-// if not self.terms:
-// return '0'
-// string_rep = ''
-// for term in self.terms:
-// tmp_string = '{}'.format(self.terms[term])
-// if term == ():
-// tmp_string += ' I'
-// for operator in term:
-// if operator[1] == 'X':
-// tmp_string += ' X{}'.format(operator[0])
-// elif operator[1] == 'Y':
-// tmp_string += ' Y{}'.format(operator[0])
-// else:
-// assert operator[1] == 'Z'
-// tmp_string += ' Z{}'.format(operator[0])
-// string_rep += '{} +\n'.format(tmp_string)
-// return string_rep[:-3]
-//
-// def __repr__(self):
-// return str(self)
