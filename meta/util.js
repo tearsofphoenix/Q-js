@@ -29,7 +29,7 @@ Engine: The dropped engine.
 export function dropEngineAfter(engine) {
   const e = engine.next
   engine.next = e.next
-  e.next = null
-  e.main = null
+  delete e.next
+  delete e.main
   return e
 }
