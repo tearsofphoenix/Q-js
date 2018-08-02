@@ -25,7 +25,7 @@ apply wrapper (apply_command).
 */
 import {arrayEqual} from '../utils/polyfill'
 import {getInverse} from './_cycle'
-import {Qureg} from '../types/qubit';
+import {BasicQubit, Qureg} from '../types/qubit';
 import {markTuple} from '../libs/util'
 
 /*
@@ -109,7 +109,9 @@ Tags associated with the command.
   }
 
   copy() {
-    return new Command(this.engine, this.gate.copy(), this.qubits.slice(0), this.controlQubits.slice(0), this.tags.slice(0))
+    const qubits = this.qubits.map(looper => BasicQubit.copyArray(looper))
+    const controlQubits = BasicQubit.copyArray(this.controlQubits)
+    return new Command(this.engine, this.gate.copy(), qubits, controlQubits, this.tags.slice(0))
   }
 
   /*

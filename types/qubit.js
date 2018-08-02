@@ -84,6 +84,14 @@ idx: Unique index of the qubit referenced by this qubit
     }
     return this.engine + this.id
   }
+
+  weakCopy() {
+    return new BasicQubit(this.engine, this.id)
+  }
+
+  static copyArray(array) {
+    return array.map(i => i.weakCopy())
+  }
 }
 
 /*
