@@ -91,6 +91,9 @@ export function isKindclassOf(cls, superClass) {
 }
 
 export function instanceOf(inst, cls) {
+  if (Array.isArray(cls)) {
+    return cls.some(looper => instanceOf(inst, looper))
+  }
   switch (cls.name) {
     case 'String': {
       return typeof inst === 'string' || inst instanceof cls
@@ -102,4 +105,12 @@ export function instanceOf(inst, cls) {
       return inst instanceof cls
     }
   }
+}
+
+export function genString(item, n) {
+  let str = ''
+  for (let i = 0; i < n; ++i) {
+    str += item
+  }
+  return str
 }

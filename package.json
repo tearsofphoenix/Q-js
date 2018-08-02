@@ -6,6 +6,7 @@
     "test": "mocha --require babel-register ./ops/*.spec.js"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "deep-equal": "^1.0.1",
     "mathjs": "^5.0.4"
   },
