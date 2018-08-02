@@ -1,9 +1,9 @@
 import {BasicEngine} from '../cengines/basics'
 import {setEqual} from '../utils/polyfill';
 import {dropEngineAfter, insertEngine} from './util';
-import {Allocate, Deallocate} from "../ops/gates";
+import {Allocate, Deallocate} from '../ops/gates';
 
-class LoopTag {
+export class LoopTag {
   constructor(num) {
     this.num = num
     this.id = LoopTag.loop_tag_id
@@ -14,6 +14,8 @@ class LoopTag {
     return other instanceof LoopTag && other.id === this.id && this.num === other.num
   }
 }
+
+LoopTag.loop_tag_id = 0
 
 /*
 Stores all commands and, when done, executes them num times if no loop tag
@@ -117,7 +119,7 @@ LoopTag.
       if (this._tag.num === 0) {
         return
       }
-      commandList.forEach(cmd => {
+      commandList.forEach((cmd) => {
         if (cmd.gate.equal(Allocate)) {
           this._allocatedQubitIDs.add(cmd.qubits[0][0].id)
         } else if (cmd.gate.equal(Deallocate)) {
@@ -130,38 +132,29 @@ LoopTag.
       // LoopTag is not supported, save the full loop body
       this._cmdList = this._cmdList.concat(commandList)
       // Check for all local qubits allocated and deallocated in loop body
-      commandList.forEach(cmd => {
+      commandList.forEach((cmd) => {
+        const qb = cmd.qubits[0][0]
+        const qid = qb.id
         if (cmd.gate.equal(Allocate)) {
-          this._allocatedQubitIDs.add(cmd.qubits[0][0].id)
+          this._allocatedQubitIDs.add(qid)
+          this._refsToLocalQB[qid] = [qb]
         } else if (cmd.gate.equal(Deallocate)) {
-          this._deallocatedQubitIDs.add(cmd.qubits[0][0].id)
+          this._deallocatedQubitIDs.add(qid)
+          this._refsToLocalQB[qid].push(qb)
+        } else {
+          cmd.controlQubits.forEach((ctrlQubit) => {
+            const v = this._allocatedQubitIDs[ctrlQubit.id]
+            if (v) {
+              this._refsToLocalQB[ctrlQubit.id].push(ctrlQubit)
+            }
+          })
+          cmd.qubits.forEach(qureg => qureg.forEach((qubit) => {
+            if (this._allocatedQubitIDs[qubit.id]) {
+              this._refsToLocalQB[qubit.id].push(qubit)
+            }
+          }))
         }
-        cmd.tags.push(this._tag)
-        this.send([cmd])
       })
-      //   for cmd in command_list:
-      //   if cmd.gate == Allocate:
-      //   this._allocated_qubit_ids.add(cmd.qubits[0][0].id)
-      //   # Save reference to this local qubit
-      //   this._refs_to_local_qb[cmd.qubits[0][0].id] = (
-      //       [cmd.qubits[0][0]])
-      //   elif cmd.gate == Deallocate:
-      //   this._deallocated_qubit_ids.add(cmd.qubits[0][0].id)
-      //   # Save reference to this local qubit
-      //   this._refs_to_local_qb[cmd.qubits[0][0].id].append(
-      //       cmd.qubits[0][0])
-      // else:
-      //   # Add a reference to each place a local qubit id is
-      //   # used as within either control_qubit or qubits
-      //   for control_qubit in cmd.control_qubits:
-      //   if control_qubit.id in this._allocated_qubit_ids:
-      //   this._refs_to_local_qb[control_qubit.id].append(
-      //       control_qubit)
-      //   for qureg in cmd.qubits:
-      //   for qubit in qureg:
-      //   if qubit.id in this._allocated_qubit_ids:
-      //   this._refs_to_local_qb[qubit.id].append(
-      //       qubit)
     }
   }
 }
@@ -198,7 +191,7 @@ qb = eng.allocate_qubit()
 del qb # sends deallocate gate
  */
 export function Loop(engine, num, func) {
-  if (typeof num === 'number' && num >= 0) {
+  if (typeof num === 'number' && num >= 0 && num % 1 === 0) {
     const _num = num
     let _loopEngine
     const enter = () => {
@@ -218,12 +211,15 @@ export function Loop(engine, num, func) {
 
     if (typeof func === 'function') {
       enter()
-      func()
-      exit()
+      try {
+        func()
+      } catch (e) {
+        throw e
+      } finally {
+        exit()
+      }
     }
   } else {
     throw new Error('invalid number of loop iterations')
   }
 }
-
-Loop.loop_tag_id = 0
