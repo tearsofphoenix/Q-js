@@ -17,6 +17,7 @@ import {Qureg, Qubit} from '../types/qubit'
 import {Command} from '../ops/command'
 import {Allocate, Deallocate} from '../ops/gates'
 import {DirtyQubitTag} from '../meta/tag'
+import { LastEngineError } from '../meta/error'
 
 export class BasicEngine {
   /*
@@ -48,7 +49,7 @@ is not implemented.
     if (!this.isLastEngine) {
       return this.next.isAvailable(cmd)
     }
-    throw new Error('Should not be last!')
+    throw new LastEngineError('Should not be last!')
   }
 
   /*

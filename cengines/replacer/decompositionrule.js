@@ -1,4 +1,5 @@
 import {BasicGate} from '../../ops/basics'
+import { isKindclassOf } from '../../libs/util'
 
 // A rule for breaking down specific gates into sequences of simpler gates.
 export default class DecompositionRule {
@@ -36,11 +37,9 @@ all gates matching the gate_class.
             + '\nDid you pass in someGate instead of someGate.__class__?')
     }
 
-    // TODO
-    // if gate_class == type.__class__:
-    // raise ThisIsNotAGateClassError(
-    //     "gate_class is type.__class__ instead of a type of BasicGate."
-    // "\nDid you pass in GateType.__class__ instead of GateType?")
+    if (!isKindclassOf(gateClass, BasicGate)) {
+      throw new Error('Invalid class type, you should pass a subclass of BasicGate!')
+    }
 
     this.gateClass = gateClass
     this.gateDecomposer = gateDecomposer

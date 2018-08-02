@@ -9,6 +9,7 @@ import {FlushGate, Measure} from '../ops/gates'
 import {getControlCount} from '../meta/control'
 import {LogicalQubitIDTag} from '../meta/tag'
 import {BasicQubit} from '../types/qubit'
+import { LastEngineError } from '../meta/error'
 
 export default class CommandPrinter extends BasicEngine {
   /*
@@ -50,7 +51,9 @@ the Command (if there is a next engine).
     try {
       return super.isAvailable(cmd)
     } catch (e) {
-      console.log(e)
+      if (e instanceof LastEngineError) {
+        return true
+      }
     }
     return false
   }
@@ -80,8 +83,9 @@ Args:
           })
 
           if (logicQubitTag) {
-            this.main.setMeasurementResult(new BasicQubit(qubit.engine, logicQubitTag.logical_qubit_id), m)
+            qubit = new BasicQubit(qubit.engine, logicQubitTag.logical_qubit_id)
           }
+          this.main.setMeasurementResult(qubit, m)
         })
       })
     } else if (this._inPlace) {

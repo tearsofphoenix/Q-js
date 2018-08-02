@@ -4,7 +4,7 @@ import DecompositionRule from './decompositionrule'
 
 describe('decomposition rule set test', () => {
   it('should test_decomposition_rule_wrong_input', () => {
-    class WrongInput extends BasicRotationGate {
+    class WrongInput {
 
     }
 

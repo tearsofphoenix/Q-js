@@ -32,19 +32,6 @@ describe('main engine test', () => {
 
     expect(engine_list.length).to.equal(2)
 
-    //
-    // def test_main_engine_atexit_no_error():
-    // # Clear previous exceptions of other tests
-    // sys.last_type = None
-    // del sys.last_type
-    // backend = DummyEngine(save_commands=True)
-    // eng = new MainEngine(backend=backend, engine_list=[])
-    // qb = eng.allocateQubit()
-    // eng._delfun(weakref.ref(eng))
-    // assert len(backend.received_commands) == 3
-    // assert backend.received_commands[0].gate == AllocateQubitGate()
-    // assert backend.received_commands[1].gate == DeallocateQubitGate()
-    // assert backend.received_commands[2].gate == FlushGate()
   });
 
   it('should test_main_engine_init_failure', () => {

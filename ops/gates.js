@@ -301,13 +301,21 @@ export class MeasureGate extends FastForwardingGate {
 
      */
   or(qubits) {
+    let num_qubits = 0
     const qs = BasicGate.makeTupleOfQureg(qubits)
     qs.forEach((qureg) => {
       qureg.forEach((qubit) => {
+        num_qubits += 1
         const cmd = this.generateCommand([qubit])
         applyCommand(cmd)
       })
     })
+    if (num_qubits > 1) {
+      console.warn('Pending syntax change in future versions of '
+      + 'ProjectQ: \n Measure will be a single qubit gate '
+      + 'only. Use `All(Measure) | qureg` instead to '
+        + 'measure multiple qubits.')
+    }
   }
 }
 
