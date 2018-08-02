@@ -1,5 +1,6 @@
 import {BasicEngine} from '../basics'
-import {FlushGate} from "../../ops/gates";
+import {FlushGate} from '../../ops/gates'
+import CommandModifier from '../cmdmodifier'
 
 /*
 The InstructionFilter is a compiler engine which changes the behavior of
@@ -8,7 +9,6 @@ this function, which then returns whether this command can be executed
 (True) or needs replacement (False).
  */
 export class InstructionFilter extends BasicEngine {
-
   /*
   Initializer: The provided filterfun returns True for all commands
 which do not need replacement and False for commands that do.
@@ -53,7 +53,6 @@ further. The loaded setup is used to find decomposition rules appropriate
 for each command (e.g., setups.default).
  */
 export class AutoReplacer extends BasicEngine {
-
   /*
   Initialize an AutoReplacer.
 
@@ -103,24 +102,23 @@ Exception if no replacement is available in the loaded setup.
     if (this.isAvailable(cmd)) {
       this.send([cmd])
     } else {
-
     // check for decomposition rules
-    const decomp_list = []
+      const decomp_list = []
       let potential_decomps = []
 
-    // First check for a decomposition rules of the gate class, then
-    // the gate class of the inverse gate. If nothing is found, do the
-    // same for the first parent class, etc.
+      // First check for a decomposition rules of the gate class, then
+      // the gate class of the inverse gate. If nothing is found, do the
+      // same for the first parent class, etc.
       const gate_mro = type(cmd.gate).mro().slice(0)
-    // If gate does not have an inverse it's parent classes are
-    // DaggeredGate, BasicGate, object. Hence don't check the last two
-    const inverse_mro = type(get_inverse(cmd.gate)).mro().slice(0)
-    const rules = this.decompositionRuleSet.decompositions
+      // If gate does not have an inverse it's parent classes are
+      // DaggeredGate, BasicGate, object. Hence don't check the last two
+      const inverse_mro = type(get_inverse(cmd.gate)).mro().slice(0)
+      const rules = this.decompositionRuleSet.decompositions
       const total = Math.max(gate_mro.left, inverse_mro.length)
       for (let level = 0; level < total; ++level) {
         // Check for forward rules
         if (level < gate_mro.length) {
-          let class_name = gate_mro[level].__name__
+          const class_name = gate_mro[level].__name__
           try {
             potential_decomps = rules[class_name].slice(0)
           } catch (e) {
@@ -176,7 +174,7 @@ Exception if no replacement is available in the loaded setup.
           Args:
       command_list (list<Command>): List of commands to handle.
      */
-    const cmd_mod_fun = (cmd) => {   // Adds the tags
+    const cmd_mod_fun = (cmd) => { // Adds the tags
       cmd.tags = [...old_tags, ...cmd.tags]
       cmd.engine = this.main
       return cmd
@@ -184,20 +182,20 @@ Exception if no replacement is available in the loaded setup.
     // the CommandModifier calls cmd_mod_fun for each command
     // --> commands get the right tags.
     const cmod_eng = new CommandModifier(cmd_mod_fun)
-cmod_eng.next = this  // send modified commands back here
-cmod_eng.main = this.main
-// forward everything to cmod_eng using the ForwarderEngine
-// which behaves just like MainEngine
-// (--> meta functions still work)
-const forwarder_eng = new ForwarderEngine(cmod_eng)
-cmd.engine = forwarder_eng  // send gates directly to forwarder
-// (and not to main engine, which would screw up the ordering).
+    cmod_eng.next = this // send modified commands back here
+    cmod_eng.main = this.main
+    // forward everything to cmod_eng using the ForwarderEngine
+    // which behaves just like MainEngine
+    // (--> meta functions still work)
+    const forwarder_eng = new ForwarderEngine(cmod_eng)
+    cmd.engine = forwarder_eng // send gates directly to forwarder
+    // (and not to main engine, which would screw up the ordering).
 
-chosen_decomp.decompose(cmd)  // run the decomposition
+    chosen_decomp.decompose(cmd) // run the decomposition
   }
 
   receive(commandList) {
-    commandList.forEach(cmd => {
+    commandList.forEach((cmd) => {
       if (!(cmd.gate instanceof FlushGate)) {
         this._processCommand(cmd)
       } else {
