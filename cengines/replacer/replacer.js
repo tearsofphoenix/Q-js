@@ -1,5 +1,6 @@
-import {BasicEngine} from '../basics'
-import {FlushGate} from '../../ops/gates';
+import {BasicEngine, ForwarderEngine} from '../basics'
+import {FlushGate} from '../../ops/gates'
+import CommandModifier from '../cmdmodifier'
 
 /*
 The InstructionFilter is a compiler engine which changes the behavior of

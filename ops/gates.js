@@ -145,7 +145,7 @@ export class SqrtXGate extends BasicGate {
 export const SqrtX = new SqrtXGate()
 
 // Swap gate class (swaps 2 qubits)
-//
+// also self inverse gate
 export class SwapGate extends BasicMathGate {
   constructor() {
     super()
@@ -163,6 +163,12 @@ export class SwapGate extends BasicMathGate {
       [0, 1, 0, 0],
       [0, 0, 0, 1]
     ])
+  }
+
+  getInverse() {
+    const inv = new SwapGate()
+    inv.interchangeableQubitIndices = this.interchangeableQubitIndices.slice(0)
+    return inv
   }
 }
 

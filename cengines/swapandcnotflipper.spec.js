@@ -1,18 +1,17 @@
 import {expect} from 'chai'
 import SwapAndCNOTFlipper from './swapandcnotflipper'
-import {Swap, H, X} from "../ops/gates"
+import {Swap, H, X} from '../ops/gates'
 import {CNOT} from '../ops/shortcuts'
-import {tuple, instanceOf} from "../libs/util"
+import {tuple, instanceOf} from '../libs/util'
 import {DummyEngine} from './testengine'
 import {MainEngine} from './main'
-import {Control} from "../meta/control"
-import {Compute, Uncompute} from "../meta/compute";
-import {ComputeTag, UncomputeTag} from "../meta/tag";
+import {Control} from '../meta/control'
+import {Compute, Uncompute} from '../meta/compute';
+import {ComputeTag, UncomputeTag} from '../meta/tag';
 import {All} from '../ops/metagates'
 
 describe('swap and cnot flipper test', () => {
-
-  it('should test_swapandcnotflipper_missing_connection', function () {
+  it('should test_swapandcnotflipper_missing_connection', () => {
     const flipper = new SwapAndCNOTFlipper(new Set())
     const eng = new MainEngine(new DummyEngine(true), [flipper])
     const [qubit1, qubit2] = eng.allocateQureg(2)
@@ -20,7 +19,7 @@ describe('swap and cnot flipper test', () => {
     expect(() => Swap.or(tuple(qubit1, qubit2))).to.throw()
   });
 
-  it('should test_swapandcnotflipper_is_available', function () {
+  it('should test_swapandcnotflipper_is_available', () => {
     const flipper = new SwapAndCNOTFlipper(new Set())
     const dummy = new DummyEngine()
     dummy.isAvailable = () => false
@@ -30,7 +29,7 @@ describe('swap and cnot flipper test', () => {
     Swap.or(tuple(qubit1, qubit2))
     let swap_count = 0
 
-    eng.backend.receivedCommands.forEach(cmd => {
+    eng.backend.receivedCommands.forEach((cmd) => {
       if (cmd.gate.equal(Swap)) {
         swap_count += 1
         expect(flipper.isAvailable(cmd)).to.equal(true)
@@ -47,7 +46,7 @@ describe('swap and cnot flipper test', () => {
     })
 
     swap_count = 0
-    eng.backend.receivedCommands.forEach(cmd => {
+    eng.backend.receivedCommands.forEach((cmd) => {
       if (cmd.gate.equal(Swap)) {
         swap_count += 1
         expect(flipper.isAvailable(cmd)).to.equal(false)
@@ -55,10 +54,9 @@ describe('swap and cnot flipper test', () => {
     })
 
     expect(swap_count).to.equal(1)
-
   });
 
-  it('should test_swapandcnotflipper_flips_cnot', function () {
+  it('should test_swapandcnotflipper_flips_cnot', () => {
     const backend = new DummyEngine(true)
     const connectivity = new Set()
     connectivity.add([0, 1])
@@ -69,7 +67,7 @@ describe('swap and cnot flipper test', () => {
     CNOT.or(tuple(qb0, qb1))
     CNOT.or(tuple(qb1, qb0))
     let hgates = 0
-    backend.receivedCommands.forEach(cmd => {
+    backend.receivedCommands.forEach((cmd) => {
       if (cmd.gate.equal(H)) {
         hgates += 1
       }
@@ -81,7 +79,7 @@ describe('swap and cnot flipper test', () => {
     expect(hgates).to.equal(4)
   });
 
-  it('should test_swapandcnotflipper_invalid_circuit', function () {
+  it('should test_swapandcnotflipper_invalid_circuit', () => {
     const backend = new DummyEngine(true)
     const connectivity = new Set()
     connectivity.add([0, 2])
@@ -97,7 +95,7 @@ describe('swap and cnot flipper test', () => {
     expect(() => Swap.or(tuple(qb0, qb1))).to.throw()
   });
 
-  it('should test_swapandcnotflipper_optimize_swaps', function () {
+  it('should test_swapandcnotflipper_optimize_swaps', () => {
     let backend = new DummyEngine(true)
     let connectivity = new Set()
     connectivity.add([1, 0])
@@ -108,7 +106,7 @@ describe('swap and cnot flipper test', () => {
     Swap.or(tuple(qb0, qb1))
     let hgates = 0
 
-    backend.receivedCommands.forEach(cmd => {
+    backend.receivedCommands.forEach((cmd) => {
       if (cmd.gate.equal(H)) {
         hgates += 1
       }
@@ -128,7 +126,7 @@ describe('swap and cnot flipper test', () => {
     qb1 = eng.allocateQubit()
     Swap.or(tuple(qb0, qb1))
     hgates = 0
-    backend.receivedCommands.forEach(cmd => {
+    backend.receivedCommands.forEach((cmd) => {
       if (cmd.gate.equal(H)) {
         hgates += 1
       }
@@ -139,7 +137,7 @@ describe('swap and cnot flipper test', () => {
     })
   });
 
-  it('should test_swapandcnotflipper_keeps_tags', function () {
+  it('should test_swapandcnotflipper_keeps_tags', () => {
     const backend = new DummyEngine(true)
     const connectivity = new Set([[1, 0]])
     const flipper = new SwapAndCNOTFlipper(connectivity)
@@ -155,10 +153,10 @@ describe('swap and cnot flipper test', () => {
     Uncompute(eng)
     let hgates = 0
 
-    backend.receivedCommands.forEach(cmd => {
+    backend.receivedCommands.forEach((cmd) => {
+      console.log(cmd.toString())
       if (cmd.gate.equal(H)) {
-        console.log(cmd.tags)
-        cmd.tags.forEach(t => {
+        cmd.tags.forEach((t) => {
           if (instanceOf(t, [ComputeTag, UncomputeTag])) {
             hgates += 1
           }

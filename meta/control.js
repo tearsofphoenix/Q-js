@@ -98,8 +98,17 @@ with Control(eng, ctrlqubits):
 
   if (typeof func === 'function') {
     enter()
-    func()
-    exit()
+    let exception
+    try {
+      func()
+    } catch (e) {
+      exception = e
+    } finally {
+      exit()
+      if (!!exception) {
+        throw exception
+      }
+    }
   }
 }
 

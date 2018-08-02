@@ -23,6 +23,7 @@ Swap | (qubit2, qubit1)
 The command then gets sent to the MainEngine via the
 apply wrapper (apply_command).
 */
+import assert from 'assert'
 import {arrayEqual} from '../utils/polyfill'
 import {getInverse} from './_cycle'
 import {BasicQubit, Qureg} from '../types/qubit';
@@ -93,7 +94,7 @@ Tags associated with the command.
 
      */
   constructor(engine, gate, qubits, controls = [], tags = []) {
-    const qs = qubits
+    const qs = qubits.map(qureg => new Qureg(...qureg.map(looper => new BasicQubit(looper.engine, looper.id))))
     this.gate = gate
     this.tags = tags
     this.qubits = qs
@@ -217,7 +218,8 @@ gate, i.e., the gate is only executed if all qubits are
 in state 1.
      */
   addControlQubits(qubits) {
-    this._controlQubits = this._controlQubits.concat(qubits)
+    assert(Array.isArray(qubits))
+    this._controlQubits = this._controlQubits.concat(BasicQubit.copyArray(qubits))
     this._controlQubits.sort((a, b) => a.id - b.id)
   }
 
