@@ -108,7 +108,7 @@ uncompute.
 
         // Allocate needs to have old tags + uncompute tag
         const add_uncompute = (command, old_tags = cmd.tags.slice(0)) => {
-          command.tags = old_tags.push(new UncomputeTag())
+          command.tags = old_tags.concat([new UncomputeTag()])
           return command
         }
         const tagger_eng = new CommandModifier(add_uncompute)
@@ -305,8 +305,17 @@ export function Compute(engine, func) {
 
   if (typeof func === 'function') {
     enter()
-    func()
-    exit()
+    let exp
+    try {
+      func()
+    } catch (e) {
+      exp = e
+    } finally {
+      exit()
+      if (exp) {
+        throw exp
+      }
+    }
   }
 }
 

@@ -47,6 +47,8 @@ describe('compute test', () => {
     compute_engine.runUnCompute()
     eng.flush()
 
+    backend.receivedCommands.forEach(cmd => console.log(cmd.tags))
+
     expect(backend.receivedCommands[0].gate.equal(Allocate)).to.equal(true)
     expect(backend.receivedCommands[0].tags).to.deep.equal([new ComputeTag()])
     expect(backend.receivedCommands[1].gate.equal(H)).to.equal(true)
