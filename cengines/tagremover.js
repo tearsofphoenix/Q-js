@@ -26,12 +26,7 @@ denoting the tags to remove
   }
 
   _isTagIn(tag) {
-    for (let i = 0; i < this._tags.length; ++i) {
-      if (instanceOf(tag, this._tags[i])) {
-        return true
-      }
-    }
-    return false
+    return instanceOf(tag, this._tags)
   }
 
   /*

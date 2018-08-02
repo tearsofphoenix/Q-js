@@ -166,10 +166,10 @@ get_inverse functions of the gate (see, e.g., BasicRotationGate).
             new_list = this._l[looper].slice(0, gid[j]).concat(this._l[looper].slice(gid[j] + 2))
             this._l[looper] = new_list
           })
+          i = 0
+          limit -= 2
+          continue
         }
-        i = 0
-        limit -= 2
-        continue
       }
       // gates are not each other's inverses --> check if they're
       // mergeable
@@ -216,11 +216,12 @@ get_inverse functions of the gate (see, e.g., BasicRotationGate).
     Object.keys(this._l).forEach((i) => {
       const v = this._l[i]
       const lastCMD = v[v.length - 1]
-      if (v.length >= this._m || v.length > 0 && instanceOf(lastCMD, FastForwardingGate)) {
+      const gateFlag = instanceOf(lastCMD.gate, FastForwardingGate)
+      if (v.length >= this._m || (v.length > 0 && gateFlag)) {
         this.optimize(i)
-        if (v.length >= this._m && !instanceOf(lastCMD, FastForwardingGate)) {
+        if (v.length >= this._m && !gateFlag) {
           this.sendQubitPipeline(i, v.length - this._m + 1)
-        } else if (v.length > 0 && instanceOf(lastCMD, FastForwardingGate)) {
+        } else if (v.length > 0 && gateFlag) {
           this.sendQubitPipeline(i, v.length)
         }
       }

@@ -15,8 +15,8 @@ describe('control test', () => {
     const test_cmd0 = new Command(eng, H, [qubit])
     const test_cmd1 = new Command(eng, H, [qubit])
     const test_cmd2 = new Command(eng, H, [qubit])
-    test_cmd0.tags = [DirtyQubitTag, ComputeTag, DirtyQubitTag]
-    test_cmd1.tags = [DirtyQubitTag, UncomputeTag, DirtyQubitTag]
+    test_cmd0.tags = [DirtyQubitTag, new ComputeTag(), DirtyQubitTag]
+    test_cmd1.tags = [DirtyQubitTag, new UncomputeTag(), DirtyQubitTag]
     test_cmd2.tags = [DirtyQubitTag]
     const control_eng = new ControlEngine('MockEng')
     expect(control_eng.hasComputeUnComputeTag(test_cmd0)).to.equal(true)

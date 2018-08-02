@@ -4,8 +4,6 @@ import {dropEngineAfter, insertEngine} from './util';
 import {Allocate, Deallocate} from "../ops/gates";
 
 class LoopTag {
-  static loop_tag_id = 0
-
   constructor(num) {
     this.num = num
     this.id = LoopTag.loop_tag_id
@@ -227,3 +225,5 @@ export function Loop(engine, num, func) {
     throw new Error('invalid number of loop iterations')
   }
 }
+
+Loop.loop_tag_id = 0

@@ -12,18 +12,16 @@ import {
 
 describe('compute test', () => {
   it('should test compute tag', () => {
-    const tag0 = ComputeTag
-    const tag1 = ComputeTag
-    expect(tag0 === tag1).to.equal(true)
-    expect(tag0).to.equal(tag1)
+    const tag0 = new ComputeTag()
+    const tag1 = new ComputeTag()
+    expect(tag0.equal(tag1)).to.equal(true)
     expect(tag0 === new Object()).to.equal(false)
   });
 
   it('should test uncompute tag', () => {
-    const tag0 = UncomputeTag
-    const tag1 = UncomputeTag
-    expect(tag0 === tag1).to.equal(true)
-    expect(tag0).to.equal(tag1)
+    const tag0 = new UncomputeTag()
+    const tag1 = new UncomputeTag()
+    expect(tag0.equal(tag1)).to.equal(true)
     expect(tag0 === new Object()).to.equal(false)
   });
 
@@ -49,14 +47,14 @@ describe('compute test', () => {
     eng.flush()
 
     expect(backend.receivedCommands[0].gate.equal(Allocate)).to.equal(true)
-    expect(backend.receivedCommands[0].tags).to.deep.equal([ComputeTag])
+    expect(backend.receivedCommands[0].tags).to.deep.equal([new ComputeTag()])
     expect(backend.receivedCommands[1].gate.equal(H)).to.equal(true)
-    expect(backend.receivedCommands[1].tags).to.deep.equal([ComputeTag, 'TagAddedLater'])
+    expect(backend.receivedCommands[1].tags).to.deep.equal([new ComputeTag(), 'TagAddedLater'])
 
     expect(backend.receivedCommands[2].gate.equal(new Rx(0.6))).to.equal(true)
-    expect(backend.receivedCommands[2].tags).to.deep.equal([ComputeTag])
+    expect(backend.receivedCommands[2].tags).to.deep.equal([new ComputeTag()])
     expect(backend.receivedCommands[3].gate.equal(Deallocate)).to.equal(true)
-    expect(backend.receivedCommands[3].tags).to.deep.equal([ComputeTag])
+    expect(backend.receivedCommands[3].tags).to.deep.equal([new ComputeTag()])
 
     expect(backend.receivedCommands[4].gate.equal(Allocate)).to.equal(true)
     expect(backend.receivedCommands[4].tags).to.deep.equal([])
@@ -64,14 +62,14 @@ describe('compute test', () => {
     expect(backend.receivedCommands[5].tags).to.deep.equal([])
 
     expect(backend.receivedCommands[6].gate.equal(Allocate)).to.equal(true)
-    expect(backend.receivedCommands[6].tags).to.deep.equal([UncomputeTag])
+    expect(backend.receivedCommands[6].tags).to.deep.equal([new UncomputeTag()])
     expect(backend.receivedCommands[7].gate.equal(new Ry(-0.6))).to.equal(true)
-    expect(backend.receivedCommands[7].tags).to.deep.equal([UncomputeTag])
+    expect(backend.receivedCommands[7].tags).to.deep.equal([new UncomputeTag()])
 
     expect(backend.receivedCommands[8].gate.equal(H)).to.equal(true)
-    expect(backend.receivedCommands[8].tags).to.deep.equal([UncomputeTag])
+    expect(backend.receivedCommands[8].tags).to.deep.equal([new UncomputeTag()])
     expect(backend.receivedCommands[9].gate.equal(Deallocate)).to.equal(true)
-    expect(backend.receivedCommands[9].tags).to.deep.equal([UncomputeTag])
+    expect(backend.receivedCommands[9].tags).to.deep.equal([new UncomputeTag()])
   });
 
   it('should test uncompute engine', () => {
@@ -81,9 +79,9 @@ describe('compute test', () => {
     const qubit = eng.allocateQubit()
     H.or(qubit)
     expect(backend.receivedCommands[0].gate.equal(Allocate)).to.equal(true)
-    expect(backend.receivedCommands[0].tags).to.deep.equal([UncomputeTag])
+    expect(backend.receivedCommands[0].tags).to.deep.equal([new UncomputeTag()])
     expect(backend.receivedCommands[1].gate.equal(H)).to.equal(true)
-    expect(backend.receivedCommands[1].tags).to.deep.equal([UncomputeTag])
+    expect(backend.receivedCommands[1].tags).to.deep.equal([new UncomputeTag()])
   });
 
   it('should test outside qubit deallocated in compute', () => {
@@ -189,9 +187,9 @@ describe('compute test', () => {
     expect(backend0.receivedCommands[4].gate.equal(Deallocate)).to.equal(true)
 
     expect(backend0.receivedCommands[0].tags).to.deep.equal([])
-    expect(backend0.receivedCommands[1].tags).to.deep.equal([ComputeTag])
+    expect(backend0.receivedCommands[1].tags).to.deep.equal([new ComputeTag()])
     expect(backend0.receivedCommands[2].tags).to.deep.equal([])
-    expect(backend0.receivedCommands[3].tags).to.deep.equal([UncomputeTag])
+    expect(backend0.receivedCommands[3].tags).to.deep.equal([new UncomputeTag()])
     expect(backend0.receivedCommands[4].tags).to.deep.equal([])
 
     // Same using CustomUncompute and test using CompareEngine

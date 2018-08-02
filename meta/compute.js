@@ -36,7 +36,7 @@ export class ComputeEngine extends BasicEngine {
 cmd (Command): Command to modify.
      */
   addUnComputeTag(cmd) {
-    cmd.tags.push(UncomputeTag)
+    cmd.tags.push(new UncomputeTag())
     return cmd
   }
 
@@ -108,7 +108,7 @@ uncompute.
 
         // Allocate needs to have old tags + uncompute tag
         const add_uncompute = (command, old_tags = cmd.tags.slice(0)) => {
-          command.tags = old_tags.push(UncomputeTag)
+          command.tags = old_tags.push(new UncomputeTag())
           return command
         }
         const tagger_eng = new CommandModifier(add_uncompute)
@@ -207,7 +207,7 @@ command_list (list<Command>): List of commands to receive.
           this.deallocatedQubitIDs.add(cmd.qubits[0][0].id)
         }
         this._l.push(cmd.copy())
-        cmd.tags.push(ComputeTag)
+        cmd.tags.push(new ComputeTag())
       })
     }
     this.send(commandList)
@@ -235,7 +235,7 @@ command_list (list<Command>): List of commands to handle.
       } else if (cmd.gate.equal(Deallocate)) {
         this.deallocatedQubitIDs.add(cmd.qubits[0][0].id)
       }
-      cmd.tags.push(UncomputeTag)
+      cmd.tags.push(new UncomputeTag())
       this.send([cmd])
     })
   }

@@ -82,7 +82,7 @@ describe('command test', () => {
     const ctrl_qubit = main_engine.allocateQubit()
     const cmd = new Command(main_engine, new Rx(0.5), makeTuple(qubit))
     cmd.addControlQubits(ctrl_qubit)
-    cmd.tags = [ComputeTag]
+    cmd.tags = [new ComputeTag()]
     const inverse_cmd = cmd.getInverse()
     expect(inverse_cmd.gate.equal(new Rx(-0.5 + 4 * math.pi))).to.equal(true)
     expect(cmd.qubits.length).to.equal(inverse_cmd.qubits.length)
