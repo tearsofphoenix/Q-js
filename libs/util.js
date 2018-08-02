@@ -44,3 +44,62 @@ export function ObjectCopy(obj) {
   Object.assign(copy, obj)
   return copy
 }
+
+export function classHierachy(cls) {
+  const result = []
+  if (typeof cls === 'function') {
+    let {name} = cls
+    while (name.length > 0) {
+      result.push(name)
+      cls = cls.__proto__
+      name = cls.name
+    }
+  }
+  return result
+}
+
+export function isSubclassOf(cls, superClass) {
+  if (typeof cls === 'function' && typeof superClass === 'function') {
+    const targetName = superClass.name
+    let {name} = cls
+    let level = 0
+    while (name.length > 0) {
+      if (name === targetName && level > 0) {
+        return true
+      }
+      cls = cls.__proto__
+      name = cls.name
+      ++level
+    }
+  }
+  return false
+}
+
+export function isKindclassOf(cls, superClass) {
+  if (typeof cls === 'function' && typeof superClass === 'function') {
+    const targetName = superClass.name
+    let {name} = cls
+    while (name.length > 0) {
+      if (name === targetName) {
+        return true
+      }
+      cls = cls.__proto__
+      name = cls.name
+    }
+  }
+  return false
+}
+
+export function instanceOf(inst, cls) {
+  switch (cls.name) {
+    case 'String': {
+      return typeof inst === 'string' || inst instanceof cls
+    }
+    case 'Number': {
+      return typeof inst === 'number' || inst instanceof cls
+    }
+    default: {
+      return inst instanceof cls
+    }
+  }
+}

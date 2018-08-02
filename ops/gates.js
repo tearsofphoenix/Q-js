@@ -295,7 +295,7 @@ export class MeasureGate extends FastForwardingGate {
 
      */
   or(qubits) {
-    const qs = this.makeTupleOfQureg(qubits)
+    const qs = BasicGate.makeTupleOfQureg(qubits)
     qs.forEach((qureg) => {
       qureg.forEach((qubit) => {
         const cmd = this.generateCommand([qubit])

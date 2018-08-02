@@ -61,8 +61,7 @@ cmd: Command object with logical qubit ids.
       }
       // Add LogicalQubitIDTag to MeasureGate
       const add_logical_id = function (command, old_tags = cmd.tags.slice(0)) {
-        old_tags.push(LogicalQubitIDTag)
-        console.log(65, old_tags)
+        old_tags.push(new LogicalQubitIDTag(cmd.qubits[0][0].id))
         command.tags = old_tags
         return command
       }

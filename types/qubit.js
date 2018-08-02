@@ -214,6 +214,9 @@ Qureg.prototype.add = function(other) {
   return new Qureg(array)
 }
 
+// fix class hierarchy
+Qureg.__proto__ = Array
+
 Object.defineProperty(Qureg.prototype, 'engine', {
   get() {
     return this[0].engine

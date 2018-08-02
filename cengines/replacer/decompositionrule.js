@@ -1,16 +1,9 @@
-/*
-A rule for breaking down specific gates into sequences of simpler gates.
-"""
+import {BasicGate} from '../../ops/basics'
 
-def __init__(self,
-    gate_class,
-    gate_decomposer,
-    gate_recognizer=lambda cmd: True):
- */
+// A rule for breaking down specific gates into sequences of simpler gates.
 export default class DecompositionRule {
-
-}
-Args:
+  /*
+    Args:
     gate_class (type): The type of gate that this rule decomposes.
 
     The gate class is redundant information used to make lookups
@@ -35,18 +28,22 @@ gates that rotate by a specific angle.
 
     If no gate_recognizer is given, the decomposition applies to
 all gates matching the gate_class.
-"""
+     */
+  constructor(gateClass, gateDecomposer, gateRecognizer = () => true) {
+    // Check for common gate_class type mistakes.
+    if (gateClass instanceof BasicGate) {
+      throw new Error('gate_class is a gate instance instead of a type of BasicGate.'
+            + '\nDid you pass in someGate instead of someGate.__class__?')
+    }
 
-# Check for common gate_class type mistakes.
-    if isinstance(gate_class, BasicGate):
-raise ThisIsNotAGateClassError(
-    "gate_class is a gate instance instead of a type of BasicGate."
-"\nDid you pass in someGate instead of someGate.__class__?")
-if gate_class == type.__class__:
-raise ThisIsNotAGateClassError(
-    "gate_class is type.__class__ instead of a type of BasicGate."
-"\nDid you pass in GateType.__class__ instead of GateType?")
+    // TODO
+    // if gate_class == type.__class__:
+    // raise ThisIsNotAGateClassError(
+    //     "gate_class is type.__class__ instead of a type of BasicGate."
+    // "\nDid you pass in GateType.__class__ instead of GateType?")
 
-self.gate_class = gate_class
-self.gate_decomposer = gate_decomposer
-self.gate_recognizer = gate_recognizer
+    this.gateClass = gateClass
+    this.gateDecomposer = gateDecomposer
+    this.gateRecognizer = gateRecognizer
+  }
+}
