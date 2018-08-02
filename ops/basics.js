@@ -20,6 +20,7 @@ import math from 'mathjs'
 import { BasicQubit } from '../types/qubit'
 import {Command, applyCommand} from './command'
 import {arrayIsTuple, ObjectCopy} from '../libs/util'
+import {NotMergeable} from '../meta/error'
 
 const ANGLE_PRECISION = 12
 const ANGLE_TOLERANCE = 10 ** -ANGLE_PRECISION
@@ -70,7 +71,7 @@ self.set_interchangeable_qubit_indices([[0,1],[2,3,4]])
   }
 
   getMerged() {
-    throw new Error('BasicGate: No getMerged() implemented.')
+    throw new NotMergeable('BasicGate: No getMerged() implemented.')
   }
 
   toString() {
@@ -248,7 +249,7 @@ New object representing the merged gates.
     if (other instanceof BasicRotationGate) {
       return new BasicRotationGate(this.angle + other.angle)
     }
-    throw new Error('Can\'t merge different types of rotation gates.')
+    throw new NotMergeable('Can\'t merge different types of rotation gates.')
   }
 
   toString() {

@@ -2,8 +2,8 @@ import axios from 'axios'
 
 const _api_url = 'https://quantumexperience.ng.bluemix.net/api/'
 
-export default class IBMHttpClient {
-  async isOnline(device) {
+export default class IBMHTTPClient {
+  static async isOnline(device) {
     const url = `Backends/${device}/queue/status`
     const result = await axios.get(`${_api_url}${url}`)
     return result.state
@@ -18,12 +18,12 @@ export default class IBMHttpClient {
   password (str): IBM quantum experience password
   jobid (str): Id of the job to retrieve
    */
-  async retrieve(device, user, password, jobid) {
-    const [user_id, access_token] = await this.authenticate(user, password)
-    return this.getResult(device, jobid, access_token)
+  static async retrieve(device, user, password, jobid) {
+    const [user_id, access_token] = await IBMHTTPClient.authenticate(user, password)
+    return IBMHTTPClient.getResult(device, jobid, access_token)
   }
 
-  async sleep(interval) {
+  static async sleep(interval) {
     return new Promise((resolve) => {
       setTimeout(interval, resolve)
     })
@@ -42,11 +42,11 @@ verbose (bool): If True, additional information is printed, such as
 measurement statistics. Otherwise, the backend simply registers
 one measurement result (same behavior as the projectq Simulator).
    */
-  async send(info, device = 'sim_trivial_2', user = '', password = '', shots = 1, verbose = false) {
+  static async send(info, device = 'sim_trivial_2', user = '', password = '', shots = 1, verbose = false) {
     try {
       // check if the device is online
       if (['ibmqx4', 'ibmqx5'].includes(device)) {
-        const online = await this.isOnline(device)
+        const online = await IBMHTTPClient.isOnline(device)
         if (!online) {
           console.log('The device is offline (for maintenance?). Use the simulator instead or try again later.')
           throw new Error('Device is offline')
@@ -55,16 +55,16 @@ one measurement result (same behavior as the projectq Simulator).
       if (verbose) {
         console.log('- Authenticating...')
       }
-      const [user_id, access_token] = await this.authenticate(user, password)
+      const [user_id, access_token] = await IBMHTTPClient.authenticate(user, password)
       if (verbose) {
         const obj = JSON.parse(info)
         console.log(`- Running code: ${obj.qasms[0].qasm}`)
       }
-      const execution_id = await this.run(info, device, user_id, access_token, shots)
+      const execution_id = await IBMHTTPClient.run(info, device, user_id, access_token, shots)
       if (verbose) {
         console.log('- Waiting for results...')
       }
-      const res = await this.getResult(device, execution_id, access_token)
+      const res = await IBMHTTPClient.getResult(device, execution_id, access_token)
       if (verbose) {
         console.log('- Done.')
       }
@@ -74,13 +74,13 @@ one measurement result (same behavior as the projectq Simulator).
     }
   }
 
-  async authenticate(email = '', password = '') {
+  static async authenticate(email = '', password = '') {
     const result = await axios.post(`${_api_url}users/login`, {email, password})
     const {userId, id} = result.data
     return [userId, id]
   }
 
-  async run(qasm, device, user_id, access_token, shots) {
+  static async run(qasm, device, user_id, access_token, shots) {
     const suffix = 'Jobs'
     const params = {
       'access_token': access_token,
@@ -99,7 +99,7 @@ one measurement result (same behavior as the projectq Simulator).
     return resp.data.id
   }
 
-  async getResult(device, execution_id, access_token, num_retries = 3000,
+  static async getResult(device, execution_id, access_token, num_retries = 3000,
     interval = 1) {
     const suffix = `Jobs/${execution_id}`
     const status_url = `${_api_url}Backends/${device}/queue/status`
@@ -116,7 +116,7 @@ one measurement result (same behavior as the projectq Simulator).
           return result
         }
       }
-      await this.sleep(interval)
+      await IBMHTTPClient.sleep(interval)
       if (['ibmqx4', 'ibmqx5'].includes(device) && retries % 60 === 0) {
         const stateResp = await axios.get(status_url)
         const {state, lengthQueue} = stateResp.data

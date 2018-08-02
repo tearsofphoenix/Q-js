@@ -1,13 +1,24 @@
+import assert from 'assert'
 import {BasicEngine} from '../../cengines/basics'
-import {Allocate, Barrier, Deallocate, H, Measure, NOT, Rz, S, T, Y, Z} from "../../ops/gates";
-import {getControlCount} from "../../meta/control";
-import {LogicalQubitIDTag} from "../../meta/tag";
+import Gates, {
+  Allocate, Barrier, Deallocate, FlushGate, H, Measure, NOT, Rx, Ry, Rz, S, T, Y, Z
+} from '../../ops/gates'
+import {getControlCount} from '../../meta/control';
+import {LogicalQubitIDTag} from '../../meta/tag';
+import IBMHTTPClient from './ibmhttpclient'
+import {instanceOf} from '../../libs/util'
 
+const {Tdag, Sdag} = Gates
 /*
 The IBM Backend class, which stores the circuit, transforms it to JSON
 QASM, and sends the circuit through the IBM API.
  */
 export class IBMBackend extends BasicEngine {
+  // Mapping of gate names from our gate objects to the IBM QASM representation.
+  static gateNames = {
+    [Tdag.toString()]: 'tdg',
+    [Sdag.toString()]: 'sdg'
+  }
 
   /*
   Initialize the Backend object.
@@ -28,8 +39,8 @@ retrieve_execution (int): Job ID to retrieve instead of re-
 running the circuit (e.g., if previous run timed out).
    */
   constructor(use_hardware = false, num_runs = 1024, verbose = false,
-              user = null, password = null, device = 'ibmqx4',
-              retrieve_execution = null) {
+    user = null, password = null, device = 'ibmqx4',
+    retrieve_execution = null) {
     super()
     this._reset()
     if (use_hardware) {
@@ -41,7 +52,7 @@ running the circuit (e.g., if previous run timed out).
       this._user = user
       this._password = password
       this._probabilities = {}
-      this.qasm = ""
+      this.qasm = ''
       this._measured_ids = []
       this._allocated_qubits = new Set()
       this._retrieve_execution = retrieve_execution
@@ -99,21 +110,21 @@ Temporarily store the command cmd.
     }
 
     this._clear = false
-    this.qasm = ""
+    this.qasm = ''
     this._allocated_qubits = new Set()
 
-    const gate = cmd.gate
+    const {gate} = cmd
 
-    if (gate == Allocate) {
+    if (gate === Allocate) {
       this._allocated_qubits.add(cmd.qubits[0][0].id)
       return
     }
 
-    if (gate == Deallocate) {
+    if (gate === Deallocate) {
       return
     }
 
-    if (gate == Measure) {
+    if (gate === Measure) {
       assert(cmd.qubits.length === 1 && cmd.qubits[0].length === 1)
       const qb_id = cmd.qubits[0][0].id
       let logical_id
@@ -126,38 +137,38 @@ Temporarily store the command cmd.
       }
       assert(typeof logical_id !== 'undefined')
       this._measured_ids.push(logical_id)
-    } else if (gate == NOT && getControlCount(cmd) == 1) {
+    } else if (gate === NOT && getControlCount(cmd) === 1) {
       const ctrl_pos = cmd.controlQubits[0].id
       const qb_pos = cmd.qubits[0][0].id
       this.qasm += `\ncx q[${ctrl_pos}], q[${qb_pos}];`
-    } else if (gate == Barrier) {
+    } else if (gate === Barrier) {
       const qb_pos = []
-          cmd.qubits.forEach(qr => qr.forEach(qb => qb_pos.push(qb.id)))
-      this.qasm += "\nbarrier "
-      let qb_str = ""
-      qb_pos.forEach(pos => {
+      cmd.qubits.forEach(qr => qr.forEach(qb => qb_pos.push(qb.id)))
+      this.qasm += '\nbarrier '
+      let qb_str = ''
+      qb_pos.forEach((pos) => {
         qb_str += `q[${pos}]`
       })
 
-      this.qasm += qb_str.substring(0, qb_str.length - 2) + ";"
+      this.qasm += `${qb_str.substring(0, qb_str.length - 2)};`
     } else if (instanceOf(gate, [Rx, Ry, Rz])) {
-      assert (getControlCount(cmd) == 0)
+      assert(getControlCount(cmd) == 0)
       const qb_pos = cmd.qubits[0][0].id
       const u_strs = {
-        Rx: (a) => `u3(${a}, -pi/2, pi/2)`,
-        Ry: (a) => `u3(${a}, 0, 0)`,
-        Rz: (a) => `u1(${a})`
+        Rx: a => `u3(${a}, -pi/2, pi/2)`,
+        Ry: a => `u3(${a}, 0, 0)`,
+        Rz: a => `u1(${a})`
       }
       const gateASM = u_strs[gate.toString().substring(0, 2)](gate.angle)
       this.qasm += `\n${gateASM} q[${qb_pos}];`
     } else {
       assert(getControlCount(cmd) == 0)
       const key = gate.toString()
-      const v = this._gateNames[key]
+      const v = IBMBackend.gateNames[key]
       let gate_str
       if (typeof v !== 'undefined') {
         gate_str = v
-      }else {
+      } else {
         gate_str = key.toLowerCase()
       }
 
@@ -215,7 +226,7 @@ present in the circuit (might have gotten optimized away).
 
     const probability_dict = {}
 
-    this._probabilities.forEach(state => {
+    this._probabilities.forEach((state) => {
       const mapped_state = []
       for (let i = 0; i < qureg.length; ++i) {
         mapped_state.push('0')
@@ -237,100 +248,93 @@ present in the circuit (might have gotten optimized away).
     Send the circuit via the IBM API (JSON QASM) using the provided user
 data / ask for username & password.
    */
-  run() {
+  async run() {
     if (this.qasm.length === 0) {
       return
     }
     // finally: add measurements (no intermediate measurements are allowed)
-    this._measured_ids.forEach(measured_id => {
+    this._measured_ids.forEach((measured_id) => {
       const qb_loc = this.main.mapper.currentMapping[measured_id]
       this.qasm += `measure q[${qb_loc}] -> c[${qb_loc}];`
     })
     let max_qubit_id = -1
-    this._allocated_qubits.forEach(id => {
+    this._allocated_qubits.forEach((id) => {
       if (id > max_qubit_id) {
         max_qubit_id = id
       }
     })
 
     const nq = max_qubit_id + 1
-    const qasm = `\ninclude \"qelib1.inc\";\nqreg q[${nq}];\ncreg c[${nq}];` + this.qasm
+    const qasm = `\ninclude \"qelib1.inc\";\nqreg q[${nq}];\ncreg c[${nq}];${this.qasm}`
     const info = {}
-    info['qasms'] = [{qasm}]
-    info['shots'] = this._num_runs
-    info['maxCredits'] = 5
-    info['backend'] = {'name': this.device}
+    info.qasms = [{qasm}]
+    info.shots = this._num_runs
+    info.maxCredits = 5
+    info.backend = {'name': this.device}
     const infoJSON = JSON.stringify(info)
 
     try {
+      let res
       if (!this._retrieve_execution) {
-        const res = 
+        res = await IBMHTTPClient.send(infoJSON, this.device, this._user, this._password, this._num_runs, this._verbose)
+      } else {
+        res = await IBMHTTPClient.retrieve(this.device, this._user, this._password, this._retrieve_execution)
       }
+
+      const {counts} = res.data
+      // Determine random outcome
+      const P = Math.random()
+      let p_sum = 0.0
+      let measured = ''
+      counts.forEach((state) => {
+        const probability = counts[state] * 1.0 / this._num_runs
+        state = state.slice(0).reverse()
+        state = ''.join(state)
+        p_sum += probability
+        let star = ''
+        if (p_sum >= P && measured === '') {
+          measured = state
+          star = '*'
+        }
+        this._probabilities[state] = probability
+        if (this._verbose && probability > 0) {
+          console.log(`${state.toString()} with p = ${probability.toString()}${star}`)
+        }
+      })
+
+      class QB {
+        constructor(ID) {
+          this.id = ID
+        }
+      }
+
+      // register measurement result
+      this._measured_ids.forEach((ID) => {
+        const location = this._logicalToPhysical(ID)
+        const result = measured[location]
+        this.main.setMeasurementResult(new QB(ID), result)
+      })
+      this._reset()
+    } catch (e) {
+      console.log(e)
+      throw new Error('Failed to run the circuit. Aborting.')
     }
   }
-}
 
-
-
-try:
-if this._retrieve_execution is None:
-    res = send(info, device=this.device,
-        user=this._user, password=this._password,
-        shots=this._num_runs, verbose=this._verbose)
-else:
-res = retrieve(device=this.device, user=this._user,
-    password=this._password,
-    jobid=this._retrieve_execution)
-
-counts = res['data']['counts']
-# Determine random outcome
-P = random.random()
-p_sum = 0.
-measured = ""
-for state in counts:
-probability = counts[state] * 1. / this._num_runs
-state = list(reversed(state))
-state = "".join(state)
-p_sum += probability
-star = ""
-if p_sum >= P and measured == "":
-measured = state
-star = "*"
-this._probabilities[state] = probability
-if this._verbose and probability > 0:
-print(str(state) + " with p = " + str(probability) +
-    star)
-
-class QB():
-    def __init__(self, ID):
-this.id = ID
-
-# register measurement result
-for ID in this._measured_ids:
-location = this._logical_to_physical(ID)
-result = int(measured[location])
-this.main_engine.set_measurement_result(QB(ID), result)
-this._reset()
-except TypeError:
-    raise Exception("Failed to run the circuit. Aborting.")
-
-def receive(self, command_list):
-"""
-Receives a command list and, for each command, stores it until
+  /*
+  Receives a command list and, for each command, stores it until
 completion.
 
     Args:
 command_list: List of commands to execute
-"""
-for cmd in command_list:
-if not cmd.gate == FlushGate():
-this._store(cmd)
-else:
-this._run()
-this._reset()
-
-"""
-Mapping of gate names from our gate objects to the IBM QASM representation.
-"""
-_gate_names = {str(Tdag): "tdg",
-  str(Sdag): "sdg"}
+   */
+  receive(commandList) {
+    commandList.forEach((cmd) => {
+      if (!(cmd.gate instanceof FlushGate)) {
+        this._store(cmd)
+      } else {
+        this.run().then(() => this._reset())
+      }
+    })
+  }
+}

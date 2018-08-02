@@ -27,6 +27,7 @@ import {arrayEqual} from '../utils/polyfill'
 import {getInverse} from './_cycle'
 import {BasicQubit, Qureg} from '../types/qubit';
 import {markTuple} from '../libs/util'
+import {NotMergeable} from "../meta/error";
 
 /*
 Apply a command.
@@ -144,7 +145,7 @@ or can't be merged for other reasons.
       return new Command(this.engine, this.gate.getMerged(other.gate), this.qubits, this.controlQubits, this.tags.slice(0))
     }
 
-    throw new Error('Command not mergeable')
+    throw new NotMergeable('Command not mergeable')
   }
 
   /*
