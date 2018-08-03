@@ -9,11 +9,12 @@ import assert from 'assert'
 import {BasicEngine} from '../cengines/basics'
 import CommandModifier from '../cengines/cmdmodifier'
 import {ComputeTag, UncomputeTag} from './tag'
-import {dropEngineAfter, insertEngine} from './util';
-import {Allocate, Deallocate} from '../ops/gates';
+import {dropEngineAfter, insertEngine} from './util'
+import {Allocate, Deallocate} from '../ops/gates'
 import {
   unionSet, setEqual, setIsSuperSet, intersection, symmetricDifference
 } from '../utils/polyfill'
+import {QubitManagementError} from './error'
 
 /*
 Adds Compute-tags to all commands and stores them (to later uncompute them
@@ -87,7 +88,7 @@ uncompute.
           }
 
           if (!qubit_found) {
-            throw new Error('\nQubit was not found in '
+            throw new QubitManagementError('\nQubit was not found in '
                 + 'MainEngine.active_qubits.\n')
           }
           this.send([this.addUnComputeTag(cmd.getInverse())])
@@ -144,7 +145,7 @@ uncompute.
             }
           }
           if (!qubit_found) {
-            throw new Error(
+            throw new QubitManagementError(
               '\nQubit was not found in '
             + 'MainEngine.active_qubits.\n'
             )
@@ -183,7 +184,7 @@ section which has not been allocated in Compute section
   endCompute() {
     this._compute = false
     if (!setIsSuperSet(this.allocatedQubitIDs, this.deallocatedQubitIDs)) {
-      throw new Error(
+      throw new QubitManagementError(
         '\nQubit has been deallocated in with Compute(eng) context \n'
     + 'which has not been allocated within this Compute section'
       )
@@ -305,16 +306,12 @@ export function Compute(engine, func) {
 
   if (typeof func === 'function') {
     enter()
-    let exp
     try {
       func()
     } catch (e) {
-      exp = e
+      throw e
     } finally {
       exit()
-      if (exp) {
-        throw exp
-      }
     }
   }
 }
@@ -344,7 +341,7 @@ export function CustomUncompute(engine, func) {
     // first, remove the compute engine
     const compute_eng = engine.next
     if (!(compute_eng instanceof ComputeEngine)) {
-      throw new Error(
+      throw new QubitManagementError(
         'Invalid call to CustomUncompute: No corresponding'
         + "'with Compute' statement found."
       )
@@ -369,7 +366,7 @@ export function CustomUncompute(engine, func) {
     const all_allocated_qubits = unionSet(allocatedQubitIDs, uncomputeEngine.allocatedQubitIDs)
     const all_deallocated_qubits = unionSet(deallocatedQubitIDs, uncomputeEngine.deallocatedQubitIDs)
     if (!setEqual(all_allocated_qubits, all_deallocated_qubits)) {
-      throw new Error('\nError. Not all qubits have been deallocated which have \n'
+      throw new QubitManagementError('\nError. Not all qubits have been deallocated which have \n'
                + 'been allocated in the with Compute(eng) or with '
                + 'CustomUncompute(eng) context.')
     }
@@ -379,8 +376,13 @@ export function CustomUncompute(engine, func) {
 
   if (typeof func === 'function') {
     enter()
-    func()
-    exit()
+    try {
+      func()
+    } catch (e) {
+      throw e
+    } finally {
+      exit()
+    }
   }
 }
 

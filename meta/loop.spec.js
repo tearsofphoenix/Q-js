@@ -8,6 +8,7 @@ import {
 } from '../ops/gates'
 import {instanceOf, tuple} from '../libs/util'
 import {CNOT} from '../ops/shortcuts'
+import {QubitManagementError} from './error'
 
 describe('loop test', () => {
   it('should test_loop_tag', () => {
@@ -36,7 +37,7 @@ describe('loop test', () => {
     const backend = new DummyEngine(true)
     const eng = new MainEngine(backend, [new DummyEngine()])
 
-    const allow_loop_tags = meta_tag => meta_tag.equal(new LoopTag())
+    const allow_loop_tags = meta_tag => meta_tag === LoopTag
 
     backend.isMetaTagHandler = allow_loop_tags
     const qubit = eng.allocateQubit()
@@ -59,6 +60,7 @@ describe('loop test', () => {
     H.or(qubit)
     eng.flush(true)
 
+    backend.receivedCommands.forEach(cmd => console.log(cmd.toString()))
     expect(backend.receivedCommands.length).to.equal(14)
     expect(backend.receivedCommands[0].gate.equal(Allocate)).to.equal(true)
     expect(backend.receivedCommands[1].gate.equal(H)).to.equal(true)
@@ -111,139 +113,134 @@ describe('loop test', () => {
     ids = [2, 9]
     ids.forEach(ii => expect(backend.receivedCommands[ii].tags).to.deep.equal([loop_tag]))
   });
-})
 
-//
-// def test_empty_loop():
-// backend = DummyEngine(save_commands=True)
-// eng = MainEngine(backend=backend, engine_list=[DummyEngine()])
-// qubit = eng.allocateQubit()
-//
-// assert len(backend.received_commands) == 1
-// with new Loop(eng, 0):
-// H.or(qubit
-// assert len(backend.received_commands) == 1
-//
-//
-// def test_empty_loop_when_loop_tag_supported_by_backend():
-// backend = DummyEngine(save_commands=True)
-// eng = MainEngine(backend=backend, engine_list=[DummyEngine()])
-//
-// def allow_loop_tags(self, meta_tag):
-// return meta_tag == new LoopTag
-//
-// backend.is_meta_tag_handler = types.MethodType(allow_loop_tags, backend)
-// qubit = eng.allocateQubit()
-//
-// assert len(backend.received_commands) == 1
-// with new Loop(eng, 0):
-// H.or(qubit
-// assert len(backend.received_commands) == 1
-//
-//
-// def test_loop_with_supported_loop_tag_depending_on_num():
-// # Test that if loop has only one iteration, there is no loop tag
-// backend = DummyEngine(save_commands=True)
-// eng = MainEngine(backend=backend, engine_list=[DummyEngine()])
-//
-// def allow_loop_tags(self, meta_tag):
-// return meta_tag == new LoopTag
-//
-// backend.is_meta_tag_handler = types.MethodType(allow_loop_tags, backend)
-// qubit = eng.allocateQubit()
-// with new Loop(eng, 1):
-// H.or(qubit
-// with new Loop(eng, 2):
-// H.or(qubit
-// assert len(backend.received_commands[1].tags) == 0
-// assert len(backend.received_commands[2].tags) == 1
-//
-//
-// def test_loop_unrolling():
-// backend = DummyEngine(save_commands=True)
-// eng = MainEngine(backend=backend, engine_list=[DummyEngine()])
-// qubit = eng.allocateQubit()
-// with new Loop(eng, 3):
-// H.or(qubit
-// eng.flush(deallocateQubits=True)
-// assert len(backend.received_commands) == 6
-//
-//
-// def test_loop_unrolling_with_ancillas():
-// backend = DummyEngine(save_commands=True)
-// eng = MainEngine(backend=backend, engine_list=[DummyEngine()])
-// qubit = eng.allocateQubit()
-// qubit_id = deepcopy(qubit[0].id)
-// with new Loop(eng, 3):
-// ancilla = eng.allocateQubit()
-// H.or(ancilla
-// CNOT.or((ancilla, qubit)
-// del ancilla
-// eng.flush(deallocateQubits=True)
-// assert len(backend.received_commands) == 15
-// assert backend.received_commands[0].gate == Allocate
-// for ii in range(3):
-// assert backend.received_commands[ii * 4 + 1].gate == Allocate
-// assert backend.received_commands[ii * 4 + 2].gate == H
-// assert backend.received_commands[ii * 4 + 3].gate == X
-// assert backend.received_commands[ii * 4 + 4].gate == Deallocate
-// # Check qubit ids
-// assert (backend.received_commands[ii * 4 + 1].qubits[0][0].id ==
-//     backend.received_commands[ii * 4 + 2].qubits[0][0].id)
-// assert (backend.received_commands[ii * 4 + 1].qubits[0][0].id ==
-//     backend.received_commands[ii * 4 + 3].control_qubits[0].id)
-// assert (backend.received_commands[ii * 4 + 3].qubits[0][0].id ==
-//     qubit_id)
-// assert (backend.received_commands[ii * 4 + 1].qubits[0][0].id ==
-//     backend.received_commands[ii * 4 + 4].qubits[0][0].id)
-// assert backend.received_commands[13].gate == Deallocate
-// assert backend.received_commands[14].gate == FlushGate()
-// assert (backend.received_commands[1].qubits[0][0].id !=
-//     backend.received_commands[5].qubits[0][0].id)
-// assert (backend.received_commands[1].qubits[0][0].id !=
-//     backend.received_commands[9].qubits[0][0].id)
-// assert (backend.received_commands[5].qubits[0][0].id !=
-//     backend.received_commands[9].qubits[0][0].id)
-//
-//
-// def test_nested_loop():
-// backend = DummyEngine(save_commands=True)
-//
-// def allow_loop_tags(self, meta_tag):
-// return meta_tag == new LoopTag
-//
-// backend.is_meta_tag_handler = types.MethodType(allow_loop_tags, backend)
-// eng = MainEngine(backend=backend, engine_list=[DummyEngine()])
-// qubit = eng.allocateQubit()
-// with new Loop(eng, 3):
-// with new Loop(eng, 4):
-// H.or(qubit
-// eng.flush(deallocateQubits=True)
-// assert len(backend.received_commands) == 4
-// assert backend.received_commands[1].gate == H
-// assert len(backend.received_commands[1].tags) == 2
-// assert backend.received_commands[1].tags[0].num == 4
-// assert backend.received_commands[1].tags[1].num == 3
-// assert (backend.received_commands[1].tags[0].id !=
-//     backend.received_commands[1].tags[1].id)
-//
-//
-// def test_qubit_management_error():
-// backend = DummyEngine(save_commands=True)
-// eng = MainEngine(backend=backend, engine_list=[DummyEngine()])
-// with pytest.raises(new QubitManagementError):
-// with new Loop(eng, 3):
-// qb = eng.allocateQubit()
-//
-//
-// def test_qubit_management_error_when_loop_tag_supported():
-// backend = DummyEngine(save_commands=True)
-//
-// def allow_loop_tags(self, meta_tag):
-// return meta_tag == new LoopTag
-//
-// backend.is_meta_tag_handler = types.MethodType(allow_loop_tags, backend)
-// eng = MainEngine(backend=backend, engine_list=[DummyEngine()])
-// with pytest.raises(new QubitManagementError):
-// with new Loop(eng, 3):
-// qb = eng.allocateQubit()
+  it('should test_empty_loop', () => {
+    const backend = new DummyEngine(true)
+    const eng = new MainEngine(backend, [new DummyEngine()])
+    const qubit = eng.allocateQubit()
+
+    expect(backend.receivedCommands.length).to.equal(1)
+    Loop(eng, 0, () => H.or(qubit))
+    expect(backend.receivedCommands.length).to.equal(1)
+  });
+
+  it('should test_empty_loop_when_loop_tag_supported_by_backend', () => {
+    const backend = new DummyEngine(true)
+    const eng = new MainEngine(backend, [new DummyEngine()])
+
+    const allow_loop_tags = meta_tag => (meta_tag === LoopTag)
+
+    backend.isMetaTagHandler = allow_loop_tags
+    const qubit = eng.allocateQubit()
+
+    expect(backend.receivedCommands.length).to.equal(1)
+    Loop(eng, 0, () => H.or(qubit))
+    expect(backend.receivedCommands.length).to.equal(1)
+  });
+
+  it('should test_loop_with_supported_loop_tag_depending_on_num', () => {
+    // Test that if loop has only one iteration, there is no loop tag
+    const backend = new DummyEngine(true)
+    const eng = new MainEngine(backend, [new DummyEngine()])
+
+    const allow_loop_tags = meta_tag => (meta_tag === LoopTag)
+
+    backend.isMetaTagHandler = allow_loop_tags
+    const qubit = eng.allocateQubit()
+    Loop(eng, 1, () => H.or(qubit))
+    Loop(eng, 2, () => H.or(qubit))
+    expect(backend.receivedCommands[1].tags.length).to.equal(0)
+    expect(backend.receivedCommands[2].tags.length).to.equal(1)
+  });
+
+  it('should test_loop_unrolling', () => {
+    const backend = new DummyEngine(true)
+    const eng = new MainEngine(backend, [new DummyEngine()])
+    const qubit = eng.allocateQubit()
+    Loop(eng, 3, () => H.or(qubit))
+
+    eng.flush(true)
+    expect(backend.receivedCommands.length).to.equal(6)
+  });
+
+  it('should test_loop_unrolling_with_ancillas', () => {
+    const backend = new DummyEngine(true)
+    const eng = new MainEngine(backend, [new DummyEngine()])
+    const qubit = eng.allocateQubit()
+    const qubit_id = qubit[0].id
+    Loop(eng, 3, () => {
+      const ancilla = eng.allocateQubit()
+      H.or(ancilla)
+      CNOT.or(tuple(ancilla, qubit))
+      ancilla.deallocate()
+    })
+
+    eng.flush(true)
+
+    expect(backend.receivedCommands.length).to.equal(15)
+    expect(backend.receivedCommands[0].gate.equal(Allocate)).to.equal(true)
+    for (let ii = 0; ii < 3; ++ii) {
+      expect(backend.receivedCommands[ii * 4 + 1].gate.equal(Allocate)).to.equal(true)
+      expect(backend.receivedCommands[ii * 4 + 2].gate.equal(H)).to.equal(true)
+      expect(backend.receivedCommands[ii * 4 + 3].gate.equal(X)).to.equal(true)
+      expect(backend.receivedCommands[ii * 4 + 4].gate.equal(Deallocate)).to.equal(true)
+
+      // Check qubit ids
+      expect(backend.receivedCommands[ii * 4 + 1].qubits[0][0].id).to.equal(backend.receivedCommands[ii * 4 + 2].qubits[0][0].id)
+      expect(backend.receivedCommands[ii * 4 + 1].qubits[0][0].id).to.equal(backend.receivedCommands[ii * 4 + 3].controlQubits[0].id)
+      expect(backend.receivedCommands[ii * 4 + 3].qubits[0][0].id).to.equal(qubit_id)
+      expect(backend.receivedCommands[ii * 4 + 1].qubits[0][0].id).to.equal(backend.receivedCommands[ii * 4 + 4].qubits[0][0].id)
+    }
+
+    expect(backend.receivedCommands[13].gate.equal(Deallocate)).to.equal(true)
+    expect(backend.receivedCommands[14].gate.equal(new FlushGate())).to.equal(true)
+
+
+    expect(backend.receivedCommands[1].qubits[0][0].id
+    !== backend.receivedCommands[5].qubits[0][0].id).to.equal(true)
+    expect(backend.receivedCommands[1].qubits[0][0].id
+    !== backend.receivedCommands[9].qubits[0][0].id).to.equal(true)
+    expect(backend.receivedCommands[5].qubits[0][0].id
+    !== backend.receivedCommands[9].qubits[0][0].id).to.equal(true)
+  });
+
+  it('should test_nested_loop', () => {
+    const backend = new DummyEngine(true)
+
+    const allow_loop_tags = meta_tag => (meta_tag === LoopTag)
+
+    backend.isMetaTagHandler = allow_loop_tags
+    const eng = new MainEngine(backend, [new DummyEngine()])
+    const qubit = eng.allocateQubit()
+    Loop(eng, 3, () => {
+      Loop(eng, 4, () => {
+        H.or(qubit)
+      })
+    })
+
+    eng.flush(true)
+    expect(backend.receivedCommands.length).to.equal(4)
+    expect(backend.receivedCommands[1].gate.equal(H)).to.equal(true)
+    expect(backend.receivedCommands[1].tags.length).to.equal(2)
+    expect(backend.receivedCommands[1].tags[0].num).to.equal(4)
+    expect(backend.receivedCommands[1].tags[1].num).to.equal(3)
+    expect(backend.receivedCommands[1].tags[0].id !== backend.receivedCommands[1].tags[1].id).to.equal(true)
+  });
+
+  it('should test_qubit_management_error', () => {
+    const backend = new DummyEngine(true)
+    const eng = new MainEngine(backend, [new DummyEngine()])
+
+    expect(() => Loop(eng, 3, () => eng.allocateQubit())).to.throw(QubitManagementError)
+  });
+
+  it('should test_qubit_management_error_when_loop_tag_supported', () => {
+    const backend = new DummyEngine(true)
+
+    const allow_loop_tags = meta_tag => (meta_tag === LoopTag)
+
+    backend.isMetaTagHandler = allow_loop_tags
+    const eng = new MainEngine(backend, [new DummyEngine()])
+    expect(() => Loop(eng, 3, () => eng.allocateQubit())).to.throw(QubitManagementError)
+  });
+})

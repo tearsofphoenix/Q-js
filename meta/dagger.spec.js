@@ -8,6 +8,7 @@ import {DummyEngine} from '../cengines/testengine'
 import {Dagger} from './dagger'
 import {CNOT} from '../ops/shortcuts'
 import {makeTuple} from '../libs/util'
+import {QubitManagementError} from './error'
 
 describe('dagger test', () => {
   it('should test dagger with dirty qubits', () => {
@@ -41,7 +42,7 @@ describe('dagger test', () => {
 
     expect(backend.receivedCommands[1].tags).to.deep.equal([DirtyQubitTag])
     expect(backend.receivedCommands[6].tags).to.deep.equal([DirtyQubitTag])
-  });
+  })
 
   it('should test dagger qubit management error', () => {
     const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])
@@ -49,8 +50,8 @@ describe('dagger test', () => {
       Dagger(eng, () => {
         const ancilla = eng.allocateQubit()
       })
-    }).to.throw()
-  });
+    }).to.throw(QubitManagementError)
+  })
 
   it('should test dagger raise only single error', () => {
     const eng = new MainEngine(new DummyEngine(), [])
@@ -61,5 +62,5 @@ describe('dagger test', () => {
         throw new Error('RuntimeError')
       })
     }).to.throw()
-  });
+  })
 })

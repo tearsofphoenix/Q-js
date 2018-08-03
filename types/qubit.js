@@ -222,6 +222,11 @@ Qureg.prototype.add = function(other) {
   return new Qureg(array)
 }
 
+Qureg.prototype.deallocate = function() {
+  this.forEach(qubit => qubit.deallocate())
+  this.length = 0
+}
+
 // fix class hierarchy
 Qureg.__proto__ = Array
 

@@ -12,6 +12,7 @@ import {BasicEngine} from '../cengines/basics'
 import {Allocate, Deallocate} from '../ops/gates'
 import {insertEngine, dropEngineAfter} from './util'
 import {setEqual} from '../utils/polyfill';
+import {QubitManagementError} from "./error";
 
 // Stores all commands and, when done, inverts the circuit & runs it.
 export class DaggerEngine extends BasicEngine {
@@ -28,7 +29,7 @@ have been deallocated.
      */
   run() {
     if (!setEqual(this.deallocateQubitIDs, this.allocateQubitIDs)) {
-      throw new Error(
+      throw new QubitManagementError(
         "\n Error. Qubits have been allocated in 'with "
           + "Dagger(eng)' context,\n which have not explicitely "
           + 'been deallocated.\n'
@@ -125,7 +126,12 @@ QFT | qubits
 
   if (typeof func === 'function') {
     enter()
-    func()
-    exit()
+    try {
+      func()
+    } catch (e) {
+      throw e
+    } finally {
+      exit()
+    }
   }
 }

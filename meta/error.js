@@ -11,3 +11,10 @@ export class LastEngineError extends Error {
     this.__proto__ = LastEngineError.prototype
   }
 }
+
+export class QubitManagementError extends Error {
+  constructor(...args) {
+    super(...args)
+    this.__proto__ = QubitManagementError.prototype
+  }
+}

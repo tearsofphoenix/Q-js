@@ -1,7 +1,8 @@
 import {BasicEngine} from '../cengines/basics'
 import {setEqual} from '../utils/polyfill';
 import {dropEngineAfter, insertEngine} from './util';
-import {Allocate, Deallocate} from '../ops/gates';
+import {Allocate, Deallocate} from '../ops/gates'
+import {QubitManagementError} from './error'
 
 export class LoopTag {
   constructor(num) {
@@ -65,7 +66,7 @@ num (int): Number of loop iterations.
       // Unroll the loop
       // Check that local qubits have been deallocated:
       if (!setEqual(this._deallocatedQubitIDs, this._allocatedQubitIDs)) {
-        throw new Error(error_message)
+        throw new QubitManagementError(error_message)
       }
       if (this._allocatedQubitIDs.size === 0) {
         // No local qubits, just send the circuit num times
@@ -82,16 +83,16 @@ num (int): Number of loop iterations.
           } else {
             // Change local qubit ids before sending them
             // TODO
-            // for refs_loc_qubit in this._refs_to_local_qb.values():
-            // new_qb_id = this.main_engine.get_new_qubit_id()
-            // for qubit_ref in refs_loc_qubit:
-            // qubit_ref.id = new_qb_id
-            // this.send(deepcopy(this._cmd_list))
+            Object.values(this._refsToLocalQB).forEach(refs_loc_qubit => {
+              const new_qb_id = this.main.getNewQubitID()
+              refs_loc_qubit.forEach(qubitRef => qubitRef.id = new_qb_id)
+            })
+            this.send(this._cmdList.slice(0))
           }
         }
       }
     } else if (!setEqual(this._deallocatedQubitIDs, this._allocatedQubitIDs)) {
-      throw new Error(error_message)
+      throw new QubitManagementError(error_message)
     }
   }
 
