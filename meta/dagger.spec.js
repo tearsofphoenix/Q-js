@@ -40,8 +40,8 @@ describe('dagger test', () => {
     expect(backend.receivedCommands[6].gate.equal(Deallocate)).to.equal(true)
     expect(backend.receivedCommands[7].gate.equal(Deallocate)).to.equal(true)
 
-    expect(backend.receivedCommands[1].tags).to.deep.equal([DirtyQubitTag])
-    expect(backend.receivedCommands[6].tags).to.deep.equal([DirtyQubitTag])
+    expect(backend.receivedCommands[1].tags).to.deep.equal([new DirtyQubitTag()])
+    expect(backend.receivedCommands[6].tags).to.deep.equal([new DirtyQubitTag()])
   })
 
   it('should test dagger qubit management error', () => {

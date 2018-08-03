@@ -18,3 +18,10 @@ export class QubitManagementError extends Error {
     this.__proto__ = QubitManagementError.prototype
   }
 }
+
+export class NotYetMeasuredError extends Error {
+  constructor(...args) {
+    super(...args)
+    this.__proto__ = NotYetMeasuredError.prototype
+  }
+}

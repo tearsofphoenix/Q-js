@@ -98,7 +98,7 @@ describe('basics test', () => {
       expect(cmd.gate.equal(new AllocateQubitGate())).to.equal(true)
     })
 
-    expect(saving_backend.receivedCommands[2].tags).to.deep.equal([DirtyQubitTag])
+    expect(saving_backend.receivedCommands[2].tags).to.deep.equal([new DirtyQubitTag()])
 
     // Test deallocate gates were sent
     eng.deallocateQubit(qubit[0])
@@ -114,7 +114,7 @@ describe('basics test', () => {
       expect(cmd.gate.equal(new DeallocateQubitGate())).to.equal(true)
     })
 
-    expect(saving_backend.receivedCommands[7].tags).to.deep.equal([DirtyQubitTag])
+    expect(saving_backend.receivedCommands[7].tags).to.deep.equal([new DirtyQubitTag()])
   });
 
   it('should test_deallocate_qubit_exception', () => {

@@ -1,10 +1,16 @@
 import { BasicEngine } from '../cengines/basics'
 import { LastEngineError } from '../meta/error'
-import { Allocate, FlushGate } from '../ops/gates'
+import {
+  Allocate, Deallocate, FlushGate, Measure
+} from '../ops/gates'
 import { LogicalQubitIDTag } from '../meta/tag'
 import { BasicQubit } from '../types/qubit'
 import { getControlCount } from '../meta/control'
+import {genString} from '../libs/util'
 
+function parseStringKey(key) {
+  return key.split(',')
+}
 /*
 ResourceCounter is a compiler engine which counts the number of gates and
 max. number of active qubits.
@@ -22,14 +28,14 @@ Properties:
   depth_of_dag (int): It is the longest path in the directed
 acyclic graph (DAG) of the program.
  */
-export class ResourceCounter extends BasicEngine {
+export default class ResourceCounter extends BasicEngine {
   constructor() {
     super()
     this.gate_counts = {}
     this.gate_class_counts = {}
     this._active_qubits = 0
     this.max_width = 0
-// key: qubit id, depth of this qubit
+    // key: qubit id, depth of this qubit
     this._depth_of_qubit = {}
     this._previous_max_depth = 0
   }
@@ -58,7 +64,7 @@ the Command (if there is a next engine).
 
   get depthOfDag() {
     if (this._depth_of_qubit) {
-      const current_max = Math.max(...this._depth_of_qubit.values())
+      const current_max = Math.max(...Object.values(this._depth_of_qubit))
       return Math.max(current_max, this._previous_max_depth)
     } else {
       return this._previous_max_depth
@@ -76,12 +82,12 @@ the Command (if there is a next engine).
       this._previous_max_depth = Math.max(this._previous_max_depth, depth)
       delete this._depth_of_qubit[qid]
     } else if (this.isLastEngine && cmd.gate.equal(Measure)) {
-      cmd.qubits.forEach(qureg => {
-        qureg.forEach(qubit => {
+      cmd.qubits.forEach((qureg) => {
+        qureg.forEach((qubit) => {
           this._depth_of_qubit[qubit.id] += 1
           //  Check if a mapper assigned a different logical id
           let logical_id_tag
-          cmd.tags.forEach(tag => {
+          cmd.tags.forEach((tag) => {
             if (tag instanceof LogicalQubitIDTag) {
               logical_id_tag = tag
             }
@@ -94,8 +100,8 @@ the Command (if there is a next engine).
       })
     } else {
       const qubit_ids = new Set()
-      cmd.allQubits.forEach(qureg => {
-        qureg.forEach(qubit => {
+      cmd.allQubits.forEach((qureg) => {
+        qureg.forEach((qubit) => {
           qubit_ids.add(qubit.id)
         })
       })
@@ -104,7 +110,7 @@ the Command (if there is a next engine).
         this._depth_of_qubit[list[0]] += 1
       } else {
         let max_depth = 0
-        qubit_ids.forEach(qubit_id => {
+        qubit_ids.forEach((qubit_id) => {
           max_depth = Math.max(max_depth, this._depth_of_qubit[qubit_id])
         })
 
@@ -116,17 +122,19 @@ the Command (if there is a next engine).
 
     const ctrl_cnt = getControlCount(cmd)
     const gate_description = [cmd.gate, ctrl_cnt]
-    const gate_class_description = [cmd.gate.contructor, ctrl_cnt]
+    const gate_class_description = [cmd.gate.constructor.name, ctrl_cnt]
 
     try {
-      this.gate_counts[gate_description] += 1
+      const v = this.gate_counts[gate_description] || 0
+      this.gate_counts[gate_description] = v + 1
     } catch (e) {
       console.log(e)
       this.gate_counts[gate_description] = 1
     }
 
     try {
-      this.gate_class_counts[gate_class_description] += 1
+      const v = this.gate_class_counts[gate_class_description] || 0
+      this.gate_class_counts[gate_class_description] = v + 1
     } catch (e) {
       console.log(e)
       this.gate_class_counts[gate_class_description] = 1
@@ -134,7 +142,7 @@ the Command (if there is a next engine).
   }
 
   receive(commandList) {
-    commandList.forEach(cmd => {
+    commandList.forEach((cmd) => {
       if (!(cmd.gate instanceof FlushGate)) {
         this.addCMD(cmd)
       }
@@ -143,34 +151,38 @@ the Command (if there is a next engine).
       }
     })
   }
+
+  /*
+  Return the string representation of this ResourceCounter.
+
+  Returns:
+A summary (string) of resources used, including gates, number of
+calls, and max. number of qubits that were active at the same
+time.
+   */
+  toString() {
+    console.log(162, this.gate_counts, Object.keys(this.gate_counts))
+    if (Object.keys(this.gate_counts).length > 0) {
+      const gate_class_list = []
+      Object.keys(this.gate_class_counts).forEach((gate_class_description) => {
+        const num = this.gate_class_counts[gate_class_description]
+        const [gate_class, ctrl_cnt] = parseStringKey(gate_class_description)
+        console.log(gate_class, ctrl_cnt, num)
+        const name = genString('C', ctrl_cnt) + gate_class
+        gate_class_list.push(`${name} : ${num}`)
+      })
+
+      const gate_list = []
+      Object.keys(this.gate_counts).forEach((gate_description) => {
+        const num = this.gate_counts[gate_description]
+        const [gate, ctrl_cnt] = parseStringKey(gate_description)
+        const name = genString('C', ctrl_cnt) + gate.toString()
+        gate_list.push(`${name} : ${num}`)
+      })
+
+      return `Gate class counts:\n    ${gate_class_list.join('\n    ')}\n\nGate counts:\n    ${gate_list.join('\n    ')}\n\nMax. width (number of qubits) : ${this.max_width}.`
+    } else {
+      return '(No quantum resources used)'
+    }
+  }
 }
-//
-// def __str__(self):
-// """
-// Return the string representation of this ResourceCounter.
-//
-//   Returns:
-// A summary (string) of resources used, including gates, number of
-// calls, and max. number of qubits that were active at the same
-// time.
-// """
-// if len(this.gate_counts) > 0:
-// gate_class_list = []
-// for gate_class_description, num in this.gate_class_counts.items():
-// gate_class, ctrl_cnt = gate_class_description
-// gate_class_name = ctrl_cnt * "C" + gate_class.__name__
-// gate_class_list.append(gate_class_name + " : " + str(num))
-//
-// gate_list = []
-// for gate_description, num in this.gate_counts.items():
-// gate, ctrl_cnt = gate_description
-// gate_name = ctrl_cnt * "C" + str(gate)
-// gate_list.append(gate_name + " : " + str(num))
-//
-// return ("Gate class counts:\n    " +
-//   "\n    ".join(list(sorted(gate_class_list))) +
-//   "\n\nGate counts:\n    " +
-//   "\n    ".join(list(sorted(gate_list))) +
-//   "\n\nMax. width (number of qubits) : " +
-//   str(this.max_width) + ".")
-// return "(No quantum resources used)"

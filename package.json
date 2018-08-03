@@ -7,6 +7,8 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-stage-0": "^6.24.1",
     "deep-equal": "^1.0.1",
     "mathjs": "^5.0.4"
   },

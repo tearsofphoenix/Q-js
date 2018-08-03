@@ -14,12 +14,6 @@ The IBM Backend class, which stores the circuit, transforms it to JSON
 QASM, and sends the circuit through the IBM API.
  */
 export class IBMBackend extends BasicEngine {
-  // Mapping of gate names from our gate objects to the IBM QASM representation.
-  static gateNames = {
-    [Tdag.toString()]: 'tdg',
-    [Sdag.toString()]: 'sdg'
-  }
-
   /*
   Initialize the Backend object.
 
@@ -337,4 +331,9 @@ command_list: List of commands to execute
       }
     })
   }
+}
+
+IBMBackend.gateNames = {
+  [Tdag.toString()]: 'tdg',
+  [Sdag.toString()]: 'sdg'
 }

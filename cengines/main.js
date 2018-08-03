@@ -4,6 +4,7 @@ import {FlushGate} from '../ops/gates'
 import BasicMapperEngine from './basicmapper'
 import {Command} from '../ops/command'
 import {BasicQubit} from "../types/qubit";
+import {NotYetMeasuredError} from "../meta/error";
 
 /*
 The MainEngine class provides all functionality of the main compiler
@@ -177,7 +178,7 @@ eng.get_measurement_result(qubit[0]) == int(qubit)
   getMeasurementResult(qubit) {
     const v = this._measurements[qubit.id]
     if (typeof v === 'undefined') {
-      throw new Error(`${"\nError: Can't access measurement result for "
+      throw new NotYetMeasuredError(`${"\nError: Can't access measurement result for "
       + 'qubit #'}${qubit.id}. The problem may `
       + 'be:\n\t1. Your '
       + 'code lacks a measurement statement\n\t'

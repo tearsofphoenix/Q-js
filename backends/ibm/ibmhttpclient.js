@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+import 'babel-polyfill'
 const _api_url = 'https://quantumexperience.ng.bluemix.net/api/'
 
 export default class IBMHTTPClient {
