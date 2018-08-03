@@ -3,8 +3,9 @@ import {BasicEngine} from './basics'
 import {FlushGate} from '../ops/gates'
 import BasicMapperEngine from './basicmapper'
 import {Command} from '../ops/command'
-import {BasicQubit} from "../types/qubit";
-import {NotYetMeasuredError} from "../meta/error";
+import {BasicQubit} from '../types/qubit';
+import {NotYetMeasuredError} from '../meta/error'
+import {getEngineList} from '../setups';
 
 /*
 The MainEngine class provides all functionality of the main compiler
@@ -22,7 +23,7 @@ dirty_qubits (Set): Containing all dirty qubit ids
 backend (BasicEngine): Access the back-end.
 mapper (BasicMapperEngine): Access to the mapper if there is one.
  */
-export class MainEngine extends BasicEngine {
+export default class MainEngine extends BasicEngine {
   /*
   Initialize the main compiler engine and all compiler engines.
 

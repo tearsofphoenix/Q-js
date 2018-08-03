@@ -4,7 +4,7 @@ import {InstructionFilter} from './replacer/replacer'
 import {DirtyQubitTag} from '../meta/tag'
 import {H, AllocateQubitGate, DeallocateQubitGate} from '../ops/gates'
 import {DummyEngine} from './testengine'
-import {MainEngine} from './main'
+import MainEngine from './main'
 import {Qubit} from '../types/qubit'
 import {ClassicalInstructionGate, FastForwardingGate} from '../ops/basics';
 

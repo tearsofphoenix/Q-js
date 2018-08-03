@@ -4,7 +4,7 @@ import {Measure, H} from '../ops/gates'
 import {All} from '../ops/metagates'
 import {LogicalQubitIDTag} from '../meta/tag'
 import {DummyEngine} from './testengine'
-import {MainEngine} from './main'
+import MainEngine from './main'
 import ManualMapper from './manualmapper'
 
 describe('manual mapper test', () => {

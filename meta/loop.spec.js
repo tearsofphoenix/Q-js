@@ -2,7 +2,7 @@ import {expect} from 'chai'
 import {LoopTag, LoopEngine, Loop} from './loop'
 import {ComputeTag} from './tag'
 import {DummyEngine} from '../cengines/testengine'
-import {MainEngine} from '../cengines/main'
+import MainEngine from '../cengines/main'
 import {
   Allocate, Deallocate, H, X, FlushGate
 } from '../ops/gates'
@@ -188,16 +188,16 @@ describe('loop test', () => {
       console.log(cmd2.toString())
       console.log(cmd3.toString())
       console.log(cmd4.toString())
-      // expect(backend.receivedCommands[ii * 4 + 1].gate.equal(Allocate)).to.equal(true)
-      // expect(backend.receivedCommands[ii * 4 + 2].gate.equal(H)).to.equal(true)
-      // expect(backend.receivedCommands[ii * 4 + 3].gate.equal(X)).to.equal(true)
-      // expect(backend.receivedCommands[ii * 4 + 4].gate.equal(Deallocate)).to.equal(true)
-      //
-      // // Check qubit ids
-      // expect(backend.receivedCommands[ii * 4 + 1].qubits[0][0].id).to.equal(backend.receivedCommands[ii * 4 + 2].qubits[0][0].id)
-      // expect(backend.receivedCommands[ii * 4 + 1].qubits[0][0].id).to.equal(backend.receivedCommands[ii * 4 + 3].controlQubits[0].id)
-      // expect(backend.receivedCommands[ii * 4 + 3].qubits[0][0].id).to.equal(qubit_id)
-      // expect(backend.receivedCommands[ii * 4 + 1].qubits[0][0].id).to.equal(backend.receivedCommands[ii * 4 + 4].qubits[0][0].id)
+      expect(backend.receivedCommands[ii * 4 + 1].gate.equal(Allocate)).to.equal(true)
+      expect(backend.receivedCommands[ii * 4 + 2].gate.equal(H)).to.equal(true)
+      expect(backend.receivedCommands[ii * 4 + 3].gate.equal(X)).to.equal(true)
+      expect(backend.receivedCommands[ii * 4 + 4].gate.equal(Deallocate)).to.equal(true)
+
+      // Check qubit ids
+      expect(backend.receivedCommands[ii * 4 + 1].qubits[0][0].id).to.equal(backend.receivedCommands[ii * 4 + 2].qubits[0][0].id)
+      expect(backend.receivedCommands[ii * 4 + 1].qubits[0][0].id).to.equal(backend.receivedCommands[ii * 4 + 3].controlQubits[0].id)
+      expect(backend.receivedCommands[ii * 4 + 3].qubits[0][0].id).to.equal(qubit_id)
+      expect(backend.receivedCommands[ii * 4 + 1].qubits[0][0].id).to.equal(backend.receivedCommands[ii * 4 + 4].qubits[0][0].id)
     }
 
     expect(backend.receivedCommands[13].gate.equal(Deallocate)).to.equal(true)

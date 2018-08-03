@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {MainEngine} from './main'
+import MainEngine from './main'
 import {DummyEngine} from './testengine'
 import {
   H, AllocateQubitGate, FlushGate, DeallocateQubitGate

@@ -2,7 +2,7 @@ import {assert, expect} from 'chai'
 import mathjs from 'mathjs'
 import {BasicQubit, Qubit, Qureg} from './qubit'
 import {BasicEngine} from '../cengines/basics'
-import {MainEngine} from '../cengines/main'
+import MainEngine from '../cengines/main'
 import {DummyEngine} from '../cengines/testengine'
 import {Deallocate} from '../ops/gates';
 

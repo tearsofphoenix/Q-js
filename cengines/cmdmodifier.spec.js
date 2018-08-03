@@ -2,7 +2,7 @@ import {expect} from 'chai'
 import { ClassicalInstructionGate, FastForwardingGate } from '../ops/basics'
 import {H} from '../ops/gates'
 import {DummyEngine} from './testengine'
-import {MainEngine} from './main'
+import MainEngine from './main'
 import CommandModifier from './cmdmodifier'
 
 describe('cmdmodifier test', () => {

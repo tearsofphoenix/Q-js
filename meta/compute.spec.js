@@ -4,7 +4,7 @@ import {
   Allocate, Deallocate, H, NOT, Rx, Ry, FlushGate
 } from '../ops/gates'
 import {CNOT} from '../ops/shortcuts'
-import {MainEngine} from '../cengines/main'
+import MainEngine from '../cengines/main'
 import {DummyEngine, CompareEngine} from '../cengines/testengine'
 import {
   ComputeEngine, UncomputeEngine, Compute, Uncompute, CustomUncompute

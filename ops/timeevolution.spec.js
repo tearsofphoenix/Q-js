@@ -4,7 +4,7 @@ import QubitOperator from './qubitoperator'
 import TimeEvolution from './timeevolution'
 import {tuple} from '../libs/util'
 import {BasicGate} from './basics'
-import {MainEngine} from '../cengines/main'
+import MainEngine from '../cengines/main'
 import {DummyEngine} from '../cengines/testengine'
 import {Ph} from './gates';
 

@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 import { makeTuple } from '../libs/util'
-import {MainEngine} from './main'
+import MainEngine from './main'
 import {DummyEngine, CompareEngine} from './testengine'
 import {
   H, Rx, FlushGate, Allocate

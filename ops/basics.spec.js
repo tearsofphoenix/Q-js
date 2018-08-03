@@ -1,6 +1,6 @@
 import {assert, expect} from 'chai'
 import math from 'mathjs'
-import { MainEngine } from '../cengines/main'
+import MainEngine from '../cengines/main'
 import {DummyEngine} from '../cengines/testengine'
 import {
   BasicGate, FastForwardingGate, BasicRotationGate, SelfInverseGate, BasicPhaseGate, BasicMathGate

@@ -4,7 +4,7 @@ import {Swap, H, X} from '../ops/gates'
 import {CNOT} from '../ops/shortcuts'
 import {tuple, instanceOf} from '../libs/util'
 import {DummyEngine} from './testengine'
-import {MainEngine} from './main'
+import MainEngine from './main'
 import {Control} from '../meta/control'
 import {Compute, Uncompute} from '../meta/compute';
 import {ComputeTag, UncomputeTag} from '../meta/tag';

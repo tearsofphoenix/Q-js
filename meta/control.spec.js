@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 
-import { MainEngine } from '../cengines/main'
+import MainEngine from '../cengines/main'
 import {DummyEngine} from '../cengines/testengine'
 import { H, Rx } from '../ops/gates'
 import {Command} from '../ops/command'

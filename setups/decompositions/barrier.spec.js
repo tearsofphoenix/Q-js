@@ -1,7 +1,7 @@
 import {expect} from 'chai'
 import {_recognize_barrier } from './barrier'
 import {DummyEngine} from '../../cengines/testengine'
-import {MainEngine} from '../../cengines/main'
+import MainEngine from '../../cengines/main'
 import {R, Barrier} from '../../ops/gates'
 
 describe('barrier test', () => {

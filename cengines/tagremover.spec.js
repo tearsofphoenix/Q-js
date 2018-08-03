@@ -5,7 +5,7 @@ import {tuple} from '../libs/util'
 import {H} from '../ops/gates'
 import {Command} from '../ops/command'
 import {DummyEngine} from './testengine'
-import {MainEngine} from './main'
+import MainEngine from './main'
 
 describe('tag remover test', () => {
   it('should test_tagremover_default', () => {

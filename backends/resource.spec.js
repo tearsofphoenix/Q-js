@@ -2,7 +2,7 @@ import {expect} from 'chai'
 import ResourceCounter from './resource'
 import {BasicQubit} from '../types/qubit';
 import {instanceOf, tuple} from '../libs/util';
-import {MainEngine} from '../cengines/main'
+import MainEngine from '../cengines/main'
 import {
   Allocate, H, Measure, Rz, X
 } from '../ops/gates';

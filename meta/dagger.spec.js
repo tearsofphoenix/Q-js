@@ -3,7 +3,7 @@ import {
   Allocate, Deallocate, H, Rx, X
 } from '../ops/gates'
 import {DirtyQubitTag} from './tag'
-import {MainEngine} from '../cengines/main'
+import MainEngine from '../cengines/main'
 import {DummyEngine} from '../cengines/testengine'
 import {Dagger} from './dagger'
 import {CNOT} from '../ops/shortcuts'

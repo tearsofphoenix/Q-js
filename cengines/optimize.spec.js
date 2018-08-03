@@ -1,7 +1,7 @@
 import {expect} from 'chai'
 import LocalOptimizer from './optimize'
 import {DummyEngine} from './testengine'
-import {MainEngine} from './main'
+import MainEngine from './main'
 import {tuple, instanceOf} from '../libs/util';
 import {
   AllocateQubitGate, X, H, Rx
