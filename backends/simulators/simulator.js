@@ -2,6 +2,7 @@ import {BasicEngine} from '../../cengines/basics'
 import SimulatorBackend from './jssim'
 import {Deallocate, Measure} from '../../ops/gates';
 import {BasicMathGate} from '../../ops/basics';
+import TimeEvolution from "../../ops/timeevolution";
 /*
 Simulator is a compiler engine which simulates a quantum computer using
 C++-based kernels.

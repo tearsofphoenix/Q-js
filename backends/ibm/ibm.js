@@ -7,6 +7,7 @@ import {getControlCount} from '../../meta/control';
 import {LogicalQubitIDTag} from '../../meta/tag';
 import IBMHTTPClient from './ibmhttpclient'
 import {instanceOf} from '../../libs/util'
+import '../../ops/metagates'
 
 const {Tdag, Sdag} = Gates
 /*

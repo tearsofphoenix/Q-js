@@ -34,9 +34,10 @@ describe('barrier test', () => {
     eng.flush(true)
     // Don't test initial allocate and trailing deallocate and flush gate.
     const cmds = saving_backend.receivedCommands
-    cmds.slice(1, cmds.length - 2).forEach((cmd) => {
-      expect(cmd.gate !== Barrier)
+    const sub = cmds.slice(1, cmds.length - 2)
+    sub.forEach((cmd) => {
+      expect(cmd.gate.equal(Barrier)).to.equal(false)
     })
-    expect(cmds.length).to.equal(1)
+    expect(sub.length).to.equal(1)
   });
 })

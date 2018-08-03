@@ -8,7 +8,7 @@ import {InstructionFilter, AutoReplacer} from './replacer';
 import {BasicGate, ClassicalInstructionGate} from '../../ops/basics';
 import DecompositionRuleSet from './decompositionruleset'
 import DecompositionRule from './decompositionrule'
-import {DaggeredGate} from '../../ops/metagates'
+import '../../ops/metagates'
 import {NoGateDecompositionError} from '../../meta/error';
 
 describe('replacer test', () => {

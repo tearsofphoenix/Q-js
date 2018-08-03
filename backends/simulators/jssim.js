@@ -58,7 +58,7 @@ List of measurement results (containing either True or False).
    */
   measureQubits(ids) {
     const P = Math.random()
-    let val = 0.
+    let val = 0.0
     let i_picked = 0
     while (val < P && i_picked < this._state.length) {
       val += mathjs.abs(this._state[i_picked]) ** 2
@@ -68,7 +68,7 @@ List of measurement results (containing either True or False).
     i_picked -= 1
 
     const res = []
-    const pos = ids.map(ID => {
+    const pos = ids.map((ID) => {
       res.push(false)
       return this._map[ID]
     })
@@ -82,17 +82,17 @@ List of measurement results (containing either True or False).
       val |= ((res[i] & 1) << looper)
     })
 
-    let nrm = 0.
+    let nrm = 0.0
     this._state.forEach((looper, i) => {
       if ((mask & i) != val) {
-        this._state[i] = 0.
-      }else {
+        this._state[i] = 0.0
+      } else {
         nrm += mathjs.abs(looper) ** 2
       }
     })
 
     // normalize
-    const scale = 1. / Math.sqrt(nrm)
+    const scale = 1.0 / Math.sqrt(nrm)
     this._state.forEach((looper, i) => {
       this._state[i] = looper * scale
     })
@@ -124,7 +124,7 @@ RuntimeError: If the qubit is in a superposition, i.e., has not
 been measured / uncomputed.
 */
   getClassicalValue(ID, tolerance = 1.e-10) {
-    let pos = this._map[ID]
+    const pos = this._map[ID]
     let up = false
     let down = false
 
@@ -139,10 +139,10 @@ been measured / uncomputed.
         }
 
         if (up && down) {
-          throw new Error("Qubit has not been measured / " +
-          "uncomputed. Cannot access its " +
-          "classical value and/or deallocate a " +
-          "qubit in superposition!")
+          throw new Error('Qubit has not been measured / '
+          + 'uncomputed. Cannot access its '
+          + 'classical value and/or deallocate a '
+          + 'qubit in superposition!')
         }
       }
     }
@@ -171,7 +171,7 @@ been measured / uncomputed.
     }
 
     const newmap = {}
-    Object.keys(this._map).forEach(key => {
+    Object.keys(this._map).forEach((key) => {
       const value = this._map[key]
       if (value > pos) {
         newmap[key] = value - 1
@@ -193,7 +193,7 @@ A mask which represents the control qubits in binary.
    */
   getControlMask(ctrlids) {
     let mask = 0
-    ctrlids.forEach(ctrlid => {
+    ctrlids.forEach((ctrlid) => {
       const ctrlpos = this._map[ctrlid]
       mask |= (1 << ctrlpos)
     })
@@ -214,9 +214,9 @@ ctrlqubit_ids (list<int>): List of control qubit ids.
     const mask = this.getControlMask(ctrlQubitIDs)
     // determine qubit locations from their IDs
     const qb_locs = []
-    qubitIDs.forEach(qureg => {
+    qubitIDs.forEach((qureg) => {
       qb_locs.push([])
-      qureg.forEach(qubitID => {
+      qureg.forEach((qubitID) => {
         qb_locs[qb_locs.length - 1].push(this._map[qubitID])
       })
     })
@@ -263,10 +263,10 @@ ids (list[int]): List of qubit ids upon which the operator acts.
 Expectation value
    */
   getExpectationValue(termsDict, IDs) {
-    let expectation = 0.
+    let expectation = 0.0
     const current_state = {}
     Object.assign(current_state, this._state)
-    Object.keys(termsDict).forEach(term => {
+    Object.keys(termsDict).forEach((term) => {
       const coefficient = termsDict[term]
       this.applyTerm(term, IDs)
       const delta = coefficient * _np.vdot(current_state, this._state).real
