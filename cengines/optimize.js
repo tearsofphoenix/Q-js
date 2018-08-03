@@ -3,7 +3,7 @@ import {BasicEngine} from './basics'
 import {FastForwardingGate} from '../ops/basics';
 import {FlushGate} from '../ops/gates'
 import {instanceOf} from '../libs/util'
-import {NotMergeable} from "../meta/error";
+import {NotMergeable} from '../meta/error';
 
 
 /*
@@ -177,8 +177,8 @@ get_inverse functions of the gate (see, e.g., BasicRotationGate).
         const merged_command = this._l[idx][i].getMerged(this._l[idx][i + 1])
         // determine index of this gate on all qubits
         const qubitids = []
-        const cmd = this._l[idx][i]
-        cmd.allQubits.forEach(sublist => sublist.forEach(qb => qubitids.push(qb.id)))
+        const c = this._l[idx][i]
+        c.allQubits.forEach(sublist => sublist.forEach(qb => qubitids.push(qb.id)))
 
         const gid = this.getGateIndices(idx, i, qubitids)
 
@@ -214,11 +214,15 @@ get_inverse functions of the gate (see, e.g., BasicRotationGate).
    */
   checkAndSend() {
     Object.keys(this._l).forEach((i) => {
-      const v = this._l[i]
-      const lastCMD = v.length > 0 ? v[v.length - 1] : {}
-      const gateFlag = instanceOf(lastCMD.gate, FastForwardingGate)
+      let v = this._l[i]
+      let lastCMD = v.length > 0 ? v[v.length - 1] : {}
+      let gateFlag = instanceOf(lastCMD.gate, FastForwardingGate)
       if (v.length >= this._m || (v.length > 0 && gateFlag)) {
         this.optimize(i)
+        v = this._l[i]
+        lastCMD = v.length > 0 ? v[v.length - 1] : {}
+        gateFlag = instanceOf(lastCMD.gate, FastForwardingGate)
+
         if (v.length >= this._m && !gateFlag) {
           this.sendQubitPipeline(i, v.length - this._m + 1)
         } else if (v.length > 0 && gateFlag) {
