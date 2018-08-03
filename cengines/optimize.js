@@ -56,7 +56,7 @@ first gate.
         try {
           let gateloc = 0
           // find location of this gate within its list
-          while (this._l[idLooper][gateloc].equal(il[i])) {
+          while (!this._l[idLooper][gateloc].equal(il[i])) {
             gateloc += 1
           }
 
@@ -139,8 +139,8 @@ get_inverse functions of the gate (see, e.g., BasicRotationGate).
     let limit = this._l[idx].length
     if (typeof lim !== 'undefined') {
       limit = lim
+      new_gateloc = limit
     }
-    new_gateloc = limit
 
     while (i < limit - 1) {
     // can be dropped if two in a row are self-inverses
@@ -215,7 +215,7 @@ get_inverse functions of the gate (see, e.g., BasicRotationGate).
   checkAndSend() {
     Object.keys(this._l).forEach((i) => {
       const v = this._l[i]
-      const lastCMD = v[v.length - 1]
+      const lastCMD = v.length > 0 ? v[v.length - 1] : {}
       const gateFlag = instanceOf(lastCMD.gate, FastForwardingGate)
       if (v.length >= this._m || (v.length > 0 && gateFlag)) {
         this.optimize(i)

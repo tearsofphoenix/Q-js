@@ -223,9 +223,9 @@ object).
      */
   getInverse() {
     if (this.angle == 0) {
-      return new this.constructor(0)
+      return new this.__proto__.constructor(0)
     } else {
-      return new this.constructor(-this.angle + 4 * Math.PI)
+      return new this.__proto__.constructor(-this.angle + 4 * Math.PI)
     }
   }
 
@@ -247,7 +247,7 @@ New object representing the merged gates.
      */
   getMerged(other) {
     if (other instanceof BasicRotationGate) {
-      return new BasicRotationGate(this.angle + other.angle)
+      return new this.__proto__.constructor(this.angle + other.angle)
     }
     throw new NotMergeable('Can\'t merge different types of rotation gates.')
   }
@@ -296,9 +296,9 @@ object).
      */
   getInverse() {
     if (this.angle == 0) {
-      return new BasicPhaseGate(0)
+      return new this.__proto__.constructor(0)
     } else {
-      return new BasicPhaseGate(-this.angle + 2 * Math.PI)
+      return new this.__proto__.constructor(-this.angle + 2 * Math.PI)
     }
   }
 
@@ -320,7 +320,7 @@ New object representing the merged gates.
      */
   getMerged(other) {
     if (other instanceof BasicPhaseGate) {
-      return new BasicPhaseGate(this.angle + other.angle)
+      return new this.__proto__.constructor(this.angle + other.angle)
     }
     throw new Error('Can\'t merge different types of rotation gates.')
   }

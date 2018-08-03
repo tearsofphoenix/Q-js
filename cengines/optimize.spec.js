@@ -26,23 +26,28 @@ describe('optimize test', () => {
     expect(backend.receivedCommands.length).to.equal(0)
 
     new Rx(0.5).or(qb0)
+    // backend.receivedCommands.forEach(cmd => console.log(cmd.toString()))
+    Object.keys(local_optimizer._l).forEach(key => console.log(key, local_optimizer._l[key].toString()))
     expect(backend.receivedCommands.length).to.equal(1)
     expect(backend.receivedCommands[0].gate.equal(new AllocateQubitGate())).to.equal(true)
 
     H.or(qb0)
+    console.log('-----------------------------------')
+    Object.keys(local_optimizer._l).forEach(key => console.log(key, local_optimizer._l[key].toString()))
+    // backend.receivedCommands.forEach(cmd => console.log(cmd.toString()))
     expect(backend.receivedCommands.length).to.equal(2)
     expect(backend.receivedCommands[1].gate.equal(H)).to.equal(true)
-
+    console.log('-----------------------------------')
     // Another gate on qb0 means it needs to send CNOT but clear pipeline of qb1
     new Rx(0.6).or(qb0)
     backend.receivedCommands.forEach(cmd => console.log(cmd.toString()))
-
+    Object.keys(local_optimizer._l).forEach(key => console.log(key, local_optimizer._l[key].toString()))
     expect(backend.receivedCommands.length).to.equal(5)
     expect(backend.receivedCommands[2].gate.equal(new AllocateQubitGate())).to.equal(true)
     expect(backend.receivedCommands[3].gate.equal(H)).to.equal(true)
     expect(backend.receivedCommands[3].qubits[0][0].id).to.equal(qb1[0].id)
     expect(backend.receivedCommands[4].gate.equal(X)).to.equal(true)
-    expect(backend.receivedCommands[4].controlQubits[0][0].id).to.equal(qb0[0].id)
+    expect(backend.receivedCommands[4].controlQubits[0].id).to.equal(qb0[0].id)
     expect(backend.receivedCommands[4].qubits[0][0].id).to.equal(qb1[0].id)
   });
 
@@ -125,6 +130,7 @@ describe('optimize test', () => {
     for (let i = 0; i < 10; ++i) {
       new Rx(0.5).or(qb0)
     }
+    backend.receivedCommands.forEach(cmd => console.log(cmd.toString()))
     expect(backend.receivedCommands.length).to.equal(0)
     eng.flush()
     // Expect allocate, one Rx gate, and flush gate
