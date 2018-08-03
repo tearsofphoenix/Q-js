@@ -83,7 +83,7 @@ Returns:
     const cmd = new Command(this, Allocate, [qb])
     if (dirty) {
       if (this.isMetaTagSupported(DirtyQubitTag)) {
-        cmd.tags.push(DirtyQubitTag)
+        cmd.tags.push(new DirtyQubitTag())
         this.main.dirtyQubits.add(qubit.id)
       }
     }
@@ -125,7 +125,7 @@ ValueError: Qubit already deallocated. Caller likely has a bug.
       throw new Error('Already deallocated.')
     }
     const is_dirty = this.main.dirtyQubits.has(qubit.id)
-    const cmds = [new Command(this, Deallocate, [new Qureg([qubit])], [], is_dirty ? [DirtyQubitTag] : [])]
+    const cmds = [new Command(this, Deallocate, [new Qureg([qubit])], [], is_dirty ? [new DirtyQubitTag()] : [])]
     this.send(cmds)
   }
 
