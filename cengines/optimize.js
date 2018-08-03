@@ -199,7 +199,7 @@ get_inverse functions of the gate (see, e.g., BasicRotationGate).
         }
       } catch (e) {
         if (!(e instanceof NotMergeable)) {
-          console.log(e)
+          throw e
         }
       }
       i += 1 // next iteration: look at next gate

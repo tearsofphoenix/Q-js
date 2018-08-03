@@ -322,7 +322,7 @@ New object representing the merged gates.
     if (other instanceof BasicPhaseGate) {
       return new this.__proto__.constructor(this.angle + other.angle)
     }
-    throw new Error('Can\'t merge different types of rotation gates.')
+    throw new NotMergeable('Can\'t merge different types of rotation gates.')
   }
 
   toString() {

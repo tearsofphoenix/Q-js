@@ -25,3 +25,10 @@ export class NotYetMeasuredError extends Error {
     this.__proto__ = NotYetMeasuredError.prototype
   }
 }
+
+export class NoGateDecompositionError extends Error {
+  constructor(...args) {
+    super(...args)
+    this.__proto__ = NoGateDecompositionError.prototype
+  }
+}

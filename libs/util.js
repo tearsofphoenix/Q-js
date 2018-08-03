@@ -50,7 +50,7 @@ export function classHierachy(cls) {
   if (typeof cls === 'function') {
     let {name} = cls
     while (name.length > 0) {
-      result.push(name)
+      result.push({name, class: cls})
       cls = cls.__proto__
       name = cls.name
     }

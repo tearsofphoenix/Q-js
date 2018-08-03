@@ -1,16 +1,21 @@
 import {expect} from 'chai'
 import {classHierachy, isSubclassOf, isKindclassOf} from './util'
 import {HGate} from '../ops/gates'
-import {BasicGate} from '../ops/basics'
+import {BasicGate, SelfInverseGate} from '../ops/basics'
 import {Qureg} from '../types/qubit'
 
 describe('util test', () => {
   it('should test class hierachy 1', () => {
     const hierachy = classHierachy(HGate)
-    expect(hierachy).to.deep.equal(['HGate', 'SelfInverseGate', 'BasicGate'])
+    expect(hierachy).to.deep.equal([
+      {name: 'HGate', class: HGate},
+      {name: 'SelfInverseGate', class: SelfInverseGate},
+      {name: 'BasicGate', class: BasicGate}])
 
     const h1 = classHierachy(Qureg)
-    expect(h1).to.deep.equal(['Qureg', 'Array'])
+    expect(h1).to.deep.equal([
+      {name: 'Qureg', class: Qureg},
+      {name: 'Array', class: Array}])
   });
 
   it('should test isSubclassOf', () => {

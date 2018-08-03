@@ -32,7 +32,7 @@ containing decomposition rules to add to the rule set.
 rule (DecompositionRuleGate): The decomposition rule to add.
      */
   addDecompositionRule(rule) {
-    const decomp_obj = _Decomposition(rule.gateDecomposer, rule.gateRecognizer)
+    const decomp_obj = new _Decomposition(rule.gateDecomposer, rule.gateRecognizer)
     const cls = rule.gateClass.name
     if (!(cls in this.decompositions)) {
       this.decompositions[cls] = []

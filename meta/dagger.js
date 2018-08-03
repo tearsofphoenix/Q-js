@@ -41,7 +41,7 @@ have been deallocated.
       )
     }
     this.commands.rforEach((cmd) => {
-      this.send(cmd.getInverse())
+      this.send([cmd.getInverse()])
     })
   }
 

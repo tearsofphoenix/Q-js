@@ -5,7 +5,7 @@ import LocalOptimizer from '../cengines/optimize'
 import {AutoReplacer} from '../cengines/replacer/replacer'
 
 export function getEngineList() {
-  const rule_set = DecompositionRuleSet([decompositions])
+  const rule_set = new DecompositionRuleSet(decompositions)
   return [new TagRemover(),
     new LocalOptimizer(10),
     new AutoReplacer(rule_set),
