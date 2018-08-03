@@ -418,8 +418,4 @@ describe('compute test', () => {
     const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])
     expect(() => Uncompute(eng)).to.throw()
   })
-
-  it('should allow dirty qubits', () => {
-
-  })
 })
