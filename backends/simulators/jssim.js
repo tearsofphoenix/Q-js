@@ -5,6 +5,7 @@ Contains a (slow) Python simulator.
 */
 import mathjs from 'mathjs'
 import {arrayRangeAssign, zeros} from '../../libs/util'
+import { setEqual } from '../../utils/polyfill'
 
 /*
 NodeJS implementation of a quantum computer simulator.
@@ -79,7 +80,7 @@ List of measurement results (containing either True or False).
     pos.forEach((looper, i) => {
       res[i] = (((i_picked >> looper) & 1) == 1)
       mask |= (1 << looper)
-      val |= ((res[i] & 1) << looper)
+      val |= ((res[i] & 1) ** looper)
     })
 
     let nrm = 0.0
@@ -284,94 +285,111 @@ terms_dict (dict): Operator dictionary (see QubitOperator.terms)
 ids (list[int]): List of qubit ids upon which the operator acts.
    */
   applyQubitOperator(termsDict, IDs) {
-
+    let new_state = math.zero(this._state.length)
+    const current_state = this._state.slice(0)
+    Object.keys(termsDict).forEach((term) => {
+      const coefficient = termsDict[term]
+      this.applyTerm(term, IDs)
+      this._state *= coefficient
+      new_state = new_state.concat(this._state)
+      this._state = current_state.slice(0)
+    })
+    this._state = new_state
   }
+
+  /*
+  Return the probability of the outcome `bit_string` when measuring
+the qubits given by the list of ids.
+
+    Args:
+bit_string (list[bool|int]): Measurement outcome.
+ids (list[int]): List of qubit ids determining the ordering.
+
+    Returns:
+Probability of measuring the provided bit string.
+
+    Raises:
+RuntimeError if an unknown qubit id was provided.
+   */
+  getProbability(bitString, IDs) {
+    const n = IDs.length
+    for (let i = 0; i < n; ++i) {
+      const id = IDs[i]
+      const v = this._map[id]
+      if (typeof v === 'undefined') {
+        throw new Error('get_probability(): Unknown qubit id. '
+        + 'Please make sure you have called '
+        + 'eng.flush().')
+      }
+    }
+    let mask = 0
+    let bit_str = 0
+    for (let i = 0; i < n; ++i) {
+      mask |= (1 << this._map[IDs[i]])
+      bit_str |= (bitString[i] << this._map[IDs[i]])
+    }
+
+    let probability = 0.
+    this._state.forEach(j => {
+      if (i & mask == bit_str) {
+        const e = this._state[i]
+        probability += math.re(e) ** 2 + math.im(e) ** 2
+      }
+    })
+    return probability
+  }
+
+  /*
+  Return the probability amplitude of the supplied `bit_string`.
+    The ordering is given by the list of qubit ids.
+
+    Args:
+bit_string (list[bool|int]): Computational basis state
+ids (list[int]): List of qubit ids determining the
+ordering. Must contain all allocated qubits.
+
+    Returns:
+Probability amplitude of the provided bit string.
+
+    Raises:
+RuntimeError if the second argument is not a permutation of all
+allocated qubits.
+   */
+  getAmplitude(bitString, IDs) {
+    if (!setEqual(new Set(IDs), new Set(this._map))) {
+      throw new Error("The second argument to get_amplitude() must"
+      + " be a permutation of all allocated qubits. "
+      + "Please make sure you have called "
+      + "eng.flush().")
+    }
+    let index = 0
+    IDs.forEach((item, i) => index |= bitString[i] << this._map[item])
+    return this._state[index]
+  }
+
+  /*
+Applies exp(-i*time*H) to the wave function, i.e., evolves under
+the Hamiltonian H for a given time. The terms in the Hamiltonian
+are not required to commute.
+
+    This function computes the action of the matrix exponential using
+ideas from Al-Mohy and Higham, 2011.
+TODO: Implement better estimates for s.
+
+                                         Args:
+terms_dict (dict): Operator dictionary (see QubitOperator.terms)
+defining the Hamiltonian.
+time (scalar): Time to evolve for
+    ids (list): A list of qubit IDs to which to apply the evolution.
+ctrlids (list): A list of control qubit IDs.
+   */
 }
-//
-// new_state = _np.zeros_like(this._state)
-// current_state = _np.copy(this._state)
-// for (term, coefficient) in terms_dict:
-//     this._apply_term(term, ids)
-// this._state *= coefficient
-// new_state += this._state
-// this._state = _np.copy(current_state)
-// this._state = new_state
-//
-// def get_probability(self, bit_string, ids):
-// """
-// Return the probability of the outcome `bit_string` when measuring
-// the qubits given by the list of ids.
-//
-//     Args:
-// bit_string (list[bool|int]): Measurement outcome.
-// ids (list[int]): List of qubit ids determining the ordering.
-//
-//     Returns:
-// Probability of measuring the provided bit string.
-//
-//     Raises:
-// RuntimeError if an unknown qubit id was provided.
-// """
-// for i in range(len(ids)):
-// if ids[i] not in this._map:
-// raise RuntimeError("get_probability(): Unknown qubit id. "
-// "Please make sure you have called "
-// "eng.flush().")
-// mask = 0
-// bit_str = 0
-// for i in range(len(ids)):
-// mask |= (1 << this._map[ids[i]])
-// bit_str |= (bit_string[i] << this._map[ids[i]])
-// probability = 0.
-// for i in range(len(this._state)):
-// if (i & mask) == bit_str:
-//     e = this._state[i]
-// probability += e.real**2 + e.imag**2
-// return probability
-//
-// def get_amplitude(self, bit_string, ids):
-// """
-// Return the probability amplitude of the supplied `bit_string`.
-//     The ordering is given by the list of qubit ids.
-//
-//     Args:
-// bit_string (list[bool|int]): Computational basis state
-// ids (list[int]): List of qubit ids determining the
-// ordering. Must contain all allocated qubits.
-//
-//     Returns:
-// Probability amplitude of the provided bit string.
-//
-//     Raises:
-// RuntimeError if the second argument is not a permutation of all
-// allocated qubits.
-// """
-// if not set(ids) == set(this._map):
-// raise RuntimeError("The second argument to get_amplitude() must"
-// " be a permutation of all allocated qubits. "
-// "Please make sure you have called "
-// "eng.flush().")
-// index = 0
-// for i in range(len(ids)):
-// index |= (bit_string[i] << this._map[ids[i]])
-// return this._state[index]
+
+
+
 //
 // def emulate_time_evolution(self, terms_dict, time, ids, ctrlids):
 // """
-// Applies exp(-i*time*H) to the wave function, i.e., evolves under
-// the Hamiltonian H for a given time. The terms in the Hamiltonian
-// are not required to commute.
-//
-//     This function computes the action of the matrix exponential using
-// ideas from Al-Mohy and Higham, 2011.
-// TODO: Implement better estimates for s.
-//
-//                                          Args:
-// terms_dict (dict): Operator dictionary (see QubitOperator.terms)
-// defining the Hamiltonian.
-// time (scalar): Time to evolve for
-//     ids (list): A list of qubit IDs to which to apply the evolution.
-// ctrlids (list): A list of control qubit IDs.
 // """
 // # Determine the (normalized) trace, which is nonzero only for identity
 //   # terms:
