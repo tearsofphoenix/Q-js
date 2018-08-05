@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).
+ * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com). 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
  */
 
 import {expect} from 'chai'
-import {QFT} from './qftgate'
+import {TrivialMapper} from './classicalsimulator.spec'
 
-describe('QFT gate test', () => {
-  it('should test_qft_gate_str', () => {
-    const gate = QFT
-    expect(gate.toString()).to.equal('QFT')
-  })
+describe('simulator test', () => {
+  it('should ', function () {
+    
+  });
 })

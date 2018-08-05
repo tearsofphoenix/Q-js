@@ -1,8 +1,10 @@
 {
-  "name": "q",
+  "name": "projectq",
   "version": "0.0.1",
   "private": true,
+  "license": "Apache",
   "scripts": {
+    "install": "node scripts/install.js",
     "test": "mocha --require babel-register ./ops/*.spec.js"
   },
   "dependencies": {

@@ -1,9 +1,26 @@
 /*
+ * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
 Contains a (slow) Python simulator.
 
     Please compile the c++ simulator for large-scale simulations.
 */
 import mathjs from 'mathjs'
+import bigInt from 'big-integer'
 import {arrayRangeAssign, zeros} from '../../libs/util'
 import { setEqual } from '../../utils/polyfill'
 
@@ -329,8 +346,8 @@ RuntimeError if an unknown qubit id was provided.
       bit_str |= (bitString[i] << this._map[IDs[i]])
     }
 
-    let probability = 0.
-    this._state.forEach(j => {
+    let probability = 0.0
+    this._state.forEach((j) => {
       if (i & mask == bit_str) {
         const e = this._state[i]
         probability += math.re(e) ** 2 + math.im(e) ** 2
@@ -357,10 +374,10 @@ allocated qubits.
    */
   getAmplitude(bitString, IDs) {
     if (!setEqual(new Set(IDs), new Set(this._map))) {
-      throw new Error("The second argument to get_amplitude() must"
-      + " be a permutation of all allocated qubits. "
-      + "Please make sure you have called "
-      + "eng.flush().")
+      throw new Error('The second argument to get_amplitude() must'
+      + ' be a permutation of all allocated qubits. '
+      + 'Please make sure you have called '
+      + 'eng.flush().')
     }
     let index = 0
     IDs.forEach((item, i) => index |= bitString[i] << this._map[item])
@@ -384,7 +401,6 @@ time (scalar): Time to evolve for
 ctrlids (list): A list of control qubit IDs.
    */
 }
-
 
 
 //

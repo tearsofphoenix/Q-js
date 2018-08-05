@@ -1,6 +1,25 @@
+/*
+ * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import assert from 'assert'
 import {BasicEngine} from '../../cengines/basics'
 import SimulatorBackend from './jssim'
-import { Allocate, Deallocate, FlushGate, Measure } from '../../ops/gates';
+import {
+  Allocate, Deallocate, FlushGate, Measure
+} from '../../ops/gates';
 import {BasicMathGate} from '../../ops/basics';
 import TimeEvolution from '../../ops/timeevolution';
 import { BasicQubit } from '../../types/qubit'
@@ -245,9 +264,9 @@ automatically converts from logical qubits to mapped qubits for
     the qureg argument.
    */
   getAmplitude(bitString, qureg) {
-qureg = this.convertLogicalToMappedQureg(qureg)
-const bit_string = bitString.map(b => b.toBoolean())
-return this._simulator.getAmplitude(bit_string, qureg.map(qb => qb.id))
+    qureg = this.convertLogicalToMappedQureg(qureg)
+    const bit_string = bitString.map(b => b.toBoolean())
+    return this._simulator.getAmplitude(bit_string, qureg.map(qb => qb.id))
   }
 
   /*
@@ -346,11 +365,11 @@ Exception: If a non-single-qubit gate needs to be processed
       cmd.qubits.forEach(qr => qr.forEach(qb => ids.push(qb.id)))
       const out = this._simulator.measureQubits(ids)
       let i = 0
-      cmd.qubits.forEach(qr => {
-        qr.forEach(qb => {
+      cmd.qubits.forEach((qr) => {
+        qr.forEach((qb) => {
           // Check if a mapper assigned a different logical id
           let logical_id_tag
-          cmd.tags.forEach(tag => {
+          cmd.tags.forEach((tag) => {
             if (tag instanceof LogicalQubitIDTag) {
               logical_id_tag = tag
             }
@@ -370,10 +389,10 @@ Exception: If a non-single-qubit gate needs to be processed
       this._simulator.deallocateQubit(ID)
     } else if (cmd.gate instanceof BasicMathGate) {
       const qubitids = []
-      cmd.qubits.forEach(qr => {
+      cmd.qubits.forEach((qr) => {
         const latest = []
         qubitids.push(latest)
-        qr.forEach(qb => {
+        qr.forEach((qb) => {
           latest.push(qb.id)
         })
       })
@@ -381,8 +400,8 @@ Exception: If a non-single-qubit gate needs to be processed
       const math_fun = cmd.gate.getMathFunction(cmd.qubits)
       this._simulator.emulateMath(math_fun, qubitids, cmd.controlQubits.map(qb => qb.id))
     } else if (cmd.gate.equal(TimeEvolution)) {
-      const op = [(list(term), coeff) for (term, coeff)
-        in cmd.gate.hamiltonian.terms.items()]
+      // TODO
+      const op = cmd.gate.hamiltonian.terms
       const t = cmd.gate.time
       const qubitids = cmd.qubits[0].map(qb => qb.id)
       const ctrlids = cmd.controlQubits.map(qb => qb.id)
@@ -392,16 +411,16 @@ Exception: If a non-single-qubit gate needs to be processed
       const ids = []
       cmd.qubits.forEach(qr => qr.forEach(qb => ids.push(qb.id)))
       if (2 ** ids.length !== matrix.length) {
-        throw new Error(`Simulator: Error applying ${cmd.gate.toString()} gate: ${math.log(len(cmd.gate.matrix), 2)}-qubit gate applied to ${ids.length} qubits.`)
+        throw new Error(`Simulator: Error applying ${cmd.gate.toString()} gate: ${math.log(cmd.gate.matrix.length, 2)}-qubit gate applied to ${ids.length} qubits.`)
       }
       this._simulator.applyControlledGate(matrix.tolist(), ids, cmd.controlQubits.map(qb => qb.id))
       if (!this._gate_fusion) {
         this._simulator.run()
       }
     } else {
-      throw new Error("This simulator only supports controlled k-qubit"
-      + " gates with k < 6!\nPlease add an auto-replacer"
-      + " engine to your list of compiler engines.")
+      throw new Error('This simulator only supports controlled k-qubit'
+      + ' gates with k < 6!\nPlease add an auto-replacer'
+      + ' engine to your list of compiler engines.')
     }
   }
 
@@ -415,7 +434,7 @@ command_list (list<Command>): List of commands to execute on the
 simulator.
    */
   receive(commandList) {
-    commandList.forEach(cmd => {
+    commandList.forEach((cmd) => {
       if (!(cmd.gate instanceof FlushGate)) {
         this.handle(cmd)
       } else {
