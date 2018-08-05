@@ -7,20 +7,7 @@
       'target_name': 'binding',
       'win_delay_load_hook': 'true',
       'sources': [
-        'src/binding.cpp',
-        'src/create_string.cpp',
-        'src/custom_function_bridge.cpp',
-        'src/custom_importer_bridge.cpp',
-        'src/sass_context_wrapper.cpp',
-        'src/sass_types/boolean.cpp',
-        'src/sass_types/color.cpp',
-        'src/sass_types/error.cpp',
-        'src/sass_types/factory.cpp',
-        'src/sass_types/list.cpp',
-        'src/sass_types/map.cpp',
-        'src/sass_types/null.cpp',
-        'src/sass_types/number.cpp',
-        'src/sass_types/string.cpp'
+        'backends/simulators/cppsim.cpp'
       ],
       'msvs_settings': {
         'VCLinkerTool': {
@@ -41,7 +28,7 @@
       'conditions': [
         ['libsass_ext == "" or libsass_ext == "no"', {
           'dependencies': [
-            'src/libsass.gyp:libsass',
+            './libq.gyp:libq',
           ]
         }],
         ['libsass_ext == "auto"', {

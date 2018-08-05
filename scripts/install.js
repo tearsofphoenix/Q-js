@@ -20,7 +20,7 @@ const mkdir = require('mkdirp');
 const path = require('path');
 const request = require('request');
 const log = require('npmlog');
-const sass = require('../lib/extensions');
+const sass = require('./extensions');
 
 const downloadOptions = require('./util/downloadoptions');
 
@@ -108,7 +108,7 @@ function download(url, dest, cb) {
  */
 
 function checkAndDownloadBinary() {
-  if (process.env.SKIP_SASS_BINARY_DOWNLOAD_FOR_CI) {
+  if (process.env.SKIP_PROJECTQ_BINARY_DOWNLOAD_FOR_CI) {
     console.log('Skipping downloading binaries on CI builds');
     return;
   }
