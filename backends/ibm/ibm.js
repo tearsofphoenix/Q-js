@@ -30,7 +30,7 @@ const {Tdag, Sdag} = Gates
 The IBM Backend class, which stores the circuit, transforms it to JSON
 QASM, and sends the circuit through the IBM API.
  */
-export class IBMBackend extends BasicEngine {
+export default class IBMBackend extends BasicEngine {
   /*
   Initialize the Backend object.
 

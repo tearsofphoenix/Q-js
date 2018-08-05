@@ -23,6 +23,7 @@ import mathjs from 'mathjs'
 import bigInt from 'big-integer'
 import {arrayRangeAssign, zeros} from '../../libs/util'
 import { setEqual } from '../../utils/polyfill'
+import { stringToArray } from '../../ops/qubitoperator'
 
 /*
 NodeJS implementation of a quantum computer simulator.
@@ -400,47 +401,61 @@ time (scalar): Time to evolve for
     ids (list): A list of qubit IDs to which to apply the evolution.
 ctrlids (list): A list of control qubit IDs.
    */
+  emulateTimeEvolution(terms_dict, time, ids, ctrlids) {
+    // Determine the (normalized) trace, which is nonzero only for identity
+  // terms:
+    let tr = 0
+    let tmp = 0
+    const newTerms = {}
+    terms_dict.forEach(t => {
+      const key = stringToArray(t)
+      const c = terms_dict[t]
+      if (key.length === 0) {
+        tr += c
+      } else {
+        newTerms[t] = c
+        tmp += math.abs(c)
+      }
+    })
+
+terms_dict = newTerms
+
+const op_nrm = math.abs(time) * tmp
+// rescale the operator by s:
+    const s = Math.floor(op_nrm + 1)
+const correction = math.exp(math.complex(0, -time * tr / (s * 1.0)))
+const output_state = this._state.slice(0)
+const mask = this.getControlMask(ctrlids)
+for i in range(s):
+j = 0
+nrm_change = 1.
+while nrm_change > 1.e-12:
+coeff = (-time * 1j) / float(s * (j + 1))
+current_state = _np.copy(this._state)
+update = 0j
+for t, c in terms_dict:
+this._apply_term(t, ids)
+this._state *= c
+update += this._state
+this._state = _np.copy(current_state)
+update *= coeff
+this._state = update
+for i in range(len(update)):
+if (i & mask) == mask:
+    output_state[i] += update[i]
+nrm_change = _np.linalg.norm(update)
+j += 1
+for i in range(len(update)):
+if (i & mask) == mask:
+    output_state[i] *= correction
+this._state = _np.copy(output_state)
+  }
+
+  run() {
+    //
+  }
 }
 
-
-//
-// def emulate_time_evolution(self, terms_dict, time, ids, ctrlids):
-// """
-// """
-// # Determine the (normalized) trace, which is nonzero only for identity
-//   # terms:
-// tr = sum([c for (t, c) in terms_dict if len(t) == 0])
-// terms_dict = [(t, c) for (t, c) in terms_dict if len(t) > 0]
-// op_nrm = abs(time) * sum([abs(c) for (_, c) in terms_dict])
-// # rescale the operator by s:
-//     s = int(op_nrm + 1.)
-// correction = _np.exp(-1j * time * tr / float(s))
-// output_state = _np.copy(this._state)
-// mask = this._get_control_mask(ctrlids)
-// for i in range(s):
-// j = 0
-// nrm_change = 1.
-// while nrm_change > 1.e-12:
-// coeff = (-time * 1j) / float(s * (j + 1))
-// current_state = _np.copy(this._state)
-// update = 0j
-// for t, c in terms_dict:
-// this._apply_term(t, ids)
-// this._state *= c
-// update += this._state
-// this._state = _np.copy(current_state)
-// update *= coeff
-// this._state = update
-// for i in range(len(update)):
-// if (i & mask) == mask:
-//     output_state[i] += update[i]
-// nrm_change = _np.linalg.norm(update)
-// j += 1
-// for i in range(len(update)):
-// if (i & mask) == mask:
-//     output_state[i] *= correction
-// this._state = _np.copy(output_state)
-//
 // def apply_controlled_gate(self, m, ids, ctrlids):
 // """
 // Applies the k-qubit gate matrix m to the qubits with indices ids,
@@ -580,12 +595,6 @@ ctrlids (list): A list of control qubit IDs.
 //     this._state[i] = 0.
 // else:
 // this._state[i] *= inv_nrm
-//
-// def run(self):
-// """
-// Dummy function to implement the same interface as the c++ simulator.
-// """
-// pass
 //
 // def _apply_term(self, term, ids, ctrlids=[]):
 // """
