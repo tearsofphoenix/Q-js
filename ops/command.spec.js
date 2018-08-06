@@ -23,7 +23,7 @@ import {
 } from './basics';
 import {Qubit, Qureg} from '../types/qubit'
 import { Command } from './command'
-import {arrayEqual} from '../utils/polyfill'
+import {arrayEqual} from '../libs/polyfill'
 import {makeTuple, ObjectCopy} from '../libs/util';
 import {Rx} from './gates'
 import {ComputeTag} from '../meta/tag'

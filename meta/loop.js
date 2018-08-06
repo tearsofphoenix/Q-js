@@ -15,7 +15,7 @@
  */
 
 import {BasicEngine} from '../cengines/basics'
-import {setEqual} from '../utils/polyfill';
+import {setEqual} from '../libs/polyfill';
 import {dropEngineAfter, insertEngine} from './util';
 import {Allocate, Deallocate} from '../ops/gates'
 import {QubitManagementError} from './error'

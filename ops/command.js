@@ -40,7 +40,7 @@ The command then gets sent to the MainEngine via the
 apply wrapper (apply_command).
 */
 import assert from 'assert'
-import {arrayEqual} from '../utils/polyfill'
+import {arrayEqual} from '../libs/polyfill'
 import {getInverse} from './_cycle'
 import {BasicQubit, Qureg} from '../types/qubit';
 import {markTuple} from '../libs/util'

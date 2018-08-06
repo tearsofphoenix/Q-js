@@ -29,7 +29,7 @@ import {dropEngineAfter, insertEngine} from './util'
 import {Allocate, Deallocate} from '../ops/gates'
 import {
   unionSet, setEqual, setIsSuperSet, intersection, symmetricDifference
-} from '../utils/polyfill'
+} from '../libs/polyfill'
 import {QubitManagementError} from './error'
 
 /*

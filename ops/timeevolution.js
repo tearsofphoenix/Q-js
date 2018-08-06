@@ -18,7 +18,7 @@ import assert from 'assert'
 import math from 'mathjs'
 import {BasicGate} from './basics'
 import QubitOperator, {stringToArray} from './qubitoperator'
-import {setEqual, isComplex, isNumeric} from '../utils/polyfill';
+import {setEqual, isComplex, isNumeric} from '../libs/polyfill';
 import {applyCommand} from './command';
 import {makeTuple} from '../libs/util';
 import {Ph} from './gates'

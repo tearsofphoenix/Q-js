@@ -23,7 +23,7 @@ import {
 } from './basics';
 import {Qubit, Qureg} from '../types/qubit'
 import { Command } from './command'
-import {arrayEqual} from '../utils/polyfill'
+import {arrayEqual} from '../libs/polyfill'
 
 function mainEngine() {
   return new MainEngine(new DummyEngine(), [new DummyEngine()])

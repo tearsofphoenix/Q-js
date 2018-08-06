@@ -17,7 +17,7 @@
 import math from 'mathjs'
 
 // QubitOperator stores a sum of Pauli operators acting on qubits."""
-import {isNumeric, symmetricDifference} from '../utils/polyfill'
+import {isNumeric, symmetricDifference} from '../libs/polyfill'
 
 const mc = math.complex
 

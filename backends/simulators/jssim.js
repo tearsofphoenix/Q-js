@@ -22,7 +22,7 @@ Contains a (slow) Python simulator.
 import math from 'math'
 import bigInt from 'big-integer'
 import {arrayRangeAssign, zeros} from '../../libs/util'
-import { setEqual } from '../../utils/polyfill'
+import { setEqual } from '../../libs/polyfill'
 import { stringToArray } from '../../ops/qubitoperator'
 
 /*

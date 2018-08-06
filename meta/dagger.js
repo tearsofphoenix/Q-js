@@ -27,7 +27,7 @@ Rz(0.5) | qubit2
 import {BasicEngine} from '../cengines/basics'
 import {Allocate, Deallocate} from '../ops/gates'
 import {insertEngine, dropEngineAfter} from './util'
-import {setEqual} from '../utils/polyfill';
+import {setEqual} from '../libs/polyfill';
 import {QubitManagementError} from "./error";
 
 // Stores all commands and, when done, inverts the circuit & runs it.

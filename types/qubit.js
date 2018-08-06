@@ -35,7 +35,7 @@ qubit goes out of scope.
     WeakQubit are used inside the Command object and are not automatically
 deallocated.
 */
-import {arrayEqual} from '../utils/polyfill'
+import {arrayEqual} from '../libs/polyfill'
 /*
 BasicQubit objects represent qubits.
 
