@@ -45,14 +45,12 @@ the target qubit.
    */
   constructor(connectivity) {
     super()
-    console.log(48, connectivity)
     if (connectivity instanceof Set) {
       const newMap = {}
       connectivity.forEach(v => newMap[v] = 1)
       connectivity = newMap
     }
     this.connectivity = connectivity
-    console.log(54, this.connectivity)
   }
 
   /*

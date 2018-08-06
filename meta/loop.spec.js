@@ -76,7 +76,6 @@ describe('loop test', () => {
     H.or(qubit)
     eng.flush(true)
 
-    backend.receivedCommands.forEach(cmd => console.log(cmd.toString()))
     expect(backend.receivedCommands.length).to.equal(14)
     expect(backend.receivedCommands[0].gate.equal(Allocate)).to.equal(true)
     expect(backend.receivedCommands[1].gate.equal(H)).to.equal(true)
@@ -186,7 +185,6 @@ describe('loop test', () => {
     const qubit_id = qubit[0].id
     Loop(eng, 3, () => {
       const ancilla = eng.allocateQubit()
-      console.log(189, ancilla)
       H.or(ancilla)
       CNOT.or(tuple(ancilla, qubit))
       ancilla.deallocate()
@@ -194,18 +192,9 @@ describe('loop test', () => {
 
     eng.flush(true)
 
-    backend.receivedCommands.forEach(cmd => console.log(cmd.toString()))
     expect(backend.receivedCommands.length).to.equal(15)
     expect(backend.receivedCommands[0].gate.equal(Allocate)).to.equal(true)
     for (let ii = 0; ii < 3; ++ii) {
-      const cmd1 = backend.receivedCommands[ii * 4 + 1]
-      const cmd2 = backend.receivedCommands[ii * 4 + 2]
-      const cmd3 = backend.receivedCommands[ii * 4 + 3]
-      const cmd4 = backend.receivedCommands[ii * 4 + 4]
-      console.log(cmd1.toString())
-      console.log(cmd2.toString())
-      console.log(cmd3.toString())
-      console.log(cmd4.toString())
       expect(backend.receivedCommands[ii * 4 + 1].gate.equal(Allocate)).to.equal(true)
       expect(backend.receivedCommands[ii * 4 + 2].gate.equal(H)).to.equal(true)
       expect(backend.receivedCommands[ii * 4 + 3].gate.equal(X)).to.equal(true)

@@ -95,7 +95,7 @@ num (int): Number of loop iterations.
         // replace the qubit id in all commands using it.
         for (let i = 0; i < this._tag.num; ++i) {
           if (i === 0) {
-            this.send(this._cmdList.slice(0))
+            this.send(this._cmdList.map(cmd => cmd.copy()))
           } else {
             // Change local qubit ids before sending them
             // TODO
@@ -103,7 +103,7 @@ num (int): Number of loop iterations.
               const new_qb_id = this.main.getNewQubitID()
               refs_loc_qubit.forEach(qubitRef => qubitRef.id = new_qb_id)
             })
-            this.send(this._cmdList.slice(0))
+            this.send(this._cmdList.map(cmd => cmd.copy()))
           }
         }
       }
@@ -160,13 +160,13 @@ LoopTag.
           this._refsToLocalQB[qid].push(qb)
         } else {
           cmd.controlQubits.forEach((ctrlQubit) => {
-            const v = this._allocatedQubitIDs[ctrlQubit.id]
+            const v = this._allocatedQubitIDs.has(ctrlQubit.id)
             if (v) {
               this._refsToLocalQB[ctrlQubit.id].push(ctrlQubit)
             }
           })
           cmd.qubits.forEach(qureg => qureg.forEach((qubit) => {
-            if (this._allocatedQubitIDs[qubit.id]) {
+            if (this._allocatedQubitIDs.has(qubit.id)) {
               this._refsToLocalQB[qubit.id].push(qubit)
             }
           }))

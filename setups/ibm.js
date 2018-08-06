@@ -20,14 +20,16 @@ import TagRemover from '../cengines/tagremover'
 import LocalOptimizer from '../cengines/optimize'
 import { AutoReplacer } from '../cengines/replacer/replacer'
 import SwapAndCNOTFlipper from '../cengines/swapandcnotflipper'
+import decompositions from './decompositions'
+import IBM5QubitMapper, {ibmqx4_connections} from '../cengines/ibm5qubitmapper';
 
 export function getEngineList() {
-  const rule_set = new DecompositionRuleSet(projectq.setups.decompositions)
+  const rule_set = new DecompositionRuleSet(decompositions)
   return [new TagRemover(),
     new LocalOptimizer(10),
     new AutoReplacer(rule_set),
-    TagRemover(),
-    IBM5QubitMapper(),
+    new TagRemover(),
+    new IBM5QubitMapper(),
     new SwapAndCNOTFlipper(ibmqx4_connections),
     new LocalOptimizer(10)
   ]

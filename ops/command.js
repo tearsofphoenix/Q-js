@@ -308,6 +308,10 @@ engine: New owner of qubits and owner of this Command object
     return `${cs}${this.gate.toString()} | ${qs}`
   }
 
+  inspect() {
+    return this.toString()
+  }
+
   get description() {
     return this.toString()
   }

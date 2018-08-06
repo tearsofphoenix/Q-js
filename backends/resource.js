@@ -177,13 +177,11 @@ calls, and max. number of qubits that were active at the same
 time.
    */
   toString() {
-    console.log(162, this.gate_counts, Object.keys(this.gate_counts))
     if (Object.keys(this.gate_counts).length > 0) {
       const gate_class_list = []
       Object.keys(this.gate_class_counts).forEach((gate_class_description) => {
         const num = this.gate_class_counts[gate_class_description]
         const [gate_class, ctrl_cnt] = parseStringKey(gate_class_description)
-        console.log(gate_class, ctrl_cnt, num)
         const name = genString('C', ctrl_cnt) + gate_class
         gate_class_list.push(`${name} : ${num}`)
       })
