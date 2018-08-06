@@ -133,3 +133,25 @@ export function stringToBitArray(str) {
   }
   return result
 }
+
+export function copyComplexArray(complexArray) {
+  if (Array.isArray(complexArray)) {
+    return complexArray.map(c => mathjs.clone(c))
+  }
+  return []
+}
+
+export function complexVectorDot(a1, a2) {
+  let real = 0
+  let image = 0
+  a1.forEach((c1, i) => {
+    const c2 = a2[i]
+    const r1 = mathjs.re(c1)
+    const i1 = mathjs.im(c1)
+    const r2 = mathjs.re(c2)
+    const i2 = mathjs.im(c2)
+    real += r1 * r2 - (- i1 * i2)
+    image += r1 * i2 - r2 * i1
+  })
+  return mathjs.complex(real, image)
+}

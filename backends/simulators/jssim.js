@@ -23,7 +23,9 @@ import assert from 'assert'
 import math from 'mathjs'
 import bigInt from 'big-integer'
 import {arrayRangeAssign, zeros} from '../../libs/util'
-import {len, setEqual} from '../../libs/polyfill'
+import {
+  copyComplexArray, len, setEqual, complexVectorDot
+} from '../../libs/polyfill'
 import { stringToArray } from '../../ops/qubitoperator'
 
 /*
@@ -284,15 +286,17 @@ Expectation value
    */
   getExpectationValue(termsArray, IDs) {
     let expectation = 0.0
-    const current_state = math.complex(math.re(this._state), math.im(this._state))
-    Object.assign(current_state, this._state)
+    const current_state = copyComplexArray(this._state)
     termsArray.forEach(([term, coefficient]) => {
       this.applyTerm(term, IDs)
-      const tmp = math.re(current_state) * math.re(this._state) - (-math.im(current_state) * math.im(this._state))
-      const delta = coefficient * tmp
-      expectation += delta
+      const tmp = complexVectorDot(current_state, this._state)
+      const delta = math.multiply(coefficient, tmp)
+      expectation = math.add(expectation, delta)
       this._state = current_state
     })
+    if (math.im(expectation) === 0) {
+      return math.re(expectation)
+    }
     return expectation
   }
 
@@ -303,13 +307,14 @@ Expectation value
 terms_dict (dict): Operator dictionary (see QubitOperator.terms)
 ids (list[int]): List of qubit ids upon which the operator acts.
    */
-  applyQubitOperator(termsDict, IDs) {
-    let new_state = math.zero(this._state.length)
+  applyQubitOperator(termsArray, IDs) {
+    let new_state = []
     const current_state = this._state.slice(0)
-    Object.keys(termsDict).forEach((term) => {
-      const coefficient = termsDict[term]
+    termsArray.forEach(([term, coefficient]) => {
+      console.log(311, term, coefficient)
       this.applyTerm(term, IDs)
-      this._state *= coefficient
+      this._state = math.multiply(this._state, coefficient)
+      console.log(308, new_state, typeof new_state)
       new_state = new_state.concat(this._state)
       this._state = current_state.slice(0)
     })
@@ -349,6 +354,7 @@ RuntimeError if an unknown qubit id was provided.
     }
 
     let probability = 0.0
+    console.log(353, this._state)
     this._state.forEach((i) => {
       if (i & mask == bit_str) {
         const e = this._state[i]
@@ -445,7 +451,7 @@ ctrlids (list): A list of control qubit IDs.
           update += this._state
           this._state = current_state.copy()
         })
-        update *= coeff
+        update = math.multiply(update, coeff)
         this._state = update
         for (let i = 0; i < update.length; ++i) {
           if (i & mask === mask) {
@@ -600,20 +606,24 @@ describing the wavefunction (must be normalized).
 ordering (list): List of ids describing the new ordering of qubits
 (i.e., the ordering of the provided wavefunction).
    */
-  setWaveFunction(wavefunction, ordering) {
+  setWavefunction(wavefunction, ordering) {
     // wavefunction contains 2^n values for n qubits
     assert(wavefunction.length === 1 << ordering.length)
 
     // all qubits must have been allocated before
-    const f1 = ordering.all(Id => typeof this._map[Id] !== 'undefined')
-    const f2 = Object(this._map).length === ordering.length
+    const f1 = ordering.filter((Id) => {
+      const v = this._map[Id]
+      console.log(610, Id, typeof Id, v)
+      return typeof v !== 'undefined'
+    }).length === ordering.length
+    const f2 = len(this._map) === ordering.length
     if (!f1 || !f2) {
       throw new Error('set_wavefunction(): Invalid mapping provided.'
       + ' Please make sure all qubits have been '
       + 'allocated previously (call eng.flush()).')
     }
 
-    this._state = _np.array(wavefunction, dtype = _np.complex128)
+    this._state = wavefunction.slice(0)
     const map = {}
     for (let i = 0; i < ordering.length; ++i) {
       map[ordering[i]] = i
@@ -636,11 +646,11 @@ are provided.
     assert(ids.length === values.length)
 
     // all qubits must have been allocated before
-    const f1 = ids.all(Id => typeof this._map[Id] !== 'undefined')
+    const f1 = ids.filter(Id => typeof this._map[Id] !== 'undefined').length === ids.length
     if (!f1) {
       throw new Error('collapse_wavefunction(): Unknown qubit id(s)'
-  + ' provided. Try calling eng.flush() before '
-  + 'invoking this function.')
+        + ' provided. Try calling eng.flush() before '
+        + 'invoking this function.')
     }
 
     let mask = 0
@@ -664,9 +674,9 @@ are provided.
     const inv_nrm = 1.0 / math.sqrt(nrm)
     this._state.forEach((looper, i) => {
       if ((mask & i) !== val) {
-        this._state = 0
+        this._state = math.complex(0, 0)
       } else {
-        this._state *= inv_nrm
+        this._state = math.multiply(this._state, inv_nrm)
       }
     })
   }

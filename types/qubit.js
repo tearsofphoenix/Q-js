@@ -143,7 +143,7 @@ export class Qubit extends BasicQubit {
       }
       this.engine.deallocateQubit(this)
     } catch (e) {
-      console.log(119, e)
+      throw e
     } finally {
       this.id = -1
     }

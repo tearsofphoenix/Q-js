@@ -239,8 +239,7 @@ automatically converts from logical qubits to mapped qubits for
    */
   getProbability(bitString, qureg) {
     qureg = this.convertLogicalToMappedQureg(qureg)
-
-    const bit_string = bitString.map(b => b.toBoolean())
+    const bit_string = stringToBitArray(bitString)
     return this._simulator.getProbability(bit_string, qureg.map(qb => qb.id))
   }
 
@@ -323,7 +322,7 @@ automatically converts from logical qubits to mapped qubits for
    */
   collapseWavefunction(qureg, values) {
     qureg = this.convertLogicalToMappedQureg(qureg)
-    return this._simulator.collapseWavefunction(qureg.map(qb => qb.id), values.map(v => v.toBoolean()))
+    return this._simulator.collapseWavefunction(qureg.map(qb => qb.id), values)
   }
 
   /*
