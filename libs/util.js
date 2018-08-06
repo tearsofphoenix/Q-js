@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import math from 'mathjs'
 /*
  */
 export function arrayRangeAssign(source, target, start, end) {
@@ -26,7 +26,7 @@ export function arrayRangeAssign(source, target, start, end) {
 export function zeros(n) {
   const array = new Array(n)
   for (let i = 0; i < n; ++i) {
-    array.push(0)
+    array[i] = 0
   }
   return array
 }
@@ -129,4 +129,16 @@ export function genString(item, n) {
     str += item
   }
   return str
+}
+
+export function matrixAppend(m, m1) {
+  const oldCount = m.size()[0]
+  m.resize([oldCount + m1.size()[0]])
+  m1.forEach((value, index) => {
+    m.subset(math.index(oldCount + index[0]), value)
+  })
+}
+
+export function matrixRangeAssign(matrix, indices, vector) {
+  indices.forEach(idx => matrix.subset(math.index(idx), vector[idx]))
 }

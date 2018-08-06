@@ -25,7 +25,7 @@ import {
 } from '../../ops/gates';
 import Simulator from './simulator'
 import {len} from '../../libs/polyfill';
-import {CNOT} from '../../ops/shortcuts';
+import { CNOT, Toffoli } from '../../ops/shortcuts';
 import {tuple} from '../../libs/util';
 import {All} from '../../ops/metagates';
 import {BasicQubit} from '../../types/qubit';
@@ -120,17 +120,16 @@ describe('simulator test', () => {
     console.log(c)
     expect(Object.keys(sim.cheat()[0]).length).to.equal(0)
     // state vector should only have 1 entry:
-    expect(sim.cheat()[1].length).to.equal(1)
+    expect(len(sim.cheat()[1])).to.equal(1)
     const eng = new MainEngine(sim, [])
     const qubit = eng.allocateQubit()
 
     // one qubit has been allocated
-    expect(Object.keys(sim.cheat()[0]).length).to.equal(1)
+    expect(len(sim.cheat()[0])).to.equal(1)
     expect(sim.cheat()[0][0]).to.equal(0)
 
-    console.log(sim.cheat()[1])
-    expect(sim.cheat()[1].length).to.equal(1)
-    expect(math.deepEqual(sim.cheat()[1][0], math.complex(1, 0))).to.equal(true)
+    expect(len(sim.cheat()[1])).to.equal(2)
+    expect(math.deepEqual(sim.cheat()[1].subset(math.index(0)), math.complex(1, 0))).to.equal(true)
 
     qubit[0].deallocate()
     // should be empty:
@@ -178,7 +177,9 @@ describe('simulator test', () => {
 
   class Plus2Gate extends BasicMathGate {
     constructor() {
-      super(x => tuple(x + 2))
+      super(x => {
+        return [x + 2]
+      })
     }
   }
 
@@ -192,12 +193,14 @@ describe('simulator test', () => {
 
     Control(eng, qubit3, () => new Plus2Gate().or(tuple(qubit1.concat(qubit2))))
 
-    expect(math.equal(sim.cheat()[1][0], math.complex(1, 0))).to.equal(true)
-
+    expect(math.equal(sim.cheat()[1].subset(math.index(0)), 1)).to.equal(true)
+    console.log(sim.cheat())
     X.or(qubit3)
-
+    console.log(sim.cheat())
+    console.log('=================')
     Control(eng, qubit3, () => new Plus2Gate().or(tuple(qubit1.concat(qubit2))))
-    expect(sim.cheat()[1][6]).to.equal(true)
+    console.log(sim.cheat())
+    expect(sim.cheat()[1].subset(math.index(6))).to.equal(1)
 
     new All(Measure).or(tuple(qubit1.concat(qubit2).concat(qubit3)))
   });
@@ -309,7 +312,7 @@ describe('simulator test', () => {
     new All(H).or(qubits)
     eng.flush()
     let bits = [0, 0, 1, 0, 1, 0]
-    expect(math.equal(eng.backend.getAmplitude(bits, qubits), math.complex(1.0 / 8, 0))).to.equal(true)
+    expect(eng.backend.getAmplitude(bits, qubits)).to.equal(math.complex(1.0 / 8, 0))
     bits = [0, 0, 0, 0, 1, 0]
     expect(math.equal(eng.backend.getAmplitude(bits, qubits), math.complex(-1.0 / 8, 0))).to.equal(true)
     bits = [0, 1, 1, 0, 1, 0]
@@ -621,11 +624,13 @@ describe('simulator test', () => {
     qubits.slice(1).forEach(qb => CNOT.or(tuple(qubits[0], qb)))
 
     // check the state vector:
-    expect(math.abs(sim.cheat()[1][0]) ** 2).to.be.closeTo(0.5, 1e-12)
-    expect(math.abs(sim.cheat()[1][31]) ** 2).to.be.closeTo(0.5, 1e-12)
+    const m = sim.cheat()[1]
+    expect(math.abs(m.subset(math.index(0))) ** 2).to.be.closeTo(0.5, 1e-12)
+    expect(math.abs(m.subset(math.index(31))) ** 2).to.be.closeTo(0.5, 1e-12)
 
     for (let i = 1; i < 31; ++i) {
-      expect(math.abs(sim.cheat()[1][i])).to.be.closeTo(0, 1e-12)
+      const v = sim.cheat()[1][i] || math.complex(0, 0)
+      expect(math.abs(v)).to.be.closeTo(0, 1e-12)
     }
 
     // unentangle all except the first 2
@@ -635,11 +640,13 @@ describe('simulator test', () => {
     qubits.slice(2).forEach(qb => Toffoli.or(tuple(qubits[0], qubits[1], qb)))
 
     // check the state vector:
-    expect(math.abs(sim.cheat()[1][0]) ** 2).to.be.closeTo(0.5)
-    expect(math.abs(sim.cheat()[1][31]) ** 2).to.be.closeTo(0.5)
+    console.log(sim.cheat()[1][0], sim.cheat()[1][31])
+    expect(math.re(math.abs(sim.cheat()[1][0]))).to.be.closeTo(Math.SQRT1_2, 1e-12)
+    expect(math.re(math.abs(sim.cheat()[1][31]))).to.be.closeTo(Math.SQRT1_2, 1e-12)
 
     for (let i = 1; i < 31; ++i) {
-      expect(math.abs(sim.cheat()[1][i])).to.be.closeTo(0, 1e-12)
+      const v = sim.cheat()[1][i] || math.complex(0, 0)
+      expect(math.abs(v)).to.be.closeTo(0, 1e-12)
     }
 
     // uncompute using multi-controlled NOTs
@@ -650,9 +657,10 @@ describe('simulator test', () => {
     H.or(qubits[0])
 
     // check the state vector:
-    expect(math.abs(sim.cheat()[1][0]) ** 2).to.be.closeTo(1)
+    expect(math.re(math.abs(sim.cheat()[1][0]))).to.be.closeTo(1, 1e-12)
     for (let i = 1; i < 32; ++i) {
-      expect(math.abs(sim.cheat()[1][i])).to.be.closeTo(0)
+      const v = sim.cheat()[1][i] || math.complex(0, 0)
+      expect(math.re(math.abs(v))).to.be.closeTo(0, 1e-12)
     }
 
     new All(Measure).or(qubits)

@@ -164,7 +164,7 @@ export const SqrtX = new SqrtXGate()
 // also self inverse gate
 export class SwapGate extends BasicMathGate {
   constructor() {
-    super()
+    super((x, y) => [y, x])
     this.interchangeableQubitIndices = [[0, 1]]
   }
 

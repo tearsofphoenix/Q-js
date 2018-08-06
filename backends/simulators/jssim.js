@@ -22,7 +22,7 @@ Contains a (slow) Python simulator.
 import assert from 'assert'
 import math from 'mathjs'
 import bigInt from 'big-integer'
-import {arrayRangeAssign, zeros} from '../../libs/util'
+import { arrayRangeAssign, matrixAppend, matrixRangeAssign, zeros } from '../../libs/util'
 import {
   copyComplexArray, len, setEqual, complexVectorDot
 } from '../../libs/polyfill'
@@ -47,7 +47,7 @@ simulator.
    */
   constructor(rndSeed) {
     // ignore seed
-    this._state = [math.complex(1, 0)]
+    this._state = math.ones(1)
     this._map = {}
     this._numQubits = 0
   }
@@ -83,7 +83,7 @@ List of measurement results (containing either True or False).
     let val = 0.0
     let i_picked = 0
     while (val < P && i_picked < this._state.length) {
-      val += math.abs(this._state[i_picked] || math.complex(0, 0)) ** 2
+      val += math.abs(this._getState(i_picked) || math.complex(0, 0)) ** 2
       i_picked += 1
     }
 
@@ -107,16 +107,17 @@ List of measurement results (containing either True or False).
     let nrm = 0.0
     this._state.forEach((looper, i) => {
       if ((mask & i) != val) {
-        this._state[i] = 0.0
+        this._setState(i, 0.0)
       } else {
-        nrm += math.abs(looper) ** 2
+        const tmp = math.abs(looper)
+        nrm += math.multiply(tmp, tmp)
       }
     })
 
     // normalize
     const scale = 1.0 / Math.sqrt(nrm)
     this._state.forEach((looper, i) => {
-      this._state[i] = looper * scale
+      this._setState(i, math.multiply(looper, scale))
     })
     return res
   }
@@ -130,6 +131,7 @@ ID (int): ID of the qubit which is being allocated.
   allocateQubit(ID) {
     this._map[ID] = this._numQubits
     this._numQubits += 1
+    this._state.resize([1 << this._numQubits], 0)
   }
 
   /*
@@ -152,11 +154,11 @@ been measured / uncomputed.
 
     for (let i = 0; i < this._state.length; i += (1 << (pos + 1))) {
       for (let j = 0; j < 1 << pos; ++j) {
-        if (math.abs(this._state[i + j]) > tolerance) {
+        if (math.abs(this._getState(i + j)) > tolerance) {
           up = true
         }
 
-        if (math.abs(this._state[i + j + (1 << pos)] || 0) > tolerance) {
+        if (math.abs(this._getState(i + j + (1 << pos)) || 0) > tolerance) {
           down = true
         }
 
@@ -264,10 +266,9 @@ ctrlqubit_ids (list<int>): List of control qubit ids.
             }
           })
         })
-
-        newstate[newI] = looper
+        newstate.subset(math.index(newI), looper)
       } else {
-        newstate[i] = looper
+        newstate.subset(math.index(i), looper)
       }
     })
 
@@ -308,15 +309,13 @@ terms_dict (dict): Operator dictionary (see QubitOperator.terms)
 ids (list[int]): List of qubit ids upon which the operator acts.
    */
   applyQubitOperator(termsArray, IDs) {
-    let new_state = []
-    const current_state = this._state.slice(0)
+    let new_state = math.matrix()
+    const current_state = math.clone(this._state)
     termsArray.forEach(([term, coefficient]) => {
-      console.log(311, term, coefficient)
       this.applyTerm(term, IDs)
       this._state = math.multiply(this._state, coefficient)
-      console.log(308, new_state, typeof new_state)
-      new_state = new_state.concat(this._state)
-      this._state = current_state.slice(0)
+      matrixAppend(new_state, this._state)
+      this._state = math.clone(current_state)
     })
     this._state = new_state
   }
@@ -354,14 +353,29 @@ RuntimeError if an unknown qubit id was provided.
     }
 
     let probability = 0.0
-    console.log(353, this._state)
+
+    if (!this._state.forEach) {
+      console.log(358, this._state)
+    }
     this._state.forEach((i) => {
       if (i & mask == bit_str) {
-        const e = this._state[i]
+        const e = this._getState(i)
+        console.log(360, e, i, this._state)
         probability += math.re(e) ** 2 + math.im(e) ** 2
       }
     })
     return probability
+  }
+
+  _getState(i) {
+    if (!this._state.subset) {
+      console.log(369, this._state)
+    }
+    return this._state.subset(math.index(i))
+  }
+
+  _setState(i, value) {
+    this._state.subset(math.index(i), value)
   }
 
   /*
@@ -391,7 +405,7 @@ allocated qubits.
     }
     let index = 0
     IDs.forEach((item, i) => index |= bitString[i] << this._map[item])
-    return this._state[index]
+    return this._getState(index)
   }
 
   /*
@@ -433,7 +447,7 @@ ctrlids (list): A list of control qubit IDs.
     // rescale the operator by s:
     const s = Math.floor(op_nrm + 1)
     const correction = math.exp(math.complex(0, -time * tr / (s * 1.0)))
-    const output_state = this._state.slice(0)
+    const output_state = math.clone(this._state)
     const mask = this.getControlMask(ctrlids)
 
     for (let i = 0; i < s; ++i) {
@@ -442,14 +456,17 @@ ctrlids (list): A list of control qubit IDs.
       let update
       while (nrm_change > 1.e-12) {
         const coeff = math.divide(math.complex(0, -time), s * (j + 1))
-        const current_state = this._state.slice(0)
-        update = math.complex(0, 0)
+        const current_state = math.clone(this._state)
+        update = math.zeros(1)
         Object.keys(terms_dict).forEach((t) => {
           const c = terms_dict[t]
           this.applyTerm(t, ids)
-          this._state *= c
-          update += this._state
-          this._state = current_state.copy()
+          this._state = math.multiply(this._state, c)
+
+          matrixAppend(update, this._state)
+          console.log(467, update, this._state)
+          // update += this._state
+          this._state = math.clone(current_state)
         })
         update = math.multiply(update, coeff)
         this._state = update
@@ -466,7 +483,7 @@ ctrlids (list): A list of control qubit IDs.
           output_state[i] *= correction
         }
       }
-      this._state = output_state.copy()
+      this._state = math.clone(output_state)
     }
   }
 
@@ -546,9 +563,9 @@ mask (int): Bit-mask where set bits indicate control qubits.
         if (((i + j) & mask) === mask) {
           const id1 = i + j
           const id2 = id1 + (1 << pos)
-          const [r1, r2] = kernel(this._state[id1], this._state[id2], m)
-          this._state[id1] = r1
-          this._state[id2] = r2
+          const [r1, r2] = kernel(this._getState(id1), this._getState(id2), m)
+          this._setState(id1, r1)
+          this._setState(id2, r2)
         }
       }
     }
@@ -569,8 +586,8 @@ mask (int): Bit-mask where set bits indicate control qubits.
     const inactive = Object.keys(this._map).filter(p => !pos.includes(p))
 
     const matrix = math.matrix(m)
-    const subvec = math.zeros(1 << pos.length)
-    const subvec_idx = [0] * subvec.length
+    const subvec = zeros(1 << pos.length)
+    const subvec_idx = zeros(subvec.length)
     for (let c = 0; c < 1 << inactive.length; ++c) {
       // determine base index (state of inactive qubits)
       let base = 0
@@ -589,11 +606,13 @@ mask (int): Bit-mask where set bits indicate control qubits.
           offset |= ((x >> i) & 1) << pos[i]
         }
         subvec_idx[x] = base | offset
-        subvec[x] = this._state[subvec_idx[x]]
+        console.log(609, subvec_idx[x], x)
+        subvec[x] = this._getState(subvec_idx[x]) || math.complex(0, 0)
       }
 
       // perform mat-vec mul
-      this._state[subvec_idx] = math.multiply(matrix, subvec)
+      console.log(613, subvec)
+      matrixRangeAssign(this._state, subvec_idx, math.multiply(matrix, subvec))
     }
   }
 
@@ -613,7 +632,6 @@ ordering (list): List of ids describing the new ordering of qubits
     // all qubits must have been allocated before
     const f1 = ordering.filter((Id) => {
       const v = this._map[Id]
-      console.log(610, Id, typeof Id, v)
       return typeof v !== 'undefined'
     }).length === ordering.length
     const f2 = len(this._map) === ordering.length
@@ -623,7 +641,7 @@ ordering (list): List of ids describing the new ordering of qubits
       + 'allocated previously (call eng.flush()).')
     }
 
-    this._state = wavefunction.slice(0)
+    this._state = math.matrix(wavefunction)
     const map = {}
     for (let i = 0; i < ordering.length; ++i) {
       map[ordering[i]] = i
@@ -664,7 +682,7 @@ are provided.
     let nrm = 0.0
     this._state.forEach((looper, i) => {
       if ((mask & i) === val) {
-        nrm += math.abs(this._state[i]) ** 2
+        nrm += math.abs(this._getState(i)) ** 2
       }
     })
 
@@ -674,7 +692,7 @@ are provided.
     const inv_nrm = 1.0 / math.sqrt(nrm)
     this._state.forEach((looper, i) => {
       if ((mask & i) !== val) {
-        this._state = math.complex(0, 0)
+        this._state = math.zeros(1)
       } else {
         this._state = math.multiply(this._state, inv_nrm)
       }

@@ -21,7 +21,8 @@ import BasicMapperEngine from './basicmapper'
 import {Command} from '../ops/command'
 import {BasicQubit} from '../types/qubit';
 import {NotYetMeasuredError} from '../meta/error'
-import {getEngineList} from '../setups';
+import {getEngineList} from '../setups'
+import Simulator from '../backends/simulators/simulator'
 
 /*
 The MainEngine class provides all functionality of the main compiler
