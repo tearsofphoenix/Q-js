@@ -3,6 +3,7 @@ import SimulatorBackend from './jssim'
 import {Deallocate, Measure} from '../../ops/gates';
 import {BasicMathGate} from '../../ops/basics';
 import TimeEvolution from "../../ops/timeevolution";
+import {BasicQubit} from "../../types/qubit";
 /*
 Simulator is a compiler engine which simulates a quantum computer using
 C++-based kernels.
@@ -82,30 +83,41 @@ Returns:
       return false
     }
   }
+
+  /*
+  Converts a qureg from logical to mapped qubits if there is a mapper.
+    Args:
+qureg (list[Qubit],Qureg): Logical quantum bits
+  */
+  convertLogicalToMappedQureg(qureg) {
+    const mapper = this.main.mapper
+    let mapped_qureg
+    if (mapper) {
+      mapped_qureg = []
+
+      qureg.forEach(qubit => {
+        const v = mapper.currentMapping[qubit.id]
+        if (typeof v === 'undefined') {
+          throw new Error("Unknown qubit id. "
+              + "Please make sure you have called "
+              + "eng.flush().")
+        }
+        const newQubit = new BasicQubit(qubit.engine, v)
+        mapped_qureg.push(newQubit)
+      })
+      return mapped_qureg
+    } else {
+      return qureg
+    }
+  }
 }
 
 //
 // def _convert_logical_to_mapped_qureg(self, qureg):
 // """
-// Converts a qureg from logical to mapped qubits if there is a mapper.
-//
-//     Args:
-// qureg (list[Qubit],Qureg): Logical quantum bits
+
 // """
-// mapper = self.main_engine.mapper
-// if mapper is not None:
-//     mapped_qureg = []
-// for qubit in qureg:
-// if qubit.id not in mapper.current_mapping:
-// raise RuntimeError("Unknown qubit id. "
-// "Please make sure you have called "
-// "eng.flush().")
-// new_qubit = WeakQubitRef(qubit.engine,
-//     mapper.current_mapping[qubit.id])
-// mapped_qureg.append(new_qubit)
-// return mapped_qureg
-// else:
-// return qureg
+
 //
 // def get_expectation_value(self, qubit_operator, qureg):
 // """
@@ -121,7 +133,7 @@ Returns:
 //
 // Note:
 //     Make sure all previous commands (especially allocations) have
-// passed through the compilation chain (call main_engine.flush() to
+// passed through the compilation chain (call main.flush() to
 // make sure).
 //
 // Note:
@@ -133,7 +145,7 @@ Returns:
 // Exception: If `qubit_operator` acts on more qubits than present in
 // the `qureg` argument.
 // """
-// qureg = self._convert_logical_to_mapped_qureg(qureg)
+// qureg = this._convert_logical_to_mapped_qureg(qureg)
 // num_qubits = len(qureg)
 // for term, _ in qubit_operator.terms.items():
 // if not term == () and term[-1][0] >= num_qubits:
@@ -141,7 +153,7 @@ Returns:
 // "contained in the qureg.")
 // operator = [(list(term), coeff) for (term, coeff)
 //   in qubit_operator.terms.items()]
-// return self._simulator.get_expectation_value(operator,
+// return this._simulator.get_expectation_value(operator,
 //     [qb.id for qb in qureg])
 //
 // def apply_qubit_operator(self, qubit_operator, qureg):
@@ -165,7 +177,7 @@ Returns:
 //
 //     Note:
 // Make sure all previous commands (especially allocations) have
-// passed through the compilation chain (call main_engine.flush() to
+// passed through the compilation chain (call main.flush() to
 // make sure).
 //
 // Note:
@@ -173,7 +185,7 @@ Returns:
 // automatically converts from logical qubits to mapped qubits for
 //     the qureg argument.
 // """
-// qureg = self._convert_logical_to_mapped_qureg(qureg)
+// qureg = this._convert_logical_to_mapped_qureg(qureg)
 // num_qubits = len(qureg)
 // for term, _ in qubit_operator.terms.items():
 // if not term == () and term[-1][0] >= num_qubits:
@@ -181,7 +193,7 @@ Returns:
 // "contained in the qureg.")
 // operator = [(list(term), coeff) for (term, coeff)
 //   in qubit_operator.terms.items()]
-// return self._simulator.apply_qubit_operator(operator,
+// return this._simulator.apply_qubit_operator(operator,
 //     [qb.id for qb in qureg])
 //
 // def get_probability(self, bit_string, qureg):
@@ -198,7 +210,7 @@ Returns:
 //
 //     Note:
 // Make sure all previous commands (especially allocations) have
-// passed through the compilation chain (call main_engine.flush() to
+// passed through the compilation chain (call main.flush() to
 // make sure).
 //
 // Note:
@@ -206,9 +218,9 @@ Returns:
 // automatically converts from logical qubits to mapped qubits for
 //     the qureg argument.
 // """
-// qureg = self._convert_logical_to_mapped_qureg(qureg)
+// qureg = this._convert_logical_to_mapped_qureg(qureg)
 // bit_string = [bool(int(b)) for b in bit_string]
-// return self._simulator.get_probability(bit_string,
+// return this._simulator.get_probability(bit_string,
 //     [qb.id for qb in qureg])
 //
 // def get_amplitude(self, bit_string, qureg):
@@ -227,7 +239,7 @@ Returns:
 //
 //     Note:
 // Make sure all previous commands (especially allocations) have
-// passed through the compilation chain (call main_engine.flush() to
+// passed through the compilation chain (call main.flush() to
 // make sure).
 //
 // Note:
@@ -235,9 +247,9 @@ Returns:
 // automatically converts from logical qubits to mapped qubits for
 //     the qureg argument.
 // """
-// qureg = self._convert_logical_to_mapped_qureg(qureg)
+// qureg = this._convert_logical_to_mapped_qureg(qureg)
 // bit_string = [bool(int(b)) for b in bit_string]
-// return self._simulator.get_amplitude(bit_string,
+// return this._simulator.get_amplitude(bit_string,
 //     [qb.id for qb in qureg])
 //
 // def set_wavefunction(self, wavefunction, qureg):
@@ -255,7 +267,7 @@ Returns:
 //
 //     Note:
 // Make sure all previous commands (especially allocations) have
-// passed through the compilation chain (call main_engine.flush() to
+// passed through the compilation chain (call main.flush() to
 // make sure).
 //
 // Note:
@@ -263,8 +275,8 @@ Returns:
 // automatically converts from logical qubits to mapped qubits for
 //     the qureg argument.
 // """
-// qureg = self._convert_logical_to_mapped_qureg(qureg)
-// self._simulator.set_wavefunction(wavefunction,
+// qureg = this._convert_logical_to_mapped_qureg(qureg)
+// this._simulator.set_wavefunction(wavefunction,
 //     [qb.id for qb in qureg])
 //
 // def collapse_wavefunction(self, qureg, values):
@@ -282,15 +294,15 @@ Returns:
 //
 // Note:
 //     Make sure all previous commands have passed through the
-// compilation chain (call main_engine.flush() to make sure).
+// compilation chain (call main.flush() to make sure).
 //
 // Note:
 //     If there is a mapper present in the compiler, this function
 // automatically converts from logical qubits to mapped qubits for
 //     the qureg argument.
 // """
-// qureg = self._convert_logical_to_mapped_qureg(qureg)
-// return self._simulator.collapse_wavefunction([qb.id for qb in qureg],
+// qureg = this._convert_logical_to_mapped_qureg(qureg)
+// return this._simulator.collapse_wavefunction([qb.id for qb in qureg],
 // [bool(v) for v in
 //     values])
 //
@@ -308,14 +320,14 @@ Returns:
 //
 //     Note:
 // Make sure all previous commands have passed through the
-// compilation chain (call main_engine.flush() to make sure).
+// compilation chain (call main.flush() to make sure).
 //
 // Note:
 //     If there is a mapper present in the compiler, this function
 // DOES NOT automatically convert from logical qubits to mapped
 // qubits.
 // """
-// return self._simulator.cheat()
+// return this._simulator.cheat()
 //
 // def _handle(self, cmd):
 // """
@@ -333,7 +345,7 @@ Returns:
 // if cmd.gate == Measure:
 // assert(get_control_count(cmd) == 0)
 // ids = [qb.id for qr in cmd.qubits for qb in qr]
-// out = self._simulator.measure_qubits(ids)
+// out = this._simulator.measure_qubits(ids)
 // i = 0
 // for qr in cmd.qubits:
 // for qb in qr:
@@ -345,14 +357,14 @@ Returns:
 // if logical_id_tag is not None:
 //     qb = WeakQubitRef(qb.engine,
 //         logical_id_tag.logical_qubit_id)
-// self.main_engine.set_measurement_result(qb, out[i])
+// this.main.set_measurement_result(qb, out[i])
 // i += 1
 // elif cmd.gate == Allocate:
 // ID = cmd.qubits[0][0].id
-// self._simulator.allocate_qubit(ID)
+// this._simulator.allocate_qubit(ID)
 // elif cmd.gate == Deallocate:
 // ID = cmd.qubits[0][0].id
-// self._simulator.deallocate_qubit(ID)
+// this._simulator.deallocate_qubit(ID)
 // elif isinstance(cmd.gate, BasicMathGate):
 // qubitids = []
 // for qr in cmd.qubits:
@@ -360,7 +372,7 @@ Returns:
 // for qb in qr:
 // qubitids[-1].append(qb.id)
 // math_fun = cmd.gate.get_math_function(cmd.qubits)
-// self._simulator.emulate_math(math_fun, qubitids,
+// this._simulator.emulate_math(math_fun, qubitids,
 //     [qb.id for qb in cmd.control_qubits])
 // elif isinstance(cmd.gate, TimeEvolution):
 // op = [(list(term), coeff) for (term, coeff)
@@ -368,7 +380,7 @@ Returns:
 // t = cmd.gate.time
 // qubitids = [qb.id for qb in cmd.qubits[0]]
 // ctrlids = [qb.id for qb in cmd.control_qubits]
-// self._simulator.emulate_time_evolution(op, t, qubitids, ctrlids)
+// this._simulator.emulate_time_evolution(op, t, qubitids, ctrlids)
 // elif len(cmd.gate.matrix) <= 2 ** 5:
 // matrix = cmd.gate.matrix
 // ids = [qb.id for qr in cmd.qubits for qb in qr]
@@ -378,12 +390,12 @@ Returns:
 //     str(cmd.gate),
 //     int(math.log(len(cmd.gate.matrix), 2)),
 //     len(ids)))
-// self._simulator.apply_controlled_gate(matrix.tolist(),
+// this._simulator.apply_controlled_gate(matrix.tolist(),
 //     ids,
 //     [qb.id for qb in
 //         cmd.control_qubits])
-// if not self._gate_fusion:
-// self._simulator.run()
+// if not this._gate_fusion:
+// this._simulator.run()
 // else:
 // raise Exception("This simulator only supports controlled k-qubit"
 // " gates with k < 6!\nPlease add an auto-replacer"
@@ -401,8 +413,8 @@ Returns:
 // """
 // for cmd in command_list:
 // if not cmd.gate == FlushGate():
-// self._handle(cmd)
+// this._handle(cmd)
 // else:
-// self._simulator.run()  # flush gate --> run all saved gates
-// if not self.is_last_engine:
-// self.send([cmd])
+// this._simulator.run()  # flush gate --> run all saved gates
+// if not this.is_last_engine:
+// this.send([cmd])
