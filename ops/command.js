@@ -217,7 +217,7 @@ Args:
     control_qubits (Qureg): quantum register
      */
   set controlQubits(nq) {
-    this._controlQubits = nq.sort((a, b) => a.id - b.id).slice(0)
+    this._controlQubits = nq.sort((a, b) => a.id - b.id).map(q => new BasicQubit(q.engine, q.id))
   }
 
   /*

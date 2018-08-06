@@ -7,7 +7,7 @@
       'target_name': 'binding',
       'win_delay_load_hook': 'true',
       'sources': [
-        'backends/simulators/cppsim.cpp'
+        'backends/simulators/cppkernels/Wrapper.cpp'
       ],
       'msvs_settings': {
         'VCLinkerTool': {

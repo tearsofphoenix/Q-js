@@ -11,7 +11,7 @@
       'DEBUG'
     ],
     'sources': [
-      'backends/simulators/cppsim.cpp'
+      'backends/simulators/cppkernels/Wrapper.cpp'
     ],
     'cflags!': [
       '-fno-rtti',
@@ -25,7 +25,7 @@
       '-fexceptions',
       '-frtti',
     ],
-    'include_dirs': [ 'backends/simulators/cppkernels' ],
+    'include_dirs': [ 'backends/simulators/cppkernels', 'node_modules/nan' ],
     'direct_dependent_settings': {
       'include_dirs': [ 'backends/simulators/cppkernels' ],
     },

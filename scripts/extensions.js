@@ -202,11 +202,7 @@ function getArgument(name, args) {
 
 function getBinaryName() {
   let binaryName;
-
-
   let variant;
-
-
   let platform = process.platform;
 
   if (getArgument('--binary-name')) {
@@ -263,10 +259,10 @@ function getBinaryName() {
 
 function getBinaryUrl() {
   const site = getArgument('--binary-site')
-    || process.env.SASS_BINARY_SITE
-    || process.env.npm_config_sass_binary_site
-    || (pkg.nodeSassConfig && pkg.nodeSassConfig.binarySite)
-    || 'https://github.com/sass/node-sass/releases/download';
+    || process.env.PROJECTQ_BINARY_SITE
+    || process.env.npm_config_projectq_binary_site
+    || (pkg.projectqConfig && pkg.projectqConfig.binarySite)
+    || 'https://github.com/tearsofphoenix/Q-js/releases/download';
 
   return [site, `v${pkg.version}`, getBinaryName()].join('/');
 }
@@ -288,14 +284,14 @@ function getBinaryUrl() {
 function getBinaryDir() {
   let binaryDir;
 
-  if (getArgument('--sass-binary-dir')) {
-    binaryDir = getArgument('--sass-binary-dir');
-  } else if (process.env.SASS_BINARY_DIR) {
-    binaryDir = process.env.SASS_BINARY_DIR;
-  } else if (process.env.npm_config_sass_binary_dir) {
-    binaryDir = process.env.npm_config_sass_binary_dir;
-  } else if (pkg.nodeSassConfig && pkg.nodeSassConfig.binaryDir) {
-    binaryDir = pkg.nodeSassConfig.binaryDir;
+  if (getArgument('--binary-dir')) {
+    binaryDir = getArgument('--binary-dir');
+  } else if (process.env.PROJECTQ_BINARY_DIR) {
+    binaryDir = process.env.PROJECTQ_BINARY_DIR;
+  } else if (process.env.npm_config_projectq_binary_dir) {
+    binaryDir = process.env.npm_config_projectq_binary_dir;
+  } else if (pkg.projectqConfig && pkg.projectqConfig.binaryDir) {
+    binaryDir = pkg.projectqConfig.binaryDir;
   } else {
     binaryDir = defaultBinaryDir;
   }
@@ -305,9 +301,9 @@ function getBinaryDir() {
 
 /**
  * Get binary path.
- * If environment variable SASS_BINARY_PATH,
+ * If environment variable PROJECTQ_BINARY_PATH,
  * .npmrc variable sass_binary_path or
- * process argument --sass-binary-path is provided,
+ * process argument --binary-path is provided,
  * select it by appending binary name, otherwise
  * make default binary path using binary name.
  * Once the primary selection is made, check if
@@ -320,14 +316,14 @@ function getBinaryDir() {
 function getBinaryPath() {
   let binaryPath;
 
-  if (getArgument('--sass-binary-path')) {
-    binaryPath = getArgument('--sass-binary-path');
-  } else if (process.env.SASS_BINARY_PATH) {
-    binaryPath = process.env.SASS_BINARY_PATH;
-  } else if (process.env.npm_config_sass_binary_path) {
-    binaryPath = process.env.npm_config_sass_binary_path;
-  } else if (pkg.nodeSassConfig && pkg.nodeSassConfig.binaryPath) {
-    binaryPath = pkg.nodeSassConfig.binaryPath;
+  if (getArgument('--binary-path')) {
+    binaryPath = getArgument('--binary-path');
+  } else if (process.env.PROJECTQ_BINARY_PATH) {
+    binaryPath = process.env.PROJECTQ_BINARY_PATH;
+  } else if (process.env.npm_config_projectq_binary_path) {
+    binaryPath = process.env.npm_config_projectq_binary_path;
+  } else if (pkg.projectqConfig && pkg.projectqConfig.binaryPath) {
+    binaryPath = pkg.projectqConfig.binaryPath;
   } else {
     binaryPath = path.join(getBinaryDir(), getBinaryName().replace(/_(?=binding\.node)/, '/'));
   }

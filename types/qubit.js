@@ -62,6 +62,9 @@ idx: Unique index of the qubit referenced by this qubit
     return `${this.id}`
   }
 
+  inspect() {
+    return this.toString()
+  }
   /*
         Access the result of a previous measurement and return False / True (0 / 1)
         @return bool

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import 'babel-polyfill'
 import {expect} from 'chai'
 import { DummyEngine } from './testengine'
 import MainEngine from './main'
@@ -26,7 +25,7 @@ import { H } from '../ops/gates'
 import { All } from '../ops/metagates'
 
 describe('ibm 5qubit mapper test', () => {
-  it('should test_ibm5qubitmapper_invalid_circuit', function () {
+  it('should test_ibm5qubitmapper_invalid_circuit', () => {
     const backend = new DummyEngine(true)
     const eng = new MainEngine(backend, [new IBM5QubitMapper()])
     const qb0 = eng.allocateQubit()
@@ -43,7 +42,7 @@ describe('ibm 5qubit mapper test', () => {
     }).to.throw()
   });
 
-  it('should test_ibm5qubitmapper_valid_circuit1', function () {
+  it('should test_ibm5qubitmapper_valid_circuit1', () => {
     const backend = new DummyEngine(true)
     const eng = new MainEngine(backend, [new IBM5QubitMapper()])
     const qb0 = eng.allocateQubit()
@@ -61,7 +60,7 @@ describe('ibm 5qubit mapper test', () => {
     eng.flush()
   });
 
-  it('should test_ibm5qubitmapper_valid_circuit2', function () {
+  it('should test_ibm5qubitmapper_valid_circuit2', () => {
     const backend = new DummyEngine(true)
     const eng = new MainEngine(backend, [new IBM5QubitMapper()])
     const qb0 = eng.allocateQubit()
@@ -79,7 +78,7 @@ describe('ibm 5qubit mapper test', () => {
     eng.flush()
   });
 
-  it('should test_ibm5qubitmapper_valid_circuit2_ibmqx4', function () {
+  it('should test_ibm5qubitmapper_valid_circuit2_ibmqx4', () => {
     const backend = new DummyEngine(true)
 
     class FakeIBMBackend extends IBMBackend {
@@ -107,7 +106,7 @@ describe('ibm 5qubit mapper test', () => {
     eng.flush()
   });
 
-  it('should test_ibm5qubitmapper_optimizeifpossible', function () {
+  it('should test_ibm5qubitmapper_optimizeifpossible', () => {
     const backend = new DummyEngine(true)
     const connectivity = new Set([[2, 1], [4, 2], [2, 0], [3, 2], [3, 4], [1, 0]])
     const eng = new MainEngine(backend, [new IBM5QubitMapper(), new SwapAndCNOTFlipper(connectivity)])
@@ -120,7 +119,7 @@ describe('ibm 5qubit mapper test', () => {
     CNOT.or(tuple(qb1, qb2))
 
     eng.flush()
-
+    backend.receivedCommands.forEach(cmd => console.log(cmd.toString()))
     let hadamard_count = backend.receivedCommands.filter(cmd => cmd.gate.equal(H)).length
 
     expect(hadamard_count).to.equal(4)
@@ -136,7 +135,7 @@ describe('ibm 5qubit mapper test', () => {
     expect(hadamard_count).to.equal(4)
   });
 
-  it('should test_ibm5qubitmapper_toomanyqubits', function () {
+  it('should test_ibm5qubitmapper_toomanyqubits', () => {
     const backend = new DummyEngine(true)
     const connectivity = new Set([[2, 1], [4, 2], [2, 0], [3, 2], [3, 4], [1, 0]])
     const eng = new MainEngine(backend, [new IBM5QubitMapper(), new SwapAndCNOTFlipper(connectivity)])

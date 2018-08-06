@@ -20,7 +20,7 @@ const mkdir = require('mkdirp');
 const path = require('path');
 const request = require('request');
 const log = require('npmlog');
-const sass = require('./extensions');
+const pq = require('./extensions');
 
 const downloadOptions = require('./util/downloadoptions');
 
@@ -113,16 +113,14 @@ function checkAndDownloadBinary() {
     return;
   }
 
-  let cachedBinary = sass.getCachedBinary();
+  let cachedBinary = pq.getCachedBinary();
 
+  const cachePath = pq.getBinaryCachePath();
 
-  const cachePath = sass.getBinaryCachePath();
+  const binaryPath = pq.getBinaryPath();
 
-
-  const binaryPath = sass.getBinaryPath();
-
-  if (sass.hasBinary(binaryPath)) {
-    console.log('node-sass build', 'Binary found at', binaryPath);
+  if (pq.hasBinary(binaryPath)) {
+    console.log('projectq build', 'Binary found at', binaryPath);
     return;
   }
 
@@ -139,7 +137,7 @@ function checkAndDownloadBinary() {
     return;
   }
 
-  download(sass.getBinaryUrl(), binaryPath, (err) => {
+  download(pq.getBinaryUrl(), binaryPath, (err) => {
     if (err) {
       console.error(err);
       return;
@@ -147,7 +145,7 @@ function checkAndDownloadBinary() {
 
     console.log('Binary saved to', binaryPath);
 
-    cachedBinary = path.join(cachePath, sass.getBinaryName());
+    cachedBinary = path.join(cachePath, pq.getBinaryName());
 
     if (cachePath) {
       console.log('Caching binary to', cachedBinary);

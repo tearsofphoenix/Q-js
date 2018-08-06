@@ -19,7 +19,7 @@ Contains a (slow) Python simulator.
 
     Please compile the c++ simulator for large-scale simulations.
 */
-import mathjs from 'mathjs'
+import math from 'math'
 import bigInt from 'big-integer'
 import {arrayRangeAssign, zeros} from '../../libs/util'
 import { setEqual } from '../../utils/polyfill'
@@ -44,7 +44,7 @@ simulator.
    */
   constructor(rndSeed) {
     // ignore seed
-    this._state = [mathjs.complex(1, 0)]
+    this._state = [math.complex(1, 0)]
     this._map = {}
     this._numQubits = 0
   }
@@ -80,7 +80,7 @@ List of measurement results (containing either True or False).
     let val = 0.0
     let i_picked = 0
     while (val < P && i_picked < this._state.length) {
-      val += mathjs.abs(this._state[i_picked]) ** 2
+      val += math.abs(this._state[i_picked]) ** 2
       i_picked += 1
     }
 
@@ -106,7 +106,7 @@ List of measurement results (containing either True or False).
       if ((mask & i) != val) {
         this._state[i] = 0.0
       } else {
-        nrm += mathjs.abs(looper) ** 2
+        nrm += math.abs(looper) ** 2
       }
     })
 
@@ -149,11 +149,11 @@ been measured / uncomputed.
 
     for (let i = 0; i < this._state.length; i + (1 << (pos + 1))) {
       for (let j = 0; j < 1 << pos; ++j) {
-        if (mathjs.abs(this._state[i + j]) > tolerance) {
+        if (math.abs(this._state[i + j]) > tolerance) {
           up = true
         }
 
-        if (mathjs.abs(this._state[i + j + (1 << pos)]) > tolerance) {
+        if (math.abs(this._state[i + j + (1 << pos)]) > tolerance) {
           down = true
         }
 
@@ -182,7 +182,7 @@ been measured / uncomputed.
   deallocateQubit(ID) {
     const pos = this._map[ID]
     const cv = this.getClassicalValue(ID)
-    const newstate = mathjs.czeros(1 << (this._numQubits - 1))
+    const newstate = math.czeros(1 << (this._numQubits - 1))
     let k = 0
     for (let i = (1 << pos) * cv; i < this._state.length; i += 1 << (pos + 1)) {
       arrayRangeAssign(this._state, newstate, k, k + (1 << pos))
@@ -240,7 +240,7 @@ ctrlqubit_ids (list<int>): List of control qubit ids.
       })
     })
 
-    const newstate = mathjs.czeros(this._state.length)
+    const newstate = math.czeros(this._state.length)
 
     this._state.forEach((looper, i) => {
       if ((mask & i) === mask) {
@@ -407,7 +407,7 @@ ctrlids (list): A list of control qubit IDs.
     let tr = 0
     let tmp = 0
     const newTerms = {}
-    terms_dict.forEach(t => {
+    terms_dict.forEach((t) => {
       const key = stringToArray(t)
       const c = terms_dict[t]
       if (key.length === 0) {
@@ -418,123 +418,160 @@ ctrlids (list): A list of control qubit IDs.
       }
     })
 
-terms_dict = newTerms
+    terms_dict = newTerms
 
-const op_nrm = math.abs(time) * tmp
-// rescale the operator by s:
+    const op_nrm = math.abs(time) * tmp
+    // rescale the operator by s:
     const s = Math.floor(op_nrm + 1)
-const correction = math.exp(math.complex(0, -time * tr / (s * 1.0)))
-const output_state = this._state.slice(0)
-const mask = this.getControlMask(ctrlids)
-for i in range(s):
-j = 0
-nrm_change = 1.
-while nrm_change > 1.e-12:
-coeff = (-time * 1j) / float(s * (j + 1))
-current_state = _np.copy(this._state)
-update = 0j
-for t, c in terms_dict:
-this._apply_term(t, ids)
-this._state *= c
-update += this._state
-this._state = _np.copy(current_state)
-update *= coeff
-this._state = update
-for i in range(len(update)):
-if (i & mask) == mask:
-    output_state[i] += update[i]
-nrm_change = _np.linalg.norm(update)
-j += 1
-for i in range(len(update)):
-if (i & mask) == mask:
-    output_state[i] *= correction
-this._state = _np.copy(output_state)
+    const correction = math.exp(math.complex(0, -time * tr / (s * 1.0)))
+    const output_state = this._state.slice(0)
+    const mask = this.getControlMask(ctrlids)
+
+    for (let i = 0; i < s; ++i) {
+      let j = 0
+      let nrm_change = 1.0
+      let update
+      while (nrm_change > 1.e-12) {
+        const coeff = math.divide(math.complex(0, -time), s * (j + 1))
+        const current_state = this._state.slice(0)
+        update = math.complex(0, 0)
+        Object.keys(terms_dict).forEach((t) => {
+          const c = terms_dict[t]
+          this.applyTerm(t, ids)
+          this._state *= c
+          update += this._state
+          this._state = current_state.copy()
+        })
+        update *= coeff
+        this._state = update
+        for (let i = 0; i < update.length; ++i) {
+          if (i & mask === mask) {
+            output_state[i] += update[i]
+          }
+        }
+        nrm_change = linalg.normal(update)
+        j += 1
+      }
+      for (let i = 0; i < update.length; ++i) {
+        if (i & mask === mask) {
+          output_state[i] *= correction
+        }
+      }
+      this._state = output_state.copy()
+    }
   }
 
   run() {
     //
   }
+
+  /*
+  Applies a QubitOperator term to the state vector.
+(Helper function for time evolution & expectation)
+
+Args:
+    term: One term of QubitOperator.terms
+ids (list[int]): Term index to Qubit ID mapping
+ctrlids (list[int]): Control qubit IDs
+   */
+  applyTerm(term, ids, controlIDs = []) {
+    const X = math.matrix([[0., 1.], [1., 0.]])
+    const Y = math.matrix([[0., math.complex(0, -1)], [math.complex(0, 1), 0.]])
+    const Z = math.matrix([[1., 0.], [0., -1.]])
+    const gates = {X, Y, Z}
+    term.forEach(local_op => {
+      const qb_id = ids[local_op[0]]
+      this.applyControlledGate(gates[local_op[1]], [qb_id], controlIDs)
+    })
+  }
+
+  /*
+  Applies the k-qubit gate matrix m to the qubits with indices ids,
+    using ctrlids as control qubits.
+
+    Args:
+m (list[list]): 2^k x 2^k complex matrix describing the k-qubit
+gate.
+ids (list): A list containing the qubit IDs to which to apply the
+gate.
+ctrlids (list): A list of control qubit IDs (i.e., the gate is
+only applied where these qubits are 1).
+   */
+  applyControlledGate(m, ids, ctrlids) {
+    const mask = this.getControlMask(ctrlids)
+    if (m.length === 2) {
+      const pos = this._map[ids[0]]
+      this._singleQubitGate(m, pos, mask)
+    } else {
+      const pos = ids.map(ID => this._map[ID])
+      this._multiQubitGate(m, pos, mask)
+    }
+  }
+
+  /*
+  Applies the single qubit gate matrix m to the qubit at position `pos`
+using `mask` to identify control qubits.
+
+    Args:
+m (list[list]): 2x2 complex matrix describing the single-qubit
+gate.
+pos (int): Bit-position of the qubit.
+mask (int): Bit-mask where set bits indicate control qubits.
+   */
+  _singleQubitGate(m, pos, mask) {
+    const kernel = (u, d, m) => [u * m[0][0] + d * m[0][1], u * m[1][0] + d * m[1][1]]
+
+    const step = 1 << (pos + 1)
+    for (let i = 0; i < this._state.length; i += step) {
+      for (let j = 0; j < 1 << pos; ++j) {
+        if (((i + j) & mask) === mask) {
+          const id1 = i + j
+          const id2 = id1 + (1 << pos)
+          const [r1, r2] = kernel(this._state[id1], this._state[id2], m)
+          this._state[id1] = r1
+          this._state[id2] = r2
+        }
+      }
+    }
+  }
+
+  /*
+  Applies the k-qubit gate matrix m to the qubits at `pos`
+using `mask` to identify control qubits.
+
+    Args:
+m (list[list]): 2^k x 2^k complex matrix describing the k-qubit
+gate.
+pos (list[int]): List of bit-positions of the qubits.
+mask (int): Bit-mask where set bits indicate control qubits.
+   */
+  _multiQubitGate(m, pos, mask) {
+    // follows the description in https://arxiv.org/abs/1704.01127
+const inactive = Object.keys(this._map).filter(p => !pos.has(p))
+
+const matrix = math.matrix(m)
+const subvec = math.zeros(1 << pos.length)
+const subvec_idx = [0] * subvec.length
+for c in range(1 << len(inactive)):
+// determine base index (state of inactive qubits)
+base = 0
+for i in range(len(inactive)):
+base |= ((c >> i) & 1) << inactive[i]
+// check the control mask
+if mask != (base & mask):
+continue
+// now gather all elements involved in mat-vec mul
+for x in range(len(subvec_idx)):
+offset = 0
+for i in range(len(pos)):
+offset |= ((x >> i) & 1) << pos[i]
+subvec_idx[x] = base | offset
+subvec[x] = this._state[subvec_idx[x]]
+// perform mat-vec mul
+this._state[subvec_idx] = matrix.dot(subvec)
+  }
 }
 
-// def apply_controlled_gate(self, m, ids, ctrlids):
-// """
-// Applies the k-qubit gate matrix m to the qubits with indices ids,
-//     using ctrlids as control qubits.
-//
-//     Args:
-// m (list[list]): 2^k x 2^k complex matrix describing the k-qubit
-// gate.
-// ids (list): A list containing the qubit IDs to which to apply the
-// gate.
-// ctrlids (list): A list of control qubit IDs (i.e., the gate is
-// only applied where these qubits are 1).
-// """
-// mask = this._get_control_mask(ctrlids)
-// if len(m) == 2:
-// pos = this._map[ids[0]]
-// this._single_qubit_gate(m, pos, mask)
-// else:
-// pos = [this._map[ID] for ID in ids]
-// this._multi_qubit_gate(m, pos, mask)
-//
-// def _single_qubit_gate(self, m, pos, mask):
-// """
-// Applies the single qubit gate matrix m to the qubit at position `pos`
-// using `mask` to identify control qubits.
-//
-//     Args:
-// m (list[list]): 2x2 complex matrix describing the single-qubit
-// gate.
-// pos (int): Bit-position of the qubit.
-// mask (int): Bit-mask where set bits indicate control qubits.
-// """
-// def kernel(u, d, m):
-// return u * m[0][0] + d * m[0][1], u * m[1][0] + d * m[1][1]
-//
-// for i in range(0, len(this._state), (1 << (pos + 1))):
-// for j in range(1 << pos):
-// if ((i + j) & mask) == mask:
-//     id1 = i + j
-// id2 = id1 + (1 << pos)
-// this._state[id1], this._state[id2] = kernel(
-//     this._state[id1],
-//     this._state[id2],
-//     m)
-//
-// def _multi_qubit_gate(self, m, pos, mask):
-// """
-// Applies the k-qubit gate matrix m to the qubits at `pos`
-// using `mask` to identify control qubits.
-//
-//     Args:
-// m (list[list]): 2^k x 2^k complex matrix describing the k-qubit
-// gate.
-// pos (list[int]): List of bit-positions of the qubits.
-// mask (int): Bit-mask where set bits indicate control qubits.
-// """
-// # follows the description in https://arxiv.org/abs/1704.01127
-// inactive = [p for p in range(len(this._map)) if p not in pos]
-//
-// matrix = _np.matrix(m)
-// subvec = _np.zeros(1 << len(pos), dtype=complex)
-// subvec_idx = [0] * len(subvec)
-// for c in range(1 << len(inactive)):
-// # determine base index (state of inactive qubits)
-// base = 0
-// for i in range(len(inactive)):
-// base |= ((c >> i) & 1) << inactive[i]
-// # check the control mask
-// if mask != (base & mask):
-// continue
-// # now gather all elements involved in mat-vec mul
-// for x in range(len(subvec_idx)):
-// offset = 0
-// for i in range(len(pos)):
-// offset |= ((x >> i) & 1) << pos[i]
-// subvec_idx[x] = base | offset
-// subvec[x] = this._state[subvec_idx[x]]
-// # perform mat-vec mul
-// this._state[subvec_idx] = matrix.dot(subvec)
 //
 // def set_wavefunction(self, wavefunction, ordering):
 // """
@@ -595,22 +632,3 @@ this._state = _np.copy(output_state)
 //     this._state[i] = 0.
 // else:
 // this._state[i] *= inv_nrm
-//
-// def _apply_term(self, term, ids, ctrlids=[]):
-// """
-// Applies a QubitOperator term to the state vector.
-// (Helper function for time evolution & expectation)
-//
-// Args:
-//     term: One term of QubitOperator.terms
-// ids (list[int]): Term index to Qubit ID mapping
-// ctrlids (list[int]): Control qubit IDs
-// """
-// X = [[0., 1.], [1., 0.]]
-// Y = [[0., -1j], [1j, 0.]]
-// Z = [[1., 0.], [0., -1.]]
-// gates = [X, Y, Z]
-// for local_op in term:
-// qb_id = ids[local_op[0]]
-// this.apply_controlled_gate(gates[ord(local_op[1]) - ord('X')],
-//     [qb_id], ctrlids)

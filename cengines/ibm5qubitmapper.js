@@ -20,6 +20,9 @@ import { Allocate, FlushGate, NOT } from '../ops/gates'
 import { getControlCount } from '../meta/control'
 import IBMBackend from '../backends/ibm/ibm'
 
+function stringKeyToIntArray(key) {
+  return key.split(',').map(i => parseInt(i, 10))
+}
 
 // export const ibmqx4_connections = new Set([2, 1], [4, 2], [2, 0], [3, 2], [3, 4], [1, 0])
 export const ibmqx4_connections = new Set(['2,1', '4,2', '2,0', '3,2', '3,4', '1,0'])
@@ -93,14 +96,16 @@ if the circuit cannot be executed given the mapping.
     const connections = ibmqx4_connections
     const keys = Object.keys(this._interactions)
     for (let i = 0; i < keys.length; ++i) {
-      const tpl = keys[i]
+      const tpl = stringKeyToIntArray(keys[i])
       const ctrl_id = tpl[0]
       const target_id = tpl[1]
       const ctrl_pos = mapping[ctrl_id]
       const target_pos = mapping[target_id]
-      let v = connections.has(`${ctrl_pos},${target_pos}`)
+      let k = `${ctrl_pos},${target_pos}`
+      let v = connections.has(k)
       if (!v) {
-        v = connections.has(`${target_pos},${ctrl_pos}`)
+        k = `${target_pos},${ctrl_pos}`
+        v = connections.has(k)
         if (v) {
           cost += this._interactions[tpl]
         } else {
@@ -136,9 +141,7 @@ down the pipeline.
         const mapping = {}
         physical_ids.forEach((looper, i) => mapping[logical_ids[i]] = looper)
         const new_cost = this.determineCost(mapping)
-        console.log(139, new_cost, mapping)
         if (new_cost) {
-          console.log(140, best_cost, new_cost)
           if (!best_cost || new_cost < best_cost) {
             best_cost = new_cost
             best_mapping = mapping

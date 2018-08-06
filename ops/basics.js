@@ -94,6 +94,10 @@ self.set_interchangeable_qubit_indices([[0,1],[2,3,4]])
     throw new Error('BasicGate: No toString() implemented.')
   }
 
+  inspect() {
+    return this.toString()
+  }
+
   /*
     Convert quantum input of "gate | quantum input" to internal formatting.
 

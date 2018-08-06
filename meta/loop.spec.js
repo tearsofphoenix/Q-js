@@ -186,6 +186,7 @@ describe('loop test', () => {
     const qubit_id = qubit[0].id
     Loop(eng, 3, () => {
       const ancilla = eng.allocateQubit()
+      console.log(189, ancilla)
       H.or(ancilla)
       CNOT.or(tuple(ancilla, qubit))
       ancilla.deallocate()
@@ -193,6 +194,7 @@ describe('loop test', () => {
 
     eng.flush(true)
 
+    backend.receivedCommands.forEach(cmd => console.log(cmd.toString()))
     expect(backend.receivedCommands.length).to.equal(15)
     expect(backend.receivedCommands[0].gate.equal(Allocate)).to.equal(true)
     for (let ii = 0; ii < 3; ++ii) {

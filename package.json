@@ -6,7 +6,7 @@
   "license": "Apache",
   "author": "Isaac Phoenix (tearsofphoenix@icloud.com)",
   "scripts": {
-    "install": "node scripts/install.js",
+    "install": "node %NODE_DEBUG_OPTION% scripts/install.js",
     "test": "mocha --require babel-register ./ops/*.spec.js",
     "build": "node scripts/build.js --force"
   },
