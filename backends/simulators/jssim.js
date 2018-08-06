@@ -19,10 +19,11 @@ Contains a (slow) Python simulator.
 
     Please compile the c++ simulator for large-scale simulations.
 */
-import math from 'math'
+import assert from 'assert'
+import math from 'mathjs'
 import bigInt from 'big-integer'
 import {arrayRangeAssign, zeros} from '../../libs/util'
-import { setEqual } from '../../libs/polyfill'
+import {len, setEqual} from '../../libs/polyfill'
 import { stringToArray } from '../../ops/qubitoperator'
 
 /*
@@ -80,7 +81,7 @@ List of measurement results (containing either True or False).
     let val = 0.0
     let i_picked = 0
     while (val < P && i_picked < this._state.length) {
-      val += math.abs(this._state[i_picked]) ** 2
+      val += math.abs(this._state[i_picked] || math.complex(0, 0)) ** 2
       i_picked += 1
     }
 
@@ -147,13 +148,13 @@ been measured / uncomputed.
     let up = false
     let down = false
 
-    for (let i = 0; i < this._state.length; i + (1 << (pos + 1))) {
+    for (let i = 0; i < this._state.length; i += (1 << (pos + 1))) {
       for (let j = 0; j < 1 << pos; ++j) {
         if (math.abs(this._state[i + j]) > tolerance) {
           up = true
         }
 
-        if (math.abs(this._state[i + j + (1 << pos)]) > tolerance) {
+        if (math.abs(this._state[i + j + (1 << pos)] || 0) > tolerance) {
           down = true
         }
 
@@ -182,10 +183,10 @@ been measured / uncomputed.
   deallocateQubit(ID) {
     const pos = this._map[ID]
     const cv = this.getClassicalValue(ID)
-    const newstate = math.czeros(1 << (this._numQubits - 1))
+    const newstate = math.zeros(1 << (this._numQubits - 1))
     let k = 0
     for (let i = (1 << pos) * cv; i < this._state.length; i += 1 << (pos + 1)) {
-      arrayRangeAssign(this._state, newstate, k, k + (1 << pos))
+      arrayRangeAssign(this._state.slice(i, i + 1 << pos), newstate, k, k + (1 << pos))
       k += 1 << pos
     }
 
@@ -194,7 +195,7 @@ been measured / uncomputed.
       const value = this._map[key]
       if (value > pos) {
         newmap[key] = value - 1
-      } else if (key != ID) {
+      } else if (parseInt(key, 10) !== ID) {
         newmap[key] = value
       }
     })
@@ -240,7 +241,7 @@ ctrlqubit_ids (list<int>): List of control qubit ids.
       })
     })
 
-    const newstate = math.czeros(this._state.length)
+    const newstate = math.zeros(len(this._state))
 
     this._state.forEach((looper, i) => {
       if ((mask & i) === mask) {
@@ -281,14 +282,14 @@ ids (list[int]): List of qubit ids upon which the operator acts.
     Returns:
 Expectation value
    */
-  getExpectationValue(termsDict, IDs) {
+  getExpectationValue(termsArray, IDs) {
     let expectation = 0.0
-    const current_state = {}
+    const current_state = math.complex(math.re(this._state), math.im(this._state))
     Object.assign(current_state, this._state)
-    Object.keys(termsDict).forEach((term) => {
-      const coefficient = termsDict[term]
+    termsArray.forEach(([term, coefficient]) => {
       this.applyTerm(term, IDs)
-      const delta = coefficient * _np.vdot(current_state, this._state).real
+      const tmp = math.re(current_state) * math.re(this._state) - (-math.im(current_state) * math.im(this._state))
+      const delta = coefficient * tmp
       expectation += delta
       this._state = current_state
     })
@@ -348,7 +349,7 @@ RuntimeError if an unknown qubit id was provided.
     }
 
     let probability = 0.0
-    this._state.forEach((j) => {
+    this._state.forEach((i) => {
       if (i & mask == bit_str) {
         const e = this._state[i]
         probability += math.re(e) ** 2 + math.im(e) ** 2
@@ -374,7 +375,9 @@ RuntimeError if the second argument is not a permutation of all
 allocated qubits.
    */
   getAmplitude(bitString, IDs) {
-    if (!setEqual(new Set(IDs), new Set(this._map))) {
+    const s1 = new Set(IDs)
+    const s2 = new Set(Object.keys(this._map).map(k => parseInt(k, 10)))
+    if (!setEqual(s1, s2)) {
       throw new Error('The second argument to get_amplitude() must'
       + ' be a permutation of all allocated qubits. '
       + 'Please make sure you have called '
@@ -475,11 +478,11 @@ ids (list[int]): Term index to Qubit ID mapping
 ctrlids (list[int]): Control qubit IDs
    */
   applyTerm(term, ids, controlIDs = []) {
-    const X = math.matrix([[0., 1.], [1., 0.]])
-    const Y = math.matrix([[0., math.complex(0, -1)], [math.complex(0, 1), 0.]])
-    const Z = math.matrix([[1., 0.], [0., -1.]])
+    const X = math.matrix([[0.0, 1.0], [1.0, 0.0]])
+    const Y = math.matrix([[0.0, math.complex(0, -1)], [math.complex(0, 1), 0.0]])
+    const Z = math.matrix([[1.0, 0.0], [0.0, -1.0]])
     const gates = {X, Y, Z}
-    term.forEach(local_op => {
+    term.forEach((local_op) => {
       const qb_id = ids[local_op[0]]
       this.applyControlledGate(gates[local_op[1]], [qb_id], controlIDs)
     })
@@ -499,8 +502,9 @@ only applied where these qubits are 1).
    */
   applyControlledGate(m, ids, ctrlids) {
     const mask = this.getControlMask(ctrlids)
-    if (m.length === 2) {
-      const pos = this._map[ids[0]]
+    if (len(m) === 2) {
+      const k = ids[0]
+      const pos = this._map[k] || this._map[k.toString()]
       this._singleQubitGate(m, pos, mask)
     } else {
       const pos = ids.map(ID => this._map[ID])
@@ -519,7 +523,16 @@ pos (int): Bit-position of the qubit.
 mask (int): Bit-mask where set bits indicate control qubits.
    */
   _singleQubitGate(m, pos, mask) {
-    const kernel = (u, d, m) => [u * m[0][0] + d * m[0][1], u * m[1][0] + d * m[1][1]]
+    const kernel = (u, d, m) => {
+      const mi = math.index
+      const ma = math.add
+      const mm = math.multiply
+      d = d || math.complex(0, 0)
+      u = u || math.complex(0, 0)
+      const r1 = ma(mm(u, m.subset(mi(0, 0))), mm(d, m.subset(mi(0, 1))))
+      const r2 = ma(mm(u, m.subset(mi(1, 0))), mm(d, m.subset(mi(1, 1))))
+      return [r1, r2]
+    }
 
     const step = 1 << (pos + 1)
     for (let i = 0; i < this._state.length; i += step) {
@@ -547,88 +560,114 @@ mask (int): Bit-mask where set bits indicate control qubits.
    */
   _multiQubitGate(m, pos, mask) {
     // follows the description in https://arxiv.org/abs/1704.01127
-const inactive = Object.keys(this._map).filter(p => !pos.has(p))
+    const inactive = Object.keys(this._map).filter(p => !pos.includes(p))
 
-const matrix = math.matrix(m)
-const subvec = math.zeros(1 << pos.length)
-const subvec_idx = [0] * subvec.length
-for c in range(1 << len(inactive)):
-// determine base index (state of inactive qubits)
-base = 0
-for i in range(len(inactive)):
-base |= ((c >> i) & 1) << inactive[i]
-// check the control mask
-if mask != (base & mask):
-continue
-// now gather all elements involved in mat-vec mul
-for x in range(len(subvec_idx)):
-offset = 0
-for i in range(len(pos)):
-offset |= ((x >> i) & 1) << pos[i]
-subvec_idx[x] = base | offset
-subvec[x] = this._state[subvec_idx[x]]
-// perform mat-vec mul
-this._state[subvec_idx] = matrix.dot(subvec)
+    const matrix = math.matrix(m)
+    const subvec = math.zeros(1 << pos.length)
+    const subvec_idx = [0] * subvec.length
+    for (let c = 0; c < 1 << inactive.length; ++c) {
+      // determine base index (state of inactive qubits)
+      let base = 0
+      for (let i = 0; i < inactive.length; ++i) {
+        base |= ((c >> i) & 1) << inactive[i]
+      }
+
+      // check the control mask
+      if (mask !== (base & mask)) {
+        continue
+      }
+      // now gather all elements involved in mat-vec mul
+      for (let x = 0; x < subvec_idx.length; ++x) {
+        let offset = 0
+        for (let i = 0; i < pos.length; ++i) {
+          offset |= ((x >> i) & 1) << pos[i]
+        }
+        subvec_idx[x] = base | offset
+        subvec[x] = this._state[subvec_idx[x]]
+      }
+
+      // perform mat-vec mul
+      this._state[subvec_idx] = math.multiply(matrix, subvec)
+    }
+  }
+
+  /*
+  Set wavefunction and qubit ordering.
+
+    Args:
+wavefunction (list[complex]): Array of complex amplitudes
+describing the wavefunction (must be normalized).
+ordering (list): List of ids describing the new ordering of qubits
+(i.e., the ordering of the provided wavefunction).
+   */
+  setWaveFunction(wavefunction, ordering) {
+    // wavefunction contains 2^n values for n qubits
+    assert(wavefunction.length === 1 << ordering.length)
+
+    // all qubits must have been allocated before
+    const f1 = ordering.all(Id => typeof this._map[Id] !== 'undefined')
+    const f2 = Object(this._map).length === ordering.length
+    if (!f1 || !f2) {
+      throw new Error('set_wavefunction(): Invalid mapping provided.'
+      + ' Please make sure all qubits have been '
+      + 'allocated previously (call eng.flush()).')
+    }
+
+    this._state = _np.array(wavefunction, dtype = _np.complex128)
+    const map = {}
+    for (let i = 0; i < ordering.length; ++i) {
+      map[ordering[i]] = i
+    }
+    this._map = map
+  }
+
+  /*
+  Collapse a quantum register onto a classical basis state.
+
+    Args:
+ids (list[int]): Qubit IDs to collapse.
+values (list[bool]): Measurement outcome for each of the qubit IDs
+in `ids`.
+    Raises:
+RuntimeError: If probability of outcome is ~0 or unknown qubits
+are provided.
+   */
+  collapseWavefunction(ids, values) {
+    assert(ids.length === values.length)
+
+    // all qubits must have been allocated before
+    const f1 = ids.all(Id => typeof this._map[Id] !== 'undefined')
+    if (!f1) {
+      throw new Error('collapse_wavefunction(): Unknown qubit id(s)'
+  + ' provided. Try calling eng.flush() before '
+  + 'invoking this function.')
+    }
+
+    let mask = 0
+    let val = 0
+    ids.forEach((looper, i) => {
+      const pos = this._map[looper]
+      mask |= (1 << pos)
+      val |= (Math.floor(values[i]) << pos)
+    })
+
+    let nrm = 0.0
+    this._state.forEach((looper, i) => {
+      if ((mask & i) === val) {
+        nrm += math.abs(this._state[i]) ** 2
+      }
+    })
+
+    if (nrm < 1.e-12) {
+      throw new Error('collapse_wavefunction(): Invalid collapse! Probability is ~0.')
+    }
+    const inv_nrm = 1.0 / math.sqrt(nrm)
+    this._state.forEach((looper, i) => {
+      if ((mask & i) !== val) {
+        this._state = 0
+      } else {
+        this._state *= inv_nrm
+      }
+    })
   }
 }
-
-//
-// def set_wavefunction(self, wavefunction, ordering):
-// """
-// Set wavefunction and qubit ordering.
-//
-//     Args:
-// wavefunction (list[complex]): Array of complex amplitudes
-// describing the wavefunction (must be normalized).
-// ordering (list): List of ids describing the new ordering of qubits
-// (i.e., the ordering of the provided wavefunction).
-// """
-// # wavefunction contains 2^n values for n qubits
-// assert len(wavefunction) == (1 << len(ordering))
-// # all qubits must have been allocated before
-// if (not all([Id in this._map for Id in ordering]) or
-// len(this._map) != len(ordering)):
-// raise RuntimeError("set_wavefunction(): Invalid mapping provided."
-// " Please make sure all qubits have been "
-// "allocated previously (call eng.flush()).")
-//
-// this._state = _np.array(wavefunction, dtype=_np.complex128)
-// this._map = {ordering[i]: i for i in range(len(ordering))}
-//
-// def collapse_wavefunction(self, ids, values):
-// """
-// Collapse a quantum register onto a classical basis state.
-//
-//     Args:
-// ids (list[int]): Qubit IDs to collapse.
-// values (list[bool]): Measurement outcome for each of the qubit IDs
-// in `ids`.
-//     Raises:
-// RuntimeError: If probability of outcome is ~0 or unknown qubits
-// are provided.
-// """
-// assert len(ids) == len(values)
-// # all qubits must have been allocated before
-// if not all([Id in this._map for Id in ids]):
-// raise RuntimeError("collapse_wavefunction(): Unknown qubit id(s)"
-// " provided. Try calling eng.flush() before "
-// "invoking this function.")
-// mask = 0
-// val = 0
-// for i in range(len(ids)):
-// pos = this._map[ids[i]]
-// mask |= (1 << pos)
-// val |= (int(values[i]) << pos)
-// nrm = 0.
-// for i in range(len(this._state)):
-// if (mask & i) == val:
-//     nrm += _np.abs(this._state[i]) ** 2
-// if nrm < 1.e-12:
-// raise RuntimeError("collapse_wavefunction(): Invalid collapse! "
-// "Probability is ~0.")
-// inv_nrm = 1. / _np.sqrt(nrm)
-// for i in range(len(this._state)):
-// if (mask & i) != val:
-//     this._state[i] = 0.
-// else:
-// this._state[i] *= inv_nrm

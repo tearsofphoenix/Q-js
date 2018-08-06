@@ -15,10 +15,11 @@
  */
 
 import assert from 'assert'
+import math from 'mathjs'
 import {BasicEngine} from '../../cengines/basics'
 import SimulatorBackend from './jssim'
 import {
-  Allocate, Deallocate, FlushGate, Measure
+  Allocate, AllocateQubitGate, Deallocate, DeallocateQubitGate, FlushGate, Measure, MeasureGate
 } from '../../ops/gates';
 import {BasicMathGate} from '../../ops/basics';
 import TimeEvolution from '../../ops/timeevolution';
@@ -26,6 +27,8 @@ import { BasicQubit } from '../../types/qubit'
 import { stringToArray } from '../../ops/qubitoperator'
 import { getControlCount } from '../../meta/control'
 import { LogicalQubitIDTag } from '../../meta/tag'
+import {instanceOf} from "../../libs/util";
+import {len, stringToBitArray} from "../../libs/polyfill";
 
 /*
 Simulator is a compiler engine which simulates a quantum computer using
@@ -39,7 +42,7 @@ OMP_NUM_THREADS environment variable, i.e.
 export OMP_NUM_THREADS=4 # use 4 threads
 export OMP_PROC_BIND=spread # bind threads to processors by spreading
  */
-export class Simulator extends BasicEngine {
+export default class Simulator extends BasicEngine {
   /*
   Construct the C++/Python-simulator object and initialize it with a
   random seed.
@@ -92,17 +95,16 @@ Returns:
     True if it can be simulated and False otherwise.
    */
   isAvailable(cmd) {
-    if (cmd.gate.equal(Measure) || cmd.gate.equal(Deallocate) || cmd.gate instanceof BasicMathGate || cmd.gate instanceof TimeEvolution) {
+    if (instanceOf(cmd.gate, [MeasureGate, AllocateQubitGate, DeallocateQubitGate, BasicMathGate, TimeEvolution])) {
       return true
     }
     try {
       const m = cmd.gate.matrix
       // Allow up to 5-qubit gates
-      if (m.length > 2 ** 5) return false
+      const [row, col] = m.size()
+      if (row > 2 ** 5 || col > 2 ** 5) return false
       return true
     } catch (e) {
-      console.log(81, e)
-    } finally {
       return false
     }
   }
@@ -157,10 +159,11 @@ automatically converts from logical qubits to mapped qubits for
 Exception: If `qubit_operator` acts on more qubits than present in
 the `qureg` argument.
    */
-  getExceptationValue(qubitOperator, qureg) {
+  getExpectationValue(qubitOperator, qureg) {
     qureg = this.convertLogicalToMappedQureg(qureg)
     const operator = []
     const num_qubits = qureg.length
+    console.log(166, qubitOperator, qureg)
     Object.keys(qubitOperator.terms).forEach((term) => {
       const keys = stringToArray(term)
       if (term !== '' && keys[keys.length - 1][0] >= num_qubits) {
@@ -168,7 +171,7 @@ the `qureg` argument.
       }
       operator.push([keys, qubitOperator.terms[term]])
     })
-    return this._simulator.getExceptationValue(operator, qureg.map(qb => qb.id))
+    return this._simulator.getExpectationValue(operator, qureg.map(qb => qb.id))
   }
 
   /*
@@ -266,7 +269,7 @@ automatically converts from logical qubits to mapped qubits for
    */
   getAmplitude(bitString, qureg) {
     qureg = this.convertLogicalToMappedQureg(qureg)
-    const bit_string = bitString.map(b => b.toBoolean())
+    const bit_string = stringToBitArray(bitString)
     return this._simulator.getAmplitude(bit_string, qureg.map(qb => qb.id))
   }
 
@@ -407,14 +410,14 @@ Exception: If a non-single-qubit gate needs to be processed
       const qubitids = cmd.qubits[0].map(qb => qb.id)
       const ctrlids = cmd.controlQubits.map(qb => qb.id)
       this._simulator.emulateTimeEvolution(op, t, qubitids, ctrlids)
-    } else if (cmd.gate.matrix.length <= 2 ** 5) {
+    } else if (len(cmd.gate.matrix) <= 2 ** 5) {
       const matrix = cmd.gate.matrix
       const ids = []
       cmd.qubits.forEach(qr => qr.forEach(qb => ids.push(qb.id)))
-      if (2 ** ids.length !== matrix.length) {
-        throw new Error(`Simulator: Error applying ${cmd.gate.toString()} gate: ${math.log(cmd.gate.matrix.length, 2)}-qubit gate applied to ${ids.length} qubits.`)
+      if (2 ** ids.length !== len(matrix)) {
+        throw new Error(`Simulator: Error applying ${cmd.gate.toString()} gate: ${math.log(len(cmd.gate.matrix), 2)}-qubit gate applied to ${ids.length} qubits.`)
       }
-      this._simulator.applyControlledGate(matrix.tolist(), ids, cmd.controlQubits.map(qb => qb.id))
+      this._simulator.applyControlledGate(matrix, ids, cmd.controlQubits.map(qb => qb.id))
       if (!this._gate_fusion) {
         this._simulator.run()
       }

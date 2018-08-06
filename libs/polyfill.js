@@ -1,6 +1,8 @@
 import mathjs from 'mathjs'
+import {instanceOf} from './util';
 
 const Complex = mathjs.complex().constructor
+const Matrix = mathjs.matrix().constructor
 
 export function isComplex(value) {
   return value instanceof Complex
@@ -80,11 +82,53 @@ Array.prototype.rforEach = function (callbackFunc) {
 }
 
 Array.prototype.rmap = function (callbackFunc) {
-  let result = []
+  const result = []
   if (typeof callbackFunc === 'function') {
     const count = this.length
     for (let i = count - 1; i >= 0; --i) {
       result.push(callbackFunc(this[i]))
+    }
+  }
+  return result
+}
+
+export function len(v) {
+  if (typeof v === 'undefined' || v === null) {
+    return 0
+  }
+  if (Array.isArray(v)) {
+    return v.length
+  }
+  if (v instanceof Set) {
+    return v.size
+  }
+  if (v instanceof Matrix) {
+    return v.size()[0]
+  }
+  if (instanceOf(v, String)) {
+    return v.length
+  }
+  if (typeof v.length !== 'undefined') {
+    if (typeof v.length === 'function') {
+      return v.length()
+    } else {
+      return v.length
+    }
+  }
+  if (typeof v === 'object') {
+    return Object.keys(v).length
+  }
+  return 0
+}
+
+export function stringToBitArray(str) {
+  if (Array.isArray(str)) {
+    return str
+  }
+  const result = []
+  if (instanceOf(str, String)) {
+    for (let i = 0; i < str.length; ++i) {
+      result.push(str.charAt(i) !== '0')
     }
   }
   return result
