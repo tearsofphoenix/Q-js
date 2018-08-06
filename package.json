@@ -1,29 +1,42 @@
 {
-  "name": "q",
+  "name": "projectq",
   "version": "0.0.1",
-  "private": true,
+  "libq": "0.0.1",
+  "private": false,
+  "license": "Apache",
+  "author": "Isaac Phoenix (tearsofphoenix@icloud.com)",
   "scripts": {
-    "test": "mocha --require babel-register ./ops/*.spec.js"
+    "install": "node scripts/install.js",
+    "test": "mocha --require babel-register ./ops/*.spec.js",
+    "build": "node scripts/build.js --force"
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "babel-polyfill": "^6.26.0",
-    "babel-preset-stage-0": "^6.24.1",
-    "deep-equal": "^1.0.1",
+    "big-integer": "^1.6.34",
+    "itertools": "^1.3.0",
     "mathjs": "^5.0.4"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.6",
+    "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.26.0",
     "chai": "^4.1.2",
+    "cross-spawn": "^6.0.5",
     "eslint": "^5.2.0",
     "eslint-config-airbnb": "^17.0.0",
     "eslint-loader": "^2.1.0",
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-jsx-a11y": "^6.1.1",
     "eslint-plugin-react": "^7.10.0",
-    "mocha": "^5.2.0"
+    "mkdirp": "^0.5.1",
+    "mocha": "^5.2.0",
+    "nan": "^2.10.0",
+    "node-gyp": "^3.7.0",
+    "npmlog": "^4.1.2",
+    "request": "^2.87.0",
+    "true-case-path": "^1.0.2"
   }
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import assert from 'assert'
 import {BasicEngine, ForwarderEngine} from './basics'
 import {NOT, H, Swap} from '../ops/gates'
@@ -29,13 +45,14 @@ the target qubit.
    */
   constructor(connectivity) {
     super()
+    console.log(48, connectivity)
     if (connectivity instanceof Set) {
       const newMap = {}
       connectivity.forEach(v => newMap[v] = 1)
       connectivity = newMap
     }
     this.connectivity = connectivity
-    console.log(connectivity, this.connectivity)
+    console.log(54, this.connectivity)
   }
 
   /*
