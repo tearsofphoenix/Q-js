@@ -159,6 +159,21 @@ void arrayToJS(Local<Array> &ret, T &result) {
     }
 }
 
+void jsToTermDictionary(Local<Array> &terms, Simulator::TermsDict &dict) {
+    for (int i = 0; i < terms->Length(); ++i) {
+        Local<Value> v = terms->Get(i);
+        Local<Array> pair = Local<Array>::Cast(v);
+
+        auto a = Local<Array>::Cast(pair->Get(0));
+        Simulator::Term t;
+        for (int j = 0; j < a->Length(); ++j) {
+            auto aLooper = Local<Array>::Cast(a->Get(j));
+            t.push_back(std::make_pair((unsigned)aLooper->Get(0)->Uint32Value(), (char)aLooper->Get(1)->Int32Value()));
+        }
+        dict.push_back(std::make_pair(t, pair->Get(1)->NumberValue()));
+    }
+}
+
 void Wrapper::measureQubits(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
     v8::Local<v8::Array> jsArray = v8::Local<v8::Array>::Cast(info[0]);
@@ -233,4 +248,99 @@ void Wrapper::emulateMath(const Nan::FunctionCallbackInfo<v8::Value> &info) {
 
 void Wrapper::getExpectationValue(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
+    Local<Array> terms = Local<Array>::Cast(info[0]);
+    Simulator::TermsDict termsDict;
+    jsToTermDictionary(terms, termsDict);
+
+    Local<Array> a2 = Local<Array>::Cast(info[1]);
+    std::vector<unsigned int> ids;
+    jsToArray<unsigned int>(a2, ids);
+
+    auto result = obj->_simulator->get_expectation_value(termsDict, ids);
+    info.GetReturnValue().Set(result);
+}
+
+void Wrapper::applyQubitOperator(const Nan::FunctionCallbackInfo<v8::Value> &info) {
+    Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
+    obj->_simulator->apply_qubit_operator()
+}
+
+void Wrapper::emulateTimeEvolution(const Nan::FunctionCallbackInfo<v8::Value> &info) {
+    Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
+
+    auto a1 = Local<Array>::Cast(info[0]);
+    auto a2 = info[1]->NumberValue();
+    auto a3 = Local<Array>::Cast(info[2]);
+    auto a4 = Local<Array>::Cast(info[3]);
+    Simulator::TermsDict tdict;
+    jsToTermDictionary(a1, tdict);
+    Simulator::calc_type time = a2;
+    std::vector<unsigned> ids;
+    jsToArray(a3, ids);
+    std::vector<unsigned> ctrl;
+    jsToArray(a4, ctrl);
+
+    obj->_simulator->emulate_time_evolution(tdict, time, ids, ctrl);
+}
+
+void Wrapper::getProbability(const Nan::FunctionCallbackInfo<v8::Value> &info) {
+    Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
+    Local<Array> i1 = Local<Array>::Cast(info[0]);
+    std::vector<bool> bitString;
+    jsToArray(i1, bitString);
+
+    Local<Array> i2 = Local<Array>::Cast(info[1]);
+    std::vector<unsigned int> ids;
+    jsToArray(i2, ids);
+    Simulator::calc_type result = obj->_simulator->get_probability(bitString, ids);
+    info.GetReturnValue().Set(result);
+}
+
+void Wrapper::getAmplitude(const Nan::FunctionCallbackInfo<v8::Value> &info) {
+    Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
+    Local<Array> i1 = Local<Array>::Cast(info[0]);
+    std::vector<bool> bitString;
+    jsToArray(i1, bitString);
+
+    Local<Array> i2 = Local<Array>::Cast(info[1]);
+    std::vector<unsigned int> ids;
+    jsToArray(i2, ids);
+    auto result = obj->_simulator->get_amplitude(bitString, ids);
+
+    Local<Array> ret = Nan::New<v8::Array>(2);
+    ret->Set(0, Nan::New(result.real()));
+    ret->Set(1, Nan::New(result.imag()));
+
+    info.GetReturnValue().Set(ret);
+}
+
+void Wrapper::setWavefunction(const Nan::FunctionCallbackInfo<v8::Value> &info) {
+    Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
+    obj->_simulator->set_wavefunction();
+}
+
+void Wrapper::collapseWavefunction(const Nan::FunctionCallbackInfo<v8::Value> &info) {
+    Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
+
+    Local<Array> i2 = Local<Array>::Cast(info[0]);
+    std::vector<unsigned int> ids;
+    jsToArray(i2, ids);
+
+    Local<Array> i1 = Local<Array>::Cast(info[1]);
+    std::vector<bool> bitString;
+    jsToArray(i1, bitString);
+
+    obj->_simulator->collapse_wavefunction(ids, bitString);
+}
+
+void Wrapper::run(const Nan::FunctionCallbackInfo<v8::Value> &info) {
+    Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
+    obj->_simulator->run();
+}
+
+void Wrapper::cheat(const Nan::FunctionCallbackInfo<v8::Value> &info) {
+    Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
+    auto result = obj->_simulator->cheat();
+    result[0];
+    result[1];
 }

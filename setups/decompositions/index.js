@@ -15,5 +15,17 @@
  */
 
 import barrier from './barrier'
+import cnot2cz from './cnot2cz'
+import entangle from './entangle'
+import globalphase from './globalphase'
+import ph2r from './ph2r'
+import toffoli2cnotandtgate from './toffoli2cnotandtgate'
 
-export default [...barrier]
+export default [
+    ...barrier,
+    ...cnot2cz,
+    ...entangle,
+    ...globalphase,
+    ...ph2r,
+    ...toffoli2cnotandtgate
+]
