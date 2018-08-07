@@ -94,7 +94,10 @@ describe('cnot2cz test', () => {
       expect(test_dummy_eng.receivedCommands.length).to.equal(7)
 
       for (let fstate = 0; fstate < 4; ++fstate) {
-        const binary_state = fstate.toString(2)
+        let binary_state = fstate.toString(2)
+        if (binary_state.length < 2) {
+          binary_state = `0${binary_state}`
+        }
         const test = test_sim.getAmplitude(binary_state, test_qb.concat(test_ctrl_qb))
         const correct = correct_sim.getAmplitude(binary_state, correct_qb.concat(correct_ctrl_qb))
 

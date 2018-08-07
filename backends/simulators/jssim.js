@@ -165,7 +165,7 @@ been measured / uncomputed.
     let down = false
 
     for (let i = 0; i < len(this._state); i += (1 << (pos + 1))) {
-      for (let j = 0; j < 1 << pos; ++j) {
+      for (let j = 0; j < (1 << pos); ++j) {
         if (math.abs(this._getState(i + j)) > tolerance) {
           up = true
         }
@@ -202,8 +202,9 @@ been measured / uncomputed.
     const newstate = math.zeros(1 << (this._numQubits - 1))
     let k = 0
     for (let i = (1 << pos) * cv; i < len(this._state); i += 1 << (pos + 1)) {
-      matrixRangeIndicesAssign(this._state, i, i + 1 << pos, newstate, k)
-      k += 1 << pos
+      console.log(205, k, k + (1 << pos), i)
+      matrixRangeIndicesAssign(newstate, k, k + (1 << pos), this._state, i)
+      k += (1 << pos)
     }
 
     const newmap = {}
@@ -413,7 +414,7 @@ allocated qubits.
     let index = 0
     IDs.forEach((item, i) => {
       item = parseInt(item, 10)
-      index |= bitString[i] << this._map[item]
+      index |= (bitString[i] << this._map[item])
     })
     const ret = this._getState(index)
     if (math.abs(math.im(ret)) < 1e-13) {
@@ -573,7 +574,7 @@ mask (int): Bit-mask where set bits indicate control qubits.
 
     const step = 1 << (pos + 1)
     for (let i = 0; i < len(this._state); i += step) {
-      for (let j = 0; j < 1 << pos; ++j) {
+      for (let j = 0; j < (1 << pos); ++j) {
         if (((i + j) & mask) === mask) {
           const id1 = i + j
           const id2 = id1 + (1 << pos)
@@ -602,7 +603,7 @@ mask (int): Bit-mask where set bits indicate control qubits.
     const matrix = math.matrix(m)
     const subvec = zeros(1 << pos.length)
     const subvec_idx = zeros(subvec.length)
-    for (let c = 0; c < 1 << inactive.length; ++c) {
+    for (let c = 0; c < (1 << inactive.length); ++c) {
       // determine base index (state of inactive qubits)
       let base = 0
       for (let i = 0; i < inactive.length; ++i) {
@@ -639,7 +640,7 @@ ordering (list): List of ids describing the new ordering of qubits
    */
   setWavefunction(wavefunction, ordering) {
     // wavefunction contains 2^n values for n qubits
-    assert(wavefunction.length === 1 << ordering.length)
+    assert(wavefunction.length === (1 << ordering.length))
 
     // all qubits must have been allocated before
     const f1 = ordering.filter((Id) => {

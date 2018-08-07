@@ -1,4 +1,5 @@
 import {expect} from 'chai'
+import math from 'mathjs'
 import {
   Measure,
   Ph, Rx, Ry, X, XGate
@@ -76,7 +77,7 @@ describe('cnu 2 toffoli and cu test', () => {
     }
 
     for (let basis_state_index = 0; basis_state_index < 16; ++basis_state_index) {
-      const basis_state = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ]
+      const basis_state = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
       basis_state[basis_state_index] = 1.0
       const correct_dummy_eng = new DummyEngine(true)
       const correct_eng = new MainEngine(new Simulator(), [correct_dummy_eng])
@@ -106,6 +107,7 @@ describe('cnu 2 toffoli and cu test', () => {
       correct_eng.flush()
 
       expect(len(correct_dummy_eng.receivedCommands)).to.equal(8)
+      test_dummy_eng.receivedCommands.forEach(cmd => console.log(cmd.toString()))
       expect(len(test_dummy_eng.receivedCommands)).to.equal(20)
 
       for (let fstate = 0; fstate < 16; ++fstate) {
@@ -120,7 +122,7 @@ describe('cnu 2 toffoli and cu test', () => {
         const test = test_sim.getAmplitude(binary_state, test_qb.concat(test_ctrl_qureg))
         const correct = correct_sim.getAmplitude(binary_state, correct_qb.concat(correct_ctrl_qureg))
 
-        expect(test).to.be.closeTo(correct)
+        expect(math.equal(test, correct)).to.equal(true)
       }
       new All(Measure).or(test_qb.concat(test_ctrl_qureg))
       new All(Measure).or(correct_qb.concat(correct_ctrl_qureg))
