@@ -13,7 +13,7 @@ const _decompose_entangle = (cmd) => {
 
   Control(eng, cmd.controlQubits, () => {
     H.or(qr[0])
-    Control(eng, qr[0], () => All(X).or(qr.slice(1)))
+    Control(eng, qr[0], () => new All(X).or(qr.slice(1)))
   })
 }
 

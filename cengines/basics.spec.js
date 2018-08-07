@@ -40,7 +40,7 @@ describe('basics test', () => {
     }).to.throw()
 
 
-    const filter = cmd => (cmd === 'supported')
+    const filter = (eng, cmd) => (cmd === 'supported')
 
     const filter_eng = new InstructionFilter(filter)
     eng.next = filter_eng

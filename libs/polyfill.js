@@ -144,8 +144,8 @@ export function copyComplexArray(complexArray) {
 export function complexVectorDot(a1, a2) {
   let real = 0
   let image = 0
-  a1.forEach((c1, i) => {
-    const c2 = a2[i]
+  a1.forEach((c1, [i]) => {
+    const c2 = a2.subset(mathjs.index(i))
     const r1 = mathjs.re(c1)
     const i1 = mathjs.im(c1)
     const r2 = mathjs.re(c2)

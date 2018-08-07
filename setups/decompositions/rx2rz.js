@@ -17,7 +17,7 @@ const _decompose_rx = (cmd) => {
   })
 }
 
-const _recognize_RxNoCtrl = cmd => getControlCount(cmd) === 0
+export const _recognize_RxNoCtrl = cmd => getControlCount(cmd) === 0
 
 export default [
   new DecompositionRule(Rx, _decompose_rx, _recognize_RxNoCtrl)

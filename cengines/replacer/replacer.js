@@ -51,7 +51,7 @@ call to the filter function given to the constructor.
 cmd (Command): Command for which to check availability.
    */
   isAvailable(cmd) {
-    return this._filterFunc(cmd)
+    return this._filterFunc(this, cmd)
   }
 
   /*

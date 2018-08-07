@@ -27,8 +27,8 @@ import { BasicQubit } from '../../types/qubit'
 import { stringToArray } from '../../ops/qubitoperator'
 import { getControlCount } from '../../meta/control'
 import { LogicalQubitIDTag } from '../../meta/tag'
-import {instanceOf} from "../../libs/util";
-import {len, stringToBitArray} from "../../libs/polyfill";
+import {instanceOf} from '../../libs/util';
+import {len, stringToBitArray} from '../../libs/polyfill';
 
 /*
 Simulator is a compiler engine which simulates a quantum computer using
@@ -362,7 +362,14 @@ Exception: If a non-single-qubit gate needs to be processed
 (which should never happen due to is_available).
    */
   handle(cmd) {
-    if (cmd.gate.equal(Measure)) {
+    if (cmd.gate instanceof TimeEvolution) {
+      // TODO
+      const op = cmd.gate.hamiltonian.terms
+      const t = cmd.gate.time
+      const qubitids = cmd.qubits[0].map(qb => qb.id)
+      const ctrlids = cmd.controlQubits.map(qb => qb.id)
+      this._simulator.emulateTimeEvolution(op, t, qubitids, ctrlids)
+    } else if (cmd.gate.equal(Measure)) {
       assert(getControlCount(cmd) === 0)
       const ids = []
       cmd.qubits.forEach(qr => qr.forEach(qb => ids.push(qb.id)))
@@ -402,13 +409,6 @@ Exception: If a non-single-qubit gate needs to be processed
 
       const math_fun = cmd.gate.getMathFunction(cmd.qubits)
       this._simulator.emulateMath(math_fun, qubitids, cmd.controlQubits.map(qb => qb.id))
-    } else if (cmd.gate.equal(TimeEvolution)) {
-      // TODO
-      const op = cmd.gate.hamiltonian.terms
-      const t = cmd.gate.time
-      const qubitids = cmd.qubits[0].map(qb => qb.id)
-      const ctrlids = cmd.controlQubits.map(qb => qb.id)
-      this._simulator.emulateTimeEvolution(op, t, qubitids, ctrlids)
     } else if (len(cmd.gate.matrix) <= 2 ** 5) {
       const matrix = cmd.gate.matrix
       const ids = []

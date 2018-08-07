@@ -31,7 +31,7 @@ describe('printer test', () => {
     const inline_cmd_printer = new CommandPrinter()
     const cmd_printer = new CommandPrinter()
 
-    const available_cmd = function(cmd) {
+    const available_cmd = function(eng, cmd) {
       return cmd.gate.equal(H)
     }
 

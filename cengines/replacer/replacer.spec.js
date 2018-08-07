@@ -56,7 +56,7 @@ describe('replacer test', () => {
 
   const fixture_gate_filter = () => {
     // Filter which doesn't allow SomeGate
-    const test_gate_filter_func = cmd => cmd.gate !== SomeGate
+    const test_gate_filter_func = (eng, cmd) => cmd.gate !== SomeGate
     return new InstructionFilter(test_gate_filter_func)
   }
 
@@ -110,7 +110,7 @@ describe('replacer test', () => {
   it('should test_auto_replacer_no_rule_found', () => {
     // Check that exception is thrown if no rule is found
     // For both the cmd and it's inverse (which exists)
-    const h_filter_func = cmd => !cmd.gate.equal(H)
+    const h_filter_func = (eng, cmd) => !cmd.gate.equal(H)
 
     const h_filter = new InstructionFilter(h_filter_func)
     const backend = new DummyEngine(true)
@@ -146,7 +146,7 @@ describe('replacer test', () => {
 
     rule_set.addDecompositionRule(new DecompositionRule(NoMagicGate, decompose_no_magic_gate, recognize_no_magic_gate))
 
-    const magic_filter = cmd => !(cmd.gate instanceof MagicGate)
+    const magic_filter = (eng, cmd) => !(cmd.gate instanceof MagicGate)
 
     const backend = new DummyEngine(true)
     const eng = new MainEngine(backend, [new AutoReplacer(rule_set), new InstructionFilter(magic_filter)])
@@ -187,8 +187,7 @@ describe('replacer test', () => {
 
     }
 
-    const test_gate_filter_func = cmd => (cmd.gate.equal(X) || cmd.gate.equal(H) || (cmd.gate instanceof ClassicalInstructionGate))
-
+    const test_gate_filter_func = (eng, cmd) => (cmd.gate.equal(X) || cmd.gate.equal(H) || (cmd.gate instanceof ClassicalInstructionGate))
 
     const i_filter = new InstructionFilter(test_gate_filter_func)
     const backend = new DummyEngine(true)

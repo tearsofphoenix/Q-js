@@ -37,6 +37,7 @@ import {Dagger} from '../../meta/dagger';
 import LocalOptimizer from '../../cengines/optimize';
 import QubitOperator from '../../ops/qubitoperator';
 import BasicMapperEngine from '../../cengines/basicmapper'
+import TimeEvolution from "../../ops/timeevolution";
 
 describe('simulator test', () => {
   class Mock1QubitGate extends BasicGate {
@@ -284,7 +285,7 @@ describe('simulator test', () => {
     eng.flush()
     const bits = [0, 0, 1, 0, 1, 0]
     for (let i = 0; i < 6; ++i) {
-      expect(eng.backend.getProbability(bits.slice(0, i), qubits.slice(0, i))).to.equal(0.5 ** i)
+      expect(eng.backend.getProbability(bits.slice(0, i), qubits.slice(0, i))).to.be.closeTo(0.5 ** i, 1e-12)
     }
 
     const extra_qubit = eng.allocateQubit()
@@ -294,15 +295,15 @@ describe('simulator test', () => {
     new All(H).or(qubits)
     new Ry(2 * math.acos(math.sqrt(0.3))).or(qubits[0])
     eng.flush()
-    expect(eng.backend.getProbability([0], [qubits[0]])).to.equal(0.3)
+    expect(eng.backend.getProbability([0], [qubits[0]])).to.be.closeTo(0.3, 1e-12)
 
     new Ry(2 * math.acos(math.sqrt(0.4))).or(qubits[2])
     eng.flush()
-    expect(eng.backend.getProbability([0], [qubits[2]])).to.equal(0.4)
+    expect(eng.backend.getProbability([0], [qubits[2]])).to.be.closeTo(0.4, 1e-12)
 
-    expect(eng.backend.getProbability([0, 0], [qubits[0], qubits[2]])).to.equal(0.12)
-    expect(eng.backend.getProbability([0, 1], [qubits[0], qubits[2]])).to.equal(0.18)
-    expect(eng.backend.getProbability([1, 0], [qubits[0], qubits[2]])).to.equal(0.28)
+    expect(eng.backend.getProbability([0, 0], [qubits[0], qubits[2]])).to.be.closeTo(0.12, 1e-12)
+    expect(eng.backend.getProbability([0, 1], [qubits[0], qubits[2]])).to.be.closeTo(0.18, 1e-12)
+    expect(eng.backend.getProbability([1, 0], [qubits[0], qubits[2]])).to.be.closeTo(0.28, 1e-12)
     new All(Measure).or(qubits)
   });
 
@@ -438,10 +439,10 @@ describe('simulator test', () => {
     H.or(qureg[0])
     const op_H = (new QubitOperator('X0').add(new QubitOperator('Z0'))).mul(1.0 / math.sqrt(2.0))
     sim.applyQubitOperator(op_H, [qureg[0]])
-    expect(math.abs(sim.getAmplitude('000', qureg))).to.be.closeTo(1, 1e-12)
+    expect(sim.getAmplitude('000', qureg)).to.be.closeTo(1, 1e-12)
 
-    const op_Proj0 = (new QubitOperator('').add(new QubitOperator('Z0'))).mul(0.5)
-    const op_Proj1 = (new QubitOperator('').sub(new QubitOperator('Z0'))).mul(0.5)
+    const op_Proj0 = new QubitOperator('').add(new QubitOperator('Z0')).mul(0.5)
+    const op_Proj1 = new QubitOperator('').sub(new QubitOperator('Z0')).mul(0.5)
     H.or(qureg[0])
     sim.applyQubitOperator(op_Proj0, [qureg[0]])
     expect(math.abs(sim.getAmplitude('000', qureg))).to.be.closeTo(1.0 / math.sqrt(2.0), 1e-12)
@@ -450,34 +451,34 @@ describe('simulator test', () => {
   });
 
   it('should test_simulator_time_evolution', () => {
-    //     const sim = new Simulator()
-    //     const N = 8  // number of qubits
-    // let time_to_evolve = 1.1  // time to evolve for
-    //     const eng = new MainEngine(sim, [])
-    //   const qureg = eng.allocateQureg(N)
-    // // initialize in random wavefunction by applying some gates:
-    //     qureg.forEach(qb => {
-    //       new Rx(Math.random()).or(qb)
-    //       new Ry(Math.random()).or(qb)
-    //     })
-    // eng.flush()
-    // // Use cheat to get initial start wavefunction:
-    //     let [qubit_to_bit_map, init_wavefunction] = eng.backend.cheat()
-    // let Qop = QubitOperator
-    // let op = new Qop("X0 Y1 Z2 Y3 X4").mul(0.3)
-    // op.iadd(new Qop([]).mul(1.1))
-    // op.iadd(new Qop("Y0 Z1 X3 Y5").mul(-1.4))
-    // op.iadd(new Qop("Y1 X2 X3 Y4").mul(-1.1))
-    // const ctrl_qubit = eng.allocateQubit()
-    // H.or(ctrl_qubit)
-    // Control(eng, ctrl_qubit, () => new TimeEvolution(time_to_evolve, op).or(qureg))
-    // eng.flush()
+        const sim = new Simulator()
+        const N = 8  // number of qubits
+    let time_to_evolve = 1.1  // time to evolve for
+        const eng = new MainEngine(sim, [])
+      const qureg = eng.allocateQureg(N)
+    // initialize in random wavefunction by applying some gates:
+        qureg.forEach(qb => {
+          new Rx(Math.random()).or(qb)
+          new Ry(Math.random()).or(qb)
+        })
+    eng.flush()
+    // Use cheat to get initial start wavefunction:
+        let [qubit_to_bit_map, init_wavefunction] = eng.backend.cheat()
+    let Qop = QubitOperator
+    let op = new Qop("X0 Y1 Z2 Y3 X4").mul(0.3)
+    op.iadd(new Qop([]).mul(1.1))
+    op.iadd(new Qop("Y0 Z1 X3 Y5").mul(-1.4))
+    op.iadd(new Qop("Y1 X2 X3 Y4").mul(-1.1))
+    const ctrl_qubit = eng.allocateQubit()
+    H.or(ctrl_qubit)
+    Control(eng, ctrl_qubit, () => new TimeEvolution(time_to_evolve, op).or(qureg))
+    eng.flush()
     // [qbit_to_bit_map, final_wavefunction] = eng.backend.cheat()
     // new All(Measure).or(qureg.concat(ctrl_qubit))
     // // Check manually:
     //
     //     const build_matrix = (list_single_matrices) => {
-    //       res = list_single_matrices[0]
+    //       let res = list_single_matrices[0]
     //       for i in range(1, len(list_single_matrices)):
     //       res = scipy.sparse.kron(res, list_single_matrices[i])
     //       return res
@@ -548,7 +549,7 @@ describe('simulator test', () => {
     const eng = new MainEngine(sim, engine_list)
     const qubits = eng.allocateQureg(4)
     // unknown qubits: raises
-    expect(() => eng.backend.collapseWavefunction(qubits, [0] * 4)).to.throw()
+    expect(() => eng.backend.collapseWavefunction(qubits, [0, 0, 0, 0])).to.throw()
     eng.flush()
     eng.backend.collapseWavefunction(qubits, [0, 0, 0, 0])
     const v = eng.backend.getProbability([0, 0, 0, 0], qubits)

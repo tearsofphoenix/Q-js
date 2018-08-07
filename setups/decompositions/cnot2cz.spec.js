@@ -26,6 +26,8 @@ import MainEngine from '../../cengines/main';
 import {All} from '../../ops/metagates';
 import DecompositionRuleSet from '../../cengines/replacer/decompositionruleset';
 import {AutoReplacer, InstructionFilter} from '../../cengines/replacer/replacer';
+import Simulator from "../../backends/simulators/simulator";
+import cnot2cz from "./cnot2cz";
 
 describe('cnot2cz test', () => {
   it('should test_recognize_gates', () => {
@@ -55,7 +57,7 @@ describe('cnot2cz test', () => {
   it('should test_cnot_decomposition', () => {
     const _decomp_gates = (eng, cmd) => {
       const g = cmd.gate
-      if (cmd.controlQubits.length === 1 && cmd.gate instanceof X) {
+      if (cmd.controlQubits.length === 1 && cmd.gate instanceof X.constructor) {
         return false
       }
       return true
@@ -66,7 +68,7 @@ describe('cnot2cz test', () => {
       basis_state[basis_state_index] = 1.0
       const correct_dummy_eng = new DummyEngine(true)
       const correct_eng = new MainEngine(new Simulator(), [correct_dummy_eng])
-      const rule_set = new DecompositionRuleSet([cnot2cz])
+      const rule_set = new DecompositionRuleSet(cnot2cz)
       const test_dummy_eng = new DummyEngine(true)
 
       const test_eng = new MainEngine(new Simulator(),
@@ -80,9 +82,8 @@ describe('cnot2cz test', () => {
       const test_ctrl_qb = test_eng.allocateQubit()
       test_eng.flush()
 
-      correct_sim.set_wavefunction(basis_state, correct_qb
-          + correct_ctrl_qb)
-      test_sim.set_wavefunction(basis_state, test_qb + test_ctrl_qb)
+      correct_sim.setWavefunction(basis_state, correct_qb.concat(correct_ctrl_qb))
+      test_sim.setWavefunction(basis_state, test_qb.concat(test_ctrl_qb))
       CNOT.or(tuple(test_ctrl_qb, test_qb))
       CNOT.or(tuple(correct_ctrl_qb, correct_qb))
 
@@ -93,11 +94,9 @@ describe('cnot2cz test', () => {
       expect(test_dummy_eng.receivedCommands.length).to.equal(7)
 
       for (let fstate = 0; fstate < 4; ++fstate) {
-        const binary_state = format(fstate, '02b')
-        const test = test_sim.get_amplitude(binary_state,
-          test_qb + test_ctrl_qb)
-        const correct = correct_sim.get_amplitude(binary_state, correct_qb
-            + correct_ctrl_qb)
+        const binary_state = fstate.toString(2)
+        const test = test_sim.getAmplitude(binary_state, test_qb.concat(test_ctrl_qb))
+        const correct = correct_sim.getAmplitude(binary_state, correct_qb.concat(correct_ctrl_qb))
 
         expect(correct).to.be.closeTo(test, 1e-12, 1e-12)
 

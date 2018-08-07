@@ -31,7 +31,7 @@ import {
   zeros
 } from '../../libs/util'
 import {
-  copyComplexArray, len, setEqual, complexVectorDot
+  copyComplexArray, len, setEqual, complexVectorDot, isNumeric
 } from '../../libs/polyfill'
 import { stringToArray } from '../../ops/qubitoperator'
 
@@ -90,7 +90,10 @@ List of measurement results (containing either True or False).
     let val = 0.0
     let i_picked = 0
     while (val < P && i_picked < len(this._state)) {
-      val += math.abs(this._getState(i_picked) || math.complex(0, 0)) ** 2
+      val = math.add(val, math.abs(this._getState(i_picked) || math.complex(0, 0)) ** 2)
+      if (isNaN(val)) {
+        console.log(95)
+      }
       i_picked += 1
     }
 
@@ -101,7 +104,7 @@ List of measurement results (containing either True or False).
       res.push(false)
       return this._map[ID]
     })
-
+    console.log(104, pos, val)
     let mask = 0
     val = 0
 
@@ -114,19 +117,20 @@ List of measurement results (containing either True or False).
     let nrm = 0.0
     this._state.forEach((looper, _i) => {
       const i = _i[0]
-      if ((mask & i) != val) {
+      if ((mask & i) !== val) {
         this._setState(i, 0.0)
       } else {
         const tmp = math.abs(looper)
-        nrm += math.multiply(tmp, tmp)
+        nrm = math.add(nrm, math.multiply(tmp, tmp))
+        if (nrm === 0) {
+          console.log(looper, nrm)
+        }
       }
     })
-
+    console.log(127, nrm)
     // normalize
     const scale = 1.0 / Math.sqrt(nrm)
-    this._state.forEach((looper, i) => {
-      this._setState(i[0], math.multiply(looper, scale))
-    })
+    this._state = math.multiply(this._state, scale)
     return res
   }
 
@@ -296,13 +300,13 @@ Expectation value
    */
   getExpectationValue(termsArray, IDs) {
     let expectation = 0.0
-    const current_state = copyComplexArray(this._state)
+    const current_state = math.clone(this._state)
     termsArray.forEach(([term, coefficient]) => {
       this.applyTerm(term, IDs)
       const tmp = complexVectorDot(current_state, this._state)
       const delta = math.multiply(coefficient, tmp)
       expectation = math.add(expectation, delta)
-      this._state = current_state
+      this._state = math.clone(current_state)
     })
     if (math.im(expectation) === 0) {
       return math.re(expectation)
@@ -318,12 +322,12 @@ terms_dict (dict): Operator dictionary (see QubitOperator.terms)
 ids (list[int]): List of qubit ids upon which the operator acts.
    */
   applyQubitOperator(termsArray, IDs) {
-    let new_state = math.matrix()
+    let new_state = math.zeros(len(this._state))
     const current_state = math.clone(this._state)
     termsArray.forEach(([term, coefficient]) => {
       this.applyTerm(term, IDs)
-      this._state = math.multiply(this._state, coefficient)
-      matrixAppend(new_state, this._state)
+      const temp = math.multiply(this._state, coefficient)
+      new_state = math.add(new_state, temp)
       this._state = math.clone(current_state)
     })
     this._state = new_state
@@ -363,10 +367,10 @@ RuntimeError if an unknown qubit id was provided.
 
     let probability = 0.0
 
-    this._state.forEach((_i) => {
+    this._state.forEach((val, _i) => {
       const i = _i[0]
-      if (i & mask == bit_str) {
-        const e = this._getState(i)
+      if ((i & mask) === bit_str) {
+        const e = val
         probability += math.re(e) ** 2 + math.im(e) ** 2
       }
     })
@@ -378,6 +382,10 @@ RuntimeError if an unknown qubit id was provided.
   }
 
   _setState(i, value) {
+    if (isNaN(value)) {
+      console.log(386, i, value)
+    }
+
     this._state.subset(math.index(i), value)
   }
 
@@ -407,7 +415,10 @@ allocated qubits.
       + 'eng.flush().')
     }
     let index = 0
-    IDs.forEach((item, i) => index |= bitString[i] << this._map[item])
+    IDs.forEach((item, i) => {
+      item = parseInt(item, 10)
+      index |= bitString[i] << this._map[item]
+    })
     const ret = this._getState(index)
     if (math.abs(math.im(ret)) < 1e-13) {
       return math.re(ret)
@@ -437,7 +448,7 @@ ctrlids (list): A list of control qubit IDs.
     let tr = 0
     let tmp = 0
     const newTerms = {}
-    terms_dict.forEach((t) => {
+    Object.keys(terms_dict).forEach((t) => {
       const key = stringToArray(t)
       const c = terms_dict[t]
       if (key.length === 0) {
@@ -467,7 +478,8 @@ ctrlids (list): A list of control qubit IDs.
         update = math.zeros(1)
         Object.keys(terms_dict).forEach((t) => {
           const c = terms_dict[t]
-          this.applyTerm(t, ids)
+          const keys = stringToArray(t)
+          this.applyTerm(keys, ids)
           this._state = math.multiply(this._state, c)
 
           matrixAppend(update, this._state)
@@ -477,15 +489,15 @@ ctrlids (list): A list of control qubit IDs.
         update = math.multiply(update, coeff)
         this._state = update
         for (let i = 0; i < update.length; ++i) {
-          if (i & mask === mask) {
-            output_state[i] += update[i]
+          if ((i & mask) === mask) {
+            output_state[i] = math.add(output_state[i], update[i])
           }
         }
-        nrm_change = linalg.normal(update)
+        nrm_change = math.norm(update)
         j += 1
       }
       for (let i = 0; i < update.length; ++i) {
-        if (i & mask === mask) {
+        if ((i & mask) === mask) {
           output_state[i] *= correction
         }
       }
