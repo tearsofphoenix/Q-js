@@ -33,7 +33,7 @@ export default class BasicMapperEngine extends BasicEngine {
   Parent class for all Mappers.
 
     Attributes:
-self.current_mapping (dict): Keys are the logical qubit ids and values
+this.current_mapping (dict): Keys are the logical qubit ids and values
 are the mapped qubit ids.
    */
   constructor() {
@@ -50,7 +50,7 @@ are the mapped qubit ids.
   }
 
   /*
-  Send this Command using the mapped qubit ids of self.current_mapping.
+  Send this Command using the mapped qubit ids of this.current_mapping.
 
     If it is a Measurement gate, then it adds a LogicalQubitID tag.
 

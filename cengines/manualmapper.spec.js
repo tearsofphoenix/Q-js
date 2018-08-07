@@ -28,7 +28,6 @@ describe('manual mapper test', () => {
     const backend = new DummyEngine(true)
 
     const mapping = qubit_id => (qubit_id + 1) & 1
-    console.log(mapping(1))
     const eng = new MainEngine(backend, [new ManualMapper(mapping)])
     const qb0 = eng.allocateQubit()
     const qb1 = eng.allocateQubit()

@@ -133,8 +133,8 @@ down the pipeline.
       + 'reallocations.')
     }
     if (Object.keys(this._interactions).length > 0) {
-      const logical_ids = Object.keys(this.currentMapping)
-      let best_mapping = this.current_mapping
+      const logical_ids = Object.keys(this.currentMapping).map(k => parseInt(k, 10))
+      let best_mapping = this.currentMapping
       let best_cost
 
       for (const physical_ids of permutations([0, 1, 2, 3, 4], logical_ids.length)) {
@@ -153,7 +153,7 @@ down the pipeline.
         throw new Error('Circuit cannot be mapped without using Swaps. Mapping failed.')
       }
       this._interactions = {}
-      this.current_mapping = best_mapping
+      this.currentMapping = best_mapping
     }
 
     this._cmds.forEach(cmd => this.sendCMDWithMappedIDs(cmd))

@@ -215,7 +215,7 @@ abs_tol(float): Absolute tolerance, must be at least 0.0
   }
 
   /*
-    Returns True if other (QubitOperator) is close to self.
+    Returns True if other (QubitOperator) is close to this.
 
     Comparison is done for each term individually. Return True
 if the difference between each term in self and other is

@@ -196,7 +196,7 @@ Returns: Ordered tuple of quantum registers
 
     Certain qubits can be interchanged (e.g., the qubit order for a Swap
 gate). To ensure that only those are sorted when determining the
-ordering (see _order_qubits), self.interchangeable_qubit_indices is
+ordering (see _order_qubits), this.interchangeable_qubit_indices is
 used.
     Example:
 If we can interchange qubits 0,1 and qubits 3,4,5,

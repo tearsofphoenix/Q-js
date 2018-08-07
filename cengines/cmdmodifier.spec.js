@@ -42,9 +42,6 @@ describe('cmdmodifier test', () => {
       }
     })
 
-    received_commands.forEach((cmd) => {
-      console.log(cmd.toString())
-    })
     expect(received_commands.length).to.equal(1)
     expect(received_commands[0].gate.equal(H)).to.equal(true)
     expect(received_commands[0].tags).to.equal('NewTag')

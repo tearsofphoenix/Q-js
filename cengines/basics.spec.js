@@ -187,7 +187,6 @@ describe('basics test', () => {
       }
     })
 
-    received_commands.forEach(cmd => console.log(cmd))
     expect(received_commands.length).to.equal(1)
     expect(received_commands[0].gate.equal(H)).to.equal(true)
     expect(received_commands[0].tags).to.deep.equal('NewTag')

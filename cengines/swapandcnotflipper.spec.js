@@ -170,7 +170,6 @@ describe('swap and cnot flipper test', () => {
     let hgates = 0
 
     backend.receivedCommands.forEach((cmd) => {
-      console.log(cmd.toString())
       if (cmd.gate.equal(H)) {
         cmd.tags.forEach((t) => {
           if (instanceOf(t, [ComputeTag, UncomputeTag])) {

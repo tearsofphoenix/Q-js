@@ -62,7 +62,7 @@ follows:
 
     .. code-block:: python
 
-self.set_interchangeable_qubit_indices([[0,1]])
+this.set_interchangeable_qubit_indices([[0,1]])
 
 As another example, consider
 
@@ -75,7 +75,7 @@ are interchangeable among themselves. Then, call this function as
 
 .. code-block:: python
 
-self.set_interchangeable_qubit_indices([[0,1],[2,3,4]])
+this.set_interchangeable_qubit_indices([[0,1],[2,3,4]])
 
      */
   constructor() {
@@ -213,9 +213,9 @@ export class SelfInverseGate extends BasicGate {
 Defines a base class of a rotation gate.
 
     A rotation gate has a continuous parameter (the angle), labeled 'angle' /
-self.angle. Its inverse is the same gate with the negated argument.
+this.angle. Its inverse is the same gate with the negated argument.
     Rotation gates of the same class can be merged by adding the angles.
-    The continuous parameter is modulo 4 * pi, self.angle is in the interval
+    The continuous parameter is modulo 4 * pi, this.angle is in the interval
     [0, 4 * pi).
  */
 export class BasicRotationGate extends BasicGate {
@@ -289,9 +289,9 @@ New object representing the merged gates.
 Defines a base class of a phase gate.
 
     A phase gate has a continuous parameter (the angle), labeled 'angle' /
-self.angle. Its inverse is the same gate with the negated argument.
+this.angle. Its inverse is the same gate with the negated argument.
     Phase gates of the same class can be merged by adding the angles.
-    The continuous parameter is modulo 2 * pi, self.angle is in the interval
+    The continuous parameter is modulo 2 * pi, this.angle is in the interval
     [0, 2 * pi).
  */
 export class BasicPhaseGate extends BasicGate {

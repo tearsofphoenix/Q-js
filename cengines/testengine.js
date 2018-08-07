@@ -112,9 +112,9 @@ export class CompareEngine extends BasicEngine {
 DummyEngine used for testing.
 
                          The DummyEngine forwards all commands directly to next engine.
-    If self.is_last_engine == True it just discards all gates.
+    If this.is_last_engine == True it just discards all gates.
     By setting save_commands == True all commands get saved as a
-list in self.received_commands. Elements are appended to this
+list in this.received_commands. Elements are appended to this
 list so they are ordered according to when they are received.
  */
 export class DummyEngine extends BasicEngine {

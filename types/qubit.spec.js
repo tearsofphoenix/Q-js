@@ -26,9 +26,6 @@ const mc = mathjs.complex
 const mm = mathjs.matrix
 
 describe('Qubit test', () => {
-  it('should test mathjs', () => {
-    console.log(mathjs.exp(mc(0, mathjs.pi / 4)))
-  })
 
   it('should test basic qubit', () => {
     const qubitID = [0, 1]

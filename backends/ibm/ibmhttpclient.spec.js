@@ -40,13 +40,13 @@ describe('ibm http client test', () => {
 
     // Mock of IBM server:
 
-    # Accessing status of device. Return online.
-        status_url = 'Backends/ibmqx4/queue/status'
+    // Accessing status of device. Return online.
+        const status_url = 'Backends/ibmqx4/queue/status'
     if (args[0] == urljoin(_api_url_status, status_url) and
     (request_num[0] == 0 or request_num[0] == 3)):
     request_num[0] += 1
     return MockResponse({"state": True}, 200)
-    # Getting result
+    // Getting result
     elif (args[0] == urljoin(_api_url,
         "Jobs/{execution_id}".format(execution_id=execution_id)) and
     kwargs["params"]["access_token"] == access_token and not
@@ -63,17 +63,17 @@ describe('ibm http client test', () => {
     def mocked_requests_post(*args, **kwargs):
     class MockRequest:
     def __init__(self, body="", url=""):
-    self.body = body
-    self.url = url
+    this.body = body
+    this.url = url
 
     class MockPostResponse:
     def __init__(self, json_data, text=" "):
-    self.json_data = json_data
-    self.text = text
-    self.request = MockRequest()
+    this.json_data = json_data
+    this.text = text
+    this.request = MockRequest()
 
     def json(self):
-    return self.json_data
+    return this.json_data
 
     def raise_for_status(self):
     pass

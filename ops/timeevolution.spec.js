@@ -284,8 +284,7 @@ describe('time evolution test', () => {
     const correct = math.matrix([
       [math.exp(mc(0, -3.4 * 2.1)), 0],
       [0, math.exp(mc(0, -3.4 * 2.1))]])
-    console.log(correct)
-    console.log(cmd.gate.matrix)
+
     expect(math.deepEqual(cmd.gate.matrix, correct)).to.equal(true)
   });
 })

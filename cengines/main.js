@@ -234,7 +234,7 @@ then send on)
   /*
   Forward the list of commands to the next engine in the pipeline.
 
-    It also shortens exception stack traces if self.verbose is False.
+    It also shortens exception stack traces if this.verbose is False.
    */
   send(commandList) {
     try {

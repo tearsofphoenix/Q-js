@@ -37,7 +37,7 @@ import {Dagger} from '../../meta/dagger';
 import LocalOptimizer from '../../cengines/optimize';
 import QubitOperator from '../../ops/qubitoperator';
 import BasicMapperEngine from '../../cengines/basicmapper'
-import TimeEvolution from "../../ops/timeevolution";
+import TimeEvolution from '../../ops/timeevolution';
 
 describe('simulator test', () => {
   class Mock1QubitGate extends BasicGate {
@@ -179,7 +179,7 @@ describe('simulator test', () => {
 
   class Plus2Gate extends BasicMathGate {
     constructor() {
-      super(x => {
+      super((x) => {
         return [x + 2]
       })
     }
@@ -451,24 +451,24 @@ describe('simulator test', () => {
   });
 
   it('should test_simulator_time_evolution', () => {
-        const sim = new Simulator()
-        const N = 8  // number of qubits
-    let time_to_evolve = 1.1  // time to evolve for
-        const eng = new MainEngine(sim, [])
-      const qureg = eng.allocateQureg(N)
+    const sim = new Simulator()
+    const N = 8 // number of qubits
+    const time_to_evolve = 1.1 // time to evolve for
+    const eng = new MainEngine(sim, [])
+    const qureg = eng.allocateQureg(N)
     // initialize in random wavefunction by applying some gates:
-        qureg.forEach(qb => {
-          new Rx(Math.random()).or(qb)
-          new Ry(Math.random()).or(qb)
-        })
+    qureg.forEach((qb) => {
+      new Rx(Math.random()).or(qb)
+      new Ry(Math.random()).or(qb)
+    })
     eng.flush()
     // Use cheat to get initial start wavefunction:
-        let [qubit_to_bit_map, init_wavefunction] = eng.backend.cheat()
-    let Qop = QubitOperator
-    let op = new Qop("X0 Y1 Z2 Y3 X4").mul(0.3)
+    const [qubit_to_bit_map, init_wavefunction] = eng.backend.cheat()
+    const Qop = QubitOperator
+    const op = new Qop('X0 Y1 Z2 Y3 X4').mul(0.3)
     op.iadd(new Qop([]).mul(1.1))
-    op.iadd(new Qop("Y0 Z1 X3 Y5").mul(-1.4))
-    op.iadd(new Qop("Y1 X2 X3 Y4").mul(-1.1))
+    op.iadd(new Qop('Y0 Z1 X3 Y5').mul(-1.4))
+    op.iadd(new Qop('Y1 X2 X3 Y4').mul(-1.1))
     const ctrl_qubit = eng.allocateQubit()
     H.or(ctrl_qubit)
     Control(eng, ctrl_qubit, () => new TimeEvolution(time_to_evolve, op).or(qureg))

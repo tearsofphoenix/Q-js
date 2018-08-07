@@ -119,7 +119,7 @@ describe('ibm 5qubit mapper test', () => {
     CNOT.or(tuple(qb1, qb2))
 
     eng.flush()
-    backend.receivedCommands.forEach(cmd => console.log(cmd.toString()))
+
     let hadamard_count = backend.receivedCommands.filter(cmd => cmd.gate.equal(H)).length
 
     expect(hadamard_count).to.equal(4)
