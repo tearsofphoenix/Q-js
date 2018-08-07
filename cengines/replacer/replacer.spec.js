@@ -61,7 +61,7 @@ describe('replacer test', () => {
   }
 
   it('should test_filter_engine', () => {
-    const my_filter = cmd => cmd.gate.equal(H)
+    const my_filter = (eng, cmd) => cmd.gate.equal(H)
 
     const filter_eng = new InstructionFilter(my_filter)
     const eng = new MainEngine(new DummyEngine(), [filter_eng])

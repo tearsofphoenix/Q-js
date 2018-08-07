@@ -382,10 +382,6 @@ RuntimeError if an unknown qubit id was provided.
   }
 
   _setState(i, value) {
-    if (isNaN(value)) {
-      console.log(386, i, value)
-    }
-
     this._state.subset(math.index(i), value)
   }
 
