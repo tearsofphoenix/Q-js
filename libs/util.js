@@ -140,5 +140,36 @@ export function matrixAppend(m, m1) {
 }
 
 export function matrixRangeAssign(matrix, indices, vector) {
-  indices.forEach(idx => matrix.subset(math.index(idx), vector[idx]))
+  if (Array.isArray(vector)) {
+    indices.forEach(idx => matrix.subset(math.index(idx), vector[idx]))
+  } else {
+    indices.forEach((idx, i) => matrix.subset(math.index(idx), vector.subset(math.index(i))))
+  }
+}
+
+export function matrixRangeIndicesAssign(matrix, mstart, mend, vector, vstart) {
+  if (Array.isArray(vector)) {
+    for (let i = 0; i + mstart < mend; ++i) {
+      matrix.subset(math.index(i + mstart), vector[vstart + i])
+    }
+  } else {
+    for (let i = 0; i + mstart < mend; ++i) {
+      matrix.subset(math.index(i + mstart), vector.subset(math.index(vstart + i)))
+    }
+  }
+}
+
+export function matrixGetRow(matrix, index) {
+  const rows = math.size(matrix).valueOf()[1];
+  return math.flatten(math.subset(matrix, math.index(index, math.range(0, rows))));
+}
+
+export function matrixDot(matrix, vector) {
+  const [rows] = matrix.size()
+  const result = []
+  for (let i = 0; i < rows; ++i) {
+    const row = matrixGetRow(matrix, i)
+    result.push(math.dot(row, vector))
+  }
+  return math.matrix(result)
 }

@@ -16,7 +16,7 @@
 
 import {expect} from 'chai'
 import math from 'mathjs'
-import {TrivialMapper} from './classicalsimulator.spec'
+import {TrivialMapper} from './shared.spec'
 import {BasicGate, BasicMathGate} from '../../ops/basics'
 import {DummyEngine} from '../../cengines/testengine';
 import MainEngine from '../../cengines/main';
@@ -152,6 +152,7 @@ describe('simulator test', () => {
     new All(Measure).or(qubits)
 
     const bit_value_sum = qubits.reduce((accu, current) => accu + current.toNumber(), 0)
+    console.log(155, bit_value_sum)
     expect(bit_value_sum === 0 || bit_value_sum === 5).to.equal(true)
   });
 
@@ -200,7 +201,7 @@ describe('simulator test', () => {
     console.log('=================')
     Control(eng, qubit3, () => new Plus2Gate().or(tuple(qubit1.concat(qubit2))))
     console.log(sim.cheat())
-    expect(sim.cheat()[1].subset(math.index(6))).to.equal(1)
+    expect(sim.cheat()[1].subset(math.index(6))).to.deep.equal(math.complex(1, 0))
 
     new All(Measure).or(tuple(qubit1.concat(qubit2).concat(qubit3)))
   });
@@ -227,14 +228,17 @@ describe('simulator test', () => {
     new Ry(-0.1).or(qureg[2])
     new Rz(-0.9).or(qureg[3])
     new Ry(0.1).or(qureg[3])
+
     X.or(qubit)
+    console.log('-------------------------------------------------')
     Control(eng, qubit, () => new KQubitGate().or(qureg))
+    console.log('-------------------------------------------------')
 
     X.or(qubit)
 
     Control(eng, qubit, () => Dagger(eng, () => new KQubitGate().or(qureg)))
 
-    expect(sim.getAmplitude('00000', qubit.concat(qureg))).to.equal(1)
+    expect(sim.getAmplitude('00000', qubit.concat(qureg))).to.be.closeTo(1, 1e-12)
 
     class LargerGate extends BasicGate {
       get matrix() {
@@ -312,7 +316,7 @@ describe('simulator test', () => {
     new All(H).or(qubits)
     eng.flush()
     let bits = [0, 0, 1, 0, 1, 0]
-    expect(eng.backend.getAmplitude(bits, qubits)).to.equal(math.complex(1.0 / 8, 0))
+    expect(eng.backend.getAmplitude(bits, qubits)).to.be.closeTo(1.0 / 8, 1e-12)
     bits = [0, 0, 0, 0, 1, 0]
     expect(math.equal(eng.backend.getAmplitude(bits, qubits), math.complex(-1.0 / 8, 0))).to.equal(true)
     bits = [0, 1, 1, 0, 1, 0]
@@ -624,7 +628,7 @@ describe('simulator test', () => {
     qubits.slice(1).forEach(qb => CNOT.or(tuple(qubits[0], qb)))
 
     // check the state vector:
-    const m = sim.cheat()[1]
+    let m = sim.cheat()[1]
     expect(math.abs(m.subset(math.index(0))) ** 2).to.be.closeTo(0.5, 1e-12)
     expect(math.abs(m.subset(math.index(31))) ** 2).to.be.closeTo(0.5, 1e-12)
 
@@ -641,8 +645,11 @@ describe('simulator test', () => {
 
     // check the state vector:
     console.log(sim.cheat()[1][0], sim.cheat()[1][31])
-    expect(math.re(math.abs(sim.cheat()[1][0]))).to.be.closeTo(Math.SQRT1_2, 1e-12)
-    expect(math.re(math.abs(sim.cheat()[1][31]))).to.be.closeTo(Math.SQRT1_2, 1e-12)
+
+    m = sim.cheat()[1]
+    const v31 = math.re(math.abs(m.subset(math.index(31))))
+    expect(math.re(math.abs(m.subset(math.index(0))))).to.be.closeTo(Math.SQRT1_2, 1e-12)
+    expect(v31).to.be.closeTo(Math.SQRT1_2, 1e-12)
 
     for (let i = 1; i < 31; ++i) {
       const v = sim.cheat()[1][i] || math.complex(0, 0)
@@ -657,7 +664,9 @@ describe('simulator test', () => {
     H.or(qubits[0])
 
     // check the state vector:
-    expect(math.re(math.abs(sim.cheat()[1][0]))).to.be.closeTo(1, 1e-12)
+    const mm = sim.cheat()[1]
+    const v0 = mm.subset(math.index(0))
+    expect(math.re(math.abs(v0))).to.be.closeTo(1, 1e-12)
     for (let i = 1; i < 32; ++i) {
       const v = sim.cheat()[1][i] || math.complex(0, 0)
       expect(math.re(math.abs(v))).to.be.closeTo(0, 1e-12)

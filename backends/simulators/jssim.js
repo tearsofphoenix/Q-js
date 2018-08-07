@@ -22,7 +22,14 @@ Contains a (slow) Python simulator.
 import assert from 'assert'
 import math from 'mathjs'
 import bigInt from 'big-integer'
-import { arrayRangeAssign, matrixAppend, matrixRangeAssign, zeros } from '../../libs/util'
+import {
+  arrayRangeAssign,
+  matrixAppend,
+  matrixDot,
+  matrixRangeAssign,
+  matrixRangeIndicesAssign,
+  zeros
+} from '../../libs/util'
 import {
   copyComplexArray, len, setEqual, complexVectorDot
 } from '../../libs/polyfill'
@@ -82,7 +89,7 @@ List of measurement results (containing either True or False).
     const P = Math.random()
     let val = 0.0
     let i_picked = 0
-    while (val < P && i_picked < this._state.length) {
+    while (val < P && i_picked < len(this._state)) {
       val += math.abs(this._getState(i_picked) || math.complex(0, 0)) ** 2
       i_picked += 1
     }
@@ -105,7 +112,8 @@ List of measurement results (containing either True or False).
     })
 
     let nrm = 0.0
-    this._state.forEach((looper, i) => {
+    this._state.forEach((looper, _i) => {
+      const i = _i[0]
       if ((mask & i) != val) {
         this._setState(i, 0.0)
       } else {
@@ -117,7 +125,7 @@ List of measurement results (containing either True or False).
     // normalize
     const scale = 1.0 / Math.sqrt(nrm)
     this._state.forEach((looper, i) => {
-      this._setState(i, math.multiply(looper, scale))
+      this._setState(i[0], math.multiply(looper, scale))
     })
     return res
   }
@@ -152,7 +160,7 @@ been measured / uncomputed.
     let up = false
     let down = false
 
-    for (let i = 0; i < this._state.length; i += (1 << (pos + 1))) {
+    for (let i = 0; i < len(this._state); i += (1 << (pos + 1))) {
       for (let j = 0; j < 1 << pos; ++j) {
         if (math.abs(this._getState(i + j)) > tolerance) {
           up = true
@@ -189,8 +197,8 @@ been measured / uncomputed.
     const cv = this.getClassicalValue(ID)
     const newstate = math.zeros(1 << (this._numQubits - 1))
     let k = 0
-    for (let i = (1 << pos) * cv; i < this._state.length; i += 1 << (pos + 1)) {
-      arrayRangeAssign(this._state.slice(i, i + 1 << pos), newstate, k, k + (1 << pos))
+    for (let i = (1 << pos) * cv; i < len(this._state); i += 1 << (pos + 1)) {
+      matrixRangeIndicesAssign(this._state, i, i + 1 << pos, newstate, k)
       k += 1 << pos
     }
 
@@ -247,7 +255,8 @@ ctrlqubit_ids (list<int>): List of control qubit ids.
 
     const newstate = math.zeros(len(this._state))
 
-    this._state.forEach((looper, i) => {
+    this._state.forEach((looper, _i) => {
+      const i = _i[0]
       if ((mask & i) === mask) {
         const argList = zeros(qb_locs.length)
         qb_locs.forEach((qb, qri) => {
@@ -354,13 +363,10 @@ RuntimeError if an unknown qubit id was provided.
 
     let probability = 0.0
 
-    if (!this._state.forEach) {
-      console.log(358, this._state)
-    }
-    this._state.forEach((i) => {
+    this._state.forEach((_i) => {
+      const i = _i[0]
       if (i & mask == bit_str) {
         const e = this._getState(i)
-        console.log(360, e, i, this._state)
         probability += math.re(e) ** 2 + math.im(e) ** 2
       }
     })
@@ -368,9 +374,6 @@ RuntimeError if an unknown qubit id was provided.
   }
 
   _getState(i) {
-    if (!this._state.subset) {
-      console.log(369, this._state)
-    }
     return this._state.subset(math.index(i))
   }
 
@@ -405,7 +408,11 @@ allocated qubits.
     }
     let index = 0
     IDs.forEach((item, i) => index |= bitString[i] << this._map[item])
-    return this._getState(index)
+    const ret = this._getState(index)
+    if (math.abs(math.im(ret)) < 1e-13) {
+      return math.re(ret)
+    }
+    return ret
   }
 
   /*
@@ -464,7 +471,6 @@ ctrlids (list): A list of control qubit IDs.
           this._state = math.multiply(this._state, c)
 
           matrixAppend(update, this._state)
-          console.log(467, update, this._state)
           // update += this._state
           this._state = math.clone(current_state)
         })
@@ -558,7 +564,7 @@ mask (int): Bit-mask where set bits indicate control qubits.
     }
 
     const step = 1 << (pos + 1)
-    for (let i = 0; i < this._state.length; i += step) {
+    for (let i = 0; i < len(this._state); i += step) {
       for (let j = 0; j < 1 << pos; ++j) {
         if (((i + j) & mask) === mask) {
           const id1 = i + j
@@ -583,7 +589,7 @@ mask (int): Bit-mask where set bits indicate control qubits.
    */
   _multiQubitGate(m, pos, mask) {
     // follows the description in https://arxiv.org/abs/1704.01127
-    const inactive = Object.keys(this._map).filter(p => !pos.includes(p))
+    const inactive = Object.keys(this._map).map(k => parseInt(k, 10)).filter(p => !pos.includes(p))
 
     const matrix = math.matrix(m)
     const subvec = zeros(1 << pos.length)
@@ -606,13 +612,11 @@ mask (int): Bit-mask where set bits indicate control qubits.
           offset |= ((x >> i) & 1) << pos[i]
         }
         subvec_idx[x] = base | offset
-        console.log(609, subvec_idx[x], x)
         subvec[x] = this._getState(subvec_idx[x]) || math.complex(0, 0)
       }
 
       // perform mat-vec mul
-      console.log(613, subvec)
-      matrixRangeAssign(this._state, subvec_idx, math.multiply(matrix, subvec))
+      matrixRangeAssign(this._state, subvec_idx, matrixDot(matrix, subvec))
     }
   }
 
@@ -680,7 +684,8 @@ are provided.
     })
 
     let nrm = 0.0
-    this._state.forEach((looper, i) => {
+    this._state.forEach((looper, _i) => {
+      const i = _i[0]
       if ((mask & i) === val) {
         nrm += math.abs(this._getState(i)) ** 2
       }
@@ -690,7 +695,8 @@ are provided.
       throw new Error('collapse_wavefunction(): Invalid collapse! Probability is ~0.')
     }
     const inv_nrm = 1.0 / math.sqrt(nrm)
-    this._state.forEach((looper, i) => {
+    this._state.forEach((looper, _i) => {
+      const i = _i[0]
       if ((mask & i) !== val) {
         this._state = math.zeros(1)
       } else {

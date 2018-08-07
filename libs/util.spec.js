@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import math from 'mathjs'
 import {expect} from 'chai'
-import {classHierachy, isSubclassOf, isKindclassOf} from './util'
+import {
+  classHierachy, isSubclassOf, isKindclassOf, matrixDot
+} from './util'
 import {HGate} from '../ops/gates'
 import {BasicGate, SelfInverseGate} from '../ops/basics'
 import {Qureg} from '../types/qubit'
@@ -46,5 +48,12 @@ describe('util test', () => {
     expect(isKindclassOf(BasicGate, BasicGate)).to.equal(true)
     expect(isKindclassOf(HGate, Array)).to.equal(false)
     expect(isKindclassOf(Qureg, Array)).to.equal(true)
+  });
+
+  it('should test matrixDot', () => {
+    const m = math.matrix([[1, 2], [3, 4]])
+    const v = math.matrix([1, 2])
+    const result = matrixDot(m, v)
+    expect(result).to.deep.equal(math.matrix([5, 11]))
   });
 })
