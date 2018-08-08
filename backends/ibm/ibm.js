@@ -49,11 +49,23 @@ if use_hardware is set to true. Default is ibmqx4.
 retrieve_execution (int): Job ID to retrieve instead of re-
 running the circuit (e.g., if previous run timed out).
    */
-  constructor(use_hardware = false, num_runs = 1024, verbose = false,
-    user = null, password = null, device = 'ibmqx4',
-    retrieve_execution = null) {
+  constructor(...args) {
     super()
     this._reset()
+    this._errors = []
+    let [use_hardware = false, num_runs = 1024, verbose = false,
+      user = null, password = null, device = 'ibmqx4',
+      retrieve_execution = null] = args
+    if (typeof args[0] === 'object') {
+      const obj = args[0]
+      use_hardware = obj.use_hardware
+      num_runs = obj.num_runs
+      verbose = obj.verbose
+      user = obj.user
+      password = obj.password
+      device = obj.device
+      retrieve_execution = obj.retrieve_execution
+    }
     if (use_hardware) {
       this.device = device
     } else {
@@ -163,7 +175,7 @@ Temporarily store the command cmd.
 
       this.qasm += `${qb_str.substring(0, qb_str.length - 2)};`
     } else if (instanceOf(gate, [Rx, Ry, Rz])) {
-      assert(getControlCount(cmd) == 0)
+      assert(getControlCount(cmd) === 0)
       const qb_pos = cmd.qubits[0][0].id
       const u_strs = {
         Rx: a => `u3(${a}, -pi/2, pi/2)`,
@@ -173,7 +185,10 @@ Temporarily store the command cmd.
       const gateASM = u_strs[gate.toString().substring(0, 2)](gate.angle)
       this.qasm += `\n${gateASM} q[${qb_pos}];`
     } else {
-      assert(getControlCount(cmd) == 0)
+      if (getControlCount(cmd) !== 0) {
+        console.log(187, cmd.toString())
+      }
+      assert(getControlCount(cmd) === 0)
       const key = gate.toString()
       const v = IBMBackend.gateNames[key]
       let gate_str
@@ -187,6 +202,7 @@ Temporarily store the command cmd.
       this.qasm += `\n${gate_str} q[${qb_pos}];`
     }
   }
+
 
   /*
   Return the physical location of the qubit with the given logical id.
@@ -327,7 +343,6 @@ data / ask for username & password.
       })
       this._reset()
     } catch (e) {
-      console.log(e)
       throw new Error('Failed to run the circuit. Aborting.')
     }
   }
@@ -344,9 +359,34 @@ command_list: List of commands to execute
       if (!(cmd.gate instanceof FlushGate)) {
         this._store(cmd)
       } else {
-        this.run().then(() => this._reset())
+        this.run()
+          .then(() => this._reset())
+          .catch((e) => {
+            console.log(e)
+            this.addError(e)
+          }).finally(() => {
+            if (this.didRunCallback) {
+              this.didRunCallback()
+            }
+          })
       }
     })
+  }
+
+  get errors() {
+    return this._errors
+  }
+
+  addError(error) {
+    this._errors.push(error)
+  }
+
+  get didRunCallback() {
+    return this._didRunCallback
+  }
+
+  set didRunCallback(callback) {
+    this._didRunCallback = callback
   }
 }
 

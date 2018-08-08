@@ -59,6 +59,8 @@ describe('control test', () => {
     })
 
     eng.flush()
+
+    backend.receivedCommands.forEach(cmd => console.log(cmd.toString()))
     expect(backend.receivedCommands.length).to.equal(8)
     expect(backend.receivedCommands[0].controlQubits.length).to.equal(0)
     expect(backend.receivedCommands[1].controlQubits.length).to.equal(0)

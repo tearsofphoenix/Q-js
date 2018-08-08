@@ -72,14 +72,14 @@ describe('constant math test', () => {
 
     new AddConstantModN(3, 6).or(qureg)
     let m = sim.cheat()[1]
-    expect(math.abs(m.subset(math.index(1)))).to.equal(1)
+    expect(math.abs(m.subset(math.index(1)))).to.closeTo(1, 1e-12)
 
     init(eng, qureg, 1) // reset
     init(eng, qureg, 7)
 
     new AddConstantModN(10, 13).or(qureg)
     m = sim.cheat()[1]
-    expect(math.abs(m.subset(math.index(4 - 1)))).to.equal(1)
+    expect(math.abs(m.subset(math.index(4)))).to.closeTo(1, 1e-12)
 
     new All(Measure).or(qureg)
   });
@@ -95,7 +95,7 @@ describe('constant math test', () => {
     new MultiplyByConstantModN(3, 7).or(qureg)
 
     let m = sim.cheat()[1]
-    expect(math.abs(m.subset(math.index(5 - 1)))).to.equal(1)
+    expect(math.abs(m.subset(math.index(5)))).to.closeTo(1, 1e-12)
 
     init(eng, qureg, 5) // reset
     init(eng, qureg, 7)
@@ -103,7 +103,7 @@ describe('constant math test', () => {
     new MultiplyByConstantModN(4, 13).or(qureg)
 
     m = sim.cheat()[1]
-    expect(math.abs(m.subset(math.index(2 - 1)))).to.equal(1)
+    expect(math.abs(m.subset(math.index(2)))).to.closeTo(1, 1e-12)
 
     new All(Measure).or(qureg)
   });

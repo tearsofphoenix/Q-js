@@ -422,5 +422,8 @@ export function Uncompute(engine) {
   }
   compute_eng.runUnCompute()
   dropEngineAfter(engine)
-  engine.autoDeallocateQubits()
+
+  if (engine.autoDeallocateQubits) {
+    engine.autoDeallocateQubits()
+  }
 }

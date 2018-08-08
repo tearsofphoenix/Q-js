@@ -145,15 +145,6 @@ ValueError: Qubit already deallocated. Caller likely has a bug.
     this.send(cmds)
   }
 
-  autoDeallocateQubits() {
-    const copy = new Set(this.main.activeQubits)
-    for (const qb of copy) {
-      if (qb.engine === this) {
-        // need to
-        qb.deallocate()
-      }
-    }
-  }
   /*
     Check if there is a compiler engine handling the meta tag
 
@@ -224,5 +215,15 @@ returns when getting called with cmd.
   receive(commandList) {
     const newCommandList = commandList.map(cmd => this.cmdModFunc(cmd))
     this.send(newCommandList)
+  }
+
+  autoDeallocateQubits() {
+    const copy = new Set(this.main.activeQubits)
+    for (const qb of copy) {
+      if (qb.engine === this) {
+        // need to
+        qb.deallocate()
+      }
+    }
   }
 }

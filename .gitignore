@@ -2,3 +2,5 @@
 node_modules
 build
 cmake-build-debug
+.nyc_output
+coverage

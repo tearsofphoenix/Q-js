@@ -98,16 +98,17 @@ describe('cnot2cz test', () => {
         if (binary_state.length < 2) {
           binary_state = `0${binary_state}`
         }
+        console.log(binary_state)
         const test = test_sim.getAmplitude(binary_state, test_qb.concat(test_ctrl_qb))
         const correct = correct_sim.getAmplitude(binary_state, correct_qb.concat(correct_ctrl_qb))
 
         expect(correct).to.be.closeTo(test, 1e-12, 1e-12)
-
-        new All(Measure).or(test_qb.concat(test_ctrl_qb))
-        new All(Measure).or(correct_qb.concat(correct_ctrl_qb))
-        test_eng.flush(true)
-        correct_eng.flush(true)
       }
+
+      new All(Measure).or(test_qb.concat(test_ctrl_qb))
+      new All(Measure).or(correct_qb.concat(correct_ctrl_qb))
+      test_eng.flush(true)
+      correct_eng.flush(true)
     }
   });
 })
