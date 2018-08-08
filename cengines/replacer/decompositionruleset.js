@@ -93,7 +93,7 @@ decomposition rule can indeed be applied to replace the given Command.
 Pauli-X gate with 2 control qubits. The recognizer function would then
 be:
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 def recogn_toffoli(cmd):
 # can be applied if the gate is an X-gate with 2 controls:
@@ -102,7 +102,7 @@ def recogn_toffoli(cmd):
 and, given a replacement function `replace_toffoli`, the decomposition
 rule can be registered as
 
-.. code-block:: python
+.. code-block:: javascript
 
 register_decomposition(X.__class__, decompose_toffoli,
     recogn_toffoli)

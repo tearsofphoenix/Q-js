@@ -5,7 +5,7 @@ Add a constant to a quantum number represented by a quantum register,
     stored from low- to high-bit.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 qunum = eng.allocate_qureg(5) # 5-qubit number
 X | qunum[1] # qunum is now equal to 2
@@ -47,7 +47,7 @@ register, stored from low- to high-bit.
 a (int): Constant to subtract
 
 Example:
-    .. code-block:: python
+    .. code-block:: javascript
 
 qunum = eng.allocate_qureg(5) # 5-qubit number
 X | qunum[2] # qunum is now equal to 4
@@ -64,7 +64,7 @@ modulo N.
     The number is stored from low- to high-bit, i.e., qunum[0] is the LSB.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 qunum = eng.allocate_qureg(5) # 5-qubit number
 X | qunum[1] # qunum is now equal to 2
@@ -112,7 +112,7 @@ N (int): Constant modulo which the addition of a should be carried
 out.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 qunum = eng.allocate_qureg(3) # 3-qubit number
 X | qunum[1] # qunum is now equal to 2
@@ -129,7 +129,7 @@ modulo N.
     The number is stored from low- to high-bit, i.e., qunum[0] is the LSB.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 qunum = eng.allocate_qureg(5) # 5-qubit number
 X | qunum[2] # qunum is now equal to 4

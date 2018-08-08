@@ -23,7 +23,7 @@ MainEngine. Qubit objects are automatically deallocated if they go out of
 scope and intented to be used within Qureg objects in user code.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 from projectq import MainEngine
 eng = MainEngine()

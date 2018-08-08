@@ -262,7 +262,7 @@ command_list (list<Command>): List of commands to handle.
 Start a compute-section.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 with Compute(eng):
 do_something(qubits)
@@ -276,7 +276,7 @@ uncomputed and deallocated within that section or, alternatively,
 
     This means that the following examples are valid:
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 with Compute(eng):
 anc = eng.allocate_qubit()
@@ -290,7 +290,7 @@ do_something_else(qubits)
 Uncompute(eng)  # will allocate a new ancilla (with a different id)
 # and then deallocate it again
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 with Compute(eng):
 anc = eng.allocate_qubit()
@@ -336,7 +336,7 @@ export function Compute(engine, func) {
 Start a custom uncompute-section.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 with Compute(eng):
 do_something(qubits)
@@ -406,7 +406,7 @@ export function CustomUncompute(engine, func) {
 Uncompute automatically.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 with Compute(eng):
 do_something(qubits)

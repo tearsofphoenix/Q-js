@@ -32,7 +32,7 @@ This gate is the unitary time evolution propagator:
 factor is stored implicitely.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 wavefunction = eng.allocate_qureg(5)
 hamiltonian = 0.5 * QubitOperator("X0 Z1 Y5")
@@ -159,7 +159,7 @@ New TimeEvolution gate equivalent to the two merged gates.
   /*
   Operator| overload which enables the following syntax:
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 TimeEvolution(...) | qureg
 TimeEvolution(...) | (qureg,)
@@ -171,7 +171,7 @@ quantum register or one qubit.
 
     Example:
 
-.. code-block:: python
+.. code-block:: javascript
 
 wavefunction = eng.allocate_qureg(5)
 hamiltonian = QubitOperator("X1 Y3", 0.5)
@@ -183,7 +183,7 @@ non-trivially on the two qubits wavefunction[1] and wavefunction[3].
     Therefore, the operator| will rescale the indices in the hamiltonian
 and sends the equivalent of the following new gate to the MainEngine:
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 h = QubitOperator("X0 Y1", 0.5)
 TimeEvolution(2.0, h) | [wavefunction[1], wavefunction[3]]

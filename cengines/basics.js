@@ -81,7 +81,7 @@ freed.
 
     All allocated qubits are added to the MainEngine's set of active
 qubits as weak references. This allows proper clean-up at the end of
-the Python program (using atexit), deallocating all qubits which are
+the JavaScript program (using atexit), deallocating all qubits which are
 still alive. Qubit ids of dirty qubits are registered in MainEngine's
 dirty_qubits set.
 

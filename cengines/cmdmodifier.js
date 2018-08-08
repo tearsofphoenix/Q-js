@@ -36,7 +36,7 @@ cmd_mod_fun (function): Function which, given a command cmd,
     returns the command it should send instead.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 def cmd_mod_fun(cmd):
 cmd.tags += [MyOwnTag()]

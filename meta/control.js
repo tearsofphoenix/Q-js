@@ -18,7 +18,7 @@
 Contains the tools to make an entire section of operations controlled.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 with Control(eng, qubit1):
 H | qubit2
@@ -73,7 +73,7 @@ cmd (Command object): a command object.
 Condition an entire code block on the value of qubits being 1.
 
 Example:
-    .. code-block:: python
+    .. code-block:: javascript
 
 with Control(eng, ctrlqubits):
 do_something(otherqubits)
@@ -88,7 +88,7 @@ qubits (list of Qubit objects): Qubits to condition on
 
 Enter the section using a with-statement:
 
-.. code-block:: python
+.. code-block:: javascript
 
 with Control(eng, ctrlqubits):
 ...

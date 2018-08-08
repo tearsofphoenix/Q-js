@@ -20,7 +20,7 @@
 * ControlledGate (Represents a controlled version of an arbitrary gate)
 * Tensor/All (Applies a single qubit gate to all supplied qubits), e.g.,
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 Tensor(H) | (qubit1, qubit2) # apply H to qubit #1 and #2
 
@@ -48,7 +48,7 @@ not define one.
 function on a gate which does not provide a get_inverse() member function.
 
 Example:
-    .. code-block:: python
+    .. code-block:: javascript
 
 with Dagger(eng):
 MySpecialGate | qubits
@@ -106,7 +106,7 @@ the __or__-operator, using the first qubits provided as control qubits.
 separate quregs.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 ControlledGate(gate, 2) | (qb0, qb2, qb3) # qb0 & qb2 are controls
 C(gate, 2) | (qb0, qb2, qb3) # This is much nicer.
@@ -115,7 +115,7 @@ C(gate, 2) | ([qb0,qb2], qb3) # Is equivalent
 Note:
     Use :func:`C` rather than ControlledGate, i.e.,
 
-.. code-block:: python
+.. code-block:: javascript
 
 C(X, 2) == Toffoli
  */
@@ -203,7 +203,7 @@ gate: Gate to turn into its controlled version
 n: Number of controls (default: 1)
 
 Example:
-    .. code-block:: python
+    .. code-block:: javascript
 
 C(NOT) | (c, q) # equivalent to CNOT | (c, q)
  */
@@ -217,7 +217,7 @@ quantum register. Allowed syntax is to supply either a qureg or a tuple
 which contains only one qureg.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 Tensor(H) | x # applies H to every qubit in the list of qubits x
 Tensor(H) | (x,) # alternative to be consistent with other syntax

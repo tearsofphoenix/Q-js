@@ -21,7 +21,7 @@ ClassicalInstruction gate, and the BasicMathGate class.
 
 Gates overload the | operator to allow the following syntax:
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 Gate | (qureg1, qureg2, qureg2)
 Gate | (qureg, qubit)
@@ -53,27 +53,27 @@ Set interchangeable qubit indices!
 
 As an example, consider
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 ExampleGate | (a,b,c,d,e)
 
 where a and b are interchangeable. Then, call this function as
 follows:
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 this.set_interchangeable_qubit_indices([[0,1]])
 
 As another example, consider
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 ExampleGate2 | (a,b,c,d,e)
 
 where a and b are interchangeable and, in addition, c, d, and e
 are interchangeable among themselves. Then, call this function as
 
-.. code-block:: python
+.. code-block:: javascript
 
 this.set_interchangeable_qubit_indices([[0,1],[2,3,4]])
 
@@ -196,7 +196,7 @@ Automatic implementation of the get_inverse-member function for self-
                                                                 inverse gates.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 # get_inverse(H) == H, it is a self-inverse gate:
     get_inverse(H) | qubit
@@ -385,7 +385,7 @@ calling only Measure. E.g., for the IBM Quantum Experience back-end,
     sending the circuit for each Measure-gate would be too inefficient,
     which is why a final
 
-    .. code-block: python
+    .. code-block: javascript
 
 eng.flush()
 
@@ -402,7 +402,7 @@ Base class for all math gates.
 which is given by the concrete gate which derives from this base class.
 The AddConstant gate, for example, registers a function of the form
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 def add(x):
 return (x+a,)
@@ -413,7 +413,7 @@ to the function input. As an example, consider out-of-place
 multiplication, which takes two input registers and adds the result into a
 third, i.e., (a,b,c) -> (a,b,c+a*b). The corresponding function then is
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 def multiply(a,b,c)
 return (a,b,c+a*b)
@@ -430,7 +430,7 @@ input, as the gate takes registers. For each of these values,
 output values).
 
 Example:
-    .. code-block:: python
+    .. code-block:: javascript
 
 def add(a,b):
 return (a,a+b)
@@ -440,14 +440,14 @@ If the gate acts on, e.g., fixed point numbers, the number of bits per
 register is also required in order to describe the action of such a
 mathematical gate. For this reason, there is
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 BasicMathGate.get_math_function(qubits)
 
 which can be overwritten by the gate deriving from BasicMathGate.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 def get_math_function(self, qubits):
 n = len(qubits[0])
@@ -470,8 +470,8 @@ Args:
 applied.
 
     Returns:
-math_fun (function): Python function describing the action of this
-gate. (See BasicMathGate.__init__ for an example).
+math_fun (function): javascript function describing the action of this
+gate. (See BasicMathGate.constructor for an example).
      */
   getMathFunction(qubits) {
     return this.mathFunc

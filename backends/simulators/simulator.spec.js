@@ -35,7 +35,7 @@ import {NotYetMeasuredError} from '../../meta/error';
 import {Control} from '../../meta/control';
 import {Dagger} from '../../meta/dagger';
 import LocalOptimizer from '../../cengines/optimize';
-import QubitOperator from '../../ops/qubitoperator';
+import QubitOperator, {stringToArray} from '../../ops/qubitoperator';
 import BasicMapperEngine from '../../cengines/basicmapper'
 import TimeEvolution from '../../ops/timeevolution';
 
@@ -450,7 +450,8 @@ describe('simulator test', () => {
     expect(math.abs(sim.getAmplitude('000', qureg))).to.be.closeTo(0, 1e-12)
   });
 
-  it('should test_simulator_time_evolution', () => {
+  it('should test_simulator_time_evolution', function () {
+    this.timeout(60 * 1000)
     const sim = new Simulator()
     const N = 8 // number of qubits
     const time_to_evolve = 1.1 // time to evolve for
@@ -463,7 +464,8 @@ describe('simulator test', () => {
     })
     eng.flush()
     // Use cheat to get initial start wavefunction:
-    const [qubit_to_bit_map, init_wavefunction] = eng.backend.cheat()
+    let [_, init_wavefunction] = eng.backend.cheat()
+    init_wavefunction = math.clone(init_wavefunction)
     const Qop = QubitOperator
     const op = new Qop('X0 Y1 Z2 Y3 X4').mul(0.3)
     op.iadd(new Qop([]).mul(1.1))
@@ -473,42 +475,56 @@ describe('simulator test', () => {
     H.or(ctrl_qubit)
     Control(eng, ctrl_qubit, () => new TimeEvolution(time_to_evolve, op).or(qureg))
     eng.flush()
-    // [qbit_to_bit_map, final_wavefunction] = eng.backend.cheat()
-    // new All(Measure).or(qureg.concat(ctrl_qubit))
-    // // Check manually:
-    //
-    //     const build_matrix = (list_single_matrices) => {
-    //       let res = list_single_matrices[0]
-    //       for i in range(1, len(list_single_matrices)):
-    //       res = scipy.sparse.kron(res, list_single_matrices[i])
-    //       return res
-    //     }
-    // id_sp = scipy.sparse.identity(2, format="csr", dtype=complex)
-    // x_sp = scipy.sparse.csr_matrix([[0., 1.], [1., 0.]], dtype=complex)
-    // y_sp = scipy.sparse.csr_matrix([[0., -1.j], [1.j, 0.]], dtype=complex)
-    // z_sp = scipy.sparse.csr_matrix([[1., 0.], [0., -1.]], dtype=complex)
-    // gates = [x_sp, y_sp, z_sp]
-    //
-    // res_matrix = 0
-    // for t, c in op.terms.items():
-    // matrix = [id_sp] * N
-    // for idx, gate in t:
-    // matrix[qbit_to_bit_map[qureg[idx].id]] = gates[ord(gate) -
-    // ord('X')]
-    // matrix.reverse()
-    // res_matrix += build_matrix(matrix) * c
-    // res_matrix *= -1j * time_to_evolve
-    //
-    // init_wavefunction = math.array(init_wavefunction, copy=False)
-    // final_wavefunction = math.array(final_wavefunction, copy=False)
-    // res = scipy.sparse.linalg.expm_multiply(res_matrix, init_wavefunction)
-    //
-    // half = int(len(final_wavefunction) / 2)
-    // hadamard_f = 1. / math.sqrt(2.)
-    // # check evolution and control
-    // assert math.allclose(hadamard_f * res, final_wavefunction[half:])
-    // assert math.allclose(final_wavefunction[:half], hadamard_f *
-    // init_wavefunction)
+    let [qbit_to_bit_map2, final_wavefunction] = eng.backend.cheat()
+    final_wavefunction = math.clone(final_wavefunction)
+    const map = {}
+    Object.assign(map, qbit_to_bit_map2)
+    qbit_to_bit_map2 = map
+    new All(Measure).or(qureg.concat(ctrl_qubit))
+    // Check manually:
+
+    const build_matrix = (list_single_matrices) => {
+      let res = list_single_matrices[0]
+      for (let i = 1; i < len(list_single_matrices); ++i) {
+        res = math.kron(res, list_single_matrices[i])
+      }
+      return res
+    }
+    const mc = math.complex
+    const id_sp = math.identity(2)
+    const x_sp = math.matrix([[0.0, 1.0], [1.0, 0.0]])
+    const y_sp = math.matrix([[0.0, mc(0, -1.0)], [mc(0, 1.0), 0.0]])
+    const z_sp = math.matrix([[1.0, 0.0], [0.0, -1.0]])
+    const gates = {X: x_sp, Y: y_sp, Z: z_sp}
+
+    let res_matrix = 0
+    Object.keys(op.terms).forEach((k) => {
+      // id_sp * N
+      const matrix = [id_sp, id_sp, id_sp, id_sp, id_sp, id_sp, id_sp, id_sp]
+      const t = stringToArray(k)
+      const c = op.terms[k]
+      t.forEach(([idx, gate]) => {
+        matrix[qbit_to_bit_map2[qureg[idx].id]] = gates[gate]
+      })
+      matrix.reverse()
+      res_matrix = math.add(res_matrix, math.multiply(build_matrix(matrix), c))
+    })
+
+    res_matrix = math.multiply(res_matrix, mc(0, -time_to_evolve))
+
+    init_wavefunction = math.flatten(init_wavefunction)
+    final_wavefunction = math.flatten(final_wavefunction)
+    const res = math.multiply(math.expm(res_matrix), init_wavefunction)
+
+    const count = len(final_wavefunction)
+    const half = Math.floor(count / 2)
+    const hadamard_f = 1.0 / math.sqrt(2.0)
+    // check evolution and control
+    const tail = final_wavefunction.subset(math.index(math.range(half, count)))
+    const head = final_wavefunction.subset(math.index(math.range(0, half)))
+    console.log(math.multiply(hadamard_f, res), tail)
+    expect(math.deepEqual(math.multiply(hadamard_f, res), tail)).to.equal(true)
+    expect(head).to.deep.equal(math.multiply(hadamard_f, init_wavefunction))
   });
 
   it('should test_simulator_set_wavefunction', () => {

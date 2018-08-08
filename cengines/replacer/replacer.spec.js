@@ -34,8 +34,7 @@ describe('replacer test', () => {
   const make_decomposition_rule_set = () => {
     const result = new DecompositionRuleSet()
     // BasicGate with no get_inverse used for testing:
-    // with pytest.raises(NotInvertible):
-    // SomeGate.get_inverse()
+    expect(() => SomeGate.getInverse()).to.throw()
 
     // Loading of decomposition rules:
     const decompose_test1 = cmd => X.or(cmd.qubits)

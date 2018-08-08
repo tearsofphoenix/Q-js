@@ -15,23 +15,20 @@
  */
 
 /*
-Contains a (slow) Python simulator.
+Contains a (slow) JavaScript simulator.
 
     Please compile the c++ simulator for large-scale simulations.
 */
 import assert from 'assert'
 import math from 'mathjs'
-import bigInt from 'big-integer'
 import {
-  arrayRangeAssign,
-  matrixAppend,
   matrixDot,
   matrixRangeAssign,
   matrixRangeIndicesAssign,
   zeros
 } from '../../libs/util'
 import {
-  copyComplexArray, len, setEqual, complexVectorDot, isNumeric
+  len, setEqual, complexVectorDot
 } from '../../libs/polyfill'
 import { stringToArray } from '../../ops/qubitoperator'
 
@@ -48,9 +45,7 @@ export default class Simulator {
 
     Args:
 rnd_seed (int): Seed to initialize the random number generator.
-    args: Dummy argument to allow an interface identical to the c++
-simulator.
-    kwargs: Same as args.
+    args: Dummy argument to allow an interface identical to the c++ simulator.
    */
   constructor(rndSeed) {
     // ignore seed
@@ -91,9 +86,6 @@ List of measurement results (containing either True or False).
     let i_picked = 0
     while (val < P && i_picked < len(this._state)) {
       val = math.add(val, math.abs(this._getState(i_picked) || math.complex(0, 0)) ** 2)
-      if (isNaN(val)) {
-        console.log(95)
-      }
       i_picked += 1
     }
 
@@ -104,7 +96,7 @@ List of measurement results (containing either True or False).
       res.push(false)
       return this._map[ID]
     })
-    console.log(104, pos, val)
+
     let mask = 0
     val = 0
 
@@ -122,12 +114,8 @@ List of measurement results (containing either True or False).
       } else {
         const tmp = math.abs(looper)
         nrm = math.add(nrm, math.multiply(tmp, tmp))
-        if (nrm === 0) {
-          console.log(looper, nrm)
-        }
       }
     })
-    console.log(127, nrm)
     // normalize
     const scale = 1.0 / Math.sqrt(nrm)
     this._state = math.multiply(this._state, scale)
@@ -202,7 +190,6 @@ been measured / uncomputed.
     const newstate = math.zeros(1 << (this._numQubits - 1))
     let k = 0
     for (let i = (1 << pos) * cv; i < len(this._state); i += 1 << (pos + 1)) {
-      console.log(205, k, k + (1 << pos), i)
       matrixRangeIndicesAssign(newstate, k, k + (1 << pos), this._state, i)
       k += (1 << pos)
     }
@@ -472,14 +459,14 @@ ctrlids (list): A list of control qubit IDs.
       while (nrm_change > 1.e-12) {
         const coeff = math.divide(math.complex(0, -time), s * (j + 1))
         const current_state = math.clone(this._state)
-        update = math.zeros(1)
+        update = 0
         Object.keys(terms_dict).forEach((t) => {
           const c = terms_dict[t]
           const keys = stringToArray(t)
           this.applyTerm(keys, ids)
           this._state = math.multiply(this._state, c)
 
-          matrixAppend(update, this._state)
+          update = math.add(this._state, update)
           // update += this._state
           this._state = math.clone(current_state)
         })

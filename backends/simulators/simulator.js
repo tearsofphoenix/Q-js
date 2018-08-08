@@ -44,7 +44,7 @@ export OMP_PROC_BIND=spread # bind threads to processors by spreading
  */
 export default class Simulator extends BasicEngine {
   /*
-  Construct the C++/Python-simulator object and initialize it with a
+  Construct the C++/JavaScript-simulator object and initialize it with a
   random seed.
 
     Args:
@@ -63,7 +63,7 @@ through the state vector multiple times. Depending on the system (and,
 
     Note:
 If the C++ Simulator extension was not built or cannot be found,
-    the Simulator defaults to a Python implementation of the kernels.
+    the Simulator defaults to a Javascript implementation of the kernels.
     While this is much slower, it is still good enough to run basic
 quantum algorithms.
 

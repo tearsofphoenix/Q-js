@@ -84,13 +84,13 @@ decomposition.
     The default decomposition chooser simply returns the first list
 element, i.e., calling
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 repl = AutoReplacer()
 
 Amounts to
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 def decomposition_chooser(cmd, decomp_list):
 return decomp_list[0]

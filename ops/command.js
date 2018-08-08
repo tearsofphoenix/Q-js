@@ -19,7 +19,7 @@ This file defines the apply_command function and the Command class.
 
 When a gate is applied to qubits, e.g.,
 
-.. code-block:: python
+.. code-block:: javascript
 
 CNOT | (qubit1, qubit2)
 
@@ -32,7 +32,7 @@ to generate a Command object which stores the qubits in a canonical order
 using interchangeable qubit indices defined by the gate to allow the
 optimizer to cancel the following two gates
 
-    .. code-block:: python
+    .. code-block:: javascript
 Swap | (qubit1, qubit2)
 Swap | (qubit2, qubit1)
 

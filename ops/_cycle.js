@@ -36,7 +36,7 @@ instead.
 gate: Gate of which to get the inverse
 
 Example:
-    .. code-block:: python
+    .. code-block:: javascript
 
 get_inverse(H) # returns a Hadamard gate (HGate object)
  */

@@ -57,7 +57,7 @@ verbose (bool): Either print full or compact error messages.
     Default: False (i.e. compact error messages).
 
 Example:
-    .. code-block:: python
+    .. code-block:: javascript
 
 from projectq import MainEngine
 eng = MainEngine() # uses default engine_list and the Simulator
@@ -67,7 +67,7 @@ setups which defines a custom `engine_list` useful for one of the IBM
 chips
 
 Example:
-    .. code-block:: python
+    .. code-block:: javascript
 
 import projectq.setups.ibm as ibm_setup
 from projectq import MainEngine
@@ -77,7 +77,7 @@ eng = MainEngine(engine_list=ibm_setup.get_engine_list())
 Alternatively, one can specify all compiler engines explicitly, e.g.,
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 from projectq.cengines import (TagRemover, AutoReplacer,
     LocalOptimizer,
@@ -183,7 +183,7 @@ Args:
     qubit (BasicQubit): Qubit of which to get the measurement result.
 
     Example:
-.. code-block:: python
+.. code-block:: javascript
 
 from projectq.ops import H, Measure
 from projectq import MainEngine

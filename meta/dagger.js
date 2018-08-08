@@ -17,7 +17,7 @@
 /*
 Tools to easily invert a sequence of gates.
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 with Dagger(eng):
 H | qubit1
@@ -85,7 +85,7 @@ Invert an entire code block.
 
     Use it with a with-statement, i.e.,
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 with Dagger(eng):
 [code to invert]
@@ -96,7 +96,7 @@ to be deleted prior to exiting the 'with Dagger()' context.
 
     This code is **NOT VALID**:
 
-.. code-block:: python
+.. code-block:: javascript
 
 with Dagger(eng):
 qb = eng.allocate_qubit()
@@ -104,7 +104,7 @@ H | qb # qb is still available!!!
 
 The **correct way** of handling qubit (de-)allocation is as follows:
 
-.. code-block:: python
+.. code-block:: javascript
 
 with Dagger(eng):
 qb = eng.allocate_qubit()
@@ -121,7 +121,7 @@ engine: Engine which handles the commands (usually MainEngine)
 
 Example (executes an inverse QFT):
 
-.. code-block:: python
+.. code-block:: javascript
 
 with Dagger(eng):
 QFT | qubits

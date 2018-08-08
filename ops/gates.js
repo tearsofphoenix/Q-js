@@ -290,7 +290,7 @@ the flush command).
 Note:
     This gate is sent when calling
 
-    .. code-block:: python
+    .. code-block:: javascript
 
 eng.flush()
 
