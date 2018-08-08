@@ -563,7 +563,7 @@ describe('simulator test', () => {
     expect(() => eng.backend.collapseWavefunction(qubits, [1, 0, 0, 0])).to.throw()
     eng.backend.collapseWavefunction(qubits.slice(0, qubits.length - 1), [0, 1, 0])
     let probability = eng.backend.getProbability([0, 1, 0, 1], qubits)
-    expect(probability).to.be.closeTo(0.5)
+    expect(probability).to.be.closeTo(0.5, 1e-12)
 
     eng.backend.setWavefunction([1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], qubits)
     H.or(qubits[0])

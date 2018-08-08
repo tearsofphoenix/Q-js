@@ -707,9 +707,9 @@ are provided.
     this._state.forEach((looper, _i) => {
       const i = _i[0]
       if ((mask & i) !== val) {
-        this._state = math.zeros(1)
+        this._setState(i, 0)
       } else {
-        this._state = math.multiply(this._state, inv_nrm)
+        this._setState(i, math.multiply(looper, inv_nrm))
       }
     })
   }
