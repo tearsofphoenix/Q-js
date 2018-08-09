@@ -29,7 +29,7 @@ import { CNOT, Toffoli } from '../../ops/shortcuts';
 import {tuple} from '../../libs/util';
 import {All} from '../../ops/metagates';
 import {BasicQubit} from '../../types/qubit';
-import {Command} from '../../ops/command';
+import Command from '../../ops/command';
 import {LogicalQubitIDTag} from '../../meta/tag';
 import {NotYetMeasuredError} from '../../meta/error';
 import {Control} from '../../meta/control';

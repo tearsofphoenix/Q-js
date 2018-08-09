@@ -19,7 +19,7 @@ import TagRemover from './tagremover'
 import {ComputeTag, UncomputeTag} from '../meta/tag'
 import {tuple} from '../libs/util'
 import {H} from '../ops/gates'
-import {Command} from '../ops/command'
+import Command from '../ops/command'
 import {DummyEngine} from './testengine'
 import MainEngine from './main'
 

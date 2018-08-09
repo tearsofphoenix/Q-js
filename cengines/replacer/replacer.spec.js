@@ -17,7 +17,7 @@
 import {expect, assert} from 'chai'
 import {H, X, Rx} from '../../ops/gates';
 import {tuple} from '../../libs/util';
-import {Command} from '../../ops/command';
+import Command from '../../ops/command';
 import {DummyEngine} from '../testengine';
 import MainEngine from '../main';
 import {InstructionFilter, AutoReplacer} from './replacer';

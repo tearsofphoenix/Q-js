@@ -19,19 +19,20 @@ import CommandPrinter from './printer'
 import {InstructionFilter} from '../cengines/replacer/replacer'
 import MainEngine from '../cengines/main'
 import {DummyEngine} from '../cengines/testengine'
-import {Command} from '../ops/command'
+import Command from '../ops/command'
 import { tuple } from '../libs/util'
-import {H, T, Measure, NOT, Allocate} from '../ops/gates'
+import {
+  H, T, Measure, NOT, Allocate
+} from '../ops/gates'
 import { BasicQubit } from '../types/qubit'
 import {LogicalQubitIDTag} from '../meta/tag'
 
 describe('printer test', () => {
-
-  it('should test_command_printer_is_available', function () {
+  it('should test_command_printer_is_available', () => {
     const inline_cmd_printer = new CommandPrinter()
     const cmd_printer = new CommandPrinter()
 
-    const available_cmd = function(eng, cmd) {
+    const available_cmd = function (eng, cmd) {
       return cmd.gate.equal(H)
     }
 
@@ -47,7 +48,7 @@ describe('printer test', () => {
     expect(cmd_printer.isAvailable(cmd1)).to.equal(true)
   });
 
-  it('should test_command_printer_no_input_default_measure', function () {
+  it('should test_command_printer_no_input_default_measure', () => {
     const cmd_printer = new CommandPrinter(false)
     const eng = new MainEngine(cmd_printer, [new DummyEngine()])
     const qubit = eng.allocateQubit()
@@ -56,7 +57,7 @@ describe('printer test', () => {
     expect(qubit.toNumber()).to.equal(0)
   });
 
-  it('should test_command_printer_measure_mapped_qubit', function () {
+  it('should test_command_printer_measure_mapped_qubit', () => {
     const eng = new MainEngine(new CommandPrinter(false), [])
     const qb1 = new BasicQubit(eng, 1)
     const qb2 = new BasicQubit(eng, 2)

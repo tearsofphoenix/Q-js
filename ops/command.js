@@ -42,24 +42,9 @@ apply wrapper (apply_command).
 import assert from 'assert'
 import {arrayEqual} from '../libs/polyfill'
 import {getInverse} from './_cycle'
-import {BasicQubit, Qureg} from '../types/qubit';
+import {BasicQubit, Qureg} from '../types/qubit'
 import {markTuple} from '../libs/util'
-import {NotMergeable} from "../meta/error";
-
-/*
-Apply a command.
-
-    Extracts the qubits-owning (target) engine from the Command object
-and sends the Command to it.
-
-    Args:
-cmd (Command): Command to apply
-
- */
-
-export function applyCommand(cmd) {
-  cmd.engine.receive([cmd])
-}
+import {NotMergeable} from '../meta/error'
 
 /*
 Class used as a container to store commands. If a gate is applied to
@@ -84,7 +69,7 @@ other scope receives the command after the inner scope LoopEngine
 and hence adds its LoopTag to the end.
     all_qubits: A tuple of control_qubits + qubits
  */
-export class Command {
+export default class Command {
   /*
 
 Initialize a Command object.
@@ -237,6 +222,16 @@ in state 1.
     assert(Array.isArray(qubits))
     this._controlQubits = this._controlQubits.concat(BasicQubit.copyArray(qubits))
     this._controlQubits.sort((a, b) => a.id - b.id)
+  }
+
+  /*
+  Apply a command.
+
+    Extracts the qubits-owning (target) engine from the Command object
+and sends the Command to it.
+   */
+  apply() {
+    this.engine.receive([this])
   }
 
   /*

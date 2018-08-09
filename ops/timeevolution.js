@@ -18,9 +18,7 @@ import assert from 'assert'
 import math from 'mathjs'
 import {BasicGate} from './basics'
 import QubitOperator, {stringToArray} from './qubitoperator'
-import {setEqual, isComplex, isNumeric} from '../libs/polyfill';
-import {applyCommand} from './command';
-import {makeTuple} from '../libs/util';
+import {setEqual, isComplex, isNumeric} from '../libs/polyfill'
 import {Ph} from './gates'
 
 /*
@@ -244,7 +242,7 @@ object, or a tuple of the former three cases.
     const new_qubits = non_trivial_qubits.map((looper) => qubits[0][looper])
     // Apply new gate
     const cmd = new_gate.generateCommand(new_qubits)
-    applyCommand(cmd)
+    cmd.apply()
   }
 
   equal() {

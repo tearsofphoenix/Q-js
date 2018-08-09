@@ -22,7 +22,7 @@ import {
   BasicGate, FastForwardingGate, BasicRotationGate, SelfInverseGate, BasicPhaseGate, BasicMathGate
 } from './basics';
 import {Qubit, Qureg} from '../types/qubit'
-import { Command } from './command'
+import Command from './command'
 import {arrayEqual} from '../libs/polyfill'
 
 function mainEngine() {

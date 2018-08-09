@@ -34,7 +34,7 @@ needs to be made explicitely, while for one argument it is optional.
 */
 import math from 'mathjs'
 import { BasicQubit } from '../types/qubit'
-import {Command, applyCommand} from './command'
+import Command from './command'
 import {arrayIsTuple, ObjectCopy} from '../libs/util'
 import {NotMergeable} from '../meta/error'
 
@@ -177,7 +177,7 @@ Args:
      */
   or(qubits) {
     const cmd = this.generateCommand(qubits)
-    applyCommand(cmd)
+    cmd.apply()
   }
 
   equal(other) {

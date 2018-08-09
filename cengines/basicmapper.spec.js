@@ -18,7 +18,7 @@ import {expect} from 'chai'
 import BasicMapperEngine from './basicmapper'
 import {DummyEngine} from './testengine'
 import { BasicQubit } from '../types/qubit'
-import {Command} from '../ops/command'
+import Command from '../ops/command'
 import {
   Allocate, Deallocate, Measure, FlushGate
 } from '../ops/gates'

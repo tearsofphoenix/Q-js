@@ -6,7 +6,7 @@ import Gates, {
 } from '../../ops/gates';
 import {DummyEngine} from '../../cengines/testengine';
 import IBMBackend from './ibm';
-import {Command} from '../../ops/command';
+import Command from '../../ops/command';
 import {tuple} from '../../libs/util';
 import MainEngine from '../../cengines/main';
 import IBM5QubitMapper, {ibmqx4_connections} from '../../cengines/ibm5qubitmapper';

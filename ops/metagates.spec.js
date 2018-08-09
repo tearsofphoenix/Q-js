@@ -18,7 +18,7 @@ import {expect} from 'chai'
 import math from 'mathjs'
 import MainEngine from '../cengines/main'
 import {DummyEngine} from '../cengines/testengine'
-import {Command} from './command'
+import Command from './command'
 import {Tensor} from './metagates'
 
 import {

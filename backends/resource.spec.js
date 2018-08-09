@@ -22,7 +22,7 @@ import MainEngine from '../cengines/main'
 import {
   Allocate, H, Measure, Rz, X
 } from '../ops/gates';
-import {Command} from '../ops/command';
+import Command from '../ops/command';
 import {LogicalQubitIDTag} from '../meta/tag';
 import {DummyEngine} from '../cengines/testengine';
 import {CNOT} from '../ops/shortcuts';

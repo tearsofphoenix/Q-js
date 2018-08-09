@@ -36,7 +36,6 @@ import {
 } from './basics'
 
 import {getInverse} from './_cycle'
-import {applyCommand} from './command'
 
 const mc = mathjs.complex
 const mm = mathjs.matrix
@@ -323,7 +322,7 @@ export class MeasureGate extends FastForwardingGate {
       qureg.forEach((qubit) => {
         num_qubits += 1
         const cmd = this.generateCommand([qubit])
-        applyCommand(cmd)
+        cmd.apply()
       })
     })
     if (num_qubits > 1) {
