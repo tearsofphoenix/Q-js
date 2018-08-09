@@ -39,6 +39,13 @@ import QubitOperator, {stringToArray} from '../../ops/qubitoperator';
 import BasicMapperEngine from '../../cengines/basicmapper'
 import TimeEvolution from '../../ops/timeevolution';
 
+function getMatrixValue(m, idx) {
+  if (m.subset) {
+    return m.subset(math.index(idx))
+  }
+  return m[idx]
+}
+
 describe('simulator test', () => {
   class Mock1QubitGate extends BasicGate {
     constructor() {
@@ -75,9 +82,6 @@ describe('simulator test', () => {
       throw new Error('AttributeError')
     }
   }
-
-  let sim
-  before(() => sim = new Simulator())
 
   it('should test_simulator_is_available', () => {
     const sim = new Simulator()
@@ -117,8 +121,7 @@ describe('simulator test', () => {
     expect(Array.isArray(sim.cheat())).to.equal(true)
     // first entry is the qubit mapping.
     // should be empty:
-    const c = sim.cheat()
-    console.log(c)
+
     expect(Object.keys(sim.cheat()[0]).length).to.equal(0)
     // state vector should only have 1 entry:
     expect(len(sim.cheat()[1])).to.equal(1)
@@ -130,7 +133,10 @@ describe('simulator test', () => {
     expect(sim.cheat()[0][0]).to.equal(0)
 
     expect(len(sim.cheat()[1])).to.equal(2)
-    expect(math.deepEqual(sim.cheat()[1].subset(math.index(0)), math.complex(1, 0))).to.equal(true)
+    const v = getMatrixValue(sim.cheat()[1], 0)
+
+    expect(v.re).to.equal(1)
+    expect(v.im).to.equal(0)
 
     qubit[0].deallocate()
     // should be empty:
@@ -195,14 +201,14 @@ describe('simulator test', () => {
 
     Control(eng, qubit3, () => new Plus2Gate().or(tuple(qubit1.concat(qubit2))))
 
-    expect(math.equal(sim.cheat()[1].subset(math.index(0)), 1)).to.equal(true)
+    expect(math.equal(getMatrixValue(sim.cheat()[1], 0), 1)).to.equal(true)
     console.log(sim.cheat())
     X.or(qubit3)
     console.log(sim.cheat())
     console.log('=================')
     Control(eng, qubit3, () => new Plus2Gate().or(tuple(qubit1.concat(qubit2))))
     console.log(sim.cheat())
-    expect(sim.cheat()[1].subset(math.index(6))).to.deep.equal(math.complex(1, 0))
+    expect(getMatrixValue(sim.cheat()[1], 6)).to.deep.equal(math.complex(1, 0))
 
     new All(Measure).or(tuple(qubit1.concat(qubit2).concat(qubit3)))
   });
@@ -520,8 +526,8 @@ describe('simulator test', () => {
     const half = Math.floor(count / 2)
     const hadamard_f = 1.0 / math.sqrt(2.0)
     // check evolution and control
-    const tail = final_wavefunction.subset(math.index(math.range(half, count)))
-    const head = final_wavefunction.subset(math.index(math.range(0, half)))
+    const tail = getMatrixValue(final_wavefunction, math.range(half, count))
+    const head = getMatrixValue(final_wavefunction, math.range(0, half))
     console.log(math.multiply(hadamard_f, res), tail)
     expect(math.deepEqual(math.multiply(hadamard_f, res), tail)).to.equal(true)
     expect(head).to.deep.equal(math.multiply(hadamard_f, init_wavefunction))
@@ -646,8 +652,8 @@ describe('simulator test', () => {
 
     // check the state vector:
     let m = sim.cheat()[1]
-    expect(math.abs(m.subset(math.index(0))) ** 2).to.be.closeTo(0.5, 1e-12)
-    expect(math.abs(m.subset(math.index(31))) ** 2).to.be.closeTo(0.5, 1e-12)
+    expect(math.abs(getMatrixValue(m, 0)) ** 2).to.be.closeTo(0.5, 1e-12)
+    expect(math.abs(getMatrixValue(m, 31)) ** 2).to.be.closeTo(0.5, 1e-12)
 
     for (let i = 1; i < 31; ++i) {
       const v = sim.cheat()[1][i] || math.complex(0, 0)
@@ -664,8 +670,8 @@ describe('simulator test', () => {
     console.log(sim.cheat()[1][0], sim.cheat()[1][31])
 
     m = sim.cheat()[1]
-    const v31 = math.re(math.abs(m.subset(math.index(31))))
-    expect(math.re(math.abs(m.subset(math.index(0))))).to.be.closeTo(Math.SQRT1_2, 1e-12)
+    const v31 = math.re(math.abs(getMatrixValue(m, 31)))
+    expect(math.re(math.abs(getMatrixValue(m, 0)))).to.be.closeTo(Math.SQRT1_2, 1e-12)
     expect(v31).to.be.closeTo(Math.SQRT1_2, 1e-12)
 
     for (let i = 1; i < 31; ++i) {
@@ -682,7 +688,7 @@ describe('simulator test', () => {
 
     // check the state vector:
     const mm = sim.cheat()[1]
-    const v0 = mm.subset(math.index(0))
+    const v0 = getMatrixValue(mm, 0)
     expect(math.re(math.abs(v0))).to.be.closeTo(1, 1e-12)
     for (let i = 1; i < 32; ++i) {
       const v = sim.cheat()[1][i] || math.complex(0, 0)

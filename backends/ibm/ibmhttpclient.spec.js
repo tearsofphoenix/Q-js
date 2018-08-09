@@ -20,22 +20,22 @@ const _api_url = 'https://quantumexperience.ng.bluemix.net/api/'
 const _api_url_status = 'https://quantumexperience.ng.bluemix.net/api/'
 
 describe('ibm http client test', () => {
-  it('should test_send_real_device_online_verbose', function () {
+  it('should test_send_real_device_online_verbose', () => {
     const qasms = {'qasms': [{'qasm': 'my qasm'}]}
     const json_qasm = JSON.stringify(qasms)
     const name = 'projectq_test'
-    const access_token = "access"
+    const access_token = 'access'
     const user_id = 2016
     const code_id = 11
     const name_item = `"name":"${name}", "jsonQASM":`
     const json_body = [name_item, json_qasm].join('')
     const json_data = ['{', json_body, '}'].join('')
     const shots = 1
-    const device = "ibmqx4"
+    const device = 'ibmqx4'
     const json_data_run = ['{"qasm":', json_qasm, '}'].join('')
     const execution_id = 3
     const result_ready = [false]
-    const result = "my_result"
-    const request_num = [0]  // To assert correct order of calls
+    const result = 'my_result'
+    const request_num = [0] // To assert correct order of calls
   });
 })

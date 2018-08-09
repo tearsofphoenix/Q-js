@@ -27,6 +27,11 @@ const mm = mathjs.matrix
 
 describe('Qubit test', () => {
 
+  it('should test mathjs complex type', function () {
+    const c = mc(1, -1)
+    console.log(c.re, c.im)
+  });
+
   it('should test basic qubit', () => {
     const qubitID = [0, 1]
     const fakeEngine = 'Fake'

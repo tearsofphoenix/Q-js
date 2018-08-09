@@ -5,3 +5,4 @@ cmake-build-debug
 .nyc_output
 coverage
 *.log
+*.node

@@ -1,13 +1,13 @@
 {
   'variables': {
-      'libsass_ext%': '',
+      'libq_ext%': '',
   },
   'targets': [
     {
       'target_name': 'binding',
       'win_delay_load_hook': 'true',
       'sources': [
-        'backends/simulators/cppkernels/Wrapper.cpp'
+        'backends/simulators/cppkernels/addon.cpp'
       ],
       'msvs_settings': {
         'VCLinkerTool': {
@@ -26,34 +26,34 @@
         '<!(node -e "require(\'nan\')")',
       ],
       'conditions': [
-        ['libsass_ext == "" or libsass_ext == "no"', {
+        ['libq_ext == "" or libq_ext == "no"', {
           'dependencies': [
             './libq.gyp:libq',
           ]
         }],
-        ['libsass_ext == "auto"', {
+        ['libq_ext == "auto"', {
           'cflags_cc': [
-            '<!(pkg-config --cflags libsass)',
+            '<!(pkg-config --cflags libq)',
           ],
           'link_settings': {
             'ldflags': [
-              '<!(pkg-config --libs-only-other --libs-only-L libsass)',
+              '<!(pkg-config --libs-only-other --libs-only-L libq)',
             ],
             'libraries': [
-              '<!(pkg-config --libs-only-l libsass)',
+              '<!(pkg-config --libs-only-l libq)',
             ],
           }
         }],
-        ['libsass_ext == "yes"', {
+        ['libq_ext == "yes"', {
           'cflags_cc': [
-            '<(libsass_cflags)',
+            '<(libq_cflags)',
           ],
           'link_settings': {
             'ldflags': [
-              '<(libsass_ldflags)',
+              '<(libq_ldflags)',
             ],
             'libraries': [
-              '<(libsass_library)',
+              '<(libq_library)',
             ],
           }
         }],

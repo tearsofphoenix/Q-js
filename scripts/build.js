@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-/*!
- * node-sass: scripts/build.js
- */
-
 const fs = require('fs');
 const mkdir = require('mkdirp');
 const path = require('path');
 const spawn = require('cross-spawn');
-const sass = require('./extensions');
+const ext = require('./extensions');
 
 /**
  * After build
@@ -32,7 +28,7 @@ const sass = require('./extensions');
  */
 
 function afterBuild(options) {
-  const install = sass.getBinaryPath();
+  const install = ext.getBinaryPath();
   const target = path.join(__dirname, '..', 'build',
     options.debug ? 'Debug'
       : process.config.target_defaults
@@ -73,7 +69,7 @@ function afterBuild(options) {
 
 function build(options) {
   const args = [require.resolve(path.join('node-gyp', 'bin', 'node-gyp.js')), 'rebuild', '--verbose'].concat(
-    ['libsass_ext', 'libsass_cflags', 'libsass_ldflags', 'libsass_library'].map((subject) => {
+    ['libq_ext', 'libq_cflags', 'libq_ldflags', 'libq_library'].map((subject) => {
       return ['--', subject, '=', process.env[subject.toUpperCase()] || ''].join('');
     })
   ).concat(options.args);
@@ -122,8 +118,8 @@ function parseArgs(args) {
       options.arch = arg.substring(14);
     } else if (arg === '-d' || arg === '--debug') {
       options.debug = true;
-    } else if (arg.substring(0, 13) === '--libsass_ext' && arg.substring(14) !== 'no') {
-      options.libsassExt = true;
+    } else if (arg.substring(0, 13) === '--libq_ext' && arg.substring(14) !== 'no') {
+      options.libqExt = true;
     }
 
     return true;
@@ -140,15 +136,15 @@ function parseArgs(args) {
  */
 
 function testBinary(options) {
-  if (options.force || process.env.SASS_FORCE_BUILD) {
+  if (options.force || process.env.Q_FORCE_BUILD) {
     return build(options);
   }
 
-  if (!sass.hasBinary(sass.getBinaryPath())) {
+  if (!ext.hasBinary(ext.getBinaryPath())) {
     return build(options);
   }
 
-  console.log('Binary found at', sass.getBinaryPath());
+  console.log('Binary found at', ext.getBinaryPath());
   console.log('Testing binary');
 
   try {

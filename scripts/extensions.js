@@ -347,7 +347,7 @@ function getBinaryPath() {
  */
 function getCachePathCandidates() {
   return [
-    process.env.npm_config_sass_binary_cache,
+    process.env.npm_config_projectq_binary_cache,
     process.env.npm_config_cache,
   ].filter((_) => { return _; });
 }
@@ -443,8 +443,8 @@ function hasBinary(binaryPath) {
 
 function getVersionInfo(binding) {
   return [
-    ['node-sass', pkg.version, '(Wrapper)', '[JavaScript]'].join('\t'),
-    ['libsass  ', binding.libsassVersion(), '(Sass Compiler)', '[C/C++]'].join('\t'),
+    ['node-q', pkg.version, '(Wrapper)', '[JavaScript]'].join('\t'),
+    ['libq  ', binding.libqVersion(), '(Q Compiler)', '[C/C++]'].join('\t'),
   ].join(eol);
 }
 

@@ -18,6 +18,8 @@ import assert from 'assert'
 import math from 'mathjs'
 import {BasicEngine} from '../../cengines/basics'
 import SimulatorBackend from './jssim'
+import CPPSimulatorBackend from './cppsim'
+
 import {
   Allocate, AllocateQubitGate, Deallocate, DeallocateQubitGate, FlushGate, Measure, MeasureGate
 } from '../../ops/gates';
@@ -77,7 +79,11 @@ extension.
       rnd_seed = Math.random()
     }
 
-    this._simulator = new SimulatorBackend(rnd_seed)
+    if (CPPSimulatorBackend) {
+      this._simulator = new CPPSimulatorBackend(rnd_seed)
+    } else {
+      this._simulator = new SimulatorBackend(rnd_seed)
+    }
     this._gate_fusion = gate_fusion
   }
 

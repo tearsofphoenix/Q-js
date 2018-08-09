@@ -5,7 +5,7 @@
     'win_delay_load_hook': 'false',
     'type': 'static_library',
     'defines': [
-      'LIBSASS_VERSION="<!(node -e "process.stdout.write(require(\'./package.json\').libq)")"'
+      'LIBQ_VERSION="<!(node -e "process.stdout.write(require(\'./package.json\').libq)")"'
     ],
     'defines!': [
       'DEBUG'
