@@ -3,6 +3,7 @@
 //
 #include "Wrapper.hpp"
 
+using MatrixType = std::vector<Simulator::StateVector>;
 // implementation
 
 Nan::Persistent<v8::Function> Wrapper::constructor;
@@ -100,9 +101,9 @@ void jsToArray(Local<Array> &jsArray, V ids) {
 }
 
 template <typename T>
-void arrayToJS(Local<Array> &ret, T &result) {
+void arrayToJS(Isolate* isolate, Local<Array> &ret, T &result) {
     for (int i = 0; i < result.size(); ++i) {
-        ret->Set(i, Nan::New(result[i]));
+        ret->Set(i, Number::New(isolate, result[i]));
     }
 }
 
@@ -121,9 +122,9 @@ void jsToTermDictionary(Local<Array> &terms, Simulator::TermsDict &dict) {
     }
 }
 
-void jsToComplexTermDictionary(Local<Array> &terms, Simulator::ComplexTermsDict &dict) {
-    auto re =  Nan::New<v8::String>("re").ToLocalChecked();
-    auto im =  Nan::New<v8::String>("im").ToLocalChecked();
+void jsToComplexTermDictionary(Isolate *isolate, Local<Array> &terms, Simulator::ComplexTermsDict &dict) {
+    auto re = String::NewFromUtf8(isolate, "re");
+    auto im = String::NewFromUtf8(isolate, "im");
 
     for (int i = 0; i < terms->Length(); ++i) {
         Local<Value> v = terms->Get(i);
@@ -149,9 +150,9 @@ void jsToComplexTermDictionary(Local<Array> &terms, Simulator::ComplexTermsDict 
     }
 }
 
-void jsToStateVector(Local<Array> &array, Simulator::StateVector &vec) {
-    auto re =  Nan::New<v8::String>("re").ToLocalChecked();
-    auto im =  Nan::New<v8::String>("im").ToLocalChecked();
+void jsToStateVector(Isolate *iso, Local<Array> &array, Simulator::StateVector &vec) {
+    auto re = String::NewFromUtf8(iso, "re");
+    auto im = String::NewFromUtf8(iso, "im");
 
     for (int i = 0; i < array->Length(); ++i) {
         Local<Value> v = array->Get(i);
@@ -167,19 +168,20 @@ void jsToStateVector(Local<Array> &array, Simulator::StateVector &vec) {
     }
 }
 
-void mapToJSObject(Simulator::Map &map, Local<Object> &dict) {
+void mapToJSObject(Isolate *isolate, Simulator::Map &map, Local<Object> &dict) {
     for (auto i = map.begin(); i != map.end(); ++i) {
         auto key = i->first;
         auto value = i->second;
-        auto k1 = Nan::New(key);
-        auto v1 = Nan::New(value);
+        auto k1 = Number::New(isolate, key);
+        auto v1 = Number::New(isolate, value);
+
         dict->Set(k1, v1);
     }
 }
 
 void stateVectorToJS(Isolate* isolate, Simulator::StateVector &vec, Local<Array> &array) {
-    auto re =  Nan::New<v8::String>("re").ToLocalChecked();
-    auto im =  Nan::New<v8::String>("im").ToLocalChecked();
+    auto re = String::NewFromUtf8(isolate, "re");
+    auto im = String::NewFromUtf8(isolate, "im");
 
     for (int i = 0; i < vec.size(); ++i) {
         auto value = vec[i];
@@ -195,57 +197,63 @@ void stateVectorToJS(Isolate* isolate, Simulator::StateVector &vec, Local<Array>
 
 void Wrapper::measureQubits(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
+    auto isolate = info.GetIsolate();
+
     v8::Local<v8::Array> jsArray = v8::Local<v8::Array>::Cast(info[0]);
-    std::vector<bool> result;
     std::vector<unsigned int> ids;
-    typename std::vector<unsigned int> V1;
-    typename std::vector<bool> V2;
     jsToArray<unsigned int>(jsArray, ids);
 
-    obj->_simulator->measure_qubits(ids, result);
+    auto result = obj->_simulator->measure_qubits_return(ids);
 
-    Local<Array> ret = Nan::New<v8::Array>(result.size());
-    arrayToJS(ret, result);
+    Local<Array> ret = Array::New(isolate, result.size());
+    arrayToJS(isolate, ret, result);
 
     info.GetReturnValue().Set(ret);
 }
 
+void jsToMatrix(Isolate *iso, Local<Array> &array, MatrixType &m) {
+    for (int i = 0; i < array->Length(); ++i) {
+        auto aLooper = Local<Array>::Cast(array->Get(i));
+        Simulator::StateVector vector;
+        jsToStateVector(iso, aLooper, vector);
+        m.push_back(vector);
+    }
+}
+
 void Wrapper::applyControlledGate(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
-    complex_type I(0., 1.);
-    Fusion::Matrix X = {{0., 1.}, {1., 0.}};
-    Fusion::Matrix Y = {{0., -I}, {I, 0.}};
-    Fusion::Matrix Z = {{1., 0.}, {0., -1.}};
-    std::vector<Fusion::Matrix> gates = {X, Y, Z};
+    Isolate *isolate = info.GetIsolate();
+    auto mat = Local<Array>::Cast(info[0]);
+    MatrixType m;
+    jsToMatrix(isolate, mat, m);
 
-    v8::String::Utf8Value val(info[0]->ToString());
-    std::string str(*val, val.length());
-
-    v8::Local<v8::Array> idsArray = v8::Local<v8::Array>::Cast(info[1]);
-    v8::Local<v8::Array> controlArray = v8::Local<v8::Array>::Cast(info[2]);
+    auto idsArray = v8::Local<v8::Array>::Cast(info[1]);
+    auto controlArray = v8::Local<v8::Array>::Cast(info[2]);
     std::vector<unsigned int> ids;
     jsToArray<unsigned int>(idsArray, ids);
 
     std::vector<unsigned int> ctrl;
     jsToArray<unsigned int>(controlArray, ctrl);
 
-    obj->_simulator->apply_controlled_gate(gates[str[0] - 'X'], ids, ctrl);
+    obj->_simulator->apply_controlled_gate(m, ids, ctrl);
 }
 
 void Wrapper::emulateMath(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
     Local<Function> cbFunc = Local<Function>::Cast(info[0]);
     Nan::Callback cb(cbFunc);
+    auto isolate = info.GetIsolate();
 
     auto f = [&](std::vector<int>& x) {
         const int argc = 1;
         v8::Local<v8::Value> args1[argc];
-        Local<Array> arg = Nan::New<v8::Array>(x.size());
-        arrayToJS(arg, x);
+        Local<Array> arg = Array::New(isolate, x.size());
+        arrayToJS(isolate, arg, x);
         args1[0] = arg;
 
         Local<Array> result = Local<Array>::Cast(cb.Call(argc, args1));
         std::vector<int> ret(result->Length());
+        jsToArray<int>(result, ret);
         x = std::move(ret);
     };
     v8::Local<v8::Array> quregArray = v8::Local<v8::Array>::Cast(info[1]);
@@ -281,9 +289,10 @@ void Wrapper::getExpectationValue(const Nan::FunctionCallbackInfo<v8::Value> &in
 
 void Wrapper::applyQubitOperator(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
+    Isolate *isolate = info.GetIsolate();
     Local<Array> terms = Local<Array>::Cast(info[0]);
     Simulator::ComplexTermsDict termsDict;
-    jsToComplexTermDictionary(terms, termsDict);
+    jsToComplexTermDictionary(isolate, terms, termsDict);
 
     auto a2 = Local<Array>::Cast(info[0]);
     std::vector<unsigned int> ids;
@@ -325,6 +334,7 @@ void Wrapper::getProbability(const Nan::FunctionCallbackInfo<v8::Value> &info) {
 }
 
 void Wrapper::getAmplitude(const Nan::FunctionCallbackInfo<v8::Value> &info) {
+    auto isolate = info.GetIsolate();
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
     Local<Array> i1 = Local<Array>::Cast(info[0]);
     std::vector<bool> bitString;
@@ -336,19 +346,19 @@ void Wrapper::getAmplitude(const Nan::FunctionCallbackInfo<v8::Value> &info) {
 
     auto result = obj->_simulator->get_amplitude(bitString, ids);
 
-    Local<Array> ret = Nan::New<v8::Array>(2);
-    ret->Set(0, Nan::New(result.real()));
-    ret->Set(1, Nan::New(result.imag()));
+    Local<Object> ret = Object::New(isolate);
+    ret->Set(String::NewFromUtf8(isolate, "re"), Number::New(isolate, result.real()));
+    ret->Set(String::NewFromUtf8(isolate, "im"), Number::New(isolate, result.imag()));
 
     info.GetReturnValue().Set(ret);
 }
 
 void Wrapper::setWavefunction(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
-
+    auto isolate = info.GetIsolate();
     Local<Array> i1 = Local<Array>::Cast(info[0]);
     Simulator::StateVector vec;
-    jsToStateVector(i1, vec);
+    jsToStateVector(isolate, i1, vec);
 
 
     Local<Array> i2 = Local<Array>::Cast(info[1]);
@@ -389,7 +399,7 @@ void Wrapper::cheat(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     auto rm = Object::New(isolate);
     auto rs = Array::New(isolate, state.size());
 
-    mapToJSObject(m, rm);
+    mapToJSObject(isolate, m, rm);
     stateVectorToJS(isolate, state, rs);
 
     auto ret = Array::New(isolate, 2);

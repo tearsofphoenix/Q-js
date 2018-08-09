@@ -201,7 +201,8 @@ describe('simulator test', () => {
 
     Control(eng, qubit3, () => new Plus2Gate().or(tuple(qubit1.concat(qubit2))))
 
-    expect(math.equal(getMatrixValue(sim.cheat()[1], 0), 1)).to.equal(true)
+    const v = getMatrixValue(sim.cheat()[1], 0)
+    expect(v.re).to.equal(1)
     console.log(sim.cheat())
     X.or(qubit3)
     console.log(sim.cheat())

@@ -422,7 +422,10 @@ Exception: If a non-single-qubit gate needs to be processed
       if (2 ** ids.length !== len(matrix)) {
         throw new Error(`Simulator: Error applying ${cmd.gate.toString()} gate: ${math.log(len(cmd.gate.matrix), 2)}-qubit gate applied to ${ids.length} qubits.`)
       }
-      this._simulator.applyControlledGate(matrix, ids, cmd.controlQubits.map(qb => qb.id))
+      const m = math.clone(matrix)._data
+      const ctrls = cmd.controlQubits.map(qb => qb.id)
+      console.log(m, ctrls)
+      this._simulator.applyControlledGate(m, ids, ctrls)
       if (!this._gate_fusion) {
         this._simulator.run()
       }

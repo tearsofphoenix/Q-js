@@ -30,6 +30,8 @@ describe('Qubit test', () => {
   it('should test mathjs complex type', function () {
     const c = mc(1, -1)
     console.log(c.re, c.im)
+    const a = mm([[1, 0], [0, 1]])
+    console.log(a._data)
   });
 
   it('should test basic qubit', () => {
