@@ -1,6 +1,8 @@
 
 #include <nan.h>
 #include "simulator.hpp"
+#include <iostream>
+#include <fstream>
 
 using namespace v8;
 using QuRegs = std::vector<std::vector<unsigned>>;
@@ -51,4 +53,6 @@ private:
 
     int _seed;
     Simulator *_simulator;
+public:
+    std::ofstream _logfile;
 };

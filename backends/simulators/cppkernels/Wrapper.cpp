@@ -4,16 +4,101 @@
 #include "Wrapper.hpp"
 
 using MatrixType = std::vector<Simulator::StateVector>;
+
+std::ostream& operator<<(std::ostream &os, Simulator::StateVector &vec) {
+    os << "[";
+    for (int i = 0; i < vec.size(); ++i) {
+        auto item = vec[i];
+        os << "(" << item.real() << ", " << item.imag() << ") ";
+    }
+    os << "]";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream &os, MatrixType &matrix) {
+    os << "[";
+    for (int i = 0; i < matrix.size(); ++i) {
+        auto state = matrix[i];
+        os << state;
+    }
+    os << "]";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream &os, Simulator::Term &term) {
+    os << "[";
+    for (int i = 0; i < term.size(); ++i) {
+        auto item = term[i];
+        os << "(" << item.first << ", " << item.second << ")";
+    }
+    os << "]" << std::endl;
+    return os;
+}
+
+
+std::ostream& operator<<(std::ostream &os, Simulator::TermsDict &termsDict) {
+    os << "[";
+    for (int i = 0; i < termsDict.size(); ++i) {
+        auto pair = termsDict[i];
+        os << pair.first << pair.second << std::endl;
+    }
+    os << "]";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream &os, Simulator::ComplexTermsDict &termsDict) {
+    os << "[";
+    for (int i = 0; i < termsDict.size(); ++i) {
+        auto pair = termsDict[i];
+        os << pair.first << "(" << pair.second.real() << ", " << pair.second.imag() << ")" << std::endl;
+    }
+    os << "]";
+    return os;
+}
+
+
+std::ostream& operator<<(std::ostream &os, std::vector<bool> &vec) {
+    os << "[";
+    for (int i = 0; i < vec.size(); ++i) {
+        auto item = vec[i];
+        os << item << " ";
+    }
+    os << "]";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream &os, std::vector<unsigned int> &vec) {
+    os << "[";
+    for (int i = 0; i < vec.size(); ++i) {
+        auto item = vec[i];
+        os << item << " ";
+    }
+    os << "]";
+    return os;
+}
+
+std::ostream& operator<<(std::ostream &os, QuRegs &vec) {
+    os << "[";
+    for (int i = 0; i < vec.size(); ++i) {
+        auto item = vec[i];
+        os << item << " ";
+    }
+    os << "]";
+    return os;
+}
+
 // implementation
 
 Nan::Persistent<v8::Function> Wrapper::constructor;
 
 Wrapper::Wrapper(int seed) {
     _simulator = new Simulator(seed);
+    _logfile.open("./log.txt");
 }
 
 Wrapper::~Wrapper() {
     delete _simulator;
+    _logfile.close();
 }
 
 void Wrapper::Init(v8::Local<v8::Object> exports) {
@@ -67,12 +152,16 @@ void Wrapper::allocateQubit(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
     int id = info[0]->NumberValue();
     obj->_simulator->allocate_qubit(id);
+
+    obj->_logfile << "allocateQubit: " << id << std::endl;
 }
 
 void Wrapper::deallocateQubit(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
     int id = info[0]->NumberValue();
     obj->_simulator->deallocate_qubit(id);
+
+    obj->_logfile << "deallocateQubit: " << id << std::endl;
 }
 
 void Wrapper::getClassicalValue(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -81,6 +170,8 @@ void Wrapper::getClassicalValue(const Nan::FunctionCallbackInfo<v8::Value> &info
     double calc = info[1]->NumberValue();
     bool result = obj->_simulator->get_classical_value(id, calc);
     info.GetReturnValue().Set(result);
+
+    obj->_logfile << "getClassicalValue: " << id << " result: " << result << std::endl;
 }
 
 void Wrapper::isClassical(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -89,6 +180,8 @@ void Wrapper::isClassical(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     double calc = info[1]->NumberValue();
     bool result = obj->_simulator->is_classical(id, calc);
     info.GetReturnValue().Set(result);
+
+    obj->_logfile << "isClassical: " << id << " result: " << result << std::endl;
 }
 
 template <typename T, typename V>
@@ -157,7 +250,7 @@ void jsToStateVector(Isolate *iso, Local<Array> &array, Simulator::StateVector &
     for (int i = 0; i < array->Length(); ++i) {
         Local<Value> v = array->Get(i);
 
-        if (array->IsNumber()) {
+        if (v->IsNumber()) {
             vec.push_back(Simulator::complex_type(v->NumberValue()));
         } else {
             auto obj = array->ToObject();
@@ -209,6 +302,8 @@ void Wrapper::measureQubits(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     arrayToJS(isolate, ret, result);
 
     info.GetReturnValue().Set(ret);
+
+    obj->_logfile << "measureQubits: " << ids << " result: " << result << std::endl;
 }
 
 void jsToMatrix(Isolate *iso, Local<Array> &array, MatrixType &m) {
@@ -236,6 +331,8 @@ void Wrapper::applyControlledGate(const Nan::FunctionCallbackInfo<v8::Value> &in
     jsToArray<unsigned int>(controlArray, ctrl);
 
     obj->_simulator->apply_controlled_gate(m, ids, ctrl);
+
+    obj->_logfile << "applyControlledGate: m: " << m << " ids: " << ids << " ctrls: " << ctrl << std::endl;
 }
 
 void Wrapper::emulateMath(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -271,6 +368,8 @@ void Wrapper::emulateMath(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     jsToArray<unsigned int>(ctrlArray, ctrls);
 
     obj->_simulator->emulate_math(f, regs, ctrls);
+
+    obj->_logfile << "emulateMath: f: " << " ids: " << regs << " ctrls: " << ctrls << std::endl;
 }
 
 void Wrapper::getExpectationValue(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -285,6 +384,8 @@ void Wrapper::getExpectationValue(const Nan::FunctionCallbackInfo<v8::Value> &in
 
     auto result = obj->_simulator->get_expectation_value(termsDict, ids);
     info.GetReturnValue().Set(result);
+
+    obj->_logfile << "getExpectationValue: terms: " << termsDict << " ids: " << ids << std::endl;
 }
 
 void Wrapper::applyQubitOperator(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -300,6 +401,7 @@ void Wrapper::applyQubitOperator(const Nan::FunctionCallbackInfo<v8::Value> &inf
 
     obj->_simulator->apply_qubit_operator(termsDict, ids);
 
+    obj->_logfile << "applyQubitOperator: terms: " << termsDict << " ids: " << ids << std::endl;
 }
 
 void Wrapper::emulateTimeEvolution(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -318,6 +420,8 @@ void Wrapper::emulateTimeEvolution(const Nan::FunctionCallbackInfo<v8::Value> &i
     jsToArray<unsigned int>(a4, ctrl);
 
     obj->_simulator->emulate_time_evolution(tdict, time, ids, ctrl);
+
+    obj->_logfile << "emulateTimeEvolution: terms: " << tdict << " ids: " << ids << " ctrl: " << ctrl << " time: " << time << std::endl;
 }
 
 void Wrapper::getProbability(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -331,6 +435,8 @@ void Wrapper::getProbability(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     jsToArray<unsigned int>(i2, ids);
     Simulator::calc_type result = obj->_simulator->get_probability(bitString, ids);
     info.GetReturnValue().Set(result);
+
+    obj->_logfile << "getProbability: bitstring: " << bitString << " ids: " << ids << " result: " << result << std::endl;
 }
 
 void Wrapper::getAmplitude(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -351,6 +457,8 @@ void Wrapper::getAmplitude(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     ret->Set(String::NewFromUtf8(isolate, "im"), Number::New(isolate, result.imag()));
 
     info.GetReturnValue().Set(ret);
+
+    obj->_logfile << "getAmplitude: bitstring: " << bitString << " ids: " << ids << " result: " << result << std::endl;
 }
 
 void Wrapper::setWavefunction(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -366,6 +474,8 @@ void Wrapper::setWavefunction(const Nan::FunctionCallbackInfo<v8::Value> &info) 
     jsToArray<unsigned int>(i2, ordering);
 
     obj->_simulator->set_wavefunction(vec, ordering);
+
+    obj->_logfile << "setWavefunction: wavefunction: " << vec << " ordering: " << ordering << std::endl;
 }
 
 void Wrapper::collapseWavefunction(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -380,11 +490,15 @@ void Wrapper::collapseWavefunction(const Nan::FunctionCallbackInfo<v8::Value> &i
     jsToArray<bool>(i1, bitString);
 
     obj->_simulator->collapse_wavefunction(ids, bitString);
+
+    obj->_logfile << "collapseWavefunction: ids: " << ids << " bitstring: " << bitString << std::endl;
 }
 
 void Wrapper::run(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
     obj->_simulator->run();
+
+    obj->_logfile << "run" << std::endl;
 }
 
 void Wrapper::cheat(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -407,4 +521,6 @@ void Wrapper::cheat(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     ret->Set(1, rs);
 
     info.GetReturnValue().Set(ret);
+
+    obj->_logfile << "cheat: " << state << std::endl;
 }
