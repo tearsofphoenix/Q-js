@@ -30,15 +30,15 @@ and meta gates, i.e.,
 * Allocate / Deallocate qubits
 * Flush gate (end of circuit)
 */
-import mathjs from 'mathjs'
+import math from 'mathjs'
 import {
   SelfInverseGate, BasicPhaseGate, BasicRotationGate, BasicMathGate, BasicGate, FastForwardingGate, ClassicalInstructionGate
 } from './basics'
 
 import {getInverse} from './_cycle'
 
-const mc = mathjs.complex
-const mm = mathjs.matrix
+const mc = math.complex
+const mm = math.matrix
 
 export class HGate extends SelfInverseGate {
   toString() {

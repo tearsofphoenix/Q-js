@@ -1,8 +1,8 @@
-import mathjs from 'mathjs'
+import math from 'mathjs'
 import {instanceOf} from './util';
 
-const Complex = mathjs.complex().constructor
-const Matrix = mathjs.matrix().constructor
+const Complex = math.complex().constructor
+const Matrix = math.matrix().constructor
 
 export function isComplex(value) {
   return value instanceof Complex
@@ -136,7 +136,7 @@ export function stringToBitArray(str) {
 
 export function copyComplexArray(complexArray) {
   if (Array.isArray(complexArray)) {
-    return complexArray.map(c => mathjs.clone(c))
+    return complexArray.map(c => math.clone(c))
   }
   return []
 }
@@ -145,13 +145,13 @@ export function complexVectorDot(a1, a2) {
   let real = 0
   let image = 0
   a1.forEach((c1, [i]) => {
-    const c2 = a2.subset(mathjs.index(i))
-    const r1 = mathjs.re(c1)
-    const i1 = mathjs.im(c1)
-    const r2 = mathjs.re(c2)
-    const i2 = mathjs.im(c2)
+    const c2 = a2.subset(math.index(i))
+    const r1 = math.re(c1)
+    const i1 = math.im(c1)
+    const r2 = math.re(c2)
+    const i2 = math.im(c2)
     real += r1 * r2 - (- i1 * i2)
     image += r1 * i2 - r2 * i1
   })
-  return mathjs.complex(real, image)
+  return math.complex(real, image)
 }
