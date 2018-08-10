@@ -50,10 +50,10 @@ describe('gates test', () => {
     Entangle.or(qureg)
 
     const m = sim.cheat()[1]
-    const v1 = m.subset(math.index(0))
-    const v2 = m.subset(math.index(len(m) - 1))
-    expect(math.abs(v1)).to.be.closeTo(Math.SQRT1_2, 1e-12)
-    expect(math.abs(v2)).to.be.closeTo(Math.SQRT1_2, 1e-12)
+    const v1 = m[0]
+    const v2 = m[len(m) - 1]
+    expect(v1.re).to.be.closeTo(Math.SQRT1_2, 1e-12)
+    expect(v2.re).to.be.closeTo(Math.SQRT1_2, 1e-12)
 
     new All(Measure).or(qureg)
   });
@@ -105,7 +105,9 @@ describe('gates test', () => {
     const m = sim.cheat()[1]
     const m2 = sim2.cheat()[1]
     m.forEach((val, idx) => {
-      expect(math.equal(val, m2.subset(math.index(idx[0])))).to.equal(true)
+      const v2 = m2[idx]
+      expect(val.re).to.be.closeTo(v2.re, 1e-12)
+      expect(val.im).to.be.closeTo(v2.im, 1e-12)
     })
 
     new All(Measure).or(qureg)

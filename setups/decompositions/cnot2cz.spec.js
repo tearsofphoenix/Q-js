@@ -102,7 +102,8 @@ describe('cnot2cz test', () => {
         const test = test_sim.getAmplitude(binary_state, test_qb.concat(test_ctrl_qb))
         const correct = correct_sim.getAmplitude(binary_state, correct_qb.concat(correct_ctrl_qb))
 
-        expect(correct).to.be.closeTo(test, 1e-12, 1e-12)
+        expect(correct.re).to.be.closeTo(test.re, 1e-12, 1e-12)
+        expect(correct.im).to.be.closeTo(test.im, 1e-12, 1e-12)
       }
 
       new All(Measure).or(test_qb.concat(test_ctrl_qb))

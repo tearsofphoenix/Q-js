@@ -89,6 +89,14 @@ gate: Any gate object of which to represent the inverse.
   toString() {
     return `${this.gate.toString()}^\dagger`
   }
+
+  texString() {
+    if (this.gate.texString) {
+      return `$${this.gate.texString()}^\\dagger$`
+    } else {
+      return `$${this.gate.toString()}^\\dagger$`
+    }
+  }
 }
 
 Cycle.add('DaggeredGate', DaggeredGate)

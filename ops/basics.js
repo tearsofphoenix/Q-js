@@ -276,6 +276,19 @@ New object representing the merged gates.
     return `${this.constructor.name}(${this.angle})`
   }
 
+  /*
+    Return the Latex string representation of a BasicRotationGate.
+
+  Returns the class name and the angle as a subscript, i.e.
+
+.. code-block:: latex
+
+  [CLASSNAME]$_[ANGLE]$
+   */
+  texString() {
+    return `${this.constructor.name}$_{${this.angle}}$`
+  }
+
   equal(other) {
     if (other instanceof BasicRotationGate) {
       return this.angle == other.angle
@@ -346,7 +359,11 @@ New object representing the merged gates.
   }
 
   toString() {
-    return `BasicPhaseGate(${this.angle})`
+    return `${this.constructor.name}(${this.angle})`
+  }
+
+  texString() {
+    return `${this.constructor.name}$_{${this.angle}}$`
   }
 
   equal(other) {

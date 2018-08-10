@@ -58,7 +58,7 @@ cmd (Command): Command for which to check availability.
 True if the command can be executed.
 
     Raises:
-LastEngineException: If is_last_engine is True but is_available
+LastEngineError: If is_last_engine is True but is_available
 is not implemented.
      */
   isAvailable(cmd) {

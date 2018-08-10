@@ -154,6 +154,10 @@ export class SqrtXGate extends BasicGate {
   toString() {
     return 'SqrtX'
   }
+
+  texString() {
+    return '$\\sqrt{X}$'
+  }
 }
 
 // Shortcut (instance of) :class:`projectq.ops.SqrtXGate`

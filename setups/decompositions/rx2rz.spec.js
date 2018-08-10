@@ -54,7 +54,8 @@ describe('rx2rz test', () => {
           const test = test_eng.backend.getAmplitude(fstate, test_qb)
           const correct = correct_eng.backend.getAmplitude(fstate, correct_qb)
 
-          expect(math.equal(test, correct)).to.equal(true)
+          expect(test.re).to.be.closeTo(correct.re, 1e-12)
+          expect(test.im).to.be.closeTo(correct.im, 1e-12)
         })
 
         Measure.or(test_qb)
