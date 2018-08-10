@@ -70,7 +70,7 @@ export default class LinearMapper extends BasicMapperEngine {
 
     Args:
 num_qubits(int): Number of physical qubits in the linear chain
-cyclic(bool): If 1D chain is a cycle. Default is False.
+cyclic(bool): If 1D chain is a cycle. Default is false.
 storage(int): Number of gates to temporarily store, default is 1000
    */
   constructor(num_qubits, cyclic = false, storage=1000) {
@@ -217,92 +217,109 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
       return
     }
 // at least one qubit is not an active qubit:
-    else if qubit0 not in active_qubits or qubit1 not in active_qubits:
-    active_qubits.discard(qubit0)
-    active_qubits.discard(qubit1)
+    else if(!(qubit0 in active_qubits) || !(qubit1 in active_qubits)) {
+      active_qubits.remove(qubit0)
+      active_qubits.remove(qubit1)
+    }
 // at least one qubit is in the inside of a segment:
-    elif len(neighbour_ids[qubit0]) > 1 or len(neighbour_ids[qubit1]) > 1:
-    active_qubits.discard(qubit0)
-    active_qubits.discard(qubit1)
+    else if(len(neighbour_ids[qubit0]) > 1 || len(neighbour_ids[qubit1]) > 1) {
+      active_qubits.remove(qubit0)
+      active_qubits.remove(qubit1)
+    }
 // qubits are both active and either not yet in a segment or at
 // the end of segement:
-  else:
-    segment_index_qb0 = None
-    qb0_is_left_end = None
-    segment_index_qb1 = None
-    qb1_is_left_end = None
-    for index, segment in enumerate(segments):
-    if qubit0 == segment[0]:
-    segment_index_qb0 = index
-    qb0_is_left_end = True
-    elif qubit0 == segment[-1]:
-    segment_index_qb0 = index
-    qb0_is_left_end = False
-    if qubit1 == segment[0]:
-    segment_index_qb1 = index
-    qb1_is_left_end = True
-    elif qubit1 == segment[-1]:
-    segment_index_qb1 = index
-    qb1_is_left_end = False
+  else {
+      let segment_index_qb0
+      let qb0_is_left_end
+      let segment_index_qb1
+      let qb1_is_left_end
+
+      segments.forEach((segment, index) => {
+        if(qubit0 == segment[0]) {
+          segment_index_qb0 = index
+          qb0_is_left_end = true
+        }else if(qubit0 == segment[-1]) {
+          segment_index_qb0 = index
+          qb0_is_left_end = false
+        }
+        if(qubit1 == segment[0]) {
+          segment_index_qb1 = index
+          qb1_is_left_end = true
+        } else if (qubit1 == segment[-1]) {
+          segment_index_qb1 = index
+          qb1_is_left_end = false
+        }
+      })
 // Both qubits are not yet assigned to a segment:
-    if segment_index_qb0 is None && segment_index_qb1 is None:
-        segments.append([qubit0, qubit1])
-    neighbour_ids[qubit0].add(qubit1)
-    neighbour_ids[qubit1].add(qubit0)
+      if (typeof segment_index_qb0 === 'undefined' && typeof segment_index_qb1 === 'undefined') {
+        segments.push([qubit0, qubit1])
+        neighbour_ids[qubit0].add(qubit1)
+        neighbour_ids[qubit1].add(qubit0)
+      }
 // if qubits are in the same segment, then the gate is not
-// possible. Note that if this.cyclic==True, we have
+// possible. Note that if this.cyclic==true, we have
 // added that connection already to neighbour_ids and wouldn't be
 // in this branch.
-    elif segment_index_qb0 == segment_index_qb1:
-    active_qubits.remove(qubit0)
-    active_qubits.remove(qubit1)
+      else if (segment_index_qb0 == segment_index_qb1) {
+        active_qubits.remove(qubit0)
+        active_qubits.remove(qubit1)
 // qubit0 not yet assigned to a segment:
-    elif segment_index_qb0 is None:
-        if qb1_is_left_end:
-    segments[segment_index_qb1].insert(0, qubit0)
-  else:
-    segments[segment_index_qb1].append(qubit0)
-    neighbour_ids[qubit0].add(qubit1)
-    neighbour_ids[qubit1].add(qubit0)
-    if cyclic && len(segments[0]) == num_qubits:
-    neighbour_ids[segments[0][0]].add(segments[0][-1])
-    neighbour_ids[segments[0][-1]].add(segments[0][0])
+      } else if (typeof segment_index_qb0 === 'undefined') {
+          if (qb1_is_left_end) {
+            segments[segment_index_qb1].insert(0, qubit0)
+          }else {
+            segments[segment_index_qb1].append(qubit0)
+          }
+      neighbour_ids[qubit0].add(qubit1)
+      neighbour_ids[qubit1].add(qubit0)
+      if(cyclic && len(segments[0]) == num_qubits) {
+        neighbour_ids[segments[0][0]].add(segments[0][-1])
+        neighbour_ids[segments[0][-1]].add(segments[0][0])
+      }
+      }
 // qubit1 not yet assigned to a segment:
-    elif segment_index_qb1 is None:
-        if qb0_is_left_end:
-    segments[segment_index_qb0].insert(0, qubit1)
-  else:
-    segments[segment_index_qb0].append(qubit1)
-    neighbour_ids[qubit0].add(qubit1)
-    neighbour_ids[qubit1].add(qubit0)
-    if cyclic && len(segments[0]) == num_qubits:
-    neighbour_ids[segments[0][0]].add(segments[0][-1])
-    neighbour_ids[segments[0][-1]].add(segments[0][0])
+      else if (typeof segment_index_qb1 === 'undefined') {
+        if (qb0_is_left_end) {
+          segments[segment_index_qb0].insert(0, qubit1)
+        } else {
+          segments[segment_index_qb0].append(qubit1)
+        }
+        neighbour_ids[qubit0].add(qubit1)
+        neighbour_ids[qubit1].add(qubit0)
+        if (cyclic && len(segments[0]) == num_qubits) {
+          neighbour_ids[segments[0][0]].add(segments[0][-1])
+          neighbour_ids[segments[0][-1]].add(segments[0][0])
+        }
+      }
 // both qubits are at the end of different segments -> combine them
-  else:
-    if not qb0_is_left_end && qb1_is_left_end:
-        segments[segment_index_qb0].extend(
-            segments[segment_index_qb1])
-    segments.pop(segment_index_qb1)
-    elif not qb0_is_left_end && not qb1_is_left_end:
-        segments[segment_index_qb0].extend(
-            reversed(segments[segment_index_qb1]))
-    segments.pop(segment_index_qb1)
-    elif qb0_is_left_end && qb1_is_left_end:
-        segments[segment_index_qb0].reverse()
-    segments[segment_index_qb0].extend(
-        segments[segment_index_qb1])
-    segments.pop(segment_index_qb1)
-  else:
-    segments[segment_index_qb1].extend(
-        segments[segment_index_qb0])
-    segments.pop(segment_index_qb0)
+    else {
+        if (!qb0_is_left_end && qb1_is_left_end) {
+          segments[segment_index_qb0].extend(
+              segments[segment_index_qb1])
+          segments.pop(segment_index_qb1)
+        }else if(!qb0_is_left_end && !qb1_is_left_end) {
+          segments[segment_index_qb0].extend(
+              reversed(segments[segment_index_qb1]))
+          segments.pop(segment_index_qb1)
+        }else if(qb0_is_left_end && qb1_is_left_end) {
+          segments[segment_index_qb0].reverse()
+          segments[segment_index_qb0].extend(
+              segments[segment_index_qb1])
+          segments.pop(segment_index_qb1)
+        }else {
+          segments[segment_index_qb1].extend(
+              segments[segment_index_qb0])
+          segments.pop(segment_index_qb0)
 // Add new neighbour ids && make sure to check cyclic
-    neighbour_ids[qubit0].add(qubit1)
-    neighbour_ids[qubit1].add(qubit0)
-    if cyclic && len(segments[0]) == num_qubits:
-    neighbour_ids[segments[0][0]].add(segments[0][-1])
-    neighbour_ids[segments[0][-1]].add(segments[0][0])
+          neighbour_ids[qubit0].add(qubit1)
+          neighbour_ids[qubit1].add(qubit0)
+          if (cyclic && len(segments[0]) == num_qubits) {
+            neighbour_ids[segments[0][0]].add(segments[0][-1])
+            neighbour_ids[segments[0][-1]].add(segments[0][0])
+          }
+        }
+      }
+    }
     return
   }
 }
@@ -423,30 +440,30 @@ used_mapped_ids = set(final_positions)
 used_mapped_ids.discard(None)
 all_ids = set(range(this.num_qubits))
 not_used_mapped_ids = list(all_ids.difference(used_mapped_ids))
-not_used_mapped_ids = sorted(not_used_mapped_ids, reverse=True)
+not_used_mapped_ids = sorted(not_used_mapped_ids, reverse=true)
 for i in range(len(final_positions)):
 if final_positions[i] is None:
     final_positions[i] = not_used_mapped_ids.pop()
 assert len(not_used_mapped_ids) == 0
 // Start sorting:
     swap_operations = []
-finished_sorting = False
+finished_sorting = false
 while not finished_sorting:
-    finished_sorting = True
+    finished_sorting = true
 for i in range(1, len(final_positions)-1, 2):
 if final_positions[i] > final_positions[i+1]:
 swap_operations.append((i, i+1))
 tmp = final_positions[i]
 final_positions[i] = final_positions[i+1]
 final_positions[i+1] = tmp
-finished_sorting = False
+finished_sorting = false
 for i in range(0, len(final_positions)-1, 2):
 if final_positions[i] > final_positions[i+1]:
 swap_operations.append((i, i+1))
 tmp = final_positions[i]
 final_positions[i] = final_positions[i+1]
 final_positions[i+1] = tmp
-finished_sorting = False
+finished_sorting = false
 return swap_operations
 
 def _send_possible_commands(self):
@@ -496,12 +513,12 @@ this.send([new_cmd])
 else:
 new_stored_commands.append(cmd)
 else:
-send_gate = True
+send_gate = true
 mapped_ids =new Set()
 for qureg in cmd.all_qubits:
 for qubit in qureg:
 if qubit.id not in active_ids:
-send_gate = False
+send_gate = false
 break
 mapped_ids.add(this.current_mapping[qubit.id])
 // Check that mapped ids are nearest neighbour
@@ -510,10 +527,10 @@ mapped_ids = list(mapped_ids)
 diff = abs(mapped_ids[0]-mapped_ids[1])
 if this.cyclic:
 if diff != 1 && diff != this.num_qubits-1:
-send_gate = False
+send_gate = false
 else:
 if diff != 1:
-send_gate = False
+send_gate = false
 if send_gate:
 this._send_cmd_with_mapped_ids(cmd)
 else:

@@ -1,0 +1,109 @@
+import {expect} from 'chai'
+import math from 'mathjs'
+import DecompositionRuleSet from '../cengines/replacer/decompositionruleset';
+import {getInverse} from '../ops/_cycle';
+import {
+  BasicMathGate, QFT, Swap, Measure, All, H, X
+} from '../ops';
+import {AutoReplacer, InstructionFilter} from '../cengines';
+import TagRemover from '../cengines/tagremover';
+import LocalOptimizer from '../cengines/optimize';
+import MainEngine from '../cengines/main';
+import {MultiplyByConstantModN} from '../libs/math/gates';
+import {Control} from '../meta'
+import Simulator from '../backends/simulators/simulator';
+import decompositions from '../setups/decompositions'
+import mathrules from '../libs/math/defaultrules'
+
+describe('test', () => {
+  const rule_set = new DecompositionRuleSet([...mathrules, ...decompositions])
+
+  function high_level_gates(eng, cmd) {
+    const g = cmd.gate
+    if (g.equal(QFT) || getInverse(g).equal(QFT) || g.equal(Swap)) {
+      return true
+    }
+    if (g instanceof BasicMathGate) {
+      return false
+    }
+
+    return eng.next.isAvailable(cmd)
+  }
+
+
+  function get_main_engine(sim) {
+    const engine_list = [new AutoReplacer(rule_set),
+      new InstructionFilter(high_level_gates),
+      new TagRemover(),
+      new LocalOptimizer(3),
+      new AutoReplacer(rule_set),
+      new TagRemover(),
+      new LocalOptimizer(3)]
+    return new MainEngine(sim, engine_list)
+  }
+
+  it('should ', () => {
+    const sim = new Simulator()
+    const eng = get_main_engine(sim)
+
+    const ctrl_qubit = eng.allocateQubit()
+
+    const N = 15
+    const a = 2
+
+    const x = eng.allocateQureg(4)
+    X.or(x[0])
+
+    H.or(ctrl_qubit)
+    let cheat_tpl = sim.cheat()
+    Control(eng, ctrl_qubit, () => new MultiplyByConstantModN(math.pow(a, 2 ** 7) % N, N).or(x))
+    cheat_tpl = sim.cheat()
+    H.or(ctrl_qubit)
+    cheat_tpl = sim.cheat()
+    eng.flush()
+
+    cheat_tpl = sim.cheat()
+    let idx = cheat_tpl[0][ctrl_qubit[0].id]
+    let vec = cheat_tpl[1]
+
+    vec.forEach((v, i) => {
+      v = math.complex(v.re, v.im)
+      console.log(v, i)
+      if (math.abs(v) > 1e-8) {
+        expect((i >> idx) & i).to.equal(0)
+      }
+    })
+
+    Measure.or(ctrl_qubit)
+
+    expect(ctrl_qubit.toNumber()).to.equal(0)
+
+    vec.deallocate()
+    cheat_tpl
+
+    H.or(ctrl_qubit)
+    Control(eng, ctrl_qubit, () => new MultiplyByConstantModN(math.pow(a, 2) % N, N).or(x))
+
+    H.or(ctrl_qubit)
+    eng.flush()
+    cheat_tpl = sim.cheat()
+    idx = cheat_tpl[0][ctrl_qubit[0].id]
+    vec = cheat_tpl[1]
+
+    let probability = 0.0
+
+    vec.forEach((v, i) => {
+      v = math.complex(v.re, v.im)
+      if (math.abs(v) > 1e-8) {
+        if ((i >> idx) & 1 === 0) {
+          probability += math.abs(v) ** 2
+        }
+      }
+    })
+
+    expect(probability).to.be.closeTo(0.5, 1e-12)
+
+    Measure.or(ctrl_qubit)
+    new All(Measure).or(x)
+  });
+})

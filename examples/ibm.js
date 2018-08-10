@@ -1,20 +1,47 @@
-// create a main compiler engine
+import {getEngineList} from '../setups/ibm';
 import MainEngine from '../cengines/main';
 import IBMBackend from '../backends/ibm/ibm';
-import {getEngineList} from '../setups/ibm';
-import {Measure, H} from '../ops';
+import {All, Entangle, Measure} from '../ops';
 
-const eng = new MainEngine(new IBMBackend({user: '', password: ''}), getEngineList())
+function run_entangle(eng, num_qubits = 5) {
+  /*
+  Runs an entangling operation on the provided compiler engine.
 
-// allocate one qubit
-const q1 = eng.allocateQubit()
+      Args:
+  eng (MainEngine): Main compiler engine to use.
+  num_qubits (int): Number of qubits to entangle.
 
-// put it in superposition
-H.or(q1)
+      Returns:
+  measurement (list<int>): List of measurement outcomes.
+  */
+// allocate the quantum register to entangle
+  const qureg = eng.allocateQureg(num_qubits)
 
-// measure
-Measure.or(q1)
+  // entangle the qureg
+  Entangle.or(qureg)
 
-eng.flush()
-// // print the result:
-// console.log(`Measured: ${q1.toNumber()}`)
+  // measure; should be all-0 or all-1
+  new All(Measure).or(qureg)
+
+  // run the circuit
+  eng.flush()
+
+  // access the probabilities via the back-end:
+  const results = eng.backend.getProbabilities(qureg)
+
+  // return one (random) measurement outcome.
+  return qureg.map(q => q.toNumber())
+}
+
+
+// create main compiler engine for the IBM back-end
+const eng = new MainEngine(new IBMBackend({
+  use_hardware: true,
+  num_runs: 1024,
+  verbose: false,
+  device: 'ibmqx4'
+}),
+getEngineList())
+
+// run the circuit and print the result
+console.log(run_entangle(eng))
