@@ -370,7 +370,12 @@ Exception: If a non-single-qubit gate needs to be processed
   handle(cmd) {
     if (cmd.gate instanceof TimeEvolution) {
       // TODO
-      const op = cmd.gate.hamiltonian.terms
+      const {terms} = cmd.gate.hamiltonian
+      const op = []
+      Object.keys(terms).forEach(k => {
+        const v = terms[k]
+        op.push([stringToArray(k), v])
+      })
       const t = cmd.gate.time
       const qubitids = cmd.qubits[0].map(qb => qb.id)
       const ctrlids = cmd.controlQubits.map(qb => qb.id)
@@ -424,7 +429,6 @@ Exception: If a non-single-qubit gate needs to be processed
       }
       const m = math.clone(matrix)._data
       const ctrls = cmd.controlQubits.map(qb => qb.id)
-      console.log(m, ctrls)
       this._simulator.applyControlledGate(m, ids, ctrls)
       if (!this._gate_fusion) {
         this._simulator.run()

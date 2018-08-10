@@ -201,15 +201,13 @@ describe('simulator test', () => {
 
     Control(eng, qubit3, () => new Plus2Gate().or(tuple(qubit1.concat(qubit2))))
 
-    const v = getMatrixValue(sim.cheat()[1], 0)
+    let v = getMatrixValue(sim.cheat()[1], 0)
     expect(v.re).to.equal(1)
-    console.log(sim.cheat())
     X.or(qubit3)
-    console.log(sim.cheat())
-    console.log('=================')
     Control(eng, qubit3, () => new Plus2Gate().or(tuple(qubit1.concat(qubit2))))
-    console.log(sim.cheat())
-    expect(getMatrixValue(sim.cheat()[1], 6)).to.deep.equal(math.complex(1, 0))
+    v = getMatrixValue(sim.cheat()[1], 6)
+    expect(v.re).to.equal(1)
+    expect(v.im).to.equal(0)
 
     new All(Measure).or(tuple(qubit1.concat(qubit2).concat(qubit3)))
   });
@@ -246,7 +244,7 @@ describe('simulator test', () => {
 
     Control(eng, qubit, () => Dagger(eng, () => new KQubitGate().or(qureg)))
 
-    expect(sim.getAmplitude('00000', qubit.concat(qureg))).to.be.closeTo(1, 1e-12)
+    expect(sim.getAmplitude('00000', qubit.concat(qureg)).re).to.be.closeTo(1, 1e-12)
 
     class LargerGate extends BasicGate {
       get matrix() {
@@ -324,19 +322,20 @@ describe('simulator test', () => {
     new All(H).or(qubits)
     eng.flush()
     let bits = [0, 0, 1, 0, 1, 0]
-    expect(eng.backend.getAmplitude(bits, qubits)).to.be.closeTo(1.0 / 8, 1e-12)
+    expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo(1.0 / 8, 1e-12)
     bits = [0, 0, 0, 0, 1, 0]
-    expect(math.equal(eng.backend.getAmplitude(bits, qubits), math.complex(-1.0 / 8, 0))).to.equal(true)
+
+    expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo( -1.0/ 8, 1e-12)
     bits = [0, 1, 1, 0, 1, 0]
-    expect(math.equal(eng.backend.getAmplitude(bits, qubits), math.complex(-1.0 / 8, 0))).to.equal(true)
+    expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo(-1.0 / 8, 1e-12)
     new All(H).or(qubits)
     new All(X).or(qubits)
     new Ry(2 * math.acos(0.3)).or(qubits[0])
     eng.flush()
     bits = [0, 0, 0, 0, 0, 0]
-    expect(math.equal(eng.backend.getAmplitude(bits, qubits), math.complex(0.3, 0))).to.equal(true)
+    expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo(.3, 1e-12)
     bits[0] = 1
-    expect(math.equal(eng.backend.getAmplitude(bits, qubits), math.complex(math.sqrt(0.91), 0))).to.equal(true)
+    expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo(math.sqrt(0.91), 1e-12)
 
     new All(Measure).or(qubits)
     // raises if not all qubits are in the list:
@@ -441,24 +440,44 @@ describe('simulator test', () => {
     X.or(qureg[0])
     Y.or(qureg[1])
     Z.or(qureg[2])
-    expect(math.abs(sim.getAmplitude('000', qureg))).to.be.closeTo(1, 1e-12)
+
+    let ret = sim.getAmplitude('000', qureg)
+    expect(ret.re).to.be.closeTo(1, 1e-12)
 
     H.or(qureg[0])
     const op_H = (new QubitOperator('X0').add(new QubitOperator('Z0'))).mul(1.0 / math.sqrt(2.0))
     sim.applyQubitOperator(op_H, [qureg[0]])
-    expect(sim.getAmplitude('000', qureg)).to.be.closeTo(1, 1e-12)
+
+    ret = sim.getAmplitude('000', qureg)
+    expect(ret.re).to.be.closeTo(1, 1e-12)
 
     const op_Proj0 = new QubitOperator('').add(new QubitOperator('Z0')).mul(0.5)
     const op_Proj1 = new QubitOperator('').sub(new QubitOperator('Z0')).mul(0.5)
     H.or(qureg[0])
     sim.applyQubitOperator(op_Proj0, [qureg[0]])
-    expect(math.abs(sim.getAmplitude('000', qureg))).to.be.closeTo(1.0 / math.sqrt(2.0), 1e-12)
+
+    ret = sim.getAmplitude('000', qureg)
+    expect(ret.re).to.be.closeTo(1.0 / math.sqrt(2.0), 1e-12)
     sim.applyQubitOperator(op_Proj1, [qureg[0]])
-    expect(math.abs(sim.getAmplitude('000', qureg))).to.be.closeTo(0, 1e-12)
+
+    ret = sim.getAmplitude('000', qureg)
+    expect(ret.re).to.be.closeTo(0, 1e-12)
   });
+
+
+  function convertNativeMatrix(vec) {
+    const m = math.zeros(vec.length)
+    vec.forEach((val, idx) => {
+      m.subset(math.index(idx), math.complex(val.re, val.im))
+    })
+    return m
+  }
 
   it('should test_simulator_time_evolution', function () {
     this.timeout(60 * 1000)
+
+    console.log('start time evolution', Date.now())
+
     const sim = new Simulator()
     const N = 8 // number of qubits
     const time_to_evolve = 1.1 // time to evolve for
@@ -488,6 +507,8 @@ describe('simulator test', () => {
     Object.assign(map, qbit_to_bit_map2)
     qbit_to_bit_map2 = map
     new All(Measure).or(qureg.concat(ctrl_qubit))
+
+    console.log('end time evolution', Date.now())
     // Check manually:
 
     const build_matrix = (list_single_matrices) => {
@@ -520,8 +541,13 @@ describe('simulator test', () => {
     res_matrix = math.multiply(res_matrix, mc(0, -time_to_evolve))
 
     init_wavefunction = math.flatten(init_wavefunction)
+    init_wavefunction = convertNativeMatrix(init_wavefunction)
     final_wavefunction = math.flatten(final_wavefunction)
+    final_wavefunction = convertNativeMatrix(final_wavefunction)
+
+    console.log('tick', Date.now())
     const res = math.multiply(math.expm(res_matrix), init_wavefunction)
+    console.log('tick', Date.now())
 
     const count = len(final_wavefunction)
     const half = Math.floor(count / 2)
@@ -529,9 +555,9 @@ describe('simulator test', () => {
     // check evolution and control
     const tail = getMatrixValue(final_wavefunction, math.range(half, count))
     const head = getMatrixValue(final_wavefunction, math.range(0, half))
-    console.log(math.multiply(hadamard_f, res), tail)
+
     expect(math.deepEqual(math.multiply(hadamard_f, res), tail)).to.equal(true)
-    expect(head).to.deep.equal(math.multiply(hadamard_f, init_wavefunction))
+    expect(math.deepEqual(head, math.multiply(hadamard_f, init_wavefunction))).to.equal(true)
   });
 
   it('should test_simulator_set_wavefunction', () => {
@@ -561,7 +587,8 @@ describe('simulator test', () => {
     eng.backend.setWavefunction(wf, qubit)
     Y.or(qubit)
     eng.flush()
-    expect(math.abs(eng.backend.getAmplitude('1', qubit))).to.be.closeTo(1, 1e-12)
+    const c = eng.backend.getAmplitude('1', qubit)
+    expect(math.abs(math.complex(c.re, c.im))).to.be.closeTo(1, 1e-12)
   });
 
   it('should test_simulator_collapse_wavefunction', () => {
@@ -653,11 +680,13 @@ describe('simulator test', () => {
 
     // check the state vector:
     let m = sim.cheat()[1]
+    m = convertNativeMatrix(m)
     expect(math.abs(getMatrixValue(m, 0)) ** 2).to.be.closeTo(0.5, 1e-12)
     expect(math.abs(getMatrixValue(m, 31)) ** 2).to.be.closeTo(0.5, 1e-12)
 
     for (let i = 1; i < 31; ++i) {
-      const v = sim.cheat()[1][i] || math.complex(0, 0)
+      let v = sim.cheat()[1][i]
+          v = math.complex(v.re, v.im)
       expect(math.abs(v)).to.be.closeTo(0, 1e-12)
     }
 
@@ -671,12 +700,14 @@ describe('simulator test', () => {
     console.log(sim.cheat()[1][0], sim.cheat()[1][31])
 
     m = sim.cheat()[1]
+    m = convertNativeMatrix(m)
     const v31 = math.re(math.abs(getMatrixValue(m, 31)))
     expect(math.re(math.abs(getMatrixValue(m, 0)))).to.be.closeTo(Math.SQRT1_2, 1e-12)
     expect(v31).to.be.closeTo(Math.SQRT1_2, 1e-12)
 
     for (let i = 1; i < 31; ++i) {
-      const v = sim.cheat()[1][i] || math.complex(0, 0)
+      let v = sim.cheat()[1][i]
+      v = math.complex(v.re, v.im)
       expect(math.abs(v)).to.be.closeTo(0, 1e-12)
     }
 
@@ -689,10 +720,12 @@ describe('simulator test', () => {
 
     // check the state vector:
     const mm = sim.cheat()[1]
-    const v0 = getMatrixValue(mm, 0)
+    let v0 = getMatrixValue(mm, 0)
+    v0 = math.complex(v0.re, v0.im)
     expect(math.re(math.abs(v0))).to.be.closeTo(1, 1e-12)
     for (let i = 1; i < 32; ++i) {
-      const v = sim.cheat()[1][i] || math.complex(0, 0)
+      let v = sim.cheat()[1][i]
+      v = math.complex(v.re, v.im)
       expect(math.re(math.abs(v))).to.be.closeTo(0, 1e-12)
     }
 
@@ -700,6 +733,7 @@ describe('simulator test', () => {
   });
 
   it('should test_simulator_convert_logical_to_mapped_qubits', () => {
+    const sim = new Simulator()
     const mapper = new BasicMapperEngine()
 
     const receive = (command_list) => { }

@@ -150,45 +150,65 @@ void Wrapper::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
 void Wrapper::allocateQubit(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
-    int id = info[0]->NumberValue();
-    obj->_simulator->allocate_qubit(id);
+    unsigned int id = info[0]->Uint32Value();
 
+    try {
+        obj->_simulator->allocate_qubit(id);
+    } catch (std::runtime_error &error) {
+        Nan::ThrowError(error.what());
+    }
     obj->_logfile << "allocateQubit: " << id << std::endl;
 }
 
 void Wrapper::deallocateQubit(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
-    int id = info[0]->NumberValue();
-    obj->_simulator->deallocate_qubit(id);
+    unsigned int id = info[0]->Uint32Value();
 
+    try {
+        obj->_simulator->deallocate_qubit(id);
+    } catch (std::runtime_error &error) {
+        obj->_logfile << "id: " << id << " exception" << error.what();
+        Nan::ThrowError(error.what());
+    }
     obj->_logfile << "deallocateQubit: " << id << std::endl;
 }
 
 void Wrapper::getClassicalValue(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
-    int id = info[0]->NumberValue();
+    unsigned int id = info[0]->Uint32Value();
     double calc = info[1]->NumberValue();
-    bool result = obj->_simulator->get_classical_value(id, calc);
-    info.GetReturnValue().Set(result);
 
-    obj->_logfile << "getClassicalValue: " << id << " result: " << result << std::endl;
+    try {
+        bool result = obj->_simulator->get_classical_value(id, calc);
+        info.GetReturnValue().Set(result);
+
+        obj->_logfile << "getClassicalValue: " << id << " result: " << result << std::endl;
+    } catch (std::runtime_error &error) {
+        obj->_logfile << "id: " << id << " exception" << error.what();
+        Nan::ThrowError(error.what());
+    }
 }
 
 void Wrapper::isClassical(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
-    int id = info[0]->NumberValue();
+    unsigned int id = info[0]->Uint32Value();
     double calc = info[1]->NumberValue();
-    bool result = obj->_simulator->is_classical(id, calc);
-    info.GetReturnValue().Set(result);
+    try {
+        bool result = obj->_simulator->is_classical(id, calc);
+        info.GetReturnValue().Set(result);
 
-    obj->_logfile << "isClassical: " << id << " result: " << result << std::endl;
+        obj->_logfile << "isClassical: " << id << " result: " << result << std::endl;
+    } catch (std::runtime_error &error) {
+        obj->_logfile << "id: " << id << " exception" << error.what();
+        Nan::ThrowError(error.what());
+    }
 }
 
 template <typename T, typename V>
-void jsToArray(Local<Array> &jsArray, V ids) {
+void jsToArray(Local<Array> &jsArray, V &ids) {
     for (unsigned int i = 0; i < jsArray->Length(); i++) {
         Handle<Value> val = jsArray->Get(i);
-        T numVal = val->NumberValue();
+        T numVal = val->Int32Value();
         ids.push_back(numVal);
     }
 }
@@ -209,7 +229,10 @@ void jsToTermDictionary(Local<Array> &terms, Simulator::TermsDict &dict) {
         Simulator::Term t;
         for (int j = 0; j < a->Length(); ++j) {
             auto aLooper = Local<Array>::Cast(a->Get(j));
-            t.push_back(std::make_pair((unsigned)aLooper->Get(0)->Uint32Value(), (char)aLooper->Get(1)->Int32Value()));
+            auto gate = aLooper->Get(1)->ToString();
+            String::Utf8Value value(gate);
+            auto c = (*value)[0];
+            t.push_back(std::make_pair((unsigned)aLooper->Get(0)->Uint32Value(), c));
         }
         dict.push_back(std::make_pair(t, pair->Get(1)->NumberValue()));
     }
@@ -227,7 +250,9 @@ void jsToComplexTermDictionary(Isolate *isolate, Local<Array> &terms, Simulator:
         Simulator::Term t;
         for (int j = 0; j < a->Length(); ++j) {
             auto aLooper = Local<Array>::Cast(a->Get(j));
-            t.push_back(std::make_pair((unsigned)aLooper->Get(0)->Uint32Value(), (char)aLooper->Get(1)->Int32Value()));
+            auto g = aLooper->Get(1)->ToString();
+            String::Utf8Value value(g);
+            t.push_back(std::make_pair((unsigned)aLooper->Get(0)->Uint32Value(), (*value)[0]));
         }
 
         auto coefficient = pair->Get(1);
@@ -253,7 +278,7 @@ void jsToStateVector(Isolate *iso, Local<Array> &array, Simulator::StateVector &
         if (v->IsNumber()) {
             vec.push_back(Simulator::complex_type(v->NumberValue()));
         } else {
-            auto obj = array->ToObject();
+            auto obj = v->ToObject();
             auto reValue = obj->Get(re);
             auto imValue = obj->Get(im);
             vec.push_back(Simulator::complex_type(reValue->NumberValue(), imValue->NumberValue()));
@@ -296,14 +321,19 @@ void Wrapper::measureQubits(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     std::vector<unsigned int> ids;
     jsToArray<unsigned int>(jsArray, ids);
 
-    auto result = obj->_simulator->measure_qubits_return(ids);
+    try {
+        auto result = obj->_simulator->measure_qubits_return(ids);
 
-    Local<Array> ret = Array::New(isolate, result.size());
-    arrayToJS(isolate, ret, result);
+        Local<Array> ret = Array::New(isolate, result.size());
+        arrayToJS(isolate, ret, result);
 
-    info.GetReturnValue().Set(ret);
+        info.GetReturnValue().Set(ret);
 
-    obj->_logfile << "measureQubits: " << ids << " result: " << result << std::endl;
+        obj->_logfile << "measureQubits: " << ids << " result: " << result << std::endl;
+    } catch (std::runtime_error &error) {
+        obj->_logfile << " exception" << error.what();
+        Nan::ThrowError(error.what());
+    }
 }
 
 void jsToMatrix(Isolate *iso, Local<Array> &array, MatrixType &m) {
@@ -330,8 +360,11 @@ void Wrapper::applyControlledGate(const Nan::FunctionCallbackInfo<v8::Value> &in
     std::vector<unsigned int> ctrl;
     jsToArray<unsigned int>(controlArray, ctrl);
 
-    obj->_simulator->apply_controlled_gate(m, ids, ctrl);
-
+    try {
+        obj->_simulator->apply_controlled_gate(m, ids, ctrl);
+    } catch (std::runtime_error &error) {
+        Nan::ThrowError(error.what());
+    }
     obj->_logfile << "applyControlledGate: m: " << m << " ids: " << ids << " ctrls: " << ctrl << std::endl;
 }
 
@@ -367,8 +400,11 @@ void Wrapper::emulateMath(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     std::vector<unsigned int> ctrls;
     jsToArray<unsigned int>(ctrlArray, ctrls);
 
-    obj->_simulator->emulate_math(f, regs, ctrls);
-
+    try {
+        obj->_simulator->emulate_math(f, regs, ctrls);
+    } catch (std::runtime_error &error) {
+        Nan::ThrowError(error.what());
+    }
     obj->_logfile << "emulateMath: f: " << " ids: " << regs << " ctrls: " << ctrls << std::endl;
 }
 
@@ -382,10 +418,15 @@ void Wrapper::getExpectationValue(const Nan::FunctionCallbackInfo<v8::Value> &in
     std::vector<unsigned int> ids;
     jsToArray<unsigned int>(a2, ids);
 
-    auto result = obj->_simulator->get_expectation_value(termsDict, ids);
-    info.GetReturnValue().Set(result);
+    try {
+        obj->_logfile << "getExpectationValue: terms: " << termsDict << " ids: " << ids << std::endl;
 
-    obj->_logfile << "getExpectationValue: terms: " << termsDict << " ids: " << ids << std::endl;
+        auto result = obj->_simulator->get_expectation_value(termsDict, ids);
+        info.GetReturnValue().Set(result);
+    } catch (std::runtime_error &error) {
+        obj->_logfile << " exception" << error.what();
+        Nan::ThrowError(error.what());
+    }
 }
 
 void Wrapper::applyQubitOperator(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -399,8 +440,11 @@ void Wrapper::applyQubitOperator(const Nan::FunctionCallbackInfo<v8::Value> &inf
     std::vector<unsigned int> ids;
     jsToArray<unsigned int>(a2, ids);
 
-    obj->_simulator->apply_qubit_operator(termsDict, ids);
-
+    try {
+        obj->_simulator->apply_qubit_operator(termsDict, ids);
+    } catch (std::runtime_error &error) {
+        Nan::ThrowError(error.what());
+    }
     obj->_logfile << "applyQubitOperator: terms: " << termsDict << " ids: " << ids << std::endl;
 }
 
@@ -419,9 +463,12 @@ void Wrapper::emulateTimeEvolution(const Nan::FunctionCallbackInfo<v8::Value> &i
     std::vector<unsigned int> ctrl;
     jsToArray<unsigned int>(a4, ctrl);
 
-    obj->_simulator->emulate_time_evolution(tdict, time, ids, ctrl);
-
     obj->_logfile << "emulateTimeEvolution: terms: " << tdict << " ids: " << ids << " ctrl: " << ctrl << " time: " << time << std::endl;
+    try {
+        obj->_simulator->emulate_time_evolution(tdict, time, ids, ctrl);
+    } catch (std::runtime_error &error) {
+        Nan::ThrowError(error.what());
+    }
 }
 
 void Wrapper::getProbability(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -433,10 +480,17 @@ void Wrapper::getProbability(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Local<Array> i2 = Local<Array>::Cast(info[1]);
     std::vector<unsigned int> ids;
     jsToArray<unsigned int>(i2, ids);
-    Simulator::calc_type result = obj->_simulator->get_probability(bitString, ids);
-    info.GetReturnValue().Set(result);
 
-    obj->_logfile << "getProbability: bitstring: " << bitString << " ids: " << ids << " result: " << result << std::endl;
+    try {
+        Simulator::calc_type result = obj->_simulator->get_probability(bitString, ids);
+        info.GetReturnValue().Set(result);
+
+        obj->_logfile << "getProbability: bitstring: " << bitString << " ids: " << ids << " result: " << result
+                      << std::endl;
+    } catch (std::runtime_error &error) {
+        obj->_logfile << " exception" << error.what();
+        Nan::ThrowError(error.what());
+    }
 }
 
 void Wrapper::getAmplitude(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -450,15 +504,24 @@ void Wrapper::getAmplitude(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     std::vector<unsigned int> ids;
     jsToArray<unsigned int>(i2, ids);
 
-    auto result = obj->_simulator->get_amplitude(bitString, ids);
+    try {
+        auto result = obj->_simulator->get_amplitude(bitString, ids);
 
-    Local<Object> ret = Object::New(isolate);
-    ret->Set(String::NewFromUtf8(isolate, "re"), Number::New(isolate, result.real()));
-    ret->Set(String::NewFromUtf8(isolate, "im"), Number::New(isolate, result.imag()));
+//    if (result.imag() == 0) {
+//        info.GetReturnValue().Set(result.real());
+//    } else {
+        Local<Object> ret = Object::New(isolate);
+        ret->Set(String::NewFromUtf8(isolate, "re"), Number::New(isolate, result.real()));
+        ret->Set(String::NewFromUtf8(isolate, "im"), Number::New(isolate, result.imag()));
 
-    info.GetReturnValue().Set(ret);
-
-    obj->_logfile << "getAmplitude: bitstring: " << bitString << " ids: " << ids << " result: " << result << std::endl;
+        info.GetReturnValue().Set(ret);
+//    }
+        obj->_logfile << "getAmplitude: bitstring: " << bitString << " ids: " << ids << " result: " << result
+                      << std::endl;
+    } catch (std::runtime_error &error) {
+        obj->_logfile << " exception" << error.what();
+        Nan::ThrowError(error.what());
+    }
 }
 
 void Wrapper::setWavefunction(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -473,8 +536,11 @@ void Wrapper::setWavefunction(const Nan::FunctionCallbackInfo<v8::Value> &info) 
     std::vector<unsigned int> ordering;
     jsToArray<unsigned int>(i2, ordering);
 
-    obj->_simulator->set_wavefunction(vec, ordering);
-
+    try  {
+        obj->_simulator->set_wavefunction(vec, ordering);
+    } catch (std::runtime_error &error) {
+        Nan::ThrowError(error.what());
+    }
     obj->_logfile << "setWavefunction: wavefunction: " << vec << " ordering: " << ordering << std::endl;
 }
 
@@ -489,15 +555,22 @@ void Wrapper::collapseWavefunction(const Nan::FunctionCallbackInfo<v8::Value> &i
     std::vector<bool> bitString;
     jsToArray<bool>(i1, bitString);
 
-    obj->_simulator->collapse_wavefunction(ids, bitString);
-
     obj->_logfile << "collapseWavefunction: ids: " << ids << " bitstring: " << bitString << std::endl;
+
+    try {
+        obj->_simulator->collapse_wavefunction(ids, bitString);
+    } catch (std::runtime_error &error) {
+        Nan::ThrowError(error.what());
+    }
 }
 
 void Wrapper::run(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
-    obj->_simulator->run();
-
+    try {
+        obj->_simulator->run();
+    } catch (std::runtime_error &error) {
+        Nan::ThrowError(error.what());
+    }
     obj->_logfile << "run" << std::endl;
 }
 
@@ -505,22 +578,27 @@ void Wrapper::cheat(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     auto isolate = info.GetIsolate();
 
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
-    auto result = obj->_simulator->cheat();
 
-    auto m = std::get<0>(result);
-    auto state = std::get<1>(result);
+    try {
+        auto result = obj->_simulator->cheat();
 
-    auto rm = Object::New(isolate);
-    auto rs = Array::New(isolate, state.size());
+        auto m = std::get<0>(result);
+        auto state = std::get<1>(result);
 
-    mapToJSObject(isolate, m, rm);
-    stateVectorToJS(isolate, state, rs);
+        auto rm = Object::New(isolate);
+        auto rs = Array::New(isolate, state.size());
 
-    auto ret = Array::New(isolate, 2);
-    ret->Set(0, rm);
-    ret->Set(1, rs);
+        mapToJSObject(isolate, m, rm);
+        stateVectorToJS(isolate, state, rs);
 
-    info.GetReturnValue().Set(ret);
+        auto ret = Array::New(isolate, 2);
+        ret->Set(0, rm);
+        ret->Set(1, rs);
 
-    obj->_logfile << "cheat: " << state << std::endl;
+        info.GetReturnValue().Set(ret);
+
+        obj->_logfile << "cheat: " << state << std::endl;
+    } catch (std::runtime_error &error) {
+        Nan::ThrowError(error.what());
+    }
 }
