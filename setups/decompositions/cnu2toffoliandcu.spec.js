@@ -121,7 +121,6 @@ describe('cnu 2 toffoli and cu test', () => {
 
         const test = test_sim.getAmplitude(binary_state, test_qb.concat(test_ctrl_qureg))
         const correct = correct_sim.getAmplitude(binary_state, correct_qb.concat(correct_ctrl_qureg))
-        console.log(124, fstate, test, correct)
         expect(test.re).to.be.closeTo(correct.re, 1e-12)
       }
 

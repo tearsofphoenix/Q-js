@@ -198,14 +198,14 @@ export class CircuitDrawer extends BasicEngine {
     cmd (Command): Command to add to the circuit diagram.
    */
   printCMD(cmd) {
-    if (cmd.gate === Allocate) {
+    if (cmd.gate.equal(Allocate)) {
       const qubit_id = cmd.qubits[0][0].id
       if (!(qubit_id in this._map)) {
         this._map[qubit_id] = qubit_id
       }
       this._qubit_lines[qubit_id] = []
     }
-    if (cmd.gate === Deallocate) {
+    if (cmd.gate.equal(Deallocate)) {
       const qubit_id = cmd.qubits[0][0].id
       this._free_lines.append(qubit_id)
     }

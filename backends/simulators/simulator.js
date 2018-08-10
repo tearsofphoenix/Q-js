@@ -169,7 +169,6 @@ the `qureg` argument.
     qureg = this.convertLogicalToMappedQureg(qureg)
     const operator = []
     const num_qubits = qureg.length
-    console.log(166, qubitOperator, qureg)
     Object.keys(qubitOperator.terms).forEach((term) => {
       const keys = stringToArray(term)
       if (term !== '' && keys[keys.length - 1][0] >= num_qubits) {

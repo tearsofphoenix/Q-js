@@ -53,33 +53,43 @@ running the circuit (e.g., if previous run timed out).
     super()
     this._reset()
     this._errors = []
-    let [use_hardware = false, num_runs = 1024, verbose = false,
-      user = null, password = null, device = 'ibmqx4',
-      retrieve_execution = null] = args
+    let use_hardware = false
+    let num_runs = 1024
+    let verbose = false
+    let user = null
+    let password = null
+    let device = 'ibmqx4'
+    let retrieve_execution = null
+
     if (typeof args[0] === 'object') {
       const obj = args[0]
-      use_hardware = obj.use_hardware
-      num_runs = obj.num_runs
-      verbose = obj.verbose
-      user = obj.user
-      password = obj.password
-      device = obj.device
-      retrieve_execution = obj.retrieve_execution
+      use_hardware = use_hardware || obj.use_hardware
+      num_runs = num_runs || obj.num_runs
+      verbose = verbose || obj.verbose
+      user = user || obj.user
+      password = password || obj.password
+      device = device || obj.device
+      retrieve_execution = retrieve_execution || obj.retrieve_execution
+    } else {
+      [use_hardware, num_runs, verbose, user, password, device, retrieve_execution] = args
     }
+
+    num_runs = num_runs || 1024
+    device = device || 'ibmqx4'
     if (use_hardware) {
       this.device = device
     } else {
       this.device = 'simulator'
-      this._num_runs = num_runs
-      this._verbose = verbose
-      this._user = user
-      this._password = password
-      this._probabilities = {}
-      this.qasm = ''
-      this._measured_ids = []
-      this._allocated_qubits = new Set()
-      this._retrieve_execution = retrieve_execution
     }
+    this._num_runs = num_runs
+    this._verbose = verbose
+    this._user = user
+    this._password = password
+    this._probabilities = {}
+    this.qasm = ''
+    this._measured_ids = []
+    this._allocated_qubits = new Set()
+    this._retrieve_execution = retrieve_execution
   }
 
   /*
@@ -130,24 +140,23 @@ Temporarily store the command cmd.
   _store(cmd) {
     if (this._clear) {
       this._probabilities = {}
+      this._clear = false
+      this.qasm = ''
+      this._allocated_qubits = new Set()
     }
-
-    this._clear = false
-    this.qasm = ''
-    this._allocated_qubits = new Set()
 
     const {gate} = cmd
 
-    if (gate === Allocate) {
+    if (gate.equal(Allocate)) {
       this._allocated_qubits.add(cmd.qubits[0][0].id)
       return
     }
 
-    if (gate === Deallocate) {
+    if (gate.equal(Deallocate)) {
       return
     }
 
-    if (gate === Measure) {
+    if (gate.equal(Measure)) {
       assert(cmd.qubits.length === 1 && cmd.qubits[0].length === 1)
       const qb_id = cmd.qubits[0][0].id
       let logical_id
@@ -307,16 +316,17 @@ data / ask for username & password.
       } else {
         res = await IBMHTTPClient.retrieve(this.device, this._user, this._password, this._retrieve_execution)
       }
-
       const {counts} = res.data
       // Determine random outcome
       const P = Math.random()
       let p_sum = 0.0
       let measured = ''
-      counts.forEach((state) => {
+      Object.keys(counts).forEach((state) => {
         const probability = counts[state] * 1.0 / this._num_runs
-        state = state.slice(0).reverse()
-        state = ''.join(state)
+        if (Array.isArray(state)) {
+          state = state.slice(0).reverse()
+          state = ''.join(state)
+        }
         p_sum += probability
         let star = ''
         if (p_sum >= P && measured === '') {
@@ -343,6 +353,7 @@ data / ask for username & password.
       })
       this._reset()
     } catch (e) {
+      console.log(347, e)
       throw new Error('Failed to run the circuit. Aborting.')
     }
   }

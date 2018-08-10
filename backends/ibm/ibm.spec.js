@@ -155,7 +155,6 @@ describe('ibm test', () => {
         + '"simulator"}}')
 
     const mock_send = async (args) => {
-      console.log(162, args)
       return {
         'date': '2017-01-19T14:28:47.622Z',
         'data': {

@@ -159,7 +159,6 @@ describe('simulator test', () => {
     new All(Measure).or(qubits)
 
     const bit_value_sum = qubits.reduce((accu, current) => accu + current.toNumber(), 0)
-    console.log(155, bit_value_sum)
     expect(bit_value_sum === 0 || bit_value_sum === 5).to.equal(true)
   });
 

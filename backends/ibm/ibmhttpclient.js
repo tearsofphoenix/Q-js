@@ -40,7 +40,7 @@ export default class IBMHTTPClient {
 
   static async sleep(interval) {
     return new Promise((resolve) => {
-      setTimeout(interval, resolve)
+      setTimeout(resolve, interval)
     })
   }
 
