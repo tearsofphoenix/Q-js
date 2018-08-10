@@ -277,131 +277,150 @@ describe('simulator test', () => {
   });
 
   it('should test_simulator_probability', () => {
-    const sim = new Simulator()
-    const mapper = new TrivialMapper()
-    const engine_list = [new LocalOptimizer()]
-    if (mapper) {
-      engine_list.push(mapper)
+    const mp = new TrivialMapper()
+
+    const test = (mapper) => {
+      const sim = new Simulator()
+
+      const engine_list = [new LocalOptimizer()]
+      if (mapper) {
+        engine_list.push(mapper)
+      }
+
+      const eng = new MainEngine(sim, engine_list)
+      const qubits = eng.allocateQureg(6)
+      new All(H).or(qubits)
+      eng.flush()
+      const bits = [0, 0, 1, 0, 1, 0]
+      for (let i = 0; i < 6; ++i) {
+        expect(eng.backend.getProbability(bits.slice(0, i), qubits.slice(0, i))).to.be.closeTo(0.5 ** i, 1e-12)
+      }
+
+      const extra_qubit = eng.allocateQubit()
+      expect(() => eng.backend.getProbability([0], extra_qubit)).to.throw()
+
+      extra_qubit.deallocate()
+      new All(H).or(qubits)
+      new Ry(2 * math.acos(math.sqrt(0.3))).or(qubits[0])
+      eng.flush()
+      expect(eng.backend.getProbability([0], [qubits[0]])).to.be.closeTo(0.3, 1e-12)
+
+      new Ry(2 * math.acos(math.sqrt(0.4))).or(qubits[2])
+      eng.flush()
+      expect(eng.backend.getProbability([0], [qubits[2]])).to.be.closeTo(0.4, 1e-12)
+
+      expect(eng.backend.getProbability([0, 0], [qubits[0], qubits[2]])).to.be.closeTo(0.12, 1e-12)
+      expect(eng.backend.getProbability([0, 1], [qubits[0], qubits[2]])).to.be.closeTo(0.18, 1e-12)
+      expect(eng.backend.getProbability([1, 0], [qubits[0], qubits[2]])).to.be.closeTo(0.28, 1e-12)
+      new All(Measure).or(qubits)
     }
 
-    const eng = new MainEngine(sim, engine_list)
-    const qubits = eng.allocateQureg(6)
-    new All(H).or(qubits)
-    eng.flush()
-    const bits = [0, 0, 1, 0, 1, 0]
-    for (let i = 0; i < 6; ++i) {
-      expect(eng.backend.getProbability(bits.slice(0, i), qubits.slice(0, i))).to.be.closeTo(0.5 ** i, 1e-12)
-    }
-
-    const extra_qubit = eng.allocateQubit()
-    expect(() => eng.backend.getProbability([0], extra_qubit)).to.throw()
-
-    extra_qubit.deallocate()
-    new All(H).or(qubits)
-    new Ry(2 * math.acos(math.sqrt(0.3))).or(qubits[0])
-    eng.flush()
-    expect(eng.backend.getProbability([0], [qubits[0]])).to.be.closeTo(0.3, 1e-12)
-
-    new Ry(2 * math.acos(math.sqrt(0.4))).or(qubits[2])
-    eng.flush()
-    expect(eng.backend.getProbability([0], [qubits[2]])).to.be.closeTo(0.4, 1e-12)
-
-    expect(eng.backend.getProbability([0, 0], [qubits[0], qubits[2]])).to.be.closeTo(0.12, 1e-12)
-    expect(eng.backend.getProbability([0, 1], [qubits[0], qubits[2]])).to.be.closeTo(0.18, 1e-12)
-    expect(eng.backend.getProbability([1, 0], [qubits[0], qubits[2]])).to.be.closeTo(0.28, 1e-12)
-    new All(Measure).or(qubits)
+    test(mp)
+    test()
   });
 
   it('should test_simulator_amplitude', () => {
-    const engine_list = [new LocalOptimizer()]
-    engine_list.push(new TrivialMapper())
+    const mp = new TrivialMapper()
+    const test = (mapper) => {
+      const engine_list = [new LocalOptimizer()]
+      if (mapper) {
+        engine_list.push(mapper)
+      }
 
-    const eng = new MainEngine(new Simulator(), engine_list)
-    const qubits = eng.allocateQureg(6)
-    new All(X).or(qubits)
-    new All(H).or(qubits)
-    eng.flush()
-    let bits = [0, 0, 1, 0, 1, 0]
-    expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo(1.0 / 8, 1e-12)
-    bits = [0, 0, 0, 0, 1, 0]
+      const eng = new MainEngine(new Simulator(), engine_list)
+      const qubits = eng.allocateQureg(6)
+      new All(X).or(qubits)
+      new All(H).or(qubits)
+      eng.flush()
+      let bits = [0, 0, 1, 0, 1, 0]
+      expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo(1.0 / 8, 1e-12)
+      bits = [0, 0, 0, 0, 1, 0]
 
-    expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo( -1.0/ 8, 1e-12)
-    bits = [0, 1, 1, 0, 1, 0]
-    expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo(-1.0 / 8, 1e-12)
-    new All(H).or(qubits)
-    new All(X).or(qubits)
-    new Ry(2 * math.acos(0.3)).or(qubits[0])
-    eng.flush()
-    bits = [0, 0, 0, 0, 0, 0]
-    expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo(.3, 1e-12)
-    bits[0] = 1
-    expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo(math.sqrt(0.91), 1e-12)
+      expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo(-1.0 / 8, 1e-12)
+      bits = [0, 1, 1, 0, 1, 0]
+      expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo(-1.0 / 8, 1e-12)
+      new All(H).or(qubits)
+      new All(X).or(qubits)
+      new Ry(2 * math.acos(0.3)).or(qubits[0])
+      eng.flush()
+      bits = [0, 0, 0, 0, 0, 0]
+      expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo(.3, 1e-12)
+      bits[0] = 1
+      expect(eng.backend.getAmplitude(bits, qubits).re).to.be.closeTo(math.sqrt(0.91), 1e-12)
 
-    new All(Measure).or(qubits)
-    // raises if not all qubits are in the list:
-    expect(() => eng.backend.getAmplitude(bits, qubits.slice(0, qubits.length - 1))).to.throw()
+      new All(Measure).or(qubits)
+      // raises if not all qubits are in the list:
+      expect(() => eng.backend.getAmplitude(bits, qubits.slice(0, qubits.length - 1))).to.throw()
 
-    // doesn't just check for length:
-    expect(() => eng.backend.getAmplitude(bits, qubits.slice(0, qubits.length - 1).concat(qubits[0]))).to.throw()
-    const extra_qubit = eng.allocateQubit()
-    eng.flush()
-    // there is a new qubit now!
-    expect(() => eng.backend.getAmplitude(bits, qubits)).to.throw()
+      // doesn't just check for length:
+      expect(() => eng.backend.getAmplitude(bits, qubits.slice(0, qubits.length - 1).concat(qubits[0]))).to.throw()
+      const extra_qubit = eng.allocateQubit()
+      eng.flush()
+      // there is a new qubit now!
+      expect(() => eng.backend.getAmplitude(bits, qubits)).to.throw()
+    }
+    test(mp)
+    test()
   });
 
   it('should test_simulator_expectation', () => {
-    const sim = new Simulator()
-    const mapper = new TrivialMapper()
-    const engine_list = [mapper]
+    const mp = new TrivialMapper()
 
-    const eng = new MainEngine(sim, engine_list)
-    const qureg = eng.allocateQureg(3)
-    const op0 = new QubitOperator('Z0')
-    let expectation = sim.getExpectationValue(op0, qureg)
-    expect(math.re(expectation)).to.equal(1)
+    const test = (mapper) => {
+      const sim = new Simulator()
+      const engine_list = mapper ? [mapper] : []
 
-    X.or(qureg[0])
-    expectation = sim.getExpectationValue(op0, qureg)
-    expect(expectation).to.equal(-1)
+      const eng = new MainEngine(sim, engine_list)
+      const qureg = eng.allocateQureg(3)
+      const op0 = new QubitOperator('Z0')
+      let expectation = sim.getExpectationValue(op0, qureg)
+      expect(math.re(expectation)).to.equal(1)
 
-    H.or(qureg[0])
-    const op1 = new QubitOperator('X0')
-    expectation = sim.getExpectationValue(op1, qureg)
-    expect(expectation).to.be.closeTo(-1, 1e-12)
+      X.or(qureg[0])
+      expectation = sim.getExpectationValue(op0, qureg)
+      expect(expectation).to.equal(-1)
 
-    Z.or(qureg[0])
-    expectation = sim.getExpectationValue(op1, qureg)
-    expect(expectation).to.be.closeTo(1, 1e-12)
+      H.or(qureg[0])
+      const op1 = new QubitOperator('X0')
+      expectation = sim.getExpectationValue(op1, qureg)
+      expect(expectation).to.be.closeTo(-1, 1e-12)
 
-    X.or(qureg[0])
-    S.or(qureg[0])
-    Z.or(qureg[0])
-    X.or(qureg[0])
+      Z.or(qureg[0])
+      expectation = sim.getExpectationValue(op1, qureg)
+      expect(expectation).to.be.closeTo(1, 1e-12)
 
-    const op2 = new QubitOperator('Y0')
-    expectation = sim.getExpectationValue(op2, qureg)
-    expect(expectation).to.be.closeTo(1, 1e-12)
+      X.or(qureg[0])
+      S.or(qureg[0])
+      Z.or(qureg[0])
+      X.or(qureg[0])
 
-    Z.or(qureg[0])
-    expectation = sim.getExpectationValue(op2, qureg)
-    expect(expectation).to.be.closeTo(-1, 1e-12)
+      const op2 = new QubitOperator('Y0')
+      expectation = sim.getExpectationValue(op2, qureg)
+      expect(expectation).to.be.closeTo(1, 1e-12)
 
-    let op_sum = new QubitOperator('Y0 X1 Z2').add(new QubitOperator('X1'))
-    H.or(qureg[1])
-    X.or(qureg[2])
-    expectation = sim.getExpectationValue(op_sum, qureg)
+      Z.or(qureg[0])
+      expectation = sim.getExpectationValue(op2, qureg)
+      expect(expectation).to.be.closeTo(-1, 1e-12)
 
-    expect(expectation).to.be.closeTo(2, 1e-12)
+      let op_sum = new QubitOperator('Y0 X1 Z2').add(new QubitOperator('X1'))
+      H.or(qureg[1])
+      X.or(qureg[2])
+      expectation = sim.getExpectationValue(op_sum, qureg)
 
-    op_sum = new QubitOperator('Y0 X1 Z2').add(new QubitOperator('X1'))
-    X.or(qureg[2])
-    expectation = sim.getExpectationValue(op_sum, qureg)
+      expect(expectation).to.be.closeTo(2, 1e-12)
 
-    expect(expectation).to.be.closeTo(0, 1e-12)
+      op_sum = new QubitOperator('Y0 X1 Z2').add(new QubitOperator('X1'))
+      X.or(qureg[2])
+      expectation = sim.getExpectationValue(op_sum, qureg)
 
-    const op_id = new QubitOperator([]).mul(0.4)
-    expectation = sim.getExpectationValue(op_id, qureg)
-    expect(expectation).to.be.closeTo(0.4, 1e-12)
+      expect(expectation).to.be.closeTo(0, 1e-12)
+
+      const op_id = new QubitOperator([]).mul(0.4)
+      expectation = sim.getExpectationValue(op_id, qureg)
+      expect(expectation).to.be.closeTo(0.4, 1e-12)
+    }
+    test(mp)
+    test()
   });
 
   it('should test_simulator_expectation_exception', () => {
@@ -429,39 +448,50 @@ describe('simulator test', () => {
   });
 
   it('should test_simulator_applyqubitoperator', () => {
-    const sim = new Simulator()
-    const mapper = new TrivialMapper()
-    const engine_list = [mapper]
+    const mp = new TrivialMapper()
 
-    const eng = new MainEngine(sim, engine_list)
-    const qureg = eng.allocateQureg(3)
-    const op = new QubitOperator('X0 Y1 Z2')
-    sim.applyQubitOperator(op, qureg)
-    X.or(qureg[0])
-    Y.or(qureg[1])
-    Z.or(qureg[2])
+    const test = (mapper) => {
+      const sim = new Simulator()
+      const engine_list = mapper ? [mapper] : []
 
-    let ret = sim.getAmplitude('000', qureg)
-    expect(ret.re).to.be.closeTo(1, 1e-12)
+      const eng = new MainEngine(sim, engine_list)
+      const qureg = eng.allocateQureg(3)
+      let v = sim.cheat()
+      const op = new QubitOperator('X0 Y1 Z2')
+      sim.applyQubitOperator(op, qureg)
+      v = sim.cheat()
+      X.or(qureg[0])
+      v = sim.cheat()
+      Y.or(qureg[1])
+      v = sim.cheat()
+      Z.or(qureg[2])
+      v = sim.cheat()
+      let ret = sim.getAmplitude('000', qureg)
+      v = sim.cheat()
+      expect(ret.re).to.be.closeTo(1, 1e-12)
 
-    H.or(qureg[0])
-    const op_H = (new QubitOperator('X0').add(new QubitOperator('Z0'))).mul(1.0 / math.sqrt(2.0))
-    sim.applyQubitOperator(op_H, [qureg[0]])
+      H.or(qureg[0])
+      const op_H = (new QubitOperator('X0').add(new QubitOperator('Z0'))).mul(1.0 / math.sqrt(2.0))
+      sim.applyQubitOperator(op_H, [qureg[0]])
 
-    ret = sim.getAmplitude('000', qureg)
-    expect(ret.re).to.be.closeTo(1, 1e-12)
+      ret = sim.getAmplitude('000', qureg)
+      expect(ret.re).to.be.closeTo(1, 1e-12)
 
-    const op_Proj0 = new QubitOperator('').add(new QubitOperator('Z0')).mul(0.5)
-    const op_Proj1 = new QubitOperator('').sub(new QubitOperator('Z0')).mul(0.5)
-    H.or(qureg[0])
-    sim.applyQubitOperator(op_Proj0, [qureg[0]])
+      const op_Proj0 = new QubitOperator('').add(new QubitOperator('Z0')).mul(0.5)
+      const op_Proj1 = new QubitOperator('').sub(new QubitOperator('Z0')).mul(0.5)
+      H.or(qureg[0])
+      sim.applyQubitOperator(op_Proj0, [qureg[0]])
 
-    ret = sim.getAmplitude('000', qureg)
-    expect(ret.re).to.be.closeTo(1.0 / math.sqrt(2.0), 1e-12)
-    sim.applyQubitOperator(op_Proj1, [qureg[0]])
+      ret = sim.getAmplitude('000', qureg)
+      expect(ret.re).to.be.closeTo(1.0 / math.sqrt(2.0), 1e-12)
+      sim.applyQubitOperator(op_Proj1, [qureg[0]])
 
-    ret = sim.getAmplitude('000', qureg)
-    expect(ret.re).to.be.closeTo(0, 1e-12)
+      ret = sim.getAmplitude('000', qureg)
+      expect(ret.re).to.be.closeTo(0, 1e-12)
+    }
+
+    test(mp)
+    test()
   });
 
 
@@ -474,7 +504,7 @@ describe('simulator test', () => {
   }
 
   it('should test_simulator_time_evolution', function () {
-    this.timeout(60 * 1000)
+    this.timeout(600 * 1000)
 
     console.log('start time evolution', Date.now())
 
@@ -519,10 +549,10 @@ describe('simulator test', () => {
       return res
     }
     const mc = math.complex
-    const id_sp = math.identity(2)
-    const x_sp = math.matrix([[0.0, 1.0], [1.0, 0.0]])
-    const y_sp = math.matrix([[0.0, mc(0, -1.0)], [mc(0, 1.0), 0.0]])
-    const z_sp = math.matrix([[1.0, 0.0], [0.0, -1.0]])
+    const id_sp = math.identity(2, 'sparse')
+    const x_sp = math.sparse([[0.0, 1.0], [1.0, 0.0]])
+    const y_sp = math.sparse([[0.0, mc(0, -1.0)], [mc(0, 1.0), 0.0]])
+    const z_sp = math.sparse([[1.0, 0.0], [0.0, -1.0]])
     const gates = {X: x_sp, Y: y_sp, Z: z_sp}
 
     let res_matrix = 0
@@ -561,21 +591,30 @@ describe('simulator test', () => {
   });
 
   it('should test_simulator_set_wavefunction', () => {
-    const sim = new Simulator()
-    const mapper = new TrivialMapper()
-    const engine_list = [new LocalOptimizer(), mapper]
+    const mp = new TrivialMapper()
 
-    const eng = new MainEngine(sim, engine_list)
-    const qubits = eng.allocateQureg(2)
-    const wf = [0.0, 0.0, math.sqrt(0.2), math.sqrt(0.8)]
-    expect(() => eng.backend.setWavefunction(wf, qubits)).to.throw()
-    eng.flush()
-    eng.backend.setWavefunction(wf, qubits)
+    const test = (mapper) => {
+      const sim = new Simulator()
+      const engine_list = [new LocalOptimizer()]
+      if (mapper) {
+        engine_list.push(mapper)
+      }
 
-    expect(eng.backend.getProbability('1', [qubits[0]])).to.be.closeTo(0.8, 1e-12)
-    expect(eng.backend.getProbability('01', qubits)).to.be.closeTo(0.2, 1e-12)
-    expect(eng.backend.getProbability('1', [qubits[1]])).to.be.closeTo(1, 1e-12)
-    new All(Measure).or(qubits)
+      const eng = new MainEngine(sim, engine_list)
+      const qubits = eng.allocateQureg(2)
+      const wf = [0.0, 0.0, math.sqrt(0.2), math.sqrt(0.8)]
+      expect(() => eng.backend.setWavefunction(wf, qubits)).to.throw()
+      eng.flush()
+      eng.backend.setWavefunction(wf, qubits)
+
+      expect(eng.backend.getProbability('1', [qubits[0]])).to.be.closeTo(0.8, 1e-12)
+      expect(eng.backend.getProbability('01', qubits)).to.be.closeTo(0.2, 1e-12)
+      expect(eng.backend.getProbability('1', [qubits[1]])).to.be.closeTo(1, 1e-12)
+      new All(Measure).or(qubits)
+    }
+
+    test(mp)
+    test()
   });
 
   it('should test_simulator_set_wavefunction_always_complex', () => {
@@ -592,36 +631,43 @@ describe('simulator test', () => {
   });
 
   it('should test_simulator_collapse_wavefunction', () => {
-    const sim = new Simulator()
-    const mapper = new TrivialMapper()
-    const engine_list = [new LocalOptimizer(), mapper]
+    const mp = new TrivialMapper()
+    const test = (mapper) => {
+      const sim = new Simulator()
+      const engine_list = [new LocalOptimizer()]
+      if (mapper) {
+        engine_list.push(mapper)
+      }
 
-    const eng = new MainEngine(sim, engine_list)
-    const qubits = eng.allocateQureg(4)
-    // unknown qubits: raises
-    expect(() => eng.backend.collapseWavefunction(qubits, [0, 0, 0, 0])).to.throw()
-    eng.flush()
-    eng.backend.collapseWavefunction(qubits, [0, 0, 0, 0])
-    const v = eng.backend.getProbability([0, 0, 0, 0], qubits)
-    console.log(544, v)
-    expect(v).to.be.closeTo(1, 1e-12)
-    new All(H).or(qubits.slice(1))
-    eng.flush()
-    expect(eng.backend.getProbability([0, 0, 0, 0], qubits)).to.be.closeTo(0.125, 1e-12)
+      const eng = new MainEngine(sim, engine_list)
+      const qubits = eng.allocateQureg(4)
+      // unknown qubits: raises
+      expect(() => eng.backend.collapseWavefunction(qubits, [0, 0, 0, 0])).to.throw()
+      eng.flush()
+      eng.backend.collapseWavefunction(qubits, [0, 0, 0, 0])
+      const v = eng.backend.getProbability([0, 0, 0, 0], qubits)
+      console.log(544, v)
+      expect(v).to.be.closeTo(1, 1e-12)
+      new All(H).or(qubits.slice(1))
+      eng.flush()
+      expect(eng.backend.getProbability([0, 0, 0, 0], qubits)).to.be.closeTo(0.125, 1e-12)
 
-    // impossible outcome: raises
-    expect(() => eng.backend.collapseWavefunction(qubits, [1, 0, 0, 0])).to.throw()
-    eng.backend.collapseWavefunction(qubits.slice(0, qubits.length - 1), [0, 1, 0])
-    let probability = eng.backend.getProbability([0, 1, 0, 1], qubits)
-    expect(probability).to.be.closeTo(0.5, 1e-12)
+      // impossible outcome: raises
+      expect(() => eng.backend.collapseWavefunction(qubits, [1, 0, 0, 0])).to.throw()
+      eng.backend.collapseWavefunction(qubits.slice(0, qubits.length - 1), [0, 1, 0])
+      let probability = eng.backend.getProbability([0, 1, 0, 1], qubits)
+      expect(probability).to.be.closeTo(0.5, 1e-12)
 
-    eng.backend.setWavefunction([1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], qubits)
-    H.or(qubits[0])
-    CNOT.or(tuple(qubits[0], qubits[1]))
-    eng.flush()
-    eng.backend.collapseWavefunction([qubits[0]], [1])
-    probability = eng.backend.getProbability([1, 1], qubits.slice(0, 2))
-    expect(probability).to.be.closeTo(1, 1e-12)
+      eng.backend.setWavefunction([1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], qubits)
+      H.or(qubits[0])
+      CNOT.or(tuple(qubits[0], qubits[1]))
+      eng.flush()
+      eng.backend.collapseWavefunction([qubits[0]], [1])
+      probability = eng.backend.getProbability([1, 1], qubits.slice(0, 2))
+      expect(probability).to.be.closeTo(1, 1e-12)
+    }
+    test(mp)
+    test()
   });
 
   it('should test_simulator_no_uncompute_exception', () => {

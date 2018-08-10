@@ -50,7 +50,7 @@ std::ostream& operator<<(std::ostream &os, Simulator::ComplexTermsDict &termsDic
     os << "[";
     for (int i = 0; i < termsDict.size(); ++i) {
         auto pair = termsDict[i];
-        os << pair.first << "(" << pair.second.real() << ", " << pair.second.imag() << ")" << std::endl;
+        os << pair.first << "(" << pair.second.real() << ", " << pair.second.imag() << "i)" << std::endl;
     }
     os << "]";
     return os;
@@ -436,7 +436,7 @@ void Wrapper::applyQubitOperator(const Nan::FunctionCallbackInfo<v8::Value> &inf
     Simulator::ComplexTermsDict termsDict;
     jsToComplexTermDictionary(isolate, terms, termsDict);
 
-    auto a2 = Local<Array>::Cast(info[0]);
+    auto a2 = Local<Array>::Cast(info[1]);
     std::vector<unsigned int> ids;
     jsToArray<unsigned int>(a2, ids);
 
