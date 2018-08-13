@@ -164,14 +164,16 @@ describe('tolatex test', () => {
     const settings = ToLatex.get_default_settings()
     settings.gates.AllocateQubitGate.draw_id = true
     const code = ToLatex._body(circuit_lines, settings)
-
+    console.log(code)
     // swap draws 2 nodes + 2 lines each, so is sqrtswap gate, csqrtswap,
     // inv(sqrt_swap), and cswap.
     expect(code.count('swapstyle')).to.equal(36)
     // CZ is two phases plus 2 from CNOTs + 2 from cswap + 2 from csqrtswap
     expect(code.count('phase')).to.equal(8)
     expect(code.count(`{${H.toString()}}`)).to.equal(2) // 2 hadamard gates
-    expect(code.count('{$\Ket{0}')).to.equal(3) // 3 qubits allocated
+    const exp = new RegExp(/\{\$\\Ket\{0\}/g)
+    const count = code.match(exp).length
+    expect(count).to.equal(3) // 3 qubits allocated
     // 1 cnot, 1 not gate, 3 SqrtSwap, 1 inv(SqrtSwap)
     expect(code.count('xstyle')).to.equal(7)
     expect(code.count('measure')).to.equal(1) // 1 measurement

@@ -81,7 +81,7 @@ describe('metagates test', () => {
 
   it('should test daggered gate string', () => {
     const daggered_gate = new DaggeredGate(Y)
-    expect(daggered_gate.toString()).to.equal(`${Y.toString()}^\dagger`)
+    expect(daggered_gate.toString()).to.equal(`${Y.toString()}^\\dagger`)
   });
 
   it('should test daggered gate get inverse', () => {

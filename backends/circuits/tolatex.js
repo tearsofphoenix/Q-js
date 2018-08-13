@@ -337,13 +337,11 @@ circuit.
     const cmds = circuit[line]
     for (let i = 0; i < end; ++i) {
       const {gate, lines, ctrl_lines} = cmds[i]
-
       let all_lines = lines.concat(ctrl_lines)
       const idx = all_lines.indexOf(line)
       all_lines.splice(idx, 1) // remove current line
       all_lines.forEach((l) => {
         let gate_idx = 0
-        console.log(circuit[l][gate_idx], cmds[i])
         while (!circuit[l][gate_idx].equal(cmds[i])) {
           gate_idx += 1
         }
@@ -512,7 +510,7 @@ daggered (bool): Show the daggered one if true.
     const pos = this.pos[lines[0]]
     const op_mid = `line${lines[0]}-${lines[1]}_gate${this.op_count[lines[0]]}`
     gate_str += `\n\\node[xstyle] (${op_mid}) at (${dts(pos)},-${midpoint})\
-                {\\scriptsize $\\frac{1}{2}${daggered ? '^{\dagger}' : ''}$};`
+                {\\scriptsize $\\frac{1}{2}${daggered ? '^{\\dagger}' : ''}$};`
 
     // add two vertical lines to connect circled 1/2
     gate_str += `\n\\draw (${this._op(lines[0])}) edge[edgestyle] (${op_mid});`
@@ -668,7 +666,7 @@ Returns:
    */
   _gate_width(gate) {
     if (gate instanceof DaggeredGate) {
-      gate = gate._gate
+      gate = gate.gate
     }
 
     const {gates} = this.settings
@@ -718,7 +716,7 @@ gate_height (float): Height of the gate.
    */
   _gate_height(gate) {
     if (gate instanceof DaggeredGate) {
-      gate = gate._gate
+      gate = gate.gate
     }
     const config = this.settings.gates[gate.constructor.name] || {}
     return config.height || 0.5
@@ -754,7 +752,6 @@ op_str (string): Gate name.
     if (op === null) {
       op = this.op_count[line] || 0
     }
-    console.log(`(666, ${line}, ${op}, ${offset})`)
     return `line${line}_gate${op + offset}`
   }
 

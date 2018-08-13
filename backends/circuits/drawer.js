@@ -266,7 +266,7 @@ export class CircuitDrawer extends BasicEngine {
     const lines = []
     cmd.qubits.forEach(qr => qr.forEach(qb => lines.push(qb.id)))
     const ctrl_lines = cmd.controlQubits.map(qb => qb.id)
-
+    console.log(`(243, '${gate.toString()}', [${lines.join(', ')}])`)
     const item = new CircuitItem(gate, lines, ctrl_lines)
 
     all_lines.forEach(l => this._qubit_lines[l].push(item))
@@ -297,6 +297,7 @@ export class CircuitDrawer extends BasicEngine {
         const ctrl_lines = cmd.ctrl_lines.map(qb_id => this._map[qb_id])
         const {gate} = cmd
         const new_cmd = new CircuitItem(gate, lines, ctrl_lines)
+        console.log(`('${gate.toString()}', [${lines.join(', ')}])`)
         if (gate.equal(Allocate)) {
           new_cmd.id = cmd.lines[0]
         }

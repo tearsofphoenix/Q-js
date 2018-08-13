@@ -86,8 +86,17 @@ gate: Any gate object of which to represent the inverse.
     return this._matrix
   }
 
+
+  /*
+  Return True if self is equal to other, i.e., same type and
+  representing the inverse of the same gate.
+   */
+  equal(other) {
+    return other instanceof DaggeredGate && other.gate.equal(this.gate)
+  }
+
   toString() {
-    return `${this.gate.toString()}^\dagger`
+    return `${this.gate.toString()}^\\dagger`
   }
 
   texString() {
