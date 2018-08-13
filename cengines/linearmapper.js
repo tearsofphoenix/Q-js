@@ -37,9 +37,16 @@ Swap operation
 Returns:
     Circuit depth to execute these swaps.
  */
-import BasicMapperEngine from "./basicmapper";
-import {len} from "../libs/polyfill";
-import {AllocateQubitGate, DeallocateQubitGate} from "../ops/gates";
+import BasicMapperEngine from './basicmapper';
+import {len} from '../libs/polyfill';
+import {
+  Allocate,
+  AllocateQubitGate, Deallocate, DeallocateQubitGate, FlushGate, Swap
+} from '../ops/gates';
+import {BasicQubit} from '../types/qubit';
+import {tuple} from '../libs/util';
+import Command from '../ops/command';
+import {LogicalQubitIDTag} from '../meta';
 
 function return_swap_depth(swaps) {
   const depth_of_qubits = {}
@@ -51,7 +58,7 @@ function return_swap_depth(swaps) {
   // max_depth = max(depth_of_qubits[qb0_id], depth_of_qubits[qb1_id])
   // depth_of_qubits[qb0_id] = max_depth + 1
   // depth_of_qubits[qb1_id] = max_depth + 1
-  return max(list(depth_of_qubits.values()) + [0])
+  return Math.max(...depth_of_qubits.values().push(0))
 }
 
 /*
@@ -89,7 +96,7 @@ num_qubits(int): Number of physical qubits in the linear chain
 cyclic(bool): If 1D chain is a cycle. Default is false.
 storage(int): Number of gates to temporarily store, default is 1000
    */
-  constructor(num_qubits, cyclic = false, storage=1000) {
+  constructor(num_qubits, cyclic = false, storage = 1000) {
     super()
 
     this.num_qubits = num_qubits
@@ -144,35 +151,34 @@ heuristic.
     value is placement id
    */
   static returnNewMapping(num_qubits, cyclic, currently_allocated_ids,
-                          stored_commands, current_mapping) {
-
+    stored_commands, current_mapping) {
     // allocated_qubits is used as this mapper currently does not reassign
     // a qubit placement to a new qubit if the previous qubit at that
     // location has been deallocated. This is done after the next swaps.
-       const allocated_qubits = currently_allocated_ids.slice(0)
+    const allocated_qubits = currently_allocated_ids.slice(0)
     const active_qubits = currently_allocated_ids.slice(0)
     // Segments contains a list of segments. A segment is a list of
     // neighouring qubit ids
     const segments = []
     // neighbour_ids only used to speedup the lookup process if qubits
-      // are already connected. key: qubit_id, value: set of neighbour ids
+    // are already connected. key: qubit_id, value: set of neighbour ids
     const neighbour_ids = {}
     active_qubits.forEach(qubit_id => neighbour_ids[qubit_id] = new Set())
 
     for (let i = 0; i < stored_commands.length; ++i) {
-         const cmd = stored_commands[i]
+      const cmd = stored_commands[i]
       if (len(allocated_qubits) === num_qubits && len(active_qubits) === 0) {
-           break;
+        break;
       }
 
       const qubit_ids = []
       cmd.allQubits.forEach(qureg => qureg.forEach(qubit => qubit_ids.push(qubit.id)))
 
       if (len(qubit_ids) > 2 || len(qubit_ids) === 0) {
-        throw new Error("Invalid command (number of qubits): " + cmd.toString())
+        throw new Error(`Invalid command (number of qubits): ${cmd.toString()}`)
       } else if (cmd.gate instanceof AllocateQubitGate) {
         const qubit_id = cmd.qubits[0][0].id
-        if(len(allocated_qubits) < num_qubits) {
+        if (len(allocated_qubits) < num_qubits) {
           allocated_qubits.add(qubit_id)
           active_qubits.add(qubit_id)
           neighbour_ids[qubit_id] = new Set()
@@ -191,22 +197,23 @@ heuristic.
         // Process a two qubit gate:
 
         LinearMapper._process_two_qubit_gate(
-            num_qubits,
-            cyclic,
-            qubit_ids[0],
-            qubit_ids[1],
-            active_qubits,
-            segments,
-            neighbour_ids)
+          num_qubits,
+          cyclic,
+          qubit_ids[0],
+          qubit_ids[1],
+          active_qubits,
+          segments,
+          neighbour_ids
+        )
       }
     }
 
     return LinearMapper._return_new_mapping_from_segments(
-        num_qubits,
-        segments,
-        allocated_qubits,
-        current_mapping)
-
+      num_qubits,
+      segments,
+      allocated_qubits,
+      current_mapping
+    )
   }
 
   /*
@@ -227,38 +234,38 @@ qubits.
 neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
    */
   static _process_two_qubit_gate(num_qubits, cyclic, qubit0, qubit1,
-                                 active_qubits, segments, neighbour_ids) {
+    active_qubits, segments, neighbour_ids) {
     // already connected
     if (qubit1 in neighbour_ids && qubit0 in neighbour_ids[qubit1]) {
-      return
+
     }
-// at least one qubit is not an active qubit:
-    else if(!(qubit0 in active_qubits) || !(qubit1 in active_qubits)) {
+    // at least one qubit is not an active qubit:
+    else if (!(qubit0 in active_qubits) || !(qubit1 in active_qubits)) {
       active_qubits.remove(qubit0)
       active_qubits.remove(qubit1)
     }
-// at least one qubit is in the inside of a segment:
-    else if(len(neighbour_ids[qubit0]) > 1 || len(neighbour_ids[qubit1]) > 1) {
+    // at least one qubit is in the inside of a segment:
+    else if (len(neighbour_ids[qubit0]) > 1 || len(neighbour_ids[qubit1]) > 1) {
       active_qubits.remove(qubit0)
       active_qubits.remove(qubit1)
     }
-// qubits are both active and either not yet in a segment or at
-// the end of segement:
-  else {
+    // qubits are both active and either not yet in a segment or at
+    // the end of segement:
+    else {
       let segment_index_qb0
       let qb0_is_left_end
       let segment_index_qb1
       let qb1_is_left_end
 
       segments.forEach((segment, index) => {
-        if(qubit0 == segment[0]) {
+        if (qubit0 == segment[0]) {
           segment_index_qb0 = index
           qb0_is_left_end = true
-        }else if(qubit0 == segment[-1]) {
+        } else if (qubit0 == segment[-1]) {
           segment_index_qb0 = index
           qb0_is_left_end = false
         }
-        if(qubit1 == segment[0]) {
+        if (qubit1 == segment[0]) {
           segment_index_qb1 = index
           qb1_is_left_end = true
         } else if (qubit1 == segment[-1]) {
@@ -266,34 +273,34 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
           qb1_is_left_end = false
         }
       })
-// Both qubits are not yet assigned to a segment:
+      // Both qubits are not yet assigned to a segment:
       if (typeof segment_index_qb0 === 'undefined' && typeof segment_index_qb1 === 'undefined') {
         segments.push([qubit0, qubit1])
         neighbour_ids[qubit0].add(qubit1)
         neighbour_ids[qubit1].add(qubit0)
       }
-// if qubits are in the same segment, then the gate is not
-// possible. Note that if this.cyclic==true, we have
-// added that connection already to neighbour_ids and wouldn't be
-// in this branch.
+      // if qubits are in the same segment, then the gate is not
+      // possible. Note that if this.cyclic==true, we have
+      // added that connection already to neighbour_ids and wouldn't be
+      // in this branch.
       else if (segment_index_qb0 == segment_index_qb1) {
         active_qubits.remove(qubit0)
         active_qubits.remove(qubit1)
-// qubit0 not yet assigned to a segment:
+        // qubit0 not yet assigned to a segment:
       } else if (typeof segment_index_qb0 === 'undefined') {
-          if (qb1_is_left_end) {
-            segments[segment_index_qb1].insert(0, qubit0)
-          }else {
-            segments[segment_index_qb1].append(qubit0)
-          }
-      neighbour_ids[qubit0].add(qubit1)
-      neighbour_ids[qubit1].add(qubit0)
-      if(cyclic && len(segments[0]) == num_qubits) {
-        neighbour_ids[segments[0][0]].add(segments[0][-1])
-        neighbour_ids[segments[0][-1]].add(segments[0][0])
+        if (qb1_is_left_end) {
+          segments[segment_index_qb1].insert(0, qubit0)
+        } else {
+          segments[segment_index_qb1].append(qubit0)
+        }
+        neighbour_ids[qubit0].add(qubit1)
+        neighbour_ids[qubit1].add(qubit0)
+        if (cyclic && len(segments[0]) == num_qubits) {
+          neighbour_ids[segments[0][0]].add(segments[0][-1])
+          neighbour_ids[segments[0][-1]].add(segments[0][0])
+        }
       }
-      }
-// qubit1 not yet assigned to a segment:
+      // qubit1 not yet assigned to a segment:
       else if (typeof segment_index_qb1 === 'undefined') {
         if (qb0_is_left_end) {
           segments[segment_index_qb0].insert(0, qubit1)
@@ -307,347 +314,393 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
           neighbour_ids[segments[0][-1]].add(segments[0][0])
         }
       }
-// both qubits are at the end of different segments -> combine them
-    else {
-        if (!qb0_is_left_end && qb1_is_left_end) {
-          segments[segment_index_qb0].extend(
-              segments[segment_index_qb1])
-          segments.pop(segment_index_qb1)
-        }else if(!qb0_is_left_end && !qb1_is_left_end) {
-          segments[segment_index_qb0].extend(
-              reversed(segments[segment_index_qb1]))
-          segments.pop(segment_index_qb1)
-        }else if(qb0_is_left_end && qb1_is_left_end) {
-          segments[segment_index_qb0].reverse()
-          segments[segment_index_qb0].extend(
-              segments[segment_index_qb1])
-          segments.pop(segment_index_qb1)
-        }else {
-          segments[segment_index_qb1].extend(
-              segments[segment_index_qb0])
-          segments.pop(segment_index_qb0)
-// Add new neighbour ids && make sure to check cyclic
-          neighbour_ids[qubit0].add(qubit1)
-          neighbour_ids[qubit1].add(qubit0)
-          if (cyclic && len(segments[0]) == num_qubits) {
-            neighbour_ids[segments[0][0]].add(segments[0][-1])
-            neighbour_ids[segments[0][-1]].add(segments[0][0])
-          }
+      // both qubits are at the end of different segments -> combine them
+      else if (!qb0_is_left_end && qb1_is_left_end) {
+        segments[segment_index_qb0].extend(
+          segments[segment_index_qb1]
+        )
+        segments.pop(segment_index_qb1)
+      } else if (!qb0_is_left_end && !qb1_is_left_end) {
+        segments[segment_index_qb0].extend(
+          reversed(segments[segment_index_qb1])
+        )
+        segments.pop(segment_index_qb1)
+      } else if (qb0_is_left_end && qb1_is_left_end) {
+        segments[segment_index_qb0].reverse()
+        segments[segment_index_qb0].extend(
+          segments[segment_index_qb1]
+        )
+        segments.pop(segment_index_qb1)
+      } else {
+        segments[segment_index_qb1].extend(
+          segments[segment_index_qb0]
+        )
+        segments.pop(segment_index_qb0)
+        // Add new neighbour ids && make sure to check cyclic
+        neighbour_ids[qubit0].add(qubit1)
+        neighbour_ids[qubit1].add(qubit0)
+        if (cyclic && len(segments[0]) == num_qubits) {
+          neighbour_ids[segments[0][0]].add(segments[0][-1])
+          neighbour_ids[segments[0][-1]].add(segments[0][0])
         }
       }
     }
-    return
+  }
+
+  /*
+  Returns the swap operation for an odd-even transposition sort.
+
+  See https://en.wikipedia.org/wiki/Odd-even_sort for more info.
+
+      Args:
+  old_mapping: dict: keys are logical ids and values are mapped
+  qubit ids
+  new_mapping: dict: keys are logical ids and values are mapped
+  qubit ids
+  Returns:
+      List of tuples. Each tuple is a swap operation which needs to be
+  applied. Tuple contains the two MappedQubit ids for the Swap.
+   */
+  _odd_even_transposition_sort_swaps(old_mapping, new_mapping) {
+    const final_positions = new Array(this.num_qubits)
+    // move qubits which are in both mappings
+    for (const logical_id of old_mapping) {
+      if (logical_id in new_mapping) {
+        final_positions[old_mapping[logical_id]] = new_mapping[logical_id]
+      }
+    }
+    // exchange all remaining None with the not yet used mapped ids
+    const used_mapped_ids = new Set(final_positions)
+    const all_ids = set(range(this.num_qubits))
+    let not_used_mapped_ids = list(all_ids.difference(used_mapped_ids))
+    // TODO
+    not_used_mapped_ids = not_used_mapped_ids.sort() // reverse=true)
+    final_positions.forEach((looper, i) => {
+      if (!final_positions[i]) {
+        final_positions[i] = not_used_mapped_ids.pop()
+      }
+    })
+    assert(len(not_used_mapped_ids) === 0)
+    // Start sorting:
+    const swap_operations = []
+    let finished_sorting = false
+    while (!finished_sorting) {
+      finished_sorting = true
+      for (let i = 1; i < len(final_positions); i += 2) {
+        if (final_positions[i] > final_positions[i + 1]) {
+          swap_operations.push(tuple(i, i + 1))
+          const tmp = final_positions[i]
+          final_positions[i] = final_positions[i + 1]
+          final_positions[i + 1] = tmp
+          finished_sorting = false
+        }
+      }
+      for (let i = 0; i < len(final_positions) - 1; i += 2) {
+        if (final_positions[i] > final_positions[i + 1]) {
+          swap_operations.push(tuple(i, i + 1))
+          const tmp = final_positions[i]
+          final_positions[i] = final_positions[i + 1]
+          final_positions[i + 1] = tmp
+          finished_sorting = false
+        }
+      }
+    }
+    return swap_operations
+  }
+
+
+  /*
+  Sends the stored commands possible without changing the mapping.
+
+  Note: this.current_mapping must exist already
+   */
+  _send_possible_commands() {
+    const active_ids = new Set(this._currently_allocated_ids)
+    for (const logical_id of this.current_mapping) {
+      active_ids.add(logical_id)
+    }
+
+    let new_stored_commands = []
+    for (let i = 0; i < this._stored_commands.length; ++i) {
+      const cmd = this._stored_commands[i]
+      if (len(active_ids) === 0) {
+        new_stored_commands = new_stored_commands.concat(this._stored_commands.slice(i))
+        break
+      }
+      if (cmd.gate instanceof AllocateQubitGate) {
+        const qid = cmd.qubits[0][0].id
+        if (qid in this.current_mapping) {
+          this._currently_allocated_ids.add(qid)
+          const qb = new BasicQubit(this, this.current_mapping[qid])
+          const new_cmd = new Command(this, new AllocateQubitGate(), tuple([qb]), [new LogicalQubitIDTag(qid)])
+          this.send([new_cmd])
+        } else {
+          new_stored_commands.push(cmd)
+        }
+      } else if (cmd.gate instanceof DeallocateQubitGate) {
+        const qid = cmd.qubits[0][0].id
+        if (qid in active_ids) {
+          const qb = new BasicQubit(this, this.current_mapping[qid])
+          const new_cmd = new Command(this, new DeallocateQubitGate(), tuple([qb]), [new LogicalQubitIDTag(qid)])
+          this._currently_allocated_ids.remove(qid)
+          active_ids.remove(qid)
+          this._current_mapping.pop(qid)
+          this.send([new_cmd])
+        } else {
+          new_stored_commands.append(cmd)
+        }
+      } else {
+        let send_gate = true
+        let mapped_ids = new Set()
+        for (let i = 0; i < cmd.allQubits; ++i) {
+          const qureg = cmd.allQubits[i]
+          for (let j = 0; j < qureg.length; ++j) {
+            const qubit = qureg[j]
+            if (!(qubit.id in active_ids)) {
+              send_gate = false
+              break
+            }
+            mapped_ids.add(this.current_mapping[qubit.id])
+          }
+        }
+
+        // Check that mapped ids are nearest neighbour
+        if (len(mapped_ids) == 2) {
+          mapped_ids = Array.from(mapped_ids)
+          const diff = Math.abs(mapped_ids[0] - mapped_ids[1])
+          if (this.cyclic) {
+            if (diff != 1 && diff != this.num_qubits - 1) {
+              send_gate = false
+            }
+          } else if (diff != 1) {
+            send_gate = false
+          }
+        }
+        if (send_gate) {
+          this._send_cmd_with_mapped_ids(cmd)
+        } else {
+          cmd.allQubits.forEach(qureg => qureg.forEach(qubit => active_ids.delete(qubit.id)))
+          new_stored_commands.push(cmd)
+        }
+      }
+      this._stored_commands = new_stored_commands
+    }
+  }
+
+  /*
+    Creates a new mapping and executes possible gates.
+
+  It first allocates all 0, ..., this.num_qubits-1 mapped qubit ids, if
+  they are not already used because we might need them all for the
+  swaps. Then it creates a new map, swaps all the qubits to the new map,
+  executes all possible gates, and finally deallocates mapped qubit ids
+  which don't store any information.
+   */
+  _run() {
+    const num_of_stored_commands_before = len(this._stored_commands)
+    if (!this.current_mapping) {
+      this.current_mapping = {}
+    } else {
+      this._send_possible_commands()
+      if (len(this._stored_commands) == 0) {
+        return
+      }
+    }
+    const new_mapping = this.return_new_mapping(this.num_qubits,
+      this.cyclic,
+      this._currently_allocated_ids,
+      this._stored_commands,
+      this.current_mapping)
+    const swaps = this._odd_even_transposition_sort_swaps(
+      this.current_mapping, new_mapping
+    )
+    if (swaps) { // first mapping requires no swaps
+      // Allocate all mapped qubit ids (which are not already allocated,
+      // i.e., contained in this._currently_allocated_ids)
+      let mapped_ids_used = new Set()
+      for (const logical_id of this._currently_allocated_ids) {
+        mapped_ids_used.add(this.current_mapping[logical_id])
+      }
+      const not_allocated_ids = set(range(this.num_qubits)).difference(mapped_ids_used)
+      for (const mapped_id of not_allocated_ids) {
+        const qb = new BasicQubit(this, mapped_id)
+        const cmd = new Command(this, Allocate, tuple([qb]))
+        this.send([cmd])
+      }
+      // Send swap operations to arrive at new_mapping:
+      swaps.forEach(([qubit_id0, qubit_id1]) => {
+        const q0 = new BasicQubit(this, qubit_id0)
+        const q1 = new BasicQubit(this, qubit_id1)
+        const cmd = new Command(this, Swap, tuple([q0], [q1]))
+        this.send([cmd])
+      })
+      // Register statistics:
+      this.num_mappings += 1
+      const depth = return_swap_depth(swaps)
+      if (!(depth in this.depth_of_swaps)) {
+        this.depth_of_swaps[depth] = 1
+      } else {
+        this.depth_of_swaps[depth] += 1
+      }
+      if (!(len(swaps) in this.num_of_swaps_per_mapping)) {
+        this.num_of_swaps_per_mapping[len(swaps)] = 1
+      } else {
+        this.num_of_swaps_per_mapping[len(swaps)] += 1
+      }
+      // Deallocate all previously mapped ids which we only needed for the
+      // swaps:
+      mapped_ids_used = new Set()
+      for (const logical_id of this._currently_allocated_ids) {
+        mapped_ids_used.add(new_mapping[logical_id])
+      }
+      const not_needed_anymore = set(range(this.num_qubits)).difference(mapped_ids_used)
+      for (const mapped_id of not_needed_anymore) {
+        const qb = new BasicQubit(this, mapped_id)
+        const cmd = new Command(this, Deallocate, tuple([qb]))
+        this.send([cmd])
+      }
+    }
+
+    // Change to new map:
+    this.current_mapping = new_mapping
+    // Send possible gates:
+    this._send_possible_commands()
+    // Check that mapper actually made progress
+    if (len(this._stored_commands) == num_of_stored_commands_before) {
+      throw new Error('Mapper is potentially in an infinite loop. '
+      + 'It is likely that the algorithm requires '
+      + 'too many qubits. Increase the number of '
+      + 'qubits for this mapper.')
+    }
+  }
+
+  /*
+  Receives a command list and, for each command, stores it until
+  we do a mapping (FlushGate or Cache of stored commands is full).
+
+  Args:
+      command_list (list of Command objects): list of commands to
+  receive.
+   */
+  receive(command_list) {
+    command_list.forEach((cmd) => {
+      if (cmd.gate instanceof FlushGate) {
+        while (this._stored_commands.length > 0) {
+          this._run()
+        }
+        this.send([cmd])
+      } else {
+        this._stored_commands.push(cmd)
+      }
+    })
+
+    // Storage is full: Create new map and send some gates away:
+    if (this._stored_commands.length >= this.storage) {
+      this._run()
+    }
+  }
+
+  /*
+  Combines the individual segments into a new mapping.
+
+  It tries to minimize the number of swaps to go from the old mapping
+  in this.current_mapping to the new mapping which it returns. The
+  strategy is to map a segment to the same region where most of the
+  qubits are already. Note that this is not a global optimal strategy
+  but helps if currently the qubits can be divided into independent
+  groups without interactions between the groups.
+
+  Args:
+      num_qubits (int): Total number of qubits in the linear chain
+  segments: List of segments. A segment is a list of qubit ids which
+  should be nearest neighbour in the new map.
+  Individual qubits are in allocated_qubits but not in
+  any segment
+  allocated_qubits: A set of all qubit ids which need to be present
+  in the new map
+  current_mapping: A current mapping as a dict. key is logical qubit
+  id, value is placement id. If there are different
+  possible maps, this current mapping is used to
+  minimize the swaps to go to the new mapping by a
+  heuristic.
+  Returns:
+      A new mapping as a dict. key is logical qubit id,
+  value is placement id
+   */
+  static _return_new_mapping_from_segments(num_qubits, segments, allocated_qubits, current_mapping) {
+    const remaining_segments = deepcopy(segments)
+    const individual_qubits = deepcopy(allocated_qubits)
+    const num_unused_qubits = num_qubits - len(allocated_qubits)
+    // Create a segment out of individual qubits and add to segments
+    segments.forEach((segment) => {
+      segment.forEach((qubit_id) => {
+        individual_qubits.remove(qubit_id)
+      })
+    })
+
+    for (const individual_qubit_id of individual_qubits) {
+      remaining_segments.push([individual_qubit_id])
+    }
+
+    const previous_chain = new Array(num_qubits)
+    if (current_mapping) {
+      Object.keys(current_mapping).forEach(key => previous_chain[current_mapping[key]] = key)
+    }
+
+    // Note: previous_chain potentially has some None elements
+    const new_chain = new Array(num_qubits)
+
+    let current_position_to_fill = 0
+    while (len(remaining_segments)) {
+      let best_segment
+      let best_padding = num_qubits
+      let highest_overlap_fraction = 0
+      remaining_segments.forEach((segment) => {
+        for (let padding = 0; padding < num_unused_qubits + 1; ++padding) {
+          const idx0 = current_position_to_fill + padding
+          const idx1 = idx0 + len(segment)
+
+          const previous_chain_ids = new Set(previous_chain.slice(idx0, idx1))
+
+          const segment_ids = new Set(segment)
+
+          const overlap = len(previous_chain_ids.intersection(segment_ids)) + previous_chain.slice(idx0, idx1).count(None)
+          let overlap_fraction
+          if (overlap === 0) {
+            overlap_fraction = 0
+          } else if (overlap === len(segment)) {
+            overlap_fraction = 1
+          } else {
+            overlap_fraction = overlap / (len(segment) * 1.0)
+          }
+          if ((overlap_fraction === 1 && padding < best_padding)
+          || overlap_fraction > highest_overlap_fraction
+          || highest_overlap_fraction === 0) {
+            best_segment = segment
+            best_padding = padding
+            highest_overlap_fraction = overlap_fraction
+          }
+        }
+      })
+
+      // Add best segment and padding to new_chain
+      const start = current_position_to_fill + best_padding
+      for (let i = 0; i < len(best_segment); ++i) {
+        new_chain[start + i] = best_segment[i]
+      }
+
+      remaining_segments.remove(best_segment)
+      current_position_to_fill += best_padding + len(best_segment)
+      num_unused_qubits -= best_padding
+    }
+    // Create mapping
+    const new_mapping = {}
+    Object.keys(new_chain).forEach((pos) => {
+      const logical_id = new_chain[pos]
+      if (logical_id) {
+        new_mapping[logical_id] = pos
+      }
+    })
+    return new_mapping
   }
 }
-
-@staticmethod
-def _return_new_mapping_from_segments(num_qubits, segments,
-    allocated_qubits, current_mapping):
-"""
-Combines the individual segments into a new mapping.
-
-It tries to minimize the number of swaps to go from the old mapping
-in this.current_mapping to the new mapping which it returns. The
-strategy is to map a segment to the same region where most of the
-qubits are already. Note that this is not a global optimal strategy
-but helps if currently the qubits can be divided into independent
-groups without interactions between the groups.
-
-    Args:
-num_qubits (int): Total number of qubits in the linear chain
-segments: List of segments. A segment is a list of qubit ids which
-should be nearest neighbour in the new map.
-Individual qubits are in allocated_qubits but not in
-any segment
-allocated_qubits: A set of all qubit ids which need to be present
-in the new map
-current_mapping: A current mapping as a dict. key is logical qubit
-id, value is placement id. If there are different
-possible maps, this current mapping is used to
-minimize the swaps to go to the new mapping by a
-heuristic.
-    Returns:
-A new mapping as a dict. key is logical qubit id,
-    value is placement id
-"""
-remaining_segments = deepcopy(segments)
-individual_qubits = deepcopy(allocated_qubits)
-num_unused_qubits = num_qubits - len(allocated_qubits)
-// Create a segment out of individual qubits and add to segments
-for segment in segments:
-for qubit_id in segment:
-individual_qubits.remove(qubit_id)
-for individual_qubit_id in individual_qubits:
-remaining_segments.append([individual_qubit_id])
-
-previous_chain = [None] * num_qubits
-if current_mapping:
-for key, value in current_mapping.items():
-previous_chain[value] = key
-// Note: previous_chain potentially has some None elements
-new_chain = [None] * num_qubits
-
-current_position_to_fill = 0
-while len(remaining_segments):
-best_segment = None
-best_padding = num_qubits
-highest_overlap_fraction = 0
-for segment in remaining_segments:
-for padding in range(num_unused_qubits + 1):
-idx0 = current_position_to_fill + padding
-idx1 = idx0 + len(segment)
-
-previous_chain_ids = set(previous_chain[idx0:idx1])
-previous_chain_ids.discard(None)
-segment_ids = set(segment)
-segment_ids.discard(None)
-
-overlap = len(previous_chain_ids.intersection(
-    segment_ids)) + previous_chain[idx0:idx1].count(None)
-if overlap == 0:
-overlap_fraction = 0
-elif overlap == len(segment):
-overlap_fraction = 1
-else:
-overlap_fraction = overlap / float(len(segment))
-if ((overlap_fraction == 1 && padding < best_padding) or
-overlap_fraction > highest_overlap_fraction or
-highest_overlap_fraction == 0):
-best_segment = segment
-best_padding = padding
-highest_overlap_fraction = overlap_fraction
-// Add best segment and padding to new_chain
-new_chain[current_position_to_fill+best_padding:
-current_position_to_fill+best_padding +
-len(best_segment)] = best_segment
-remaining_segments.remove(best_segment)
-current_position_to_fill += best_padding + len(best_segment)
-num_unused_qubits -= best_padding
-// Create mapping
-new_mapping = {}
-for pos, logical_id in enumerate(new_chain):
-if logical_id is not None:
-    new_mapping[logical_id] = pos
-return new_mapping
-
-def _odd_even_transposition_sort_swaps(self, old_mapping, new_mapping):
-"""
-Returns the swap operation for an odd-even transposition sort.
-
-    See https://en.wikipedia.org/wiki/Odd-even_sort for more info.
-
-    Args:
-        old_mapping: dict: keys are logical ids and values are mapped
-qubit ids
-new_mapping: dict: keys are logical ids and values are mapped
-qubit ids
-Returns:
-    List of tuples. Each tuple is a swap operation which needs to be
-applied. Tuple contains the two MappedQubit ids for the Swap.
-"""
-final_positions = [None] * this.num_qubits
-// move qubits which are in both mappings
-for logical_id in old_mapping:
-if logical_id in new_mapping:
-final_positions[old_mapping[logical_id]] = new_mapping[
-    logical_id]
-// exchange all remaining None with the not yet used mapped ids
-used_mapped_ids = set(final_positions)
-used_mapped_ids.discard(None)
-all_ids = set(range(this.num_qubits))
-not_used_mapped_ids = list(all_ids.difference(used_mapped_ids))
-not_used_mapped_ids = sorted(not_used_mapped_ids, reverse=true)
-for i in range(len(final_positions)):
-if final_positions[i] is None:
-    final_positions[i] = not_used_mapped_ids.pop()
-assert len(not_used_mapped_ids) == 0
-// Start sorting:
-    swap_operations = []
-finished_sorting = false
-while not finished_sorting:
-    finished_sorting = true
-for i in range(1, len(final_positions)-1, 2):
-if final_positions[i] > final_positions[i+1]:
-swap_operations.append((i, i+1))
-tmp = final_positions[i]
-final_positions[i] = final_positions[i+1]
-final_positions[i+1] = tmp
-finished_sorting = false
-for i in range(0, len(final_positions)-1, 2):
-if final_positions[i] > final_positions[i+1]:
-swap_operations.append((i, i+1))
-tmp = final_positions[i]
-final_positions[i] = final_positions[i+1]
-final_positions[i+1] = tmp
-finished_sorting = false
-return swap_operations
-
-def _send_possible_commands(self):
-"""
-Sends the stored commands possible without changing the mapping.
-
-    Note: this.current_mapping must exist already
-"""
-active_ids = deepcopy(this._currently_allocated_ids)
-for logical_id in this.current_mapping:
-active_ids.add(logical_id)
-
-new_stored_commands = []
-for i in range(len(this._stored_commands)):
-cmd = this._stored_commands[i]
-if len(active_ids) == 0:
-new_stored_commands += this._stored_commands[i:]
-break
-if isinstance(cmd.gate, AllocateQubitGate):
-if cmd.qubits[0][0].id in this.current_mapping:
-this._currently_allocated_ids.add(cmd.qubits[0][0].id)
-qb = WeakQubitRef(
-    engine=self,
-    idx=this.current_mapping[cmd.qubits[0][0].id])
-new_cmd = Command(
-    engine=self,
-    gate=AllocateQubitGate(),
-    qubits=([qb],),
-    tags=[LogicalQubitIDTag(cmd.qubits[0][0].id)])
-this.send([new_cmd])
-else:
-new_stored_commands.append(cmd)
-elif isinstance(cmd.gate, DeallocateQubitGate):
-if cmd.qubits[0][0].id in active_ids:
-qb = WeakQubitRef(
-    engine=self,
-    idx=this.current_mapping[cmd.qubits[0][0].id])
-new_cmd = Command(
-    engine=self,
-    gate=DeallocateQubitGate(),
-    qubits=([qb],),
-    tags=[LogicalQubitIDTag(cmd.qubits[0][0].id)])
-this._currently_allocated_ids.remove(cmd.qubits[0][0].id)
-active_ids.remove(cmd.qubits[0][0].id)
-this._current_mapping.pop(cmd.qubits[0][0].id)
-this.send([new_cmd])
-else:
-new_stored_commands.append(cmd)
-else:
-send_gate = true
-mapped_ids =new Set()
-for qureg in cmd.all_qubits:
-for qubit in qureg:
-if qubit.id not in active_ids:
-send_gate = false
-break
-mapped_ids.add(this.current_mapping[qubit.id])
-// Check that mapped ids are nearest neighbour
-if len(mapped_ids) == 2:
-mapped_ids = list(mapped_ids)
-diff = abs(mapped_ids[0]-mapped_ids[1])
-if this.cyclic:
-if diff != 1 && diff != this.num_qubits-1:
-send_gate = false
-else:
-if diff != 1:
-send_gate = false
-if send_gate:
-this._send_cmd_with_mapped_ids(cmd)
-else:
-for qureg in cmd.all_qubits:
-for qubit in qureg:
-active_ids.discard(qubit.id)
-new_stored_commands.append(cmd)
-this._stored_commands = new_stored_commands
-
-def _run(self):
-"""
-Creates a new mapping and executes possible gates.
-
-    It first allocates all 0, ..., this.num_qubits-1 mapped qubit ids, if
-    they are not already used because we might need them all for the
-  swaps. Then it creates a new map, swaps all the qubits to the new map,
-    executes all possible gates, and finally deallocates mapped qubit ids
-which don't store any information.
-"""
-num_of_stored_commands_before = len(this._stored_commands)
-if not this.current_mapping:
-this.current_mapping = {}
-else:
-this._send_possible_commands()
-if len(this._stored_commands) == 0:
-return
-new_mapping = this.return_new_mapping(this.num_qubits,
-    this.cyclic,
-    this._currently_allocated_ids,
-    this._stored_commands,
-    this.current_mapping)
-swaps = this._odd_even_transposition_sort_swaps(
-    old_mapping=this.current_mapping, new_mapping=new_mapping)
-if swaps:  // first mapping requires no swaps
-// Allocate all mapped qubit ids (which are not already allocated,
-    // i.e., contained in this._currently_allocated_ids)
-mapped_ids_used =new Set()
-for logical_id in this._currently_allocated_ids:
-mapped_ids_used.add(this.current_mapping[logical_id])
-not_allocated_ids = set(range(this.num_qubits)).difference(
-    mapped_ids_used)
-for mapped_id in not_allocated_ids:
-qb = WeakQubitRef(engine=self, idx=mapped_id)
-cmd = Command(engine=self, gate=Allocate, qubits=([qb],))
-this.send([cmd])
-// Send swap operations to arrive at new_mapping:
-    for qubit_id0, qubit_id1 in swaps:
-q0 = WeakQubitRef(engine=self, idx=qubit_id0)
-q1 = WeakQubitRef(engine=self, idx=qubit_id1)
-cmd = Command(engine=self, gate=Swap, qubits=([q0], [q1]))
-this.send([cmd])
-// Register statistics:
-    this.num_mappings += 1
-depth = return_swap_depth(swaps)
-if depth not in this.depth_of_swaps:
-this.depth_of_swaps[depth] = 1
-else:
-this.depth_of_swaps[depth] += 1
-if len(swaps) not in this.num_of_swaps_per_mapping:
-this.num_of_swaps_per_mapping[len(swaps)] = 1
-else:
-this.num_of_swaps_per_mapping[len(swaps)] += 1
-// Deallocate all previously mapped ids which we only needed for the
-  // swaps:
-mapped_ids_used =new Set()
-for logical_id in this._currently_allocated_ids:
-mapped_ids_used.add(new_mapping[logical_id])
-not_needed_anymore = set(range(this.num_qubits)).difference(
-    mapped_ids_used)
-for mapped_id in not_needed_anymore:
-qb = WeakQubitRef(engine=self, idx=mapped_id)
-cmd = Command(engine=self, gate=Deallocate,
-    qubits=([qb],))
-this.send([cmd])
-// Change to new map:
-this.current_mapping = new_mapping
-// Send possible gates:
-    this._send_possible_commands()
-// Check that mapper actually made progress
-if len(this._stored_commands) == num_of_stored_commands_before:
-raise RuntimeError("Mapper is potentially in an infinite loop. "
-"It is likely that the algorithm requires "
-"too many qubits. Increase the number of "
-"qubits for this mapper.")
-
-def receive(self, command_list):
-"""
-Receives a command list and, for each command, stores it until
-we do a mapping (FlushGate or Cache of stored commands is full).
-
-Args:
-    command_list (list of Command objects): list of commands to
-receive.
-"""
-for cmd in command_list:
-if isinstance(cmd.gate, FlushGate):
-while(len(this._stored_commands)):
-this._run()
-this.send([cmd])
-else:
-this._stored_commands.append(cmd)
-// Storage is full: Create new map and send some gates away:
-    if len(this._stored_commands) >= this.storage:
-this._run()
