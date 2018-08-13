@@ -1,40 +1,26 @@
-import fs from 'fs'
 /*
-Translates a given circuit to a TikZ picture in a Latex document.
-
-    It uses a json-configuration file which (if it does not exist) is created
-automatically upon running this function for the first time. The config
-file can be used to determine custom gate sizes, offsets, etc.
-
-    New gate options can be added under settings['gates'], using the gate
-class name string as a key. Every gate can have its own width, height, pre
-offset and offset.
-
-    Example:
-.. code-block:: python
-
-settings['gates']['HGate'] = {'width': .5, 'offset': .15}
-
-The default settings can be acquired using the get_default_settings()
-function, and written using write_settings().
-
-    Args:
-circuit (list<list<CircuitItem>>): Each qubit line is a list of
-CircuitItem objects, i.e., in circuit[line].
-
-    Returns:
-tex_doc_str (string): Latex document string which can be compiled
-using, e.g., pdflatex.
+ * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-function to_latex(circuit) {
 
-  const settings = write_settings(get_default_settings())
-
-  let text = _header(settings)
-  text += _body(circuit, settings)
-  text += _footer(settings)
-  return text
-}
+import assert from 'assert'
+import fs from 'fs'
+import { len } from '../../libs/polyfill'
+import {
+  DaggeredGate, X, Measure, Allocate, Deallocate, Z, Swap, SqrtSwap
+} from '../../ops'
+import { getInverse } from '../../ops/_cycle'
 
 
 /*
@@ -55,44 +41,92 @@ Returns:
     settings (dict): Default circuit settings
  */
 function get_default_settings() {
-
-const settings = {}
-settings['gate_shadow'] = true
-settings['lines'] = ({'style': 'very thin', 'double_classical': true,
-  'init_quantum': true, 'double_lines_sep': .04})
-settings['gates'] = ({'HGate': {'width': .5, 'offset': .3,
-    'pre_offset': .1},
-  'XGate': {'width': .35, 'height': .35,
-    'offset': .1},
-  'SqrtXGate': {'width': .7, 'offset': .3,
-    'pre_offset': .1},
-  'SwapGate': {'width': .35, 'height': .35,
-    'offset': .1},
-  'SqrtSwapGate': {'width': .35, 'height': .35,
-    'offset': .1},
-  'Rx': {'width': 1., 'height': .8, 'pre_offset': .2,
-    'offset': .3},
-  'Ry': {'width': 1., 'height': .8, 'pre_offset': .2,
-    'offset': .3},
-  'Rz': {'width': 1., 'height': .8, 'pre_offset': .2,
-    'offset': .3},
-  'Ph': {'width': 1., 'height': .8, 'pre_offset': .2,
-    'offset': .3},
-  'EntangleGate': {'width': 1.8, 'offset': .2,
-    'pre_offset': .2},
-  'DeallocateQubitGate': {'height': .15, 'offset': .2,
-    'width': .2,
-    'pre_offset': .1},
-  'AllocateQubitGate': {'height': .15, 'width': .2,
-    'offset': .1,
-    'pre_offset': .1,
-    'draw_id': false,
-    'allocate_at_zero': false},
-  'MeasureGate': {'width': 0.75, 'offset': .2,
-    'height': .5, 'pre_offset': .2}
-})
-settings['control'] = {'size': .1, 'shadow': false}
-return settings
+  const settings = {}
+  settings.gate_shadow = true
+  settings.lines = ({
+    'style': 'very thin',
+    'double_classical': true,
+    'init_quantum': true,
+    'double_lines_sep': 0.04
+  })
+  settings.gates = ({
+    'HGate': {
+      'width': 0.5,
+      'offset': 0.3,
+      'pre_offset': 0.1
+    },
+    'XGate': {
+      'width': 0.35,
+      'height': 0.35,
+      'offset': 0.1
+    },
+    'SqrtXGate': {
+      'width': 0.7,
+      'offset': 0.3,
+      'pre_offset': 0.1
+    },
+    'SwapGate': {
+      'width': 0.35,
+      'height': 0.35,
+      'offset': 0.1
+    },
+    'SqrtSwapGate': {
+      'width': 0.35,
+      'height': 0.35,
+      'offset': 0.1
+    },
+    'Rx': {
+      'width': 1.0,
+      'height': 0.8,
+      'pre_offset': 0.2,
+      'offset': 0.3
+    },
+    'Ry': {
+      'width': 1.0,
+      'height': 0.8,
+      'pre_offset': 0.2,
+      'offset': 0.3
+    },
+    'Rz': {
+      'width': 1.0,
+      'height': 0.8,
+      'pre_offset': 0.2,
+      'offset': 0.3
+    },
+    'Ph': {
+      'width': 1.0,
+      'height': 0.8,
+      'pre_offset': 0.2,
+      'offset': 0.3
+    },
+    'EntangleGate': {
+      'width': 1.8,
+      'offset': 0.2,
+      'pre_offset': 0.2
+    },
+    'DeallocateQubitGate': {
+      'height': 0.15,
+      'offset': 0.2,
+      'width': 0.2,
+      'pre_offset': 0.1
+    },
+    'AllocateQubitGate': {
+      'height': 0.15,
+      'width': 0.2,
+      'offset': 0.1,
+      'pre_offset': 0.1,
+      'draw_id': false,
+      'allocate_at_zero': false
+    },
+    'MeasureGate': {
+      'width': 0.75,
+      'offset': 0.2,
+      'height': 0.5,
+      'pre_offset': 0.2
+    }
+  })
+  settings.control = {'size': 0.1, 'shadow': false}
+  return settings
 }
 
 /*
@@ -104,55 +138,48 @@ Writes the Latex header using the settings file.
 header (string): Header of the Latex document.
  */
 function _header(settings) {
-  const packages = ("\\documentclass{standalone}\n\\usepackage[margin=1in]"
-  + "{geometry}\n\\usepackage[hang,small,bf]{caption}\n"
-  + "\\usepackage{tikz}\n"
-  + "\\usepackage{braket}\n\\usetikzlibrary{backgrounds,shadows."
-  + "blur,fit,decorations.pathreplacing,shapes}\n\n")
+  const packages = ('\\documentclass{standalone}\n\\usepackage[margin=1in]'
+  + '{geometry}\n\\usepackage[hang,small,bf]{caption}\n'
+  + '\\usepackage{tikz}\n'
+  + '\\usepackage{braket}\n\\usetikzlibrary{backgrounds,shadows.'
+  + 'blur,fit,decorations.pathreplacing,shapes}\n\n')
 
 
-  const init = ("\\begin{document}\n"
-  + "\\begin{tikzpicture}[scale=0.8, transform shape]\n\n")
+  const init = ('\\begin{document}\n'
+  + '\\begin{tikzpicture}[scale=0.8, transform shape]\n\n')
 
-  let gate_style = ("\\tikzstyle{basicshadow}=[blur shadow={shadow blur steps=8,"
-  + " shadow xshift=0.7pt, shadow yshift=-0.7pt, shadow scale="
-  + "1.02}]")
+  let gate_style = ('\\tikzstyle{basicshadow}=[blur shadow={shadow blur steps=8,'
+  + ' shadow xshift=0.7pt, shadow yshift=-0.7pt, shadow scale='
+  + '1.02}]')
 
-  if(!(settings['gate_shadow'] || settings['control']['shadow'])) {
-    gate_style = ""
+  if (!(settings.gate_shadow || settings.control.shadow)) {
+    gate_style = ''
   }
-  gate_style += "\\tikzstyle{basic}=[draw,fill=white,"
-  if(settings['gate_shadow']) {
-    gate_style += "basicshadow"
+  gate_style += '\\tikzstyle{basic}=[draw,fill=white,'
+  if (settings.gate_shadow) {
+    gate_style += 'basicshadow'
   }
-  gate_style += "]\n"
+  gate_style += ']\n'
 
-  gate_style += ("\\tikzstyle{operator}=[basic,minimum size=1.5em]\n"
-  + "\\tikzstyle{phase}=[fill=black,shape=circle," +
-  "minimum size={}".format(settings['control']['size']) +
-  "cm,inner sep=0pt,outer sep=0pt,draw=black"
-)
-  if(settings['control']['shadow']) {
-    gate_style += ",basicshadow"
+  gate_style += (`\\tikzstyle{operator}=[basic,minimum size=1.5em]\n\\tikzstyle{phase}=[fill=black,shape=circle,minimum size=${settings.control.size}cm,inner sep=0pt,outer sep=0pt,draw=black`
+  )
+  if (settings.control.shadow) {
+    gate_style += ',basicshadow'
   }
-  gate_style += ("]\n\\tikzstyle{none}=[inner sep=0pt,outer sep=-.5pt,"
-  + "minimum height=0.5cm+1pt]\n"
-  + "\\tikzstyle{measure}=[operator,inner sep=0pt,minimum " +
-  "height={}cm, minimum width={}cm]\n".format(
-      settings['gates']['MeasureGate']['height'],
-      settings['gates']['MeasureGate']['width']) +
-  "\\tikzstyle{xstyle}=[circle,basic,minimum height=")
-  const x_gate_radius = min(settings['gates']['XGate']['height'], settings['gates']['XGate']['width'])
-  gate_style += (`${x_gate_radius}cm,minimum width={x_rad}cm,inner sep=-1pt,${settings['lines']['style']}]\n`)
-  if(settings['gate_shadow']) {
-    gate_style += ("\\tikzset{\nshadowed/.style={preaction={transform "
-        + "canvas={shift={(0.5pt,-0.5pt)}}, draw=gray, opacity="
-        + "0.4}},\n}\n")
+  gate_style += (`]\n\\tikzstyle{none}=[inner sep=0pt,outer sep=-.5pt,minimum height=0.5cm+1pt]
+\\tikzstyle{measure}=[operator,inner sep=0pt,minimum height=${settings.gates.MeasureGate.height}cm, minimum width=${settings.gates.MeasureGate.width}cm]
+\\tikzstyle{xstyle}=[circle,basic,minimum height=`)
+  const x_gate_radius = Math.min(settings.gates.XGate.height, settings.gates.XGate.width)
+  gate_style += (`${x_gate_radius}cm,minimum width=${x_gate_radius}cm,inner sep=-1pt,${settings.lines.style}]\n`)
+  if (settings.gate_shadow) {
+    gate_style += ('\\tikzset{\nshadowed/.style={preaction={transform '
+        + 'canvas={shift={(0.5pt,-0.5pt)}}, draw=gray, opacity='
+        + '0.4}},\n}\n')
   }
-  gate_style += "\\tikzstyle{swapstyle}=["
-  gate_style += "inner sep=-1pt, outer sep=-1pt, minimum width=0pt]\n"
-  const edge_style = ("\\tikzstyle{edgestyle}=[" + settings['lines']['style'] +
-      "]\n")
+  gate_style += '\\tikzstyle{swapstyle}=['
+  gate_style += 'inner sep=-1pt, outer sep=-1pt, minimum width=0pt]\n'
+  const edge_style = (`\\tikzstyle{edgestyle}=[${settings.lines.style
+  }]\n`)
 
   return packages + init + gate_style + edge_style
 }
@@ -182,8 +209,44 @@ Return the footer of the Latex document.
     Returns:
 tex_footer_str (string): Latex document footer.
  */
-function _footer(settings) {
-  return "\n\n\end{tikzpicture}\n\end{document}"
+function _footer() {
+  return '\n\n\end{tikzpicture}\n\end{document}'
+}
+
+/*
+Translates a given circuit to a TikZ picture in a Latex document.
+
+    It uses a json-configuration file which (if it does not exist) is created
+automatically upon running this function for the first time. The config
+file can be used to determine custom gate sizes, offsets, etc.
+
+    New gate options can be added under settings['gates'], using the gate
+class name string as a key. Every gate can have its own width, height, pre
+offset and offset.
+
+    Example:
+.. code-block:: python
+
+settings['gates']['HGate'] = {'width': .5, 'offset': .15}
+
+The default settings can be acquired using the get_default_settings()
+function, and written using write_settings().
+
+    Args:
+circuit (list<list<CircuitItem>>): Each qubit line is a list of
+CircuitItem objects, i.e., in circuit[line].
+
+    Returns:
+tex_doc_str (string): Latex document string which can be compiled
+using, e.g., pdflatex.
+ */
+export function toLatex(circuit) {
+  const settings = write_settings(get_default_settings())
+
+  let text = _header(settings)
+  text += _body(circuit, settings)
+  text += _footer(settings)
+  return text
 }
 
 /*
@@ -193,7 +256,6 @@ and turns them into Latex/TikZ code.
     It uses the settings dictionary for gate offsets, sizes, spacing, ...
  */
 export class _Circ2Tikz {
-
   /*
   Initialize a circuit to latex converter object.
 
@@ -204,13 +266,12 @@ circuit.
    */
   constructor(settings, num_lines) {
     this.settings = settings
-    this.pos = [0.] * num_lines
+    this.pos = [0.0] * num_lines
     this.op_count = [0] * num_lines
-    this.is_quantum = [settings['lines']['init_quantum']] * num_lines
+    this.is_quantum = [settings.lines.init_quantum] * num_lines
   }
 
-  def to_tikz(self, line, circuit, end=None):
-      """
+  /*
   Generate the TikZ code for one line of the circuit up to a certain
   gate.
 
@@ -227,133 +288,134 @@ circuit.
       tikz_code (string): TikZ code representing the current qubit line
   and, if it was necessary to draw other lines, those lines as
   well.
-  """
-  if end is None:
+   */
+  to_tikz(line, circuit, end) {
+    if (!end) {
       end = len(circuit[line])
+    }
+    const tikz_code = []
 
-  tikz_code = []
+    const cmds = circuit[line]
+    for (let i = 0; i < end; ++i) {
+      const {gate, lines, ctrl_lines} = cmds[i]
 
-  cmds = circuit[line]
-  for i in range(0, end):
-  gate = cmds[i].gate
-  lines = cmds[i].lines
-  ctrl_lines = cmds[i].ctrl_lines
+      let all_lines = lines.concat(ctrl_lines)
+      all_lines.remove(line) // remove current line
+      all_lines.forEach((l) => {
+        let gate_idx = 0
+        while (!(circuit[l][gate_idx] === cmds[i])) {
+          gate_idx += 1
+        }
 
-  all_lines = lines + ctrl_lines
-  all_lines.remove(line)  # remove current line
-  for l in all_lines:
-      gate_idx = 0
-  while not (circuit[l][gate_idx] == cmds[i]):
-  gate_idx += 1
+        tikz_code.push(this.to_tikz(l, circuit, gate_idx))
+        // we are taking care of gate 0 (the current one)
+        circuit[l] = circuit[l].slice(1)
+      })
 
-  tikz_code.append(this.to_tikz(l, circuit, gate_idx))
-  # we are taking care of gate 0 (the current one)
-  circuit[l] = circuit[l][1:]
+      all_lines = lines.concat(ctrl_lines)
+      const tmp = []
+      const min = Math.min(...all_lines)
+      const max = Math.max(...all_lines)
+      for (let l = min; l < max + 1; ++l) {
+        tmp.push(this.pos[l])
+      }
+      const pos = Math.max(...tmp)
+      for (let l = min; l < max + 1; ++l) {
+        this.pos[l] = pos + this._gate_offset(gate)
+      }
 
-  all_lines = lines + ctrl_lines
-  pos = max([this.pos[l] for l in range(min(all_lines),
-      max(all_lines) + 1)])
-  for l in range(min(all_lines), max(all_lines) + 1):
-  this.pos[l] = pos + this._gate_pre_offset(gate)
+      let connections = ''
+      all_lines.forEach((l) => {
+        connections += this._line(this.op_count[l] - 1, this.op_count[l], l)
+      })
 
-  connections = ""
-  for l in all_lines:
-      connections += this._line(this.op_count[l] - 1,
-  this.op_count[l], line=l)
-  add_str = ""
-  if gate == X:
-  # draw NOT-gate with controls
-  add_str = this._x_gate(lines, ctrl_lines)
-  # and make the target qubit quantum if one of the controls is
-  if not this.is_quantum[lines[0]]:
-  if sum([this.is_quantum[i] for i in ctrl_lines]) > 0:
-      this.is_quantum[lines[0]] = true
-  elif gate == Z and len(ctrl_lines) > 0:
-      add_str = this._cz_gate(lines + ctrl_lines)
-  elif gate == Swap:
-      add_str = this._swap_gate(lines, ctrl_lines)
-  elif gate == SqrtSwap:
-      add_str = this._sqrtswap_gate(lines, ctrl_lines,
-      daggered=false)
-  elif gate == get_inverse(SqrtSwap):
-      add_str = this._sqrtswap_gate(lines, ctrl_lines, daggered=true)
-  elif gate == Measure:
-  # draw measurement gate
-  for l in lines:
-      op = this._op(l)
-  width = this._gate_width(Measure)
-  height = this._gate_height(Measure)
-  shift0 = .07 * height
-  shift1 = .36 * height
-  shift2 = .1 * width
-  add_str += ("\n\\node[measure,edgestyle] ({op}) at ({pos}"
-  ",-{line}) {{}};\n\\draw[edgestyle] ([yshift="
-  "-{shift1}cm,xshift={shift2}cm]{op}.west) to "
-  "[out=60,in=180] ([yshift={shift0}cm]{op}."
-  "center) to [out=0, in=120] ([yshift=-{shift1}"
-  "cm,xshift=-{shift2}cm]{op}.east);\n"
-  "\\draw[edgestyle] ([yshift=-{shift1}cm]{op}."
-  "center) to ([yshift=-{shift2}cm,xshift=-"
-  "{shift1}cm]{op}.north east);"
-).format(op=op, pos=this.pos[l], line=l,
-         shift0=shift0, shift1=shift1,
-         shift2=shift2)
-  this.op_count[l] += 1
-  this.pos[l] += (this._gate_width(gate) +
-  this._gate_offset(gate))
-  this.is_quantum[l] = false
-  elif gate == Allocate:
-  # draw 'begin line'
-  add_str = "\n\\node[none] ({}) at ({},-{}) {{$\Ket{{0}}{}$}};"
-  id_str = ""
-  if this.settings['gates']['AllocateQubitGate']['draw_id']:
-      id_str = "^{{\\textcolor{{red}}{{{}}}}}".format(cmds[i].id)
-  xpos = this.pos[line]
-  try:
-  if (this.settings['gates']['AllocateQubitGate']
-  ['allocate_at_zero']):
-  this.pos[line] -= this._gate_pre_offset(gate)
-  xpos = this._gate_pre_offset(gate)
-  except KeyError:
-      pass
-  this.pos[line] = max(xpos + this._gate_offset(gate) +
-      this._gate_width(gate), this.pos[line])
-  add_str = add_str.format(this._op(line), xpos, line,
-      id_str)
-  this.op_count[line] += 1
-  this.is_quantum[line] = this.settings['lines']['init_quantum']
-  elif gate == Deallocate:
-  # draw 'end of line'
-  op = this._op(line)
-  add_str = "\n\\node[none] ({}) at ({},-{}) {{}};"
-  add_str = add_str.format(op, this.pos[line], line)
-  yshift = str(this._gate_height(gate)) + "cm]"
-  add_str += ("\n\\draw ([yshift={yshift}{op}.center) edge "
-  "[edgestyle] ([yshift=-{yshift}{op}.center);"
-).format(op=op, yshift=yshift)
-  this.op_count[line] += 1
-  this.pos[line] += (this._gate_width(gate) +
-  this._gate_offset(gate))
-  else:
-  # regular gate must draw the lines it does not act upon
-  # if it spans multiple qubits
-  add_str = this._regular_gate(gate, lines, ctrl_lines)
-  for l in lines:
-      this.is_quantum[l] = true
+      let add_str = ''
+      if (gate.equal(X)) {
+        // draw NOT-gate with controls
+        add_str = this._x_gate(lines, ctrl_lines)
+        // and make the target qubit quantum if one of the controls is
+        if (!this.is_quantum[lines[0]]) {
+          let sum = 0
+          ctrl_lines.forEach(iL => sum += this.is_quantum[iL])
+          if (sum > 0) {
+            this.is_quantum[lines[0]] = true
+          }
+        }
+      } else if (gate.equal(Z) && len(ctrl_lines) > 0) {
+        add_str = this._cz_gate(lines + ctrl_lines)
+      } else if (gate.equal(Swap)) {
+        add_str = this._swap_gate(lines, ctrl_lines)
+      } else if (gate.equal(SqrtSwap)) {
+        add_str = this._sqrtswap_gate(lines, ctrl_lines, false)
+      } else if (gate.equal(getInverse(SqrtSwap))) {
+        add_str = this._sqrtswap_gate(lines, ctrl_lines, true)
+      } else if (gate.equal(Measure)) {
+        // draw measurement gate
+        lines.forEach((l) => {
+          const op = this._op(l)
+          const width = this._gate_width(Measure)
+          const height = this._gate_height(Measure)
+          const shift0 = 0.07 * height
+          const shift1 = 0.36 * height
+          const shift2 = 0.1 * width
 
-  tikz_code.append(add_str)
-  if not gate == Allocate:
-      tikz_code.append(connections)
+          add_str += (`\n\\node[measure,edgestyle] (${op}) at (${this.pos[l]}
+          ,-${l}) {{}};\n\\draw[edgestyle] ([yshift=
+          -${shift1}cm,xshift=${shift2}cm]${op}.west) to 
+          [out=60,in=180] ([yshift=${shift0}cm]${op}.
+          center) to [out=0, in=120] ([yshift=-${shift1}
+          cm,xshift=-${shift2}cm]${op}.east);\n
+          \\draw[edgestyle] ([yshift=-${shift1}cm]${op}.
+          center) to ([yshift=-${shift2}cm,xshift=-
+          ${shift1}cm]${op}.north east);`
+          )
+          this.op_count[l] += 1
+          this.pos[l] += this._gate_width(gate) + this._gate_offset(gate)
+          this.is_quantum[l] = false
+        })
+      } else if (gate.equal(Allocate)) {
+        // draw 'begin line'
+        let id_str = ''
+        if (this.settings.gates.AllocateQubitGate.draw_id) {
+          id_str = `^{{\\textcolor{{red}}{{${cmds[i].id}}}}}`
+        }
+        let xpos = this.pos[line]
 
-  circuit[line] = circuit[line][end:]
-  return "".join(tikz_code)
-}
+        if (this.settings.gates.AllocateQubitGate.allocate_at_zero) {
+          this.pos[line] -= this._gate_pre_offset(gate)
+          xpos = this._gate_pre_offset(gate)
+        }
+        this.pos[line] = Math.max(xpos + this._gate_offset(gate) + this._gate_width(gate), this.pos[line])
+        add_str = `\n\\node[none] (${this._op(line)}) at (${xpos},-${line}) {{$\Ket{{0}}${id_str}$}};`
+        this.op_count[line] += 1
+        this.is_quantum[line] = this.settings.lines.init_quantum
+      } else if (gate.equal(Deallocate)) {
+        // draw 'end of line'
+        const op = this._op(line)
+        add_str = `\n\\node[none] (${op}) at (${this.pos[line]},-${line}) {{}};`
+        const yshift = `${this._gate_height(gate)}cm]`
+        add_str += `\n\\draw ([yshift=${yshift}${op}.center) edge [edgestyle] ([yshift=-${yshift}${op}.center);`
 
+        this.op_count[line] += 1
+        this.pos[line] += (this._gate_width(gate) + this._gate_offset(gate))
+      } else {
+        // regular gate must draw the lines it does not act upon
+        // if it spans multiple qubits
+        add_str = this._regular_gate(gate, lines, ctrl_lines)
+        lines.forEach(l => this.is_quantum[l] = true)
+      }
+      tikz_code.push(add_str)
+      if (!gate.equal(Allocate)) {
+        tikz_code.push(connections)
+      }
+    }
 
+    circuit[line] = circuit[line].slice(end)
+    return tikz_code.join('')
+  }
 
-def _gate_name(self, gate):
-"""
-Return the string representation of the gate.
+  /*
+  Return the string representation of the gate.
 
     Tries to use gate.tex_str and, if that is not available, uses str(gate)
 instead.
@@ -363,258 +425,264 @@ gate: Gate object of which to get the name / latex representation.
 
     Returns:
 gate_name (string): Latex gate name.
-"""
-try:
-name = gate.tex_str()
-except AttributeError:
-    name = str(gate)
-return name
+*/
+  _gate_name(gate) {
+    let name
+    if (gate.texString) {
+      name = gate.texString()
+    }
+    name = gate.toString()
+    return name
+  }
 
-def _sqrtswap_gate(self, lines, ctrl_lines, daggered):
-"""
-Return the TikZ code for a Square-root Swap-gate.
+  /*
+  Return the TikZ code for a Square-root Swap-gate.
 
     Args:
 lines (list<int>): List of length 2 denoting the target qubit of
 the Swap gate.
 ctrl_lines (list<int>): List of qubit lines which act as controls.
 daggered (bool): Show the daggered one if true.
-  """
-assert(len(lines) == 2)  # sqrt swap gate acts on 2 qubits
-delta_pos = this._gate_offset(SqrtSwap)
-gate_width = this._gate_width(SqrtSwap)
-lines.sort()
+   */
+  _sqrtswap_gate(lines, ctrl_lines, daggered) {
+    assert(len(lines) === 2) // sqrt swap gate acts on 2 qubits
+    const delta_pos = this._gate_offset(SqrtSwap)
+    const gate_width = this._gate_width(SqrtSwap)
+    lines.sort()
 
-gate_str = ""
-for line in lines:
-op = this._op(line)
-w = "{}cm".format(.5 * gate_width)
-s1 = "[xshift=-{w},yshift=-{w}]{op}.center".format(w=w, op=op)
-s2 = "[xshift={w},yshift={w}]{op}.center".format(w=w, op=op)
-s3 = "[xshift=-{w},yshift={w}]{op}.center".format(w=w, op=op)
-s4 = "[xshift={w},yshift=-{w}]{op}.center".format(w=w, op=op)
-swap_style = "swapstyle,edgestyle"
-if this.settings['gate_shadow']:
-swap_style += ",shadowed"
-gate_str += ("\n\\node[swapstyle] ({op}) at ({pos},-{line}) {{}};"
-"\n\\draw[{swap_style}] ({s1})--({s2});\n"
-"\\draw[{swap_style}] ({s3})--({s4});"
-).format(op=op, s1=s1, s2=s2, s3=s3, s4=s4,
-    line=line, pos=this.pos[line],
-    swap_style=swap_style)
+    let gate_str = ''
+    lines.forEach((line) => {
+      const op = this._op(line)
+      const w = `${0.5 * gate_width}cm`
+      const s1 = `[xshift=-${w},yshift=-${w}]${op}.center`
+      const s2 = `[xshift=${w},yshift=${w}]${op}.center`
+      const s3 = `[xshift=-${w},yshift=${w}]${op}.center`
+      const s4 = `[xshift=${w},yshift=-${w}]${op}.center`
+      let swap_style = 'swapstyle,edgestyle'
+      if (this.settings.gate_shadow) {
+        swap_style += ',shadowed'
+      }
+      gate_str += `\n\\node[swapstyle] (${op}) at (${this.pos[line]},-${line}) {{}};
+      \\draw[${swap_style}] (${s1})--(${s2});
+      \\draw[${swap_style}] (${s3})--(${s4});`
+    })
 
-# add a circled 1/2
-midpoint = (lines[0] + lines[1]) / 2.
-pos = this.pos[lines[0]]
-op_mid = "line{}_gate{}".format(
-    '{}-{}'.format(*lines), this.op_count[lines[0]])
-gate_str += ("\n\\node[xstyle] ({op}) at ({pos},-{line})\
-                {{\\scriptsize $\\frac{{1}}{{2}}{dagger}$}};"
-).format(op=op_mid, line=midpoint, pos=pos,
-    dagger='^{{\dagger}}' if daggered else '')
+    // add a circled 1/2
+    const midpoint = (lines[0] + lines[1]) / 2.0
+    const pos = this.pos[lines[0]]
+    const op_mid = `line${lines[0]}-${lines[1]}_gate${this.op_count[lines[0]]}`
+    gate_str += `\n\\node[xstyle] (${op_mid}) at (${pos},-${midpoint})\
+                {{\\scriptsize $\\frac{{1}}{{2}}${daggered ? '^{{\dagger}}' : ''}$}};`
 
-# add two vertical lines to connect circled 1/2
-gate_str += "\n\\draw ({}) edge[edgestyle] ({});".format(
-    this._op(lines[0]), op_mid)
-gate_str += "\n\\draw ({}) edge[edgestyle] ({});".format(
-    op_mid, this._op(lines[1]))
+    // add two vertical lines to connect circled 1/2
+    gate_str += `\n\\draw (${this._op(lines[0])}) edge[edgestyle] (${op_mid});`
+    gate_str += `\n\\draw (${op_mid}) edge[edgestyle] (${this._op(lines[1])});`
 
-if len(ctrl_lines) > 0:
-for ctrl in ctrl_lines:
-gate_str += this._phase(ctrl, this.pos[lines[0]])
-if ctrl > lines[1] or ctrl < lines[0]:
-closer_line = lines[0]
-if ctrl > lines[1]:
-closer_line = lines[1]
-gate_str += this._line(ctrl, closer_line)
 
-all_lines = ctrl_lines + lines
-new_pos = this.pos[lines[0]] + delta_pos + gate_width
-for i in all_lines:
-this.op_count[i] += 1
-for i in range(min(all_lines), max(all_lines) + 1):
-this.pos[i] = new_pos
-return gate_str
+    ctrl_lines.forEach((ctrl) => {
+      gate_str += this._phase(ctrl, this.pos[lines[0]])
+      if (ctrl > lines[1] || ctrl < lines[0]) {
+        let closer_line = lines[0]
+        if (ctrl > lines[1]) {
+          closer_line = lines[1]
+        }
+        gate_str += this._line(ctrl, closer_line)
+      }
+    })
 
-def _swap_gate(self, lines, ctrl_lines):
-"""
-Return the TikZ code for a Swap-gate.
+    const all_lines = ctrl_lines.concat(lines)
+    const new_pos = this.pos[lines[0]] + delta_pos + gate_width
+    all_lines.forEach(i => this.op_count[i] += 1)
+    const min = Math.min(...all_lines)
+    const max = Math.max(...all_lines)
+    for (let i = min; i < max + 1; ++i) {
+      this.pos[i] = new_pos
+    }
+    return gate_str
+  }
+
+  /*
+  Return the TikZ code for a Swap-gate.
 
     Args:
 lines (list<int>): List of length 2 denoting the target qubit of
 the Swap gate.
 ctrl_lines (list<int>): List of qubit lines which act as controls.
+   */
+  _swap_gate(lines, ctrl_lines) {
+    assert(len(lines) == 2) // swap gate acts on 2 qubits
+    const delta_pos = this._gate_offset(Swap)
+    const gate_width = this._gate_width(Swap)
+    lines.sort()
 
-"""
-assert(len(lines) == 2)  # swap gate acts on 2 qubits
-delta_pos = this._gate_offset(Swap)
-gate_width = this._gate_width(Swap)
-lines.sort()
+    let gate_str = ''
+    lines.forEach((line) => {
+      const op = this._op(line)
+      const w = '{.5 * gate_width}cm'
+      const s1 = `[xshift=-${w},yshift=-${w}]${op}.center`
+      const s2 = `[xshift=${w},yshift=${w}]${op}.center`
+      const s3 = `[xshift=-${w},yshift=${w}]${op}.center`
+      const s4 = `[xshift=${w},yshift=-${w}]${op}.center`
+      let swap_style = 'swapstyle,edgestyle'
+      if (this.settings.gate_shadow) {
+        swap_style += ',shadowed'
+      }
+      gate_str += `\n\\node[swapstyle] (${op}) at (${this.pos[line]},-${line}) {{}};
+      \\draw[${swap_style}] (${s1})--(${s2});
+      \\draw[${swap_style}] (${s3})--(${s4});`
+    })
 
-gate_str = ""
-for line in lines:
-op = this._op(line)
-w = "{}cm".format(.5 * gate_width)
-s1 = "[xshift=-{w},yshift=-{w}]{op}.center".format(w=w, op=op)
-s2 = "[xshift={w},yshift={w}]{op}.center".format(w=w, op=op)
-s3 = "[xshift=-{w},yshift={w}]{op}.center".format(w=w, op=op)
-s4 = "[xshift={w},yshift=-{w}]{op}.center".format(w=w, op=op)
-swap_style = "swapstyle,edgestyle"
-if this.settings['gate_shadow']:
-swap_style += ",shadowed"
-gate_str += ("\n\\node[swapstyle] ({op}) at ({pos},-{line}) {{}};"
-"\n\\draw[{swap_style}] ({s1})--({s2});\n"
-"\\draw[{swap_style}] ({s3})--({s4});"
-).format(op=op, s1=s1, s2=s2, s3=s3, s4=s4,
-    line=line, pos=this.pos[line],
-    swap_style=swap_style)
-gate_str += this._line(lines[0], lines[1])
+    gate_str += this._line(lines[0], lines[1])
 
-if len(ctrl_lines) > 0:
-for ctrl in ctrl_lines:
-gate_str += this._phase(ctrl, this.pos[lines[0]])
-if ctrl > lines[1] or ctrl < lines[0]:
-closer_line = lines[0]
-if ctrl > lines[1]:
-closer_line = lines[1]
-gate_str += this._line(ctrl, closer_line)
+    ctrl_lines.forEach((ctrl) => {
+      gate_str += this._phase(ctrl, this.pos[lines[0]])
+      if (ctrl > lines[1] || ctrl < lines[0]) {
+        let closer_line = lines[0]
+        if (ctrl > lines[1]) {
+          closer_line = lines[1]
+        }
+        gate_str += this._line(ctrl, closer_line)
+      }
+    })
 
-all_lines = ctrl_lines + lines
-new_pos = this.pos[lines[0]] + delta_pos + gate_width
-for i in all_lines:
-this.op_count[i] += 1
-for i in range(min(all_lines), max(all_lines) + 1):
-this.pos[i] = new_pos
-return gate_str
+    const all_lines = ctrl_lines.concat(lines)
+    const new_pos = this.pos[lines[0]] + delta_pos + gate_width
+    all_lines.forEach(i => this.op_count[i] += 1)
+    const min = Math.min(...all_lines)
+    const max = Math.max(...all_lines)
+    for (let i = min; i < max + 1; ++i) {
+      this.pos[i] = new_pos
+    }
+    return gate_str
+  }
 
-def _x_gate(self, lines, ctrl_lines):
-"""
-Return the TikZ code for a NOT-gate.
+  /*
+  Return the TikZ code for a NOT-gate.
 
     Args:
 lines (list<int>): List of length 1 denoting the target qubit of
 the NOT / X gate.
 ctrl_lines (list<int>): List of qubit lines which act as controls.
+   */
+  _x_gate(lines, ctrl_lines = []) {
+    assert(len(lines) === 1) // NOT gate only acts on 1 qubit
+    const line = lines[0]
+    const delta_pos = this._gate_offset(X)
+    const gate_width = this._gate_width(X)
+    const op = this._op(line)
+    let gate_str = (`\n\\node[xstyle] (${op}) at (${this.pos[line]},-${line}) {{}};\n\\draw
+    [edgestyle] (${op}.north)--(${op}.south);\n\\draw
+    [edgestyle] (${op}.west)--(${op}.east);`
+    )
 
-"""
-assert(len(lines) == 1)  # NOT gate only acts on 1 qubit
-line = lines[0]
-delta_pos = this._gate_offset(X)
-gate_width = this._gate_width(X)
-op = this._op(line)
-gate_str = ("\n\\node[xstyle] ({op}) at ({pos},-{line}) {{}};\n\\draw"
-"[edgestyle] ({op}.north)--({op}.south);\n\\draw"
-"[edgestyle] ({op}.west)--({op}.east);"
-).format(op=op, line=line, pos=this.pos[line])
+    ctrl_lines.forEach((ctrl) => {
+      gate_str += this._phase(ctrl, this.pos[line])
+      gate_str += this._line(ctrl, line)
+    })
 
-if len(ctrl_lines) > 0:
-for ctrl in ctrl_lines:
-gate_str += this._phase(ctrl, this.pos[line])
-gate_str += this._line(ctrl, line)
+    const all_lines = ctrl_lines.push(line)
+    const new_pos = this.pos[line] + delta_pos + gate_width
+    all_lines.forEach(i => this.op_count[i] += 1)
+    const min = Math.min(...all_lines)
+    const max = Math.max(...all_lines)
+    for (let i = min; i < max + 1; ++i) {
+      this.pos[i] = new_pos
+    }
+    return gate_str
+  }
 
-all_lines = ctrl_lines + [line]
-new_pos = this.pos[line] + delta_pos + gate_width
-for i in all_lines:
-this.op_count[i] += 1
-for i in range(min(all_lines), max(all_lines) + 1):
-this.pos[i] = new_pos
-return gate_str
-
-def _cz_gate(self, lines):
-"""
-Return the TikZ code for an n-controlled Z-gate.
+  /*
+  Return the TikZ code for an n-controlled Z-gate.
 
     Args:
 lines (list<int>): List of all qubits involved.
-"""
-assert len(lines) > 1
-line = lines[0]
-delta_pos = this._gate_offset(Z)
-gate_width = this._gate_width(Z)
-gate_str = this._phase(line, this.pos[line])
+   */
+  _cz_gate(lines) {
+    assert(len(lines) > 1)
+    const line = lines[0]
+    const delta_pos = this._gate_offset(Z)
+    const gate_width = this._gate_width(Z)
+    let gate_str = this._phase(line, this.pos[line])
 
-for ctrl in lines[1:]:
-gate_str += this._phase(ctrl, this.pos[line])
-gate_str += this._line(ctrl, line)
+    line.slice(1).forEach((ctrl) => {
+      gate_str += this._phase(ctrl, this.pos[line])
+      gate_str += this._line(ctrl, line)
+    })
 
-new_pos = this.pos[line] + delta_pos + gate_width
-for i in lines:
-this.op_count[i] += 1
-for i in range(min(lines), max(lines) + 1):
-this.pos[i] = new_pos
-return gate_str
+    const new_pos = this.pos[line] + delta_pos + gate_width
+    lines.forEach(i => this.op_count[i] += 1)
+    const min = Math.min(...lines)
+    const max = Math.max(...lines)
+    for (let i = min; i < max + 1; ++i) {
+      this.pos[i] = new_pos
+    }
+    return gate_str
+  }
 
-def _gate_width(self, gate):
-"""
-Return the gate width, using the settings (if available).
+  /*
+  Return the gate width, using the settings (if available).
 
 Returns:
     gate_width (float): Width of the gate.
 (settings['gates'][gate_class_name]['width'])
-"""
-if isinstance(gate, DaggeredGate):
-gate = gate._gate
-try:
-gates = this.settings['gates']
-gate_width = gates[gate.__class__.__name__]['width']
-except KeyError:
-    gate_width = .5
-return gate_width
+   */
+  _gate_width(gate) {
+    if (gate instanceof DaggeredGate) {
+      gate = gate._gate
+    }
 
-def _gate_pre_offset(self, gate):
-"""
-Return the offset to use before placing this gate.
+    const {gates} = this.settings
+    return gates[gate.constructor.name].width || 0.5
+  }
+
+  /*
+  Return the offset to use before placing this gate.
 
     Returns:
 gate_pre_offset (float): Offset to use before the gate.
 (settings['gates'][gate_class_name]['pre_offset'])
-"""
-if isinstance(gate, DaggeredGate):
-gate = gate._gate
-try:
-gates = this.settings['gates']
-delta_pos = gates[gate.__class__.__name__]['pre_offset']
-except KeyError:
-    delta_pos = this._gate_offset(gate)
-return delta_pos
+   */
+  _gate_pre_offset(gate) {
+    if (gate instanceof DaggeredGate) {
+      gate = gate._gate
+    }
 
-def _gate_offset(self, gate):
-"""
-Return the offset to use after placing this gate and, if no pre_offset
+    const {gates} = this.settings
+    return gates[gate.constructor.name].pre_offset || this._gate_offset(gate)
+  }
+
+  /*
+  Return the offset to use after placing this gate and, if no pre_offset
 is defined, the same offset is used in front of the gate.
 
     Returns:
 gate_offset (float): Offset.
 (settings['gates'][gate_class_name]['offset'])
-"""
-if isinstance(gate, DaggeredGate):
-gate = gate._gate
-try:
-gates = this.settings['gates']
-delta_pos = gates[gate.__class__.__name__]['offset']
-except KeyError:
-    delta_pos = .2
-return delta_pos
+   */
+  _gate_offset(gate) {
+    if (gate instanceof DaggeredGate) {
+      gate = gate._gate
+    }
+    const {gates} = this.settings
+    return gates[gate.constructor.name].offset || 0.2
+  }
 
-def _gate_height(self, gate):
-"""
-Return the height to use for this gate.
+  /*
+  Return the height to use for this gate.
 
     Returns:
 gate_height (float): Height of the gate.
 (settings['gates'][gate_class_name]['height'])
-"""
-if isinstance(gate, DaggeredGate):
-gate = gate._gate
-try:
-height = this.settings['gates'][gate.__class__.__name__]['height']
-except KeyError:
-    height = .5
-return height
+   */
+  _gate_height(gate) {
+    if (gate instanceof DaggeredGate) {
+      gate = gate._gate
+    }
+    return this.settings.gates[gate.constructor.name].height || 0.5
+  }
 
-def _phase(self, line, pos):
-"""
-Places a phase / control circle on a qubit line at a given position.
+  /*
+  Places a phase / control circle on a qubit line at a given position.
 
     Args:
 line (int): Qubit line at which to place the circle.
@@ -623,13 +691,13 @@ pos (float): Position at which to place the circle.
     Returns:
 tex_str (string): Latex string representing a control circle at the
 given position.
-"""
-phase_str = "\n\\node[phase] ({}) at ({},-{}) {{}};"
-return phase_str.format(this._op(line), pos, line)
+   */
+  _phase(line, pos) {
+    return `\n\\node[phase] (${this._op(line)}) at (${pos},-${line}) {{}};`
+  }
 
-def _op(self, line, op=None, offset=0):
-"""
-Returns the gate name for placing a gate on a line.
+  /*
+  Returns the gate name for placing a gate on a line.
 
     Args:
 line (int): Line number.
@@ -638,14 +706,16 @@ count.
 
     Returns:
 op_str (string): Gate name.
-"""
-if op is None:
-    op = this.op_count[line]
-return "line{}_gate{}".format(line, op + offset)
+   */
+  _op(line, op = null, offset = 0) {
+    if (!op) {
+      op = this.op_count[line]
+    }
+    return `line${line}_gate${op + offset}`
+  }
 
-def _line(self, p1, p2, double=false, line=None):
-"""
-Connects p1 and p2, where p1 and p2 are either to qubit line indices,
+  /*
+  Connects p1 and p2, where p1 and p2 are either to qubit line indices,
 in which case the two most recent gates are connected, or two gate
 indices, in which case line denotes the line number and the two gates
 are connected on the given line.
@@ -659,39 +729,50 @@ indices.
 
     Returns:
 tex_str (string): Latex code to draw this / these line(s).
-"""
-dbl_classical = this.settings['lines']['double_classical']
+   */
+  _line(p1, p2, line = null) {
+    const dbl_classical = this.settings.lines.double_classical
 
-if line is None:
-    quantum = not dbl_classical or this.is_quantum[p1]
-op1, op2 = this._op(p1), this._op(p2)
-loc1, loc2 = 'north', 'south'
-shift = "xshift={}cm"
-else:
-quantum = not dbl_classical or this.is_quantum[line]
-op1, op2 = this._op(line, p1), this._op(line, p2)
-loc1, loc2 = 'west', 'east'
-shift = "yshift={}cm"
+    let quantum
+    let op1
+    let op2
+    let loc1
+    let loc2
+    let shift
+    if (!line) {
+      quantum = !dbl_classical || this.is_quantum[p1]
+      op1 = this._op(p1)
+      op2 = this._op(p2)
+      loc1 = 'north'
+      loc2 = 'south'
+      shift = 'xshift='
+    } else {
+      quantum = !dbl_classical || this.is_quantum[line]
+      op1 = this._op(line, p1)
+      op2 = this._op(line, p2)
+      loc1 = 'west'
+      loc2 = 'east'
+      shift = 'yshift='
+    }
+    if (quantum) {
+      return `\n\\draw (${op1}) edge[edgestyle] (${op2});`
+    } else {
+      if (p2 > p1) {
+        const tmp = loc1
+        loc1 = loc2
+        loc2 = tmp
+      }
+      const line_sep = this.settings.lines.double_lines_sep
+      const shift1 = `${shift}${line_sep / 2.0}cm`
+      const shift2 = `${shift}${-line_sep / 2.0}cm`
+      let edges_str = `\n\\draw ([${shift1}]${op1}.${loc1}) edge[edgestyle] ([{shift}]${op2}.${loc2});`
+      edges_str += `\n\\draw ([${shift2}]${op1}.${loc1}) edge[edgestyle] ([{shift}]${op2}.${loc2});`
+      return edges_str
+    }
+  }
 
-if quantum:
-return "\n\\draw ({}) edge[edgestyle] ({});".format(op1, op2)
-else:
-if p2 > p1:
-loc1, loc2 = loc2, loc1
-edge_str = ("\n\\draw ([{shift}]{op1}.{loc1}) edge[edgestyle] "
-"([{shift}]{op2}.{loc2});")
-line_sep = this.settings['lines']['double_lines_sep']
-shift1 = shift.format(line_sep / 2.)
-shift2 = shift.format(-line_sep / 2.)
-edges_str = edge_str.format(shift=shift1, op1=op1, op2=op2,
-    loc1=loc1, loc2=loc2)
-edges_str += edge_str.format(shift=shift2, op1=op1, op2=op2,
-    loc1=loc1, loc2=loc2)
-return edges_str
-
-def _regular_gate(self, gate, lines, ctrl_lines):
-"""
-Draw a regular gate.
+  /*
+  Draw a regular gate.
 
     Args:
 gate: Gate to draw.
@@ -701,62 +782,76 @@ ctrl_lines (list<int>): Control lines.
     Returns:
 tex_str (string): Latex string drawing a regular gate at the given
 location
-"""
-imax = max(lines)
-imin = min(lines)
+   */
+  _regular_gate(gate, lines, ctrl_lines) {
+    const imax = Math.max(...lines)
+    const imin = Math.min(...lines)
 
-gate_lines = lines + ctrl_lines
+    const gate_lines = lines.concat(ctrl_lines)
 
-delta_pos = this._gate_offset(gate)
-gate_width = this._gate_width(gate)
-gate_height = this._gate_height(gate)
+    const delta_pos = this._gate_offset(gate)
+    const gate_width = this._gate_width(gate)
+    const gate_height = this._gate_height(gate)
 
-name = this._gate_name(gate)
+    const name = this._gate_name(gate)
 
-lines = list(range(imin, imax + 1))
+    lines = []
+    for (let i = imin; i < imax + 1; ++i) {
+      lines.push(i)
+    }
 
-tex_str = ""
-pos = this.pos[lines[0]]
+    let tex_str = ''
+    const pos = this.pos[lines[0]]
 
-node_str = "\n\\node[none] ({}) at ({},-{}) {{}};"
-for l in lines:
-node1 = node_str.format(this._op(l), pos, l)
-node2 = ("\n\\node[none,minimum height={}cm,outer sep=0] ({}) at"
-" ({},-{}) {{}};"
-).format(gate_height, this._op(l, offset=1),
-    pos + gate_width / 2., l)
-node3 = node_str.format(this._op(l, offset=2),
-    pos + gate_width, l)
-tex_str += node1 + node2 + node3
-if l not in gate_lines:
-tex_str += this._line(this.op_count[l] - 1, this.op_count[l],
-    line=l)
+    lines.forEach((l) => {
+      const node1 = `\n\\node[none] (${this._op(l)}) at (${pos},-${l}) {{}};`
+      const node2 = `\n\\node[none,minimum height=${gate_height}cm,outer sep=0] (${this._op(l, null, 1)}) at (${pos + gate_width / 2.0},-{l}) {{}};`
+      const node3 = `\n\\\node[none] (${this._op(l, null, 2)}) at (${pos + gate_width},-${l}) {{}};`
+      tex_str += node1 + node2 + node3
+      if (!(l in gate_lines)) {
+        tex_str += this._line(this.op_count[l] - 1, this.op_count[l], l)
+      }
+    })
 
-tex_str += ("\n\\draw[operator,edgestyle,outer sep={width}cm] (["
-"yshift={half_height}cm]{op1}) rectangle ([yshift=-"
-"{half_height}cm]{op2}) node[pos=.5] {{{name}}};"
-).format(width=gate_width, op1=this._op(imin),
-    op2=this._op(imax, offset=2),
-    half_height=.5 * gate_height,
-    name=name)
+    const half_height = 0.5 * gate_height
+    const op1 = this._op(imin)
+    const op2 = this._op(imax, null, 2)
+    tex_str += `\n\\draw[operator,edgestyle,outer sep=${gate_width}cm] ([yshift=${half_height}cm]${op1}) rectangle ([yshift=-${half_height}cm]${op2}) node[pos=.5] {{${name}}};`
 
-for l in lines:
-this.pos[l] = pos + gate_width / 2.
-this.op_count[l] += 1
+    lines.forEach((l) => {
+      this.pos[l] = pos + gate_width / 2.0
+      this.op_count[l] += 1
+    })
 
-for ctrl in ctrl_lines:
-if ctrl not in lines:
-tex_str += this._phase(ctrl, pos + gate_width / 2.)
-connect_to = imax
-if abs(connect_to - ctrl) > abs(imin - ctrl):
-connect_to = imin
-tex_str += this._line(ctrl, connect_to)
-this.pos[ctrl] = pos + delta_pos + gate_width
-this.op_count[ctrl] += 1
+    ctrl_lines.forEach((ctrl) => {
+      if (!(ctrl in lines)) {
+        tex_str += this._phase(ctrl, pos + gate_width / 2.0)
+        let connect_to = imax
+        if (Math.abs(connect_to - ctrl) > Math.abs(imin - ctrl)) {
+          connect_to = imin
+        }
+        tex_str += this._line(ctrl, connect_to)
+        this.pos[ctrl] = pos + delta_pos + gate_width
+        this.op_count[ctrl] += 1
+      }
+    })
 
-for l in lines:
-this.op_count[l] += 2
+    lines.forEach(l => this.op_count[l] += 2)
 
-for l in range(min(ctrl_lines + lines), max(ctrl_lines + lines) + 1):
-this.pos[l] = pos + delta_pos + gate_width
-return tex_str
+    const all = ctrl_lines.concat(lines)
+    const min = Math.min(...all)
+    const max = Math.max(...all)
+    for (let l = min; l < max + 1; ++l) {
+      this.pos[l] = pos + delta_pos + gate_width
+    }
+    return tex_str
+  }
+}
+
+export default {
+  toLatex,
+  _header,
+  _body,
+  _footer,
+  get_default_settings
+}

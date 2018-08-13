@@ -19,7 +19,7 @@
           '-std=c++11'
         ],
         'OTHER_LDFLAGS': [],
-        'GCC_ENABLE_CPP_EXCEPTIONS': 'NO',
+        'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
         'MACOSX_DEPLOYMENT_TARGET': '10.7'
       },
       'include_dirs': [
