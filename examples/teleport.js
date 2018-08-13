@@ -58,7 +58,7 @@ engine and a qubit in state |0>, which it then transforms to the
 state that Alice would like to send to Bob.
 verbose (bool): If True, info messages will be printed.
  */
-function run_teleport(eng, state_creation_function, verbose = false) {
+export function run_teleport(eng, state_creation_function, verbose = false) {
 // make a Bell-pair
   const [b1, b2] = create_bell_pair(eng)
 

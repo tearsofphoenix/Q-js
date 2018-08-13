@@ -7,3 +7,4 @@ coverage
 *.log
 *.node
 settings.json
+log.txt

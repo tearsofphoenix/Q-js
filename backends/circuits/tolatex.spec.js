@@ -63,7 +63,7 @@ describe('tolatex test', () => {
       'lines': {'style': 'my_style'}
     }
     let header = ToLatex._header(settings)
-    console.log(header)
+
     expect(header.indexOf('minimum') !== -1).to.equal(true)
     expect(header.indexOf('basicshadow') === -1).to.equal(true)
     expect(header.indexOf('minimum height=0.5') !== -1).to.equal(true)
@@ -121,7 +121,6 @@ describe('tolatex test', () => {
     settings.gates.AllocateQubitGate.draw_id = true
     const code = ToLatex._body(circuit_lines, settings)
 
-    console.log(code)
     expect(code.count('large_gate')).to.equal(1) // 1 large gate was applied
     // check that large gate draws lines, also for qubits it does not act upon
     expect(code.count('edge\\[')).to.equal(5)
@@ -133,7 +132,6 @@ describe('tolatex test', () => {
     const eng = new MainEngine(drawer, [])
     const old_tolatex = ToLatex.toLatex
     ToLatex.toLatex = x => x
-
 
     const qubit1 = eng.allocateQubit()
     const qubit2 = eng.allocateQubit()

@@ -239,7 +239,7 @@ tex_str (string): Latex string to draw the entire circuit.
   tex_footer_str (string): Latex document footer.
    */
   _footer() {
-    return '\n\n\end{tikzpicture}\n\end{document}'
+    return '\n\n\\end{tikzpicture}\n\\end{document}'
   }
 
 }
@@ -273,16 +273,26 @@ tex_doc_str (string): Latex document string which can be compiled
 using, e.g., pdflatex.
  */
 function toLatex(circuit) {
-  const content = fs.readFileSync('settings.json')
+  let content
   let settings
-  if (content) {
-    settings = JSON.parse(content)
+  let text
+  if (fs.existsSync('settings.json')) {
+    content = fs.readFileSync('settings.json')
+    try {
+      settings = JSON.parse(content)
+    } catch (e) {
+      settings = _exports.get_default_settings()
+      _exports.write_settings(settings)
+    }
   } else {
-    settings = _exports.write_settings(_exports.get_default_settings())
+    settings = _exports.get_default_settings()
+    _exports.write_settings(settings)
   }
-  let text = _exports._header(settings)
+
+  text = _exports._header(settings)
   text += _exports._body(circuit, settings)
   text += _exports._footer(settings)
+
   return text
 }
 
@@ -393,20 +403,14 @@ circuit.
           const op = this._op(l)
           const width = this._gate_width(Measure)
           const height = this._gate_height(Measure)
-          const shift0 = 0.07 * height
-          const shift1 = 0.36 * height
-          const shift2 = 0.1 * width
+          const shift0 = new Decimal(height).mul(0.07)
+          const shift1 = new Decimal(height).mul(0.36)
+          const shift2 = new Decimal(width).mul(0.1)
 
-          add_str += (`\n\\node[measure,edgestyle] (${op}) at (${dts(this.pos[l])}
-          ,-${l}) {};\n\\draw[edgestyle] ([yshift=
-          -${shift1}cm,xshift=${shift2}cm]${op}.west) to 
-          [out=60,in=180] ([yshift=${shift0}cm]${op}.
-          center) to [out=0, in=120] ([yshift=-${shift1}
-          cm,xshift=-${shift2}cm]${op}.east);\n
-          \\draw[edgestyle] ([yshift=-${shift1}cm]${op}.
-          center) to ([yshift=-${shift2}cm,xshift=-
-          ${shift1}cm]${op}.north east);`
-          )
+          add_str += `\n\\node[measure,edgestyle] (${op}) at (${dts(this.pos[l])},-${l}) {};`
+          add_str += `\n\\draw[edgestyle] ([yshift=-${shift1}cm,xshift=${shift2}cm]${op}.west) to [out=60,in=180] ([yshift=${shift0}cm]${op}.center) to [out=0, in=120] ([yshift=-${shift1}cm,xshift=-${shift2}cm]${op}.east);`
+          add_str += `\n\\draw[edgestyle] ([yshift=-${shift1}cm]${op}.center) to ([yshift=-${shift2}cm,xshift=-${shift1}cm]${op}.north east);`
+
           this.op_count[l] += 1
           this.pos[l] = this.pos[l].add(this._gate_width(gate)).add(this._gate_offset(gate))
           this.is_quantum[l] = false
@@ -491,7 +495,7 @@ daggered (bool): Show the daggered one if true.
     let gate_str = ''
     lines.forEach((line) => {
       const op = this._op(line)
-      const w = `${0.5 * gate_width}cm`
+      const w = `${new Decimal(gate_width).mul(0.5).toString()}cm`
       const s1 = `[xshift=-${w},yshift=-${w}]${op}.center`
       const s2 = `[xshift=${w},yshift=${w}]${op}.center`
       const s3 = `[xshift=-${w},yshift=${w}]${op}.center`
@@ -500,9 +504,9 @@ daggered (bool): Show the daggered one if true.
       if (this.settings.gate_shadow) {
         swap_style += ',shadowed'
       }
-      gate_str += `\n\\node[swapstyle] (${op}) at (${dts(this.pos[line])},-${line}) {};
-      \\draw[${swap_style}] (${s1})--(${s2});
-      \\draw[${swap_style}] (${s3})--(${s4});`
+      gate_str += `\n\\node[swapstyle] (${op}) at (${dts(this.pos[line])},-${line}) {};`
+      gate_str += `\n\\draw[${swap_style}] (${s1})--(${s2});`
+      gate_str += `\n\\draw[${swap_style}] (${s3})--(${s4});`
     })
 
     // add a circled 1/2
@@ -510,7 +514,7 @@ daggered (bool): Show the daggered one if true.
     const pos = this.pos[lines[0]]
     const op_mid = `line${lines[0]}-${lines[1]}_gate${this.op_count[lines[0]]}`
     gate_str += `\n\\node[xstyle] (${op_mid}) at (${dts(pos)},-${midpoint})\
-                {\\scriptsize $\\frac{1}{2}${daggered ? '^{\\dagger}' : ''}$};`
+                {\\scriptsize $\\frac{1}{2}${daggered ? '^{{\\dagger}}' : ''}$};`
 
     // add two vertical lines to connect circled 1/2
     gate_str += `\n\\draw (${this._op(lines[0])}) edge[edgestyle] (${op_mid});`
@@ -531,8 +535,7 @@ daggered (bool): Show the daggered one if true.
     const all_lines = ctrl_lines.concat(lines)
     const new_pos = this.pos[lines[0]].add(delta_pos).add(gate_width)
     all_lines.forEach(i => this.op_count[i] += 1)
-    const min = Math.min(...all_lines)
-    const max = Math.max(...all_lines)
+    const [min, max] = minmax(all_lines)
     for (let i = min; i < max + 1; ++i) {
       this.pos[i] = new_pos
     }
@@ -548,7 +551,7 @@ the Swap gate.
 ctrl_lines (list<int>): List of qubit lines which act as controls.
    */
   _swap_gate(lines, ctrl_lines) {
-    assert(len(lines) == 2) // swap gate acts on 2 qubits
+    assert(len(lines) === 2) // swap gate acts on 2 qubits
     const delta_pos = this._gate_offset(Swap)
     const gate_width = this._gate_width(Swap)
     lines.sort()
@@ -556,7 +559,7 @@ ctrl_lines (list<int>): List of qubit lines which act as controls.
     let gate_str = ''
     lines.forEach((line) => {
       const op = this._op(line)
-      const w = '{.5 * gate_width}cm'
+      const w = `${new Decimal(gate_width).mul(0.5)}cm`
       const s1 = `[xshift=-${w},yshift=-${w}]${op}.center`
       const s2 = `[xshift=${w},yshift=${w}]${op}.center`
       const s3 = `[xshift=-${w},yshift=${w}]${op}.center`
@@ -565,9 +568,9 @@ ctrl_lines (list<int>): List of qubit lines which act as controls.
       if (this.settings.gate_shadow) {
         swap_style += ',shadowed'
       }
-      gate_str += `\n\\node[swapstyle] (${op}) at (${dts(this.pos[line])},-${line}) {};
-      \\draw[${swap_style}] (${s1})--(${s2});
-      \\draw[${swap_style}] (${s3})--(${s4});`
+      gate_str += `\n\\node[swapstyle] (${op}) at (${dts(this.pos[line])},-${line}) {};`
+      gate_str += `\n\\draw[${swap_style}] (${s1})--(${s2});`
+      gate_str += `\n\\draw[${swap_style}] (${s3})--(${s4});`
     })
 
     gate_str += this._line(lines[0], lines[1])
@@ -586,8 +589,7 @@ ctrl_lines (list<int>): List of qubit lines which act as controls.
     const all_lines = ctrl_lines.concat(lines)
     const new_pos = this.pos[lines[0]].add(delta_pos).add(gate_width)
     all_lines.forEach(i => this.op_count[i] += 1)
-    const min = Math.min(...all_lines)
-    const max = Math.max(...all_lines)
+    const [min, max] = minmax(all_lines)
     for (let i = min; i < max + 1; ++i) {
       this.pos[i] = new_pos
     }
@@ -608,10 +610,9 @@ ctrl_lines (list<int>): List of qubit lines which act as controls.
     const delta_pos = this._gate_offset(X)
     const gate_width = this._gate_width(X)
     const op = this._op(line)
-    let gate_str = (`\n\\node[xstyle] (${op}) at (${dts(this.pos[line])},-${line}) {};\n\\draw
-    [edgestyle] (${op}.north)--(${op}.south);\n\\draw
-    [edgestyle] (${op}.west)--(${op}.east);`
-    )
+    let gate_str = `\n\\node[xstyle] (${op}) at (${dts(this.pos[line])},-${line}) {};`
+    gate_str += `\n\\draw[edgestyle] (${op}.north)--(${op}.south);`
+    gate_str += `\n\\draw[edgestyle] (${op}.west)--(${op}.east);`
 
     ctrl_lines.forEach((ctrl) => {
       gate_str += this._phase(ctrl, this.pos[line])
@@ -649,8 +650,7 @@ lines (list<int>): List of all qubits involved.
 
     const new_pos = this.pos[line].add(delta_pos).add(gate_width)
     lines.forEach(i => this.op_count[i] += 1)
-    const min = Math.min(...lines)
-    const max = Math.max(...lines)
+    const [min, max] = minmax(lines)
     for (let i = min; i < max + 1; ++i) {
       this.pos[i] = new_pos
     }
@@ -825,8 +825,7 @@ tex_str (string): Latex string drawing a regular gate at the given
 location
    */
   _regular_gate(gate, lines, ctrl_lines) {
-    const imax = Math.max(...lines)
-    const imin = Math.min(...lines)
+    const [imin, imax] = minmax(lines)
 
     const gate_lines = lines.concat(ctrl_lines)
 
@@ -881,8 +880,7 @@ location
     lines.forEach(l => this.op_count[l] += 2)
 
     const all = ctrl_lines.concat(lines)
-    const min = Math.min(...all)
-    const max = Math.max(...all)
+    const [min, max] = minmax(all)
     for (let l = min; l < max + 1; ++l) {
       this.pos[l] = pos.add(delta_pos).add(gate_width)
     }
