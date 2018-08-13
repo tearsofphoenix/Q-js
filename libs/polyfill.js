@@ -108,6 +108,13 @@ Array.prototype.rmap = function (callbackFunc) {
   return result
 }
 
+String.prototype.count = function (substring) {
+  const exp = new RegExp(substring, 'g')
+  const result = this.match(exp)
+  if(result) return result.length
+  return 0
+}
+
 export function len(v) {
   if (typeof v === 'undefined' || v === null) {
     return 0
@@ -166,8 +173,22 @@ export function complexVectorDot(a1, a2) {
     const i1 = math.im(c1)
     const r2 = math.re(c2)
     const i2 = math.im(c2)
-    real += r1 * r2 - (- i1 * i2)
+    real += r1 * r2 - (-i1 * i2)
     image += r1 * i2 - r2 * i1
   })
   return math.complex(real, image)
+}
+
+export function narray(item, count) {
+  const result = []
+  if (typeof item === 'function') {
+    for (let i = 0; i < count; ++i) {
+      result.push(item())
+    }
+  } else {
+    for (let i = 0; i < count; ++i) {
+      result.push(item)
+    }
+  }
+  return result
 }

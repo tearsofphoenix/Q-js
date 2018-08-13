@@ -17,14 +17,30 @@ import {expect} from 'chai'
 import ToLatex from './tolatex'
 import { CircuitDrawer } from './drawer'
 import { tuple } from '../../libs/util'
-import { BasicGate } from '../../ops'
+import {
+  BasicGate, C, CNOT, H, Measure, SqrtSwap, SqrtX, Swap, X, Z
+} from '../../ops'
 import MainEngine from '../../cengines/main'
+import '../../libs/polyfill'
+import {getInverse} from '../../ops/_cycle';
+import {Control} from '../../meta';
 
 describe('tolatex test', () => {
   it('should test_tolatex', () => {
     const oldHeader = ToLatex._header
     const oldBody = ToLatex._body
     const oldFooter = ToLatex._footer
+
+    ToLatex._header = () => 'H'
+    ToLatex._body = (x, y) => x
+    ToLatex._footer = () => 'F'
+    const result = ToLatex.toLatex('B')
+
+    expect(result).to.equal('HBF')
+
+    ToLatex._header = oldHeader
+    ToLatex._body = oldBody
+    ToLatex._footer = oldFooter
   });
 
   it('should test_default_settings', () => {
@@ -76,16 +92,20 @@ describe('tolatex test', () => {
   it('should test_large_gates', () => {
     const drawer = new CircuitDrawer()
     const eng = new MainEngine(drawer, [])
-    const old_tolatex = _drawer.to_latex
-    _drawer.to_latex = x => x
+    const old_tolatex = ToLatex.toLatex
+    ToLatex.toLatex = x => x
 
-    const qubit1 = eng.allocate_qubit()
-    const qubit2 = eng.allocate_qubit()
-    const qubit3 = eng.allocate_qubit()
+    const qubit1 = eng.allocateQubit()
+    const qubit2 = eng.allocateQubit()
+    const qubit3 = eng.allocateQubit()
 
     class MyLargeGate extends BasicGate {
       toString() {
         return 'large_gate'
+      }
+
+      equal(other) {
+        return other instanceof MyLargeGate
       }
     }
 
@@ -94,187 +114,199 @@ describe('tolatex test', () => {
     H.or(qubit2)
     eng.flush()
 
-    const circuit_lines = drawer.get_latex()
-    _drawer.to_latex = old_tolatex
+    const circuit_lines = drawer.getLatex()
+    ToLatex.toLatex = old_tolatex
 
     const settings = ToLatex.get_default_settings()
     settings.gates.AllocateQubitGate.draw_id = true
     const code = ToLatex._body(circuit_lines, settings)
 
+    console.log(code)
     expect(code.count('large_gate')).to.equal(1) // 1 large gate was applied
     // check that large gate draws lines, also for qubits it does not act upon
-    expect(code.count('edge[')).to.equal(5)
+    expect(code.count('edge\\[')).to.equal(5)
     expect(code.count('{H};')).to.equal(2)
   });
-})
 
-// def test_body():
-// drawer = _drawer.CircuitDrawer()
-// eng = MainEngine(drawer, [])
-// old_tolatex = _drawer.to_latex
-// _drawer.to_latex = lambda x: x
-//
-// qubit1 = eng.allocate_qubit()
-// qubit2 = eng.allocate_qubit()
-// qubit3 = eng.allocate_qubit()
-// H.or(qubit1
-// H.or(qubit2
-// CNOT.or((qubit1, qubit2)
-// X.or(qubit2
-// Measure.or(qubit2
-// CNOT.or((qubit2, qubit1)
-// Z.or(qubit2
-// C(Z).or((qubit1, qubit2)
-// C(Swap).or((qubit1, qubit2, qubit3)
-// SqrtX.or(qubit1
-// SqrtSwap.or((qubit1, qubit2)
-// get_inverse(SqrtX).or(qubit1
-// C(SqrtSwap).or((qubit1, qubit2, qubit3)
-// get_inverse(SqrtSwap).or((qubit1, qubit2)
-// C(Swap).or((qubit3, qubit1, qubit2)
-// C(SqrtSwap).or((qubit3, qubit1, qubit2)
-//
-// del qubit1
-// eng.flush()
-//
-// circuit_lines = drawer.get_latex()
-// _drawer.to_latex = old_tolatex
-//
-// settings = ToLatex.get_default_settings()
-// settings['gates']['AllocateQubitGate']['draw_id'] = true
-// code = ToLatex._body(circuit_lines, settings)
-//
-// // swap draws 2 nodes + 2 lines each, so is sqrtswap gate, csqrtswap,
-//   // inv(sqrt_swap), and cswap.
-//   expect(code.count("swapstyle") == 36
-// // CZ is two phases plus 2 from CNOTs + 2 from cswap + 2 from csqrtswap
-// expect(code.count("phase") == 8
-// expect(code.count("{{{}}}".format(str(H))) == 2  // 2 hadamard gates
-// expect(code.count("{$\Ket{0}") == 3  // 3 qubits allocated
-// // 1 cnot, 1 not gate, 3 SqrtSwap, 1 inv(SqrtSwap)
-// expect(code.count("xstyle") == 7
-// expect(code.count("measure") == 1  // 1 measurement
-// expect(code.count("{{{}}}".format(str(Z))) == 1  // 1 Z gate
-// expect(code.count("{red}") == 3
-//
-//
-// def test_qubit_allocations_at_zero():
-// drawer = _drawer.CircuitDrawer()
-// eng = MainEngine(drawer, [])
-// old_tolatex = _drawer.to_latex
-// _drawer.to_latex = lambda x: x
-//
-// a = eng.allocate_qureg(4)
-//
-// CNOT.or((a[0], a[2])
-// CNOT.or((a[0], a[3])
-// CNOT.or((a[0], a[2])
-// CNOT.or((a[1], a[3])
-//
-// del a
-// eng.flush()
-//
-// circuit_lines = drawer.get_latex()
-// _drawer.to_latex = old_tolatex
-//
-// settings = ToLatex.get_default_settings()
-// settings['gates']['AllocateQubitGate']['allocate_at_zero'] = true
-// code = ToLatex._body(copy.deepcopy(circuit_lines), settings)
-// expect(code.count("gate0) at (0") == 4
-//
-// settings['gates']['AllocateQubitGate']['allocate_at_zero'] = False
-// code = ToLatex._body(copy.deepcopy(circuit_lines), settings)
-// expect(code.count("gate0) at (0") == 3
-//
-// del settings['gates']['AllocateQubitGate']['allocate_at_zero']
-// code = ToLatex._body(copy.deepcopy(circuit_lines), settings)
-// expect(code.count("gate0) at (0") == 3
-//
-//
-// def test_qubit_lines_classicalvsquantum1():
-// drawer = _drawer.CircuitDrawer()
-// eng = MainEngine(drawer, [])
-// old_tolatex = _drawer.to_latex
-// _drawer.to_latex = lambda x: x
-//
-// qubit1 = eng.allocate_qubit()
-//
-// H.or(qubit1
-// Measure.or(qubit1
-// X.or(qubit1
-//
-// circuit_lines = drawer.get_latex()
-// _drawer.to_latex = old_tolatex
-//
-// settings = ToLatex.get_default_settings()
-// code = ToLatex._body(circuit_lines, settings)
-//
-// expect(code.count("edge[") == 4
-//
-//
-// def test_qubit_lines_classicalvsquantum2():
-// drawer = _drawer.CircuitDrawer()
-// eng = MainEngine(drawer, [])
-//
-// controls = eng.allocate_qureg(3)
-// action = eng.allocate_qubit()
-//
-// with Control(eng, controls):
-// H.or(action
-//
-// code = drawer.get_latex()
-// expect(code.count("{{{}}}".format(str(H))) == 1  // 1 Hadamard
-// expect(code.count("{$") == 4  // four allocate gates
-// expect(code.count("node[phase]") == 3  // 3 controls
-//
-//
-// def test_qubit_lines_classicalvsquantum3():
-// drawer = _drawer.CircuitDrawer()
-// eng = MainEngine(drawer, [])
-//
-// control0 = eng.allocate_qureg(2)
-// action1 = eng.allocate_qubit()
-// control1 = eng.allocate_qureg(2)
-// action2 = eng.allocate_qubit()
-// control2 = eng.allocate_qubit()
-//
-// with Control(eng, control0 + control1 + control2):
-// H.or((action1, action2)
-//
-// code = drawer.get_latex()
-// expect(code.count("{{{}}}".format(str(H))) == 1  // 1 Hadamard
-// expect(code.count("{$") == 7  // 8 allocate gates
-// expect(code.count("node[phase]") == 3  // 1 control
-// // (other controls are within the gate -> are not drawn)
-// expect(code.count("edge[") == 10  // 7 qubit lines + 3 from controls
-//
-//
-// def test_quantum_lines_cnot():
-// drawer = _drawer.CircuitDrawer()
-// eng = MainEngine(drawer, [])
-//
-// qubit1 = eng.allocate_qubit()
-// qubit2 = eng.allocate_qubit()
-//
-// Measure.or(qubit1
-// Measure.or(qubit2
-//
-// CNOT.or((qubit2, qubit1)
-//
-// del qubit1, qubit2
-// code = drawer.get_latex()
-// expect(code.count("edge[") == 12  // all lines are classical
-//
-// drawer = _drawer.CircuitDrawer()
-// eng = MainEngine(drawer, [])
-//
-// qubit1 = eng.allocate_qubit()
-// qubit2 = eng.allocate_qubit()
-//
-// Measure.or(qubit1  // qubit1 is classical
-//
-// CNOT.or((qubit2, qubit1)  // now it is quantum
-//
-// del qubit1, qubit2
-// code = drawer.get_latex()
-// expect(code.count("edge[") == 7  // all lines are quantum
+  it('should test_body', () => {
+    const drawer = new CircuitDrawer()
+    const eng = new MainEngine(drawer, [])
+    const old_tolatex = ToLatex.toLatex
+    ToLatex.toLatex = x => x
+
+
+    const qubit1 = eng.allocateQubit()
+    const qubit2 = eng.allocateQubit()
+    const qubit3 = eng.allocateQubit()
+    H.or(qubit1)
+    H.or(qubit2)
+    CNOT.or(tuple(qubit1, qubit2))
+    X.or(qubit2)
+    Measure.or(qubit2)
+    CNOT.or(tuple(qubit2, qubit1))
+    Z.or(qubit2)
+    C(Z).or(tuple(qubit1, qubit2))
+    C(Swap).or(tuple(qubit1, qubit2, qubit3))
+    SqrtX.or(qubit1)
+    SqrtSwap.or(tuple(qubit1, qubit2))
+    getInverse(SqrtX).or(qubit1)
+    C(SqrtSwap).or(tuple(qubit1, qubit2, qubit3))
+    getInverse(SqrtSwap).or(tuple(qubit1, qubit2))
+    C(Swap).or(tuple(qubit3, qubit1, qubit2))
+    C(SqrtSwap).or(tuple(qubit3, qubit1, qubit2))
+
+    qubit1.deallocate()
+    eng.flush()
+
+    const circuit_lines = drawer.getLatex()
+    ToLatex.toLatex = old_tolatex
+
+    const settings = ToLatex.get_default_settings()
+    settings.gates.AllocateQubitGate.draw_id = true
+    const code = ToLatex._body(circuit_lines, settings)
+
+    // swap draws 2 nodes + 2 lines each, so is sqrtswap gate, csqrtswap,
+    // inv(sqrt_swap), and cswap.
+    expect(code.count('swapstyle')).to.equal(36)
+    // CZ is two phases plus 2 from CNOTs + 2 from cswap + 2 from csqrtswap
+    expect(code.count('phase')).to.equal(8)
+    expect(code.count(`{${H.toString()}}`)).to.equal(2) // 2 hadamard gates
+    expect(code.count('{$\Ket{0}')).to.equal(3) // 3 qubits allocated
+    // 1 cnot, 1 not gate, 3 SqrtSwap, 1 inv(SqrtSwap)
+    expect(code.count('xstyle')).to.equal(7)
+    expect(code.count('measure')).to.equal(1) // 1 measurement
+    expect(code.count(`{${Z.toString()}}`)).to.equal(1) // 1 Z gate
+    expect(code.count('{red}')).to.equal(3)
+  });
+
+  it('should test_qubit_allocations_at_zero', () => {
+    function copyLines(linesMap) {
+      const copy = {}
+      Object.keys(linesMap).forEach((key) => {
+        const lines = linesMap[key]
+        copy[key] = lines.map(item => item.copy())
+      })
+      return copy
+    }
+
+    const drawer = new CircuitDrawer()
+    const eng = new MainEngine(drawer, [])
+    const old_tolatex = ToLatex.toLatex
+    ToLatex.toLatex = x => x
+
+    const a = eng.allocateQureg(4)
+
+    CNOT.or(tuple(a[0], a[2]))
+    CNOT.or(tuple(a[0], a[3]))
+    CNOT.or(tuple(a[0], a[2]))
+    CNOT.or(tuple(a[1], a[3]))
+
+    a.deallocate()
+    eng.flush()
+
+    const circuit_lines = drawer.getLatex()
+    ToLatex.toLatex = old_tolatex
+
+    const settings = ToLatex.get_default_settings()
+    settings.gates.AllocateQubitGate.allocate_at_zero = true
+    let code = ToLatex._body(copyLines(circuit_lines), settings)
+    expect(code.count('gate0\\) at \\(0')).to.equal(4)
+
+    settings.gates.AllocateQubitGate.allocate_at_zero = false
+    code = ToLatex._body(copyLines(circuit_lines), settings)
+    expect(code.count('gate0\\) at \\(0')).to.equal(3)
+
+    delete settings.gates.AllocateQubitGate.allocate_at_zero
+    code = ToLatex._body(copyLines(circuit_lines), settings)
+    expect(code.count('gate0\\) at \\(0')).to.equal(3)
+  });
+
+  it('should test_qubit_lines_classicalvsquantum1', () => {
+    const drawer = new CircuitDrawer()
+    const eng = new MainEngine(drawer, [])
+    const old_tolatex = ToLatex.toLatex
+    ToLatex.toLatex = x => x
+
+    const qubit1 = eng.allocateQubit()
+
+    H.or(qubit1)
+    Measure.or(qubit1)
+    X.or(qubit1)
+
+    const circuit_lines = drawer.getLatex()
+    ToLatex.toLatex = old_tolatex
+
+    const settings = ToLatex.get_default_settings()
+    const code = ToLatex._body(circuit_lines, settings)
+
+    expect(code.count('edge\\[')).to.equal(4)
+  });
+
+  it('should test_qubit_lines_classicalvsquantum2', () => {
+    const drawer = new CircuitDrawer()
+    const eng = new MainEngine(drawer, [])
+
+    const controls = eng.allocateQureg(3)
+    const action = eng.allocateQubit()
+
+    Control(eng, controls, () => H.or(action))
+
+    const code = drawer.getLatex()
+    expect(code.count(`{${H.toString()}`)).to.equal(1) // 1 Hadamard
+    expect(code.count('\\{\\$')).to.equal(4) // four allocate gates
+    expect(code.count('node\\[phase\\]')).to.equal(3) // 3 controls
+  });
+
+  it('should test_qubit_lines_classicalvsquantum3', () => {
+    const drawer = new CircuitDrawer()
+    const eng = new MainEngine(drawer, [])
+
+    const control0 = eng.allocateQureg(2)
+    const action1 = eng.allocateQubit()
+    const control1 = eng.allocateQureg(2)
+    const action2 = eng.allocateQubit()
+    const control2 = eng.allocateQubit()
+
+    Control(eng, control0.concat(control1).concat(control2), () => H.or(tuple(action1, action2)))
+
+    const code = drawer.getLatex()
+    expect(code.count(`{${H.toString()}}`)).to.equal(1) // 1 Hadamard
+    expect(code.count('\\{\\$')).to.equal(7) // 8 allocate gates
+    expect(code.count('node\\[phase\\]')).to.equal(3) // 1 control
+    // (other controls are within the gate -> are not drawn)
+    expect(code.count('edge\\[')).to.equal(10) // 7 qubit lines + 3 from controls
+  });
+
+  it('should test_quantum_lines_cnot', () => {
+    let drawer = new CircuitDrawer()
+    let eng = new MainEngine(drawer, [])
+
+    let qubit1 = eng.allocateQubit()
+    let qubit2 = eng.allocateQubit()
+
+    Measure.or(qubit1)
+    Measure.or(qubit2)
+
+    CNOT.or(tuple(qubit2, qubit1))
+
+    qubit1.deallocate()
+    qubit2.deallocate()
+    let code = drawer.getLatex()
+    expect(code.count('edge\\[')).to.equal(12) // all lines are classical
+
+    drawer = new CircuitDrawer()
+    eng = new MainEngine(drawer, [])
+
+    qubit1 = eng.allocateQubit()
+    qubit2 = eng.allocateQubit()
+
+    Measure.or(qubit1) // qubit1 is classical
+
+    CNOT.or(tuple(qubit2, qubit1)) // now it is quantum
+
+    qubit1.deallocate()
+    qubit2.deallocate()
+    code = drawer.getLatex()
+    expect(code.count('edge\\[')).to.equal(7) // all lines are quantum
+  });
+})

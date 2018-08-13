@@ -16,14 +16,14 @@
 
 import assert from 'assert'
 import {LastEngineError} from '../../meta/error';
-import {len} from '../../libs/polyfill';
+import {arrayEqual, len} from '../../libs/polyfill';
 import {getControlCount} from '../../meta';
 
 import {
   Allocate, Deallocate, FlushGate, Measure
 } from '../../ops';
 import {BasicEngine} from '../../cengines'
-import {toLatex} from './tolatex'
+import ToLatex from './tolatex'
 
 export class CircuitItem {
   /*
@@ -41,9 +41,26 @@ ctrl_lines (list<int>): Circuit lines which control the gate.
     this.id = -1
   }
 
+  copy() {
+    const l = Array.isArray(this.lines) ? this.lines.slice(0) : this.lines
+    const cl = Array.isArray(this.ctrl_lines) ? this.ctrl_lines.slice(0) : this.ctrl_lines
+    const inst = new CircuitItem(this.gate, l, cl)
+    inst.id = this.id
+    return inst
+  }
+
   equal(other) {
-    return other instanceof CircuitItem && this.gate.equal(other.gate) && this.lines === other.lines && this.ctrl_lines == other.ctrl_lines
-    && this.id === other.id
+    if (other instanceof CircuitItem) {
+      let f = false
+      if (this.gate.equal) {
+        f = this.gate.equal(other.gate)
+      } else {
+        f = this.gate === other.gate
+      }
+      return f && arrayEqual(this.lines, other.lines)
+          && arrayEqual(this.ctrl_lines, other.ctrl_lines) && this.id === other.id
+    }
+    return false
   }
 }
 
@@ -192,8 +209,8 @@ export class CircuitDrawer extends BasicEngine {
       throw new Error('set_qubit_locations() has to be called before applying gates!')
     }
 
-    const min = Math.min(idToLoc)
-    const max = Math.max(idToLoc) + 1
+    const min = Math.min(...Object.keys(idToLoc))
+    const max = Math.max(...Object.keys(idToLoc)) + 1
     for (let k = min; k < max; ++k) {
       if (!(k in idToLoc)) {
         throw new Error('set_qubit_locations(): Invalid id_to_loc '
@@ -226,7 +243,7 @@ export class CircuitDrawer extends BasicEngine {
     }
     if (cmd.gate.equal(Deallocate)) {
       const qubit_id = cmd.qubits[0][0].id
-      this._free_lines.append(qubit_id)
+      this._free_lines.push(qubit_id)
     }
     if (this.isLastEngine && cmd.gate === Measure) {
       assert(getControlCount(cmd) === 0)
@@ -252,7 +269,7 @@ export class CircuitDrawer extends BasicEngine {
 
     const item = new CircuitItem(gate, lines, ctrl_lines)
 
-    all_lines.forEach(l => this._qubit_lines[l].append(item))
+    all_lines.forEach(l => this._qubit_lines[l].push(item))
   }
 
   /*
@@ -275,23 +292,22 @@ export class CircuitDrawer extends BasicEngine {
       const new_line = this._map[line]
       qubit_lines[new_line] = []
 
-
       this._qubit_lines[line].forEach((cmd) => {
         const lines = cmd.lines.map(qb_id => this._map[qb_id])
         const ctrl_lines = cmd.ctrl_lines.map(qb_id => this._map[qb_id])
         const {gate} = cmd
         const new_cmd = new CircuitItem(gate, lines, ctrl_lines)
-        if (gate == Allocate) {
+        if (gate.equal(Allocate)) {
           new_cmd.id = cmd.lines[0]
         }
-        qubit_lines[new_line].append(new_cmd)
+        qubit_lines[new_line].push(new_cmd)
       })
     }
 
 
     const circuit = []
-    qubit_lines.forEach(lines => circuit.push(qubit_lines[lines]))
-    return toLatex(qubit_lines)
+    Object.keys(qubit_lines).forEach(lines => circuit.push(qubit_lines[lines]))
+    return ToLatex.toLatex(qubit_lines)
   }
 
   /*
@@ -302,7 +318,7 @@ export class CircuitDrawer extends BasicEngine {
     command_list (list<Command>): List of Commands to print (and
     potentially send on to the next engine).
    */
-  receiver(commandList) {
+  receive(commandList) {
     commandList.forEach((cmd) => {
       if (!(cmd.gate instanceof FlushGate)) {
         this.printCMD(cmd)
