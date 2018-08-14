@@ -63,13 +63,13 @@ cmd: Command object with logical qubit ids.
     qubits.forEach((qureg) => {
       qureg.forEach((qubit) => {
         if (qubit.id !== -1) {
-          qubit.id = this.currentMapping[qubit.id]
+          qubit.id = this._currentMapping[qubit.id]
         }
       })
     })
     const controlQubits = newCMD.controlQubits
     controlQubits.forEach((qubit) => {
-      qubit.id = this.currentMapping[qubit.id]
+      qubit.id = this._currentMapping[qubit.id]
     })
     if (newCMD.gate instanceof MeasureGate) {
       if (!(newCMD.qubits.length === 1 && newCMD.qubits[0].length === 1)) {

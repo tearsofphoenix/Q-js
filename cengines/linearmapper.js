@@ -210,7 +210,7 @@ heuristic.
       } else {
         // Process a two qubit gate:
 
-        LinearMapper._process_two_qubit_gate(
+        LinearMapper._processTwoQubitGate(
           num_qubits,
           cyclic,
           qubit_ids[0],
@@ -222,7 +222,7 @@ heuristic.
       }
     }
 
-    return LinearMapper._return_new_mapping_from_segments(
+    return LinearMapper._returnNewMappingFromSegments(
       num_qubits,
       segments,
       allocated_qubits,
@@ -247,7 +247,7 @@ segments: List of segments. A segment is a list of neighbouring
 qubits.
 neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
    */
-  static _process_two_qubit_gate(num_qubits, cyclic, qubit0, qubit1, active_qubits, segments, neighbour_ids) {
+  static _processTwoQubitGate(num_qubits, cyclic, qubit0, qubit1, active_qubits, segments, neighbour_ids) {
     // already connected
     if (qubit1 in neighbour_ids && neighbour_ids[qubit1].has(qubit0)) {
       // do nothing
@@ -374,7 +374,7 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
       List of tuples. Each tuple is a swap operation which needs to be
   applied. Tuple contains the two MappedQubit ids for the Swap.
    */
-  _odd_even_transposition_sort_swaps(old_mapping, new_mapping) {
+  _oddEvenTranspositionSortSwaps(old_mapping, new_mapping) {
     const final_positions = new Array(this.num_qubits)
     // move qubits which are in both mappings
     Object.keys(old_mapping).forEach(logical_id => {
@@ -429,7 +429,7 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
 
   Note: this.currentMapping must exist already
    */
-  _send_possible_commands() {
+  _sendPossibleCommands() {
     const active_ids = new Set(this._currently_allocated_ids)
     Object.keys(this._currentMapping).forEach(logical_id => active_ids.add(parseInt(logical_id, 10)))
 
@@ -465,7 +465,7 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
       } else {
         let send_gate = true
         let mapped_ids = new Set()
-        for (let i = 0; i < cmd.allQubits; ++i) {
+        for (let i = 0; i < cmd.allQubits.length; ++i) {
           const qureg = cmd.allQubits[i]
           for (let j = 0; j < qureg.length; ++j) {
             const qubit = qureg[j]
@@ -514,7 +514,7 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
     if (!this._currentMapping) {
       this.currentMapping = {}
     } else {
-      this._send_possible_commands()
+      this._sendPossibleCommands()
       if (len(this._stored_commands) === 0) {
         return
       }
@@ -524,8 +524,8 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
       this._currently_allocated_ids,
       this._stored_commands,
       this.currentMapping)
-    const swaps = this._odd_even_transposition_sort_swaps(this.currentMapping, new_mapping)
-    if (swaps) { // first mapping requires no swaps
+    const swaps = this._oddEvenTranspositionSortSwaps(this._currentMapping, new_mapping)
+    if (swaps.length > 0) { // first mapping requires no swaps
       // Allocate all mapped qubit ids (which are not already allocated,
       // i.e., contained in this._currently_allocated_ids)
       let mapped_ids_used = new Set()
@@ -533,7 +533,7 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
         mapped_ids_used.add(this._currentMapping[logical_id])
       }
       const tmpSet = setFromRange(this.num_qubits)
-      const not_allocated_ids = tmpSet.difference(mapped_ids_used)
+      const not_allocated_ids = setDifference(tmpSet, mapped_ids_used)
       for (const mapped_id of not_allocated_ids) {
         const qb = new BasicQubit(this, mapped_id)
         const cmd = new Command(this, Allocate, tuple([qb]))
@@ -565,7 +565,7 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
       for (const logical_id of this._currently_allocated_ids) {
         mapped_ids_used.add(new_mapping[logical_id])
       }
-      const not_needed_anymore = setFromRange(this.num_qubits).difference(mapped_ids_used)
+      const not_needed_anymore = setDifference(setFromRange(this.num_qubits), mapped_ids_used)
       for (const mapped_id of not_needed_anymore) {
         const qb = new BasicQubit(this, mapped_id)
         const cmd = new Command(this, Deallocate, tuple([qb]))
@@ -576,7 +576,7 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
     // Change to new map:
     this.currentMapping = new_mapping
     // Send possible gates:
-    this._send_possible_commands()
+    this._sendPossibleCommands()
     // Check that mapper actually made progress
     if (len(this._stored_commands) === num_of_stored_commands_before) {
       throw new Error('Mapper is potentially in an infinite loop. '
@@ -639,7 +639,7 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
       A new mapping as a dict. key is logical qubit id,
   value is placement id
    */
-  static _return_new_mapping_from_segments(num_qubits, segments, allocated_qubits, current_mapping) {
+  static _returnNewMappingFromSegments(num_qubits, segments, allocated_qubits, current_mapping) {
     const remaining_segments = segments.slice(0)
     const individual_qubits = new Set(allocated_qubits)
     let num_unused_qubits = num_qubits - len(allocated_qubits)
