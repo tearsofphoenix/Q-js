@@ -50,15 +50,26 @@ import {LogicalQubitIDTag} from '../meta';
 
 function return_swap_depth(swaps) {
   const depth_of_qubits = {}
-  // for qb0_id, qb1_id in swaps:
-  // if qb0_id not in depth_of_qubits:
-  // depth_of_qubits[qb0_id] = 0
-  // if qb1_id not in depth_of_qubits:
-  // depth_of_qubits[qb1_id] = 0
-  // max_depth = max(depth_of_qubits[qb0_id], depth_of_qubits[qb1_id])
-  // depth_of_qubits[qb0_id] = max_depth + 1
-  // depth_of_qubits[qb1_id] = max_depth + 1
-  return Math.max(...depth_of_qubits.values().push(0))
+  swaps.forEach(([qb0_id, qb1_id]) => {
+    if (!(qb0_id in depth_of_qubits)) {
+      depth_of_qubits[qb0_id] = 0
+    }
+    if (!(qb1_id in depth_of_qubits)) {
+      depth_of_qubits[qb1_id] = 0
+    }
+    const max_depth = Math.max(depth_of_qubits[qb0_id], depth_of_qubits[qb1_id])
+    depth_of_qubits[qb0_id] = max_depth + 1
+    depth_of_qubits[qb1_id] = max_depth + 1
+  })
+  return Math.max(...Object.values(depth_of_qubits).push(0))
+}
+
+function setFromRange(n) {
+  const result = new Set()
+  for (let i = 0; i < n; i++) {
+    result.push(i)
+  }
+  return result
 }
 
 /*
@@ -371,7 +382,7 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
     }
     // exchange all remaining None with the not yet used mapped ids
     const used_mapped_ids = new Set(final_positions)
-    const all_ids = set(range(this.num_qubits))
+    const all_ids = setFromRange(this.num_qubits)
     let not_used_mapped_ids = list(all_ids.difference(used_mapped_ids))
     // TODO
     not_used_mapped_ids = not_used_mapped_ids.sort() // reverse=true)
@@ -442,9 +453,9 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
         if (qid in active_ids) {
           const qb = new BasicQubit(this, this.current_mapping[qid])
           const new_cmd = new Command(this, new DeallocateQubitGate(), tuple([qb]), [new LogicalQubitIDTag(qid)])
-          this._currently_allocated_ids.remove(qid)
+          this._currently_allocated_ids.delete(qid)
           active_ids.remove(qid)
-          this._current_mapping.pop(qid)
+          this.current_mapping.pop(qid)
           this.send([new_cmd])
         } else {
           new_stored_commands.append(cmd)
@@ -521,7 +532,8 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
       for (const logical_id of this._currently_allocated_ids) {
         mapped_ids_used.add(this.current_mapping[logical_id])
       }
-      const not_allocated_ids = set(range(this.num_qubits)).difference(mapped_ids_used)
+      const tmpSet = setFromRange(this.num_qubits)
+      const not_allocated_ids = tmpSet.difference(mapped_ids_used)
       for (const mapped_id of not_allocated_ids) {
         const qb = new BasicQubit(this, mapped_id)
         const cmd = new Command(this, Allocate, tuple([qb]))
@@ -553,7 +565,7 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
       for (const logical_id of this._currently_allocated_ids) {
         mapped_ids_used.add(new_mapping[logical_id])
       }
-      const not_needed_anymore = set(range(this.num_qubits)).difference(mapped_ids_used)
+      const not_needed_anymore = setFromRange(this.num_qubits).difference(mapped_ids_used)
       for (const mapped_id of not_needed_anymore) {
         const qb = new BasicQubit(this, mapped_id)
         const cmd = new Command(this, Deallocate, tuple([qb]))
@@ -628,9 +640,9 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
   value is placement id
    */
   static _return_new_mapping_from_segments(num_qubits, segments, allocated_qubits, current_mapping) {
-    const remaining_segments = deepcopy(segments)
-    const individual_qubits = deepcopy(allocated_qubits)
-    const num_unused_qubits = num_qubits - len(allocated_qubits)
+    const remaining_segments = segments.slice(0)
+    const individual_qubits = allocated_qubits.slice(0)
+    let num_unused_qubits = num_qubits - len(allocated_qubits)
     // Create a segment out of individual qubits and add to segments
     segments.forEach((segment) => {
       segment.forEach((qubit_id) => {
