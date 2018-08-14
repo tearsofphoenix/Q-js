@@ -55,6 +55,10 @@ export function setIsSuperSet(superset, s) {
   return result.length === 0
 }
 
+export function setDifference(s1, s2) {
+  return new Set([...s1].filter(x => !s2.has(x)))
+}
+
 export function arrayEqual(a1, a2, itemCompareFunc) {
   if (a1 === a2) {
     return true
@@ -108,10 +112,41 @@ Array.prototype.rmap = function (callbackFunc) {
   return result
 }
 
+Array.prototype.count = function (item) {
+  let count = 0
+  for (let i = 0; i < this.length; ++i) {
+    if (this[i] === item) {
+      ++count
+    }
+  }
+  return count
+}
+
+Array.prototype.remove = function(target) {
+  let idx = -1
+  for (let i = 0; i < this.length; ++i) {
+    if (arrayEqual(this[i], target)) {
+      idx = i
+      break
+    }
+  }
+  if (idx !== -1) {
+    this.splice(idx, 1)
+  }
+}
+
+Array.prototype.discard = function(item) {
+  let idx = this.findIndex(looper => arrayEqual(looper, item))
+  while (idx !== -1) {
+    this.splice(idx, 1)
+    idx = this.findIndex(looper => arrayEqual(looper, item))
+  }
+}
+
 String.prototype.count = function (substring) {
   const exp = new RegExp(substring, 'g')
   const result = this.match(exp)
-  if(result) return result.length
+  if (result) return result.length
   return 0
 }
 

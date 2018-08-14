@@ -37,8 +37,9 @@ Swap operation
 Returns:
     Circuit depth to execute these swaps.
  */
+import assert from 'assert'
 import BasicMapperEngine from './basicmapper';
-import {len} from '../libs/polyfill';
+import {intersection, len, setDifference} from '../libs/polyfill';
 import {
   Allocate,
   AllocateQubitGate, Deallocate, DeallocateQubitGate, FlushGate, Swap
@@ -48,7 +49,7 @@ import {tuple} from '../libs/util';
 import Command from '../ops/command';
 import {LogicalQubitIDTag} from '../meta';
 
-function return_swap_depth(swaps) {
+export function return_swap_depth(swaps) {
   const depth_of_qubits = {}
   swaps.forEach(([qb0_id, qb1_id]) => {
     if (!(qb0_id in depth_of_qubits)) {
@@ -61,13 +62,15 @@ function return_swap_depth(swaps) {
     depth_of_qubits[qb0_id] = max_depth + 1
     depth_of_qubits[qb1_id] = max_depth + 1
   })
-  return Math.max(...Object.values(depth_of_qubits).push(0))
+  const values = Object.values(depth_of_qubits)
+  values.push(0)
+  return Math.max(...values)
 }
 
 function setFromRange(n) {
   const result = new Set()
   for (let i = 0; i < n; i++) {
-    result.push(i)
+    result.add(i)
   }
   return result
 }
@@ -166,8 +169,8 @@ heuristic.
     // allocated_qubits is used as this mapper currently does not reassign
     // a qubit placement to a new qubit if the previous qubit at that
     // location has been deallocated. This is done after the next swaps.
-    const allocated_qubits = currently_allocated_ids.slice(0)
-    const active_qubits = currently_allocated_ids.slice(0)
+    const allocated_qubits = new Set(currently_allocated_ids)
+    const active_qubits = new Set(currently_allocated_ids)
     // Segments contains a list of segments. A segment is a list of
     // neighouring qubit ids
     const segments = []
@@ -197,7 +200,7 @@ heuristic.
       } else if (cmd.gate instanceof DeallocateQubitGate) {
         const qubit_id = cmd.qubits[0][0].id
         if (active_qubits.has(qubit_id)) {
-          active_qubits.remove(qubit_id)
+          active_qubits.delete(qubit_id)
         }
         // Do not remove from allocated_qubits as this would
         // allow the mapper to add a new qubit to this location
@@ -244,21 +247,21 @@ segments: List of segments. A segment is a list of neighbouring
 qubits.
 neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
    */
-  static _process_two_qubit_gate(num_qubits, cyclic, qubit0, qubit1,
-    active_qubits, segments, neighbour_ids) {
+  static _process_two_qubit_gate(num_qubits, cyclic, qubit0, qubit1, active_qubits, segments, neighbour_ids) {
     // already connected
-    if (qubit1 in neighbour_ids && qubit0 in neighbour_ids[qubit1]) {
-
+    if (qubit1 in neighbour_ids && neighbour_ids[qubit1].has(qubit0)) {
+      // do nothing
+      return
     }
     // at least one qubit is not an active qubit:
-    else if (!(qubit0 in active_qubits) || !(qubit1 in active_qubits)) {
-      active_qubits.remove(qubit0)
-      active_qubits.remove(qubit1)
+    else if (!active_qubits.has(qubit0) || !active_qubits.has(qubit1)) {
+      active_qubits.delete(qubit0)
+      active_qubits.delete(qubit1)
     }
     // at least one qubit is in the inside of a segment:
     else if (len(neighbour_ids[qubit0]) > 1 || len(neighbour_ids[qubit1]) > 1) {
-      active_qubits.remove(qubit0)
-      active_qubits.remove(qubit1)
+      active_qubits.delete(qubit0)
+      active_qubits.delete(qubit1)
     }
     // qubits are both active and either not yet in a segment or at
     // the end of segement:
@@ -269,17 +272,17 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
       let qb1_is_left_end
 
       segments.forEach((segment, index) => {
-        if (qubit0 == segment[0]) {
+        if (qubit0 === segment[0]) {
           segment_index_qb0 = index
           qb0_is_left_end = true
-        } else if (qubit0 == segment[-1]) {
+        } else if (qubit0 === segment[segment.length - 1]) {
           segment_index_qb0 = index
           qb0_is_left_end = false
         }
-        if (qubit1 == segment[0]) {
+        if (qubit1 === segment[0]) {
           segment_index_qb1 = index
           qb1_is_left_end = true
-        } else if (qubit1 == segment[-1]) {
+        } else if (qubit1 === segment[segment.length - 1]) {
           segment_index_qb1 = index
           qb1_is_left_end = false
         }
@@ -294,65 +297,64 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
       // possible. Note that if this.cyclic==true, we have
       // added that connection already to neighbour_ids and wouldn't be
       // in this branch.
-      else if (segment_index_qb0 == segment_index_qb1) {
-        active_qubits.remove(qubit0)
-        active_qubits.remove(qubit1)
+      else if (segment_index_qb0 === segment_index_qb1) {
+        active_qubits.delete(qubit0)
+        active_qubits.delete(qubit1)
         // qubit0 not yet assigned to a segment:
       } else if (typeof segment_index_qb0 === 'undefined') {
         if (qb1_is_left_end) {
-          segments[segment_index_qb1].insert(0, qubit0)
+          segments[segment_index_qb1].splice(0, 0, qubit0)
         } else {
-          segments[segment_index_qb1].append(qubit0)
+          segments[segment_index_qb1].push(qubit0)
         }
         neighbour_ids[qubit0].add(qubit1)
         neighbour_ids[qubit1].add(qubit0)
-        if (cyclic && len(segments[0]) == num_qubits) {
-          neighbour_ids[segments[0][0]].add(segments[0][-1])
-          neighbour_ids[segments[0][-1]].add(segments[0][0])
+        if (cyclic && len(segments[0]) === num_qubits) {
+          const tmp = segments[0]
+          neighbour_ids[tmp[0]].add(tmp[tmp.length - 1])
+          neighbour_ids[tmp[tmp.length - 1]].add(tmp[0])
         }
       }
       // qubit1 not yet assigned to a segment:
       else if (typeof segment_index_qb1 === 'undefined') {
         if (qb0_is_left_end) {
-          segments[segment_index_qb0].insert(0, qubit1)
+          segments[segment_index_qb0].splice(0, 0, qubit1)
         } else {
-          segments[segment_index_qb0].append(qubit1)
+          segments[segment_index_qb0].push(qubit1)
         }
         neighbour_ids[qubit0].add(qubit1)
         neighbour_ids[qubit1].add(qubit0)
-        if (cyclic && len(segments[0]) == num_qubits) {
-          neighbour_ids[segments[0][0]].add(segments[0][-1])
-          neighbour_ids[segments[0][-1]].add(segments[0][0])
+        if (cyclic && len(segments[0]) === num_qubits) {
+          const tmp = segments[0]
+          neighbour_ids[tmp[0]].add(tmp[tmp.length - 1])
+          neighbour_ids[tmp[tmp.length - 1]].add(tmp[0])
         }
       }
       // both qubits are at the end of different segments -> combine them
-      else if (!qb0_is_left_end && qb1_is_left_end) {
-        segments[segment_index_qb0].extend(
-          segments[segment_index_qb1]
-        )
-        segments.pop(segment_index_qb1)
-      } else if (!qb0_is_left_end && !qb1_is_left_end) {
-        segments[segment_index_qb0].extend(
-          reversed(segments[segment_index_qb1])
-        )
-        segments.pop(segment_index_qb1)
-      } else if (qb0_is_left_end && qb1_is_left_end) {
-        segments[segment_index_qb0].reverse()
-        segments[segment_index_qb0].extend(
-          segments[segment_index_qb1]
-        )
-        segments.pop(segment_index_qb1)
-      } else {
-        segments[segment_index_qb1].extend(
-          segments[segment_index_qb0]
-        )
-        segments.pop(segment_index_qb0)
+      else {
+        if (!qb0_is_left_end && qb1_is_left_end) {
+          segments[segment_index_qb0] = segments[segment_index_qb0].concat(segments[segment_index_qb1])
+          segments.splice(segment_index_qb1, 1)
+        } else if (!qb0_is_left_end && !qb1_is_left_end) {
+          const rev = segments[segment_index_qb1].slice(0).reverse()
+          segments[segment_index_qb0] = segments[segment_index_qb0].concat(rev)
+          segments.splice(segment_index_qb1, 1)
+        } else if (qb0_is_left_end && qb1_is_left_end) {
+          segments[segment_index_qb0].reverse()
+          segments[segment_index_qb0] = segments[segment_index_qb0].concat(segments[segment_index_qb1])
+          segments.splice(segment_index_qb1, 1)
+        } else {
+          segments[segment_index_qb1] = segments[segment_index_qb1].concat(segments[segment_index_qb0])
+          segments.splice(segment_index_qb0, 1)
+        }
+
         // Add new neighbour ids && make sure to check cyclic
         neighbour_ids[qubit0].add(qubit1)
         neighbour_ids[qubit1].add(qubit0)
-        if (cyclic && len(segments[0]) == num_qubits) {
-          neighbour_ids[segments[0][0]].add(segments[0][-1])
-          neighbour_ids[segments[0][-1]].add(segments[0][0])
+        if (cyclic && len(segments[0]) === num_qubits) {
+          const tmp = segments[0]
+          neighbour_ids[tmp[0]].add(tmp[tmp.length - 1])
+          neighbour_ids[tmp[tmp.length - 1]].add(tmp[0])
         }
       }
     }
@@ -375,22 +377,24 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
   _odd_even_transposition_sort_swaps(old_mapping, new_mapping) {
     const final_positions = new Array(this.num_qubits)
     // move qubits which are in both mappings
-    for (const logical_id of old_mapping) {
+    Object.keys(old_mapping).forEach(logical_id => {
       if (logical_id in new_mapping) {
         final_positions[old_mapping[logical_id]] = new_mapping[logical_id]
       }
-    }
+    })
     // exchange all remaining None with the not yet used mapped ids
     const used_mapped_ids = new Set(final_positions)
+    used_mapped_ids.delete(undefined)
     const all_ids = setFromRange(this.num_qubits)
-    let not_used_mapped_ids = list(all_ids.difference(used_mapped_ids))
+    let not_used_mapped_ids = Array.from(setDifference(all_ids, used_mapped_ids))
     // TODO
-    not_used_mapped_ids = not_used_mapped_ids.sort() // reverse=true)
-    final_positions.forEach((looper, i) => {
-      if (!final_positions[i]) {
+    not_used_mapped_ids = not_used_mapped_ids.sort().reverse()
+    for (let i = 0; i < final_positions.length; ++i) {
+      const looper = final_positions[i]
+      if (typeof looper === 'undefined') {
         final_positions[i] = not_used_mapped_ids.pop()
       }
-    })
+    }
     assert(len(not_used_mapped_ids) === 0)
     // Start sorting:
     const swap_operations = []
@@ -423,13 +427,11 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
   /*
   Sends the stored commands possible without changing the mapping.
 
-  Note: this.current_mapping must exist already
+  Note: this.currentMapping must exist already
    */
   _send_possible_commands() {
     const active_ids = new Set(this._currently_allocated_ids)
-    for (const logical_id of this.current_mapping) {
-      active_ids.add(logical_id)
-    }
+    Object.keys(this._currentMapping).forEach(logical_id => active_ids.add(parseInt(logical_id, 10)))
 
     let new_stored_commands = []
     for (let i = 0; i < this._stored_commands.length; ++i) {
@@ -440,25 +442,25 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
       }
       if (cmd.gate instanceof AllocateQubitGate) {
         const qid = cmd.qubits[0][0].id
-        if (qid in this.current_mapping) {
+        if (qid in this._currentMapping) {
           this._currently_allocated_ids.add(qid)
-          const qb = new BasicQubit(this, this.current_mapping[qid])
-          const new_cmd = new Command(this, new AllocateQubitGate(), tuple([qb]), [new LogicalQubitIDTag(qid)])
+          const qb = new BasicQubit(this, this._currentMapping[qid])
+          const new_cmd = new Command(this, new AllocateQubitGate(), tuple([qb]), [], [new LogicalQubitIDTag(qid)])
           this.send([new_cmd])
         } else {
           new_stored_commands.push(cmd)
         }
       } else if (cmd.gate instanceof DeallocateQubitGate) {
         const qid = cmd.qubits[0][0].id
-        if (qid in active_ids) {
-          const qb = new BasicQubit(this, this.current_mapping[qid])
-          const new_cmd = new Command(this, new DeallocateQubitGate(), tuple([qb]), [new LogicalQubitIDTag(qid)])
+        if (active_ids.has(qid)) {
+          const qb = new BasicQubit(this, this._currentMapping[qid])
+          const new_cmd = new Command(this, new DeallocateQubitGate(), tuple([qb]), [], [new LogicalQubitIDTag(qid)])
           this._currently_allocated_ids.delete(qid)
-          active_ids.remove(qid)
-          this.current_mapping.pop(qid)
+          active_ids.delete(qid)
+          delete this._currentMapping[qid]
           this.send([new_cmd])
         } else {
-          new_stored_commands.append(cmd)
+          new_stored_commands.push(cmd)
         }
       } else {
         let send_gate = true
@@ -467,35 +469,35 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
           const qureg = cmd.allQubits[i]
           for (let j = 0; j < qureg.length; ++j) {
             const qubit = qureg[j]
-            if (!(qubit.id in active_ids)) {
+            if (!(active_ids.has(qubit.id))) {
               send_gate = false
               break
             }
-            mapped_ids.add(this.current_mapping[qubit.id])
+            mapped_ids.add(this._currentMapping[qubit.id])
           }
         }
 
         // Check that mapped ids are nearest neighbour
-        if (len(mapped_ids) == 2) {
+        if (len(mapped_ids) === 2) {
           mapped_ids = Array.from(mapped_ids)
           const diff = Math.abs(mapped_ids[0] - mapped_ids[1])
           if (this.cyclic) {
-            if (diff != 1 && diff != this.num_qubits - 1) {
+            if (diff !== 1 && diff !== this.num_qubits - 1) {
               send_gate = false
             }
-          } else if (diff != 1) {
+          } else if (diff !== 1) {
             send_gate = false
           }
         }
         if (send_gate) {
-          this._send_cmd_with_mapped_ids(cmd)
+          this.sendCMDWithMappedIDs(cmd)
         } else {
           cmd.allQubits.forEach(qureg => qureg.forEach(qubit => active_ids.delete(qubit.id)))
           new_stored_commands.push(cmd)
         }
       }
-      this._stored_commands = new_stored_commands
     }
+    this._stored_commands = new_stored_commands
   }
 
   /*
@@ -509,28 +511,26 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
    */
   _run() {
     const num_of_stored_commands_before = len(this._stored_commands)
-    if (!this.current_mapping) {
-      this.current_mapping = {}
+    if (!this._currentMapping) {
+      this.currentMapping = {}
     } else {
       this._send_possible_commands()
-      if (len(this._stored_commands) == 0) {
+      if (len(this._stored_commands) === 0) {
         return
       }
     }
-    const new_mapping = this.return_new_mapping(this.num_qubits,
+    const new_mapping = LinearMapper.returnNewMapping(this.num_qubits,
       this.cyclic,
       this._currently_allocated_ids,
       this._stored_commands,
-      this.current_mapping)
-    const swaps = this._odd_even_transposition_sort_swaps(
-      this.current_mapping, new_mapping
-    )
+      this.currentMapping)
+    const swaps = this._odd_even_transposition_sort_swaps(this.currentMapping, new_mapping)
     if (swaps) { // first mapping requires no swaps
       // Allocate all mapped qubit ids (which are not already allocated,
       // i.e., contained in this._currently_allocated_ids)
       let mapped_ids_used = new Set()
       for (const logical_id of this._currently_allocated_ids) {
-        mapped_ids_used.add(this.current_mapping[logical_id])
+        mapped_ids_used.add(this._currentMapping[logical_id])
       }
       const tmpSet = setFromRange(this.num_qubits)
       const not_allocated_ids = tmpSet.difference(mapped_ids_used)
@@ -574,11 +574,11 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
     }
 
     // Change to new map:
-    this.current_mapping = new_mapping
+    this.currentMapping = new_mapping
     // Send possible gates:
     this._send_possible_commands()
     // Check that mapper actually made progress
-    if (len(this._stored_commands) == num_of_stored_commands_before) {
+    if (len(this._stored_commands) === num_of_stored_commands_before) {
       throw new Error('Mapper is potentially in an infinite loop. '
       + 'It is likely that the algorithm requires '
       + 'too many qubits. Increase the number of '
@@ -616,7 +616,7 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
   Combines the individual segments into a new mapping.
 
   It tries to minimize the number of swaps to go from the old mapping
-  in this.current_mapping to the new mapping which it returns. The
+  in this.currentMapping to the new mapping which it returns. The
   strategy is to map a segment to the same region where most of the
   qubits are already. Note that this is not a global optimal strategy
   but helps if currently the qubits can be divided into independent
@@ -641,12 +641,12 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
    */
   static _return_new_mapping_from_segments(num_qubits, segments, allocated_qubits, current_mapping) {
     const remaining_segments = segments.slice(0)
-    const individual_qubits = allocated_qubits.slice(0)
+    const individual_qubits = new Set(allocated_qubits)
     let num_unused_qubits = num_qubits - len(allocated_qubits)
     // Create a segment out of individual qubits and add to segments
     segments.forEach((segment) => {
       segment.forEach((qubit_id) => {
-        individual_qubits.remove(qubit_id)
+        individual_qubits.delete(qubit_id)
       })
     })
 
@@ -656,7 +656,7 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
 
     const previous_chain = new Array(num_qubits)
     if (current_mapping) {
-      Object.keys(current_mapping).forEach(key => previous_chain[current_mapping[key]] = key)
+      Object.keys(current_mapping).forEach(key => previous_chain[current_mapping[key]] = parseInt(key, 10))
     }
 
     // Note: previous_chain potentially has some None elements
@@ -664,7 +664,7 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
 
     let current_position_to_fill = 0
     while (len(remaining_segments)) {
-      let best_segment
+      let best_segment = []
       let best_padding = num_qubits
       let highest_overlap_fraction = 0
       remaining_segments.forEach((segment) => {
@@ -673,10 +673,11 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
           const idx1 = idx0 + len(segment)
 
           const previous_chain_ids = new Set(previous_chain.slice(idx0, idx1))
-
+          previous_chain_ids.delete(undefined)
           const segment_ids = new Set(segment)
+          segment_ids.delete(undefined)
 
-          const overlap = len(previous_chain_ids.intersection(segment_ids)) + previous_chain.slice(idx0, idx1).count(None)
+          const overlap = len(intersection(previous_chain_ids, segment_ids)) + previous_chain.slice(idx0, idx1).count(undefined)
           let overlap_fraction
           if (overlap === 0) {
             overlap_fraction = 0
@@ -709,8 +710,8 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
     const new_mapping = {}
     Object.keys(new_chain).forEach((pos) => {
       const logical_id = new_chain[pos]
-      if (logical_id) {
-        new_mapping[logical_id] = pos
+      if (typeof logical_id !== 'undefined') {
+        new_mapping[logical_id] = parseInt(pos, 10)
       }
     })
     return new_mapping

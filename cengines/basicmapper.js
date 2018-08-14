@@ -42,7 +42,7 @@ are the mapped qubit ids.
   }
 
   get currentMapping() {
-    return this._currentMapping
+    return Object.assign({}, this._currentMapping)
   }
 
   set currentMapping(newMap) {
