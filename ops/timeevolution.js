@@ -20,6 +20,7 @@ import {BasicGate} from './basics'
 import QubitOperator, {stringToArray} from './qubitoperator'
 import {setEqual, isComplex, isNumeric} from '../libs/polyfill'
 import {Ph} from './gates'
+import {NotMergeable} from "../meta/error";
 
 /*
 Gate for time evolution under a Hamiltonian (QubitOperator object).
@@ -130,9 +131,12 @@ New TimeEvolution gate equivalent to the two merged gates.
    */
   getMerged(other) {
     const rel_tol = 1e-9
+    if (!(other instanceof TimeEvolution)) {
+      throw new NotMergeable('Cannot merge these two gates.')
+    }
     const k1 = Object.keys(this.hamiltonian.terms)
     const k2 = Object.keys(other.hamiltonian.terms)
-    if (other instanceof TimeEvolution && setEqual(new Set(k1), new Set(k2))) {
+    if (setEqual(new Set(k1), new Set(k2))) {
       let factor
       Object.keys(this.hamiltonian.terms).forEach((term) => {
         const v1 = this.hamiltonian.terms[term]
@@ -142,7 +146,7 @@ New TimeEvolution gate equivalent to the two merged gates.
         } else {
           const tmp = math.divide(v1, v2)
           if (math.abs(math.subtract(factor, tmp)) > rel_tol * math.max(math.abs(factor), math.abs(tmp))) {
-            throw new Error('Cannot merge these two gates.')
+            throw new NotMergeable('Cannot merge these two gates.')
           }
         }
       })
@@ -150,7 +154,7 @@ New TimeEvolution gate equivalent to the two merged gates.
       const newTime = this.time + other.time / factor
       return new TimeEvolution(newTime, this.hamiltonian)
     } else {
-      throw new Error('Cannot merge these two gates.')
+      throw new NotMergeable('Cannot merge these two gates.')
     }
   }
 

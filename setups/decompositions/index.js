@@ -20,13 +20,14 @@ import entangle from './entangle'
 import globalphase from './globalphase'
 import ph2r from './ph2r'
 import toffoli2cnotandtgate from './toffoli2cnotandtgate'
-import crz2cxandrz from './crz2cxandrz';
-import cnu2toffoliandcu from './cnu2toffoliandcu';
-import qft2crandhadamard from './qft2crandhadamard';
-import r2rzandph from './r2rzandph';
-import rx2rz from './rx2rz';
-import ry2rz from './ry2rz';
-import swap2cnot from './swap2cnot';
+import crz2cxandrz from './crz2cxandrz'
+import cnu2toffoliandcu from './cnu2toffoliandcu'
+import qft2crandhadamard from './qft2crandhadamard'
+import r2rzandph from './r2rzandph'
+import rx2rz from './rx2rz'
+import ry2rz from './ry2rz'
+import swap2cnot from './swap2cnot'
+import timeevolution from './time_evolution'
 
 export default [
   ...barrier,
@@ -41,5 +42,6 @@ export default [
   ...rx2rz,
   ...ry2rz,
   ...swap2cnot,
-  ...toffoli2cnotandtgate
+  ...toffoli2cnotandtgate,
+  ...timeevolution
 ]

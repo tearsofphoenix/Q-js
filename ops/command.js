@@ -269,11 +269,15 @@ engine: New owner of qubits and owner of this Command object
 
   equal(other) {
     if (other instanceof Command) {
-      const f1 = this.gate.equal(other.gate)
-      const t1 = arrayEqual(this.tags, other.tags)
-      const e1 = this.engine === other.engine
-      const b = arrayEqual(this.allQubits, other.allQubits)
-      return f1 && t1 && e1 && b
+      try {
+        const f1 = this.gate.equal(other.gate)
+        const t1 = arrayEqual(this.tags, other.tags)
+        const e1 = this.engine === other.engine
+        const b = arrayEqual(this.allQubits, other.allQubits)
+        return f1 && t1 && e1 && b
+      } catch (e) {
+        return false
+      }
     }
     return false
   }
