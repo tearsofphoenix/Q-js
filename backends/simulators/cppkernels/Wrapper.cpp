@@ -144,7 +144,14 @@ void Wrapper::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         const int argc = 1;
         v8::Local<v8::Value> argv[argc] = { info[0] };
         v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
+        #if NODE_MAJOR_VERSION == 10
+        auto isolate = info.GetIsolate();
+        auto context = isolate->GetCurrentContext();
+        auto result = cons->NewInstance(context, argc, argv).ToLocalChecked();
+        info.GetReturnValue().Set(result);
+        #else
         info.GetReturnValue().Set(cons->NewInstance(argc, argv));
+        #endif
     }
 }
 
