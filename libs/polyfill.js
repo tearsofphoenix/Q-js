@@ -59,6 +59,44 @@ export function setDifference(s1, s2) {
   return new Set([...s1].filter(x => !s2.has(x)))
 }
 
+export function setFromRange(n) {
+  const result = new Set()
+  for (let i = 0; i < n; i++) {
+    result.add(i)
+  }
+  return result
+}
+
+export function arrayFromRange(start, end, step) {
+  if (typeof end === 'undefined') {
+    end = start
+    start = 0
+  }
+  if (typeof step === 'undefined') {
+    step = 1
+  }
+  const n = end - start
+  const result = new Array(n)
+  for (let i = 0; i < n; i += step) {
+    result[i] = i + start
+  }
+  return result
+}
+
+export function randomSample(array, count) {
+  const result = []
+  const {length} = array
+  if (length >= count) {
+    const copy = array.slice(0)
+    while (result.length < count) {
+      const idx = Math.floor(Math.random() * copy.length)
+      result.push(copy[idx])
+      copy.splice(idx, 1)
+    }
+  }
+  return result
+}
+
 export function arrayEqual(a1, a2, itemCompareFunc) {
   if (a1 === a2) {
     return true

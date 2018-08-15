@@ -38,16 +38,16 @@ Returns:
     Circuit depth to execute these swaps.
  */
 import assert from 'assert'
-import BasicMapperEngine from './basicmapper';
-import {intersection, len, setDifference} from '../libs/polyfill';
+import BasicMapperEngine from './basicmapper'
+import {intersection, len, setDifference, setFromRange} from '../libs/polyfill'
 import {
   Allocate,
   AllocateQubitGate, Deallocate, DeallocateQubitGate, FlushGate, Swap
-} from '../ops/gates';
-import {BasicQubit} from '../types/qubit';
-import {tuple} from '../libs/util';
-import Command from '../ops/command';
-import {LogicalQubitIDTag} from '../meta';
+} from '../ops/gates'
+import {BasicQubit} from '../types/qubit'
+import {tuple} from '../libs/util'
+import Command from '../ops/command'
+import {LogicalQubitIDTag} from '../meta'
 
 export function return_swap_depth(swaps) {
   const depth_of_qubits = {}
@@ -65,14 +65,6 @@ export function return_swap_depth(swaps) {
   const values = Object.values(depth_of_qubits)
   values.push(0)
   return Math.max(...values)
-}
-
-function setFromRange(n) {
-  const result = new Set()
-  for (let i = 0; i < n; i++) {
-    result.add(i)
-  }
-  return result
 }
 
 /*
@@ -182,7 +174,7 @@ heuristic.
     for (let i = 0; i < stored_commands.length; ++i) {
       const cmd = stored_commands[i]
       if (len(allocated_qubits) === num_qubits && len(active_qubits) === 0) {
-        break;
+        break
       }
 
       const qubit_ids = []
