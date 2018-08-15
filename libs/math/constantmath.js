@@ -109,6 +109,7 @@ Multiplies a quantum integer by a classical number a modulo N, i.e.,
 does not exist).
  */
 export function mul_by_constant_modN(eng, c, N, quint_in) {
+  console.log(112, c, N)
   assert(c < N && c >= 0)
   assert(math.gcd(c, N) === 1)
 

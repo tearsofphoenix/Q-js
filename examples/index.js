@@ -17,4 +17,6 @@
 require('babel-register')
 require('babel-polyfill')
 
-require('./teleport_circuit')
+// require('./teleport_circuit')
+
+require('./shor')
