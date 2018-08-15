@@ -520,7 +520,7 @@ must exist already
           //       as it looks up the mapping in this.currentMapping
           //       and not our internal mapping
           //       this._current_row_major_mapping
-          this._send_cmd_with_mapped_ids(cmd)
+          this.sendCMDWithMappedIDs(cmd)
         } else {
           cmd.allQubits.forEach(qureg => qureg.forEach(qubit => active_ids.delete(qubit.id)))
           new_stored_commands.push(cmd)
@@ -685,7 +685,7 @@ applied. Tuple contains the two mapped qubit ids for the Swap.
           const element = final_positions[row][column]
           if (typeof element.row_after_step_1 !== 'undefined') {
             continue
-          } else if (element.final_column == dest_column) {
+          } else if (element.final_column === dest_column) {
             if (typeof best_element === 'undefined') {
               best_element = element
             } else if (best_element.final_row > element.final_row) {

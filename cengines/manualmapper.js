@@ -54,9 +54,9 @@ an integer describing the physical location (must be constant).
         qr.forEach(qb => ids.push(qb.id))
       })
       ids.forEach((id) => {
-        const v = this.currentMapping[id]
+        const v = this._currentMapping[id]
         if (typeof v === 'undefined') {
-          this.currentMapping[id] = this.map(id)
+          this._currentMapping[id] = this.map(id)
         }
       })
       this.sendCMDWithMappedIDs(cmd)

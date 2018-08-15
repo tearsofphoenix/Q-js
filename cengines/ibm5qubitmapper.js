@@ -126,15 +126,15 @@ Exception:
 down the pipeline.
    */
   run() {
-    if (Object.keys(this.currentMapping).length > 0 && Math.max(...Object.values(this.currentMapping)) > 4) {
+    if (Object.keys(this._currentMapping).length > 0 && Math.max(...Object.values(this._currentMapping)) > 4) {
       throw new Error('Too many qubits allocated. The IBM Q '
       + 'device supports at most 5 qubits and no '
       + 'intermediate measurements / '
       + 'reallocations.')
     }
     if (Object.keys(this._interactions).length > 0) {
-      const logical_ids = Object.keys(this.currentMapping).map(k => parseInt(k, 10))
-      let best_mapping = this.currentMapping
+      const logical_ids = Object.keys(this._currentMapping).map(k => parseInt(k, 10))
+      let best_mapping = this._currentMapping
       let best_cost
 
       for (const physical_ids of permutations([0, 1, 2, 3, 4], logical_ids.length)) {
@@ -183,13 +183,13 @@ cmd (Command): A command to store
       }
       this._interactions[key] += 1
     } else if (cmd.gate.equal(Allocate)) {
-      const v = this.currentMapping[target]
+      const v = this._currentMapping[target]
       if (typeof v === 'undefined') {
         let newMax = 0
-        if (Object.keys(this.currentMapping).length > 0) {
-          newMax = Math.max(...Object.values(this.currentMapping)) + 1
+        if (Object.keys(this._currentMapping).length > 0) {
+          newMax = Math.max(...Object.values(this._currentMapping)) + 1
         }
-        this.currentMapping[target] = newMax
+        this._currentMapping[target] = newMax
       }
     }
     this._cmds.push(cmd)
