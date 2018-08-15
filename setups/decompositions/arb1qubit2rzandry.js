@@ -1,8 +1,10 @@
 import math from 'mathjs'
-import {Control, getControlCount} from "../../meta";
-import {len} from "../../libs/polyfill";
-import DecompositionRule from "../../cengines/replacer/decompositionrule";
-import {BasicGate, Rz, Ry, Ph} from "../../ops";
+import {Control, getControlCount} from '../../meta';
+import {len, productLoop, productLoop3} from '../../libs/polyfill';
+import DecompositionRule from '../../cengines/replacer/decompositionrule';
+import {
+  BasicGate, Rz, Ry, Ph
+} from '../../ops';
 
 const TOLERANCE = 1e-12
 
@@ -15,7 +17,6 @@ AutoReplacer might go into an infinite loop. Use
 carb1qubit2cnotrzandry instead.
  */
 const _recognize_arb1qubit = (cmd) => {
-
   try {
     const m = cmd.gate.matrix
     return len(m) === 2 && getControlCount(cmd) === 0
@@ -45,14 +46,14 @@ const _test_parameters = (matrix, a, b_half, c_half, d_half) => {
   const mc = math.complex
   const mm = math.multiply
   const U = [
-      [
-          mm(math.exp(mc(0, a-b_half-d_half)), math.cos(c_half)),
-          mm(-math.exp(mc(0, a-b_half+d_half)), math.sin(c_half))
-      ],
-  [
-      mm(math.exp(mc(0, a+b_half-d_half)), math.sin(c_half)),
-      mm(math.exp(mc(0, a+b_half+d_half)), math.cos(c_half))
-  ]
+    [
+      mm(math.exp(mc(0, a - b_half - d_half)), math.cos(c_half)),
+      mm(-math.exp(mc(0, a - b_half + d_half)), math.sin(c_half))
+    ],
+    [
+      mm(math.exp(mc(0, a + b_half - d_half)), math.sin(c_half)),
+      mm(math.exp(mc(0, a + b_half + d_half)), math.cos(c_half))
+    ]
   ]
   return math.deepEqual(U, matrix)
 }
@@ -81,101 +82,104 @@ const _find_parameters = (matrix) => {
   let c_half
   let d_half
   // Case 1: sin(c/2) == 0:
-  if(math.abs(matrix[0][1]) < TOLERANCE) {
+  if (math.abs(matrix[0][1]) < TOLERANCE) {
     const two_a = math.phase(matrix[0][0] * matrix[1][1]) % (2 * math.pi)
-    if(math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * math.pi - TOLERANCE) {
-// from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
+    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * math.pi - TOLERANCE) {
+      // from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
       // w.l.g. we can choose a==0 because (see U above)
-// c/2 -> c/2 + pi would have the same effect as as a==0 -> a==pi.
+      // c/2 -> c/2 + pi would have the same effect as as a==0 -> a==pi.
       a = 0
     } else {
-      a = two_a / 2.
+      a = two_a / 2.0
     }
-    d_half = 0  // w.l.g
-    const b = math.phase(matrix[1][1])-math.phase(matrix[0][0])
-    const possible_b_half = [(b/2.) % (2*math.pi), (b/2.+math.pi) % (2*math.pi)]
-// As we have fixed a, we need to find correct sign for cos(c/2)
+    d_half = 0 // w.l.g
+    const b = math.phase(matrix[1][1]) - math.phase(matrix[0][0])
+    const possible_b_half = [(b / 2.0) % (2 * math.pi), (b / 2.0 + math.pi) % (2 * math.pi)]
+    // As we have fixed a, we need to find correct sign for cos(c/2)
     const possible_c_half = [0.0, math.pi]
     let found = false
-    for b_half, c_half in itertools.product(possible_b_half,
-        possible_c_half):
-    if _test_parameters(matrix, a, b_half, c_half, d_half):
-    found = true
-    break
-    if not found:
-        raise Exception("Couldn't find parameters for matrix ", matrix,
-        "This shouldn't happen. Maybe the matrix is " +
-        "not unitary?")
+    productLoop(possible_b_half, possible_c_half, (b_half, c_half) => {
+      if (_test_parameters(matrix, a, b_half, c_half, d_half)) {
+        found = true
+        return true
+      }
+    })
+
+    if (!found) {
+      throw new Error(`Couldn't find parameters for matrix ${matrix},
+        This shouldn't happen. Maybe the matrix is 
+        not unitary?`)
+    }
   }
-// Case 2: cos(c/2) == 0:
+  // Case 2: cos(c/2) == 0:
   else if (math.abs(matrix[0][0]) < TOLERANCE) {
     const two_a = math.phase(-matrix[0][1] * matrix[1][0]) % (2 * math.pi)
-    if(abs(two_a) < TOLERANCE || abs(two_a) > 2 * math.pi - TOLERANCE) {
-// from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
+    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * math.pi - TOLERANCE) {
+      // from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
       // w.l.g. we can choose a==0 because (see U above)
-// c/2 -> c/2 + pi would have the same effect as as a==0 -> a==pi.
+      // c/2 -> c/2 + pi would have the same effect as as a==0 -> a==pi.
       a = 0
-    }else {
-      a = two_a / 2.
+    } else {
+      a = two_a / 2.0
     }
-    d_half = 0  // w.l.g
+    d_half = 0 // w.l.g
     const b = math.phase(matrix[1][0]) - math.phase(matrix[0][1]) + math.pi
-    const possible_b_half = [(b / 2.) % (2 * math.pi), (b / 2. + math.pi) % (2 * math.pi)]
-// As we have fixed a, we need to find correct sign for sin(c/2)
-    const possible_c_half = [math.pi / 2., 3. / 2. * math.pi]
+    const possible_b_half = [(b / 2.0) % (2 * math.pi), (b / 2.0 + math.pi) % (2 * math.pi)]
+    // As we have fixed a, we need to find correct sign for sin(c/2)
+    const possible_c_half = [math.pi / 2.0, 3.0 / 2.0 * math.pi]
     let found = false
-    for b_half, c_half in itertools.product(possible_b_half,
-        possible_c_half):
-    if _test_parameters(matrix, a, b_half, c_half, d_half):
-    found = True
-    break
-    if not found:
-        raise
-    Exception("Couldn't find parameters for matrix ", matrix,
-        "This shouldn't happen. Maybe the matrix is " +
-        "not unitary?")
-  }
-// Case 3: sin(c/2) != 0 and cos(c/2) !=0:
-else {
-    const two_a = math.phase(matrix[0][0] * matrix[1][1]) % (2 * math.pi)
-    if(abs(two_a) < TOLERANCE || abs(two_a) > 2 * math.pi - TOLERANCE) {
-    :
-// from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
-      // w.l.g. we can choose a==0 because (see U above)
-// c/2 -> c/2 + pi would have the same effect as as a==0 -> a==pi.
-      a = 0
-    }else {
-      a = two_a / 2.
+    productLoop(possible_b_half, possible_c_half, (b_half, c_half) => {
+      if (_test_parameters(matrix, a, b_half, c_half, d_half)) {
+        found = true
+        return true
+      }
+    })
+    if (!found) {
+      throw new Error(`Couldn't find parameters for matrix ${matrix},
+        This shouldn't happen. Maybe the matrix is 
+        not unitary?`)
     }
-    const two_d = 2. * math.phase(matrix[0][1]) - 2. * math.phase(matrix[0][0])
-    const possible_d_half = [two_d / 4. % (2 * math.pi),
-      (two_d / 4. + math.pi / 2.) % (2 * math.pi),
-      (two_d / 4. + math.pi) % (2 * math.pi),
-      (two_d / 4. + 3. / 2. * math.pi) % (2 * math.pi)]
-    const two_b = 2. * math.phase(matrix[1][0]) - 2. * math.phase(matrix[0][0])
-    const possible_b_half = [two_b / 4. % (2 * math.pi),
-      (two_b / 4. + math.pi / 2.) % (2 * math.pi),
-      (two_b / 4. + math.pi) % (2 * math.pi),
-      (two_b / 4. + 3. / 2. * math.pi) % (2 * math.pi)]
-    const tmp = math.acos(abs(matrix[1][1]))
+  }
+  // Case 3: sin(c/2) != 0 and cos(c/2) !=0:
+  else {
+    const two_a = math.phase(matrix[0][0] * matrix[1][1]) % (2 * math.pi)
+    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * math.pi - TOLERANCE) {
+      // from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
+      // w.l.g. we can choose a==0 because (see U above)
+      // c/2 -> c/2 + pi would have the same effect as as a==0 -> a==pi.
+      a = 0
+    } else {
+      a = two_a / 2.0
+    }
+    const two_d = 2.0 * math.phase(matrix[0][1]) - 2.0 * math.phase(matrix[0][0])
+    const possible_d_half = [two_d / 4.0 % (2 * math.pi),
+      (two_d / 4.0 + math.pi / 2.0) % (2 * math.pi),
+      (two_d / 4.0 + math.pi) % (2 * math.pi),
+      (two_d / 4.0 + 3.0 / 2.0 * math.pi) % (2 * math.pi)]
+    const two_b = 2.0 * math.phase(matrix[1][0]) - 2.0 * math.phase(matrix[0][0])
+    const possible_b_half = [two_b / 4.0 % (2 * math.pi),
+      (two_b / 4.0 + math.pi / 2.0) % (2 * math.pi),
+      (two_b / 4.0 + math.pi) % (2 * math.pi),
+      (two_b / 4.0 + 3.0 / 2.0 * math.pi) % (2 * math.pi)]
+    const tmp = math.acos(math.abs(matrix[1][1]))
     const possible_c_half = [tmp % (2 * math.pi),
       (tmp + math.pi) % (2 * math.pi),
-      (-1. * tmp) % (2 * math.pi),
-      (-1. * tmp + math.pi) % (2 * math.pi)]
-    let found = False
-    for b_half, c_half, d_half in itertools.product(possible_b_half,
-        possible_c_half,
-        possible_d_half):
-    if _test_parameters(matrix, a, b_half, c_half, d_half):
-    found = True
-    break
-    if not found:
-        raise
-    Exception("Couldn't find parameters for matrix ", matrix,
-        "This shouldn't happen. Maybe the matrix is " +
-        "not unitary?")
+      (-1.0 * tmp) % (2 * math.pi),
+      (-1.0 * tmp + math.pi) % (2 * math.pi)]
+    let found = false
+    productLoop3(possible_b_half, possible_c_half, possible_d_half, (b_half, c_half, d_half) => {
+      if (_test_parameters(matrix, a, b_half, c_half, d_half)) {
+        found = true
+        return true
+      }
+    })
+    if (!found) {
+      throw new Error(`Couldn't find parameters for matrix ${matrix},
+        This shouldn't happen. Maybe the matrix is 
+        not unitary?`)
+    }
   }
-  return (a, b_half, c_half, d_half)
+  return [a, b_half, c_half, d_half]
 }
 
 /*
@@ -195,17 +199,17 @@ const _decompose_arb1qubit = (cmd) => {
   const qb = cmd.qubits
   const eng = cmd.engine
   Control(eng, cmd.controlQubits, () => {
-    if(!new Rz(2*d_half).equal(new Rz(0))) {
-      new Rz(2*d_half).or(qb)
+    if (!new Rz(2 * d_half).equal(new Rz(0))) {
+      new Rz(2 * d_half).or(qb)
     }
 
-    if(!new Ry(2*c_half).equal(new Ry(0))) {
+    if (!new Ry(2 * c_half).equal(new Ry(0))) {
       new Ry(2 * c_half).or(qb)
     }
-    if(!new Rz(2 * b_half).equal(new Rz(0))) {
+    if (!new Rz(2 * b_half).equal(new Rz(0))) {
       new Rz(2 * b_half).or(qb)
     }
-    if(a !== 0) {
+    if (a !== 0) {
       new Ph(a).or(qb)
     }
   })

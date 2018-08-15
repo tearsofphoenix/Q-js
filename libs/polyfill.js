@@ -160,7 +160,7 @@ Array.prototype.count = function (item) {
   return count
 }
 
-Array.prototype.remove = function(target) {
+Array.prototype.remove = function (target) {
   let idx = -1
   for (let i = 0; i < this.length; ++i) {
     if (arrayEqual(this[i], target)) {
@@ -173,7 +173,7 @@ Array.prototype.remove = function(target) {
   }
 }
 
-Array.prototype.discard = function(item) {
+Array.prototype.discard = function (item) {
   let idx = this.findIndex(looper => arrayEqual(looper, item))
   while (idx !== -1) {
     this.splice(idx, 1)
@@ -264,4 +264,28 @@ export function narray(item, count) {
     }
   }
   return result
+}
+
+export function productLoop(p1, p2, func) {
+  for (let i = 0; i < p1.length; ++i) {
+    for (let j = 0; j < p2.length; ++j) {
+      const stop = func(p1[i], p2[j])
+      if (stop) {
+        return
+      }
+    }
+  }
+}
+
+export function productLoop3(p1, p2, p3, func) {
+  for (let i = 0; i < p1.length; ++i) {
+    for (let j = 0; j < p2.length; ++j) {
+      for (let k = 0; k < p3.length; ++k) {
+        const stop = func(p1[i], p2[j], p3[k])
+        if (stop) {
+          return
+        }
+      }
+    }
+  }
 }
