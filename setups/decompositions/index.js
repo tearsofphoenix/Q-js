@@ -16,6 +16,7 @@
 import arb1qubit2rzandry from './arb1qubit2rzandry'
 import barrier from './barrier'
 import cnot2cz from './cnot2cz'
+import carb1qubit2cnotrzandry from './carb1qubit2cnotrzandry'
 import entangle from './entangle'
 import globalphase from './globalphase'
 import ph2r from './ph2r'
@@ -33,6 +34,7 @@ export default [
   ...arb1qubit2rzandry,
   ...barrier,
   ...cnot2cz,
+  ...carb1qubit2cnotrzandry,
   ...crz2cxandrz,
   ...cnu2toffoliandcu,
   ...entangle,

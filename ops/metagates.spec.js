@@ -102,7 +102,7 @@ describe('metagates test', () => {
     // Choose gate which does have an inverse defined:
     const invertible_gate = Y
     expect(invertible_gate.getInverse().equal(Y)).to.equal(true)
-    // Check get_inverse(gate)
+    // Check getInverse(gate)
     const inv = getInverse(not_invertible_gate)
     expect(inv instanceof DaggeredGate && inv.gate.equal(not_invertible_gate)).to.equal(true)
     const inv2 = getInverse(invertible_gate)

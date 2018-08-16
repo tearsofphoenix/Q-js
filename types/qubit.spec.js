@@ -26,8 +26,7 @@ const mc = math.complex
 const mm = math.matrix
 
 describe('Qubit test', () => {
-
-  it('should test math complex type', function () {
+  it('should test math complex type', () => {
     const c = mc(1, -1)
     console.log(c.re, c.im)
     const a = mm([[1, 0], [0, 1]])
@@ -74,8 +73,17 @@ describe('Qubit test', () => {
     })
   });
 
-  it('should test basic qubit hash', () => {
+  it('should test basic qubit equal', () => {
+    const fakeEngine = 'Engine'
+    const q1 = new BasicQubit(fakeEngine, 1)
+    const q2 = new BasicQubit(fakeEngine, 2)
+    const q3 = new BasicQubit(null, 3)
+    const q4 = new BasicQubit(fakeEngine, 1)
 
+    expect(q1.equal(q2)).to.equal(false)
+    expect(q1.equal(q3)).to.equal(false)
+    expect(q2.equal(q3)).to.equal(false)
+    expect(q4.equal(q1)).to.equal(true)
   });
 
   class MockMainEngine {

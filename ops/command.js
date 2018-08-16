@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/*
+/**
 This file defines the apply_command function and the Command class.
 
 When a gate is applied to qubits, e.g.,
@@ -46,7 +46,9 @@ import {BasicQubit, Qureg} from '../types/qubit'
 import {markTuple} from '../libs/util'
 import {NotMergeable} from '../meta/error'
 
-/*
+/**
+ * @class Command
+ * @classdesc
 Class used as a container to store commands. If a gate is applied to
 qubits, then the gate and qubits are saved in a command object. Qubits
 are copied into WeakQubitRefs in order to allow early deallocation (would
@@ -70,8 +72,8 @@ and hence adds its LoopTag to the end.
     all_qubits: A tuple of control_qubits + qubits
  */
 export default class Command {
-  /*
-
+  /**
+   * @constructor
 Initialize a Command object.
 
     Note:
@@ -117,7 +119,7 @@ Tags associated with the command.
     return new Command(this.engine, this.gate.copy(), qubits, controlQubits, this.tags.slice(0))
   }
 
-  /*
+  /**
     Get the command object corresponding to the inverse of this command.
 
     Inverts the gate (if possible) and creates a new command object from
@@ -125,13 +127,13 @@ the result.
 
     Raises:
 NotInvertible: If the gate does not provide an inverse (see
-BasicGate.get_inverse)
+BasicGate.getInverse)
      */
   getInverse() {
     return new Command(this.engine, getInverse(this.gate), this.qubits, this.controlQubits, this.tags.slice(0))
   }
 
-  /*
+  /**
     Merge this command with another one and return the merged command
 object.
 
@@ -150,7 +152,7 @@ or can't be merged for other reasons.
     throw new NotMergeable('Command not mergeable')
   }
 
-  /*
+  /**
     Order the given qubits according to their IDs (for unique comparison of
 commands).
 
@@ -176,7 +178,7 @@ Returns: Ordered tuple of quantum registers
     return orderedQubits
   }
 
-  /*
+  /**
     Return nested list of qubit indices which are interchangeable.
 
     Certain qubits can be interchanged (e.g., the qubit order for a Swap
@@ -195,7 +197,7 @@ If we can interchange qubits 0,1 and qubits 3,4,5,
     return this._controlQubits
   }
 
-  /*
+  /**
     Set control_qubits to qubits
 
 Args:
@@ -205,7 +207,7 @@ Args:
     this._controlQubits = nq.sort((a, b) => a.id - b.id).map(q => new BasicQubit(q.engine, q.id))
   }
 
-  /*
+  /**
 
 Add (additional) control qubits to this command object.
 
@@ -224,7 +226,7 @@ in state 1.
     this._controlQubits.sort((a, b) => a.id - b.id)
   }
 
-  /*
+  /**
   Apply a command.
 
     Extracts the qubits-owning (target) engine from the Command object
@@ -234,7 +236,7 @@ and sends the Command to it.
     this.engine.receive([this])
   }
 
-  /*
+  /**
 
 Get all qubits (gate and control qubits).
 
@@ -250,8 +252,7 @@ the quantum registers to which the gate is applied.
     return this._engine
   }
 
-  /*
-
+  /**
 Set / Change engine of all qubits to engine.
 
     Args:

@@ -25,7 +25,7 @@
 Tensor(H) | (qubit1, qubit2) # apply H to qubit #1 and #2
 
 As well as the meta functions
-* get_inverse (Tries to access the get_inverse member function of a gate
+* getInverse (Tries to access the getInverse member function of a gate
 and upon failure returns a DaggeredGate)
 * C (Creates an n-ary controlled version of an arbitrary gate)
 */
@@ -44,8 +44,8 @@ not define one.
     inverse, namely the replacement function run in reverse, while inverting
     all gates. This class enables using this emulation automatically.
 
-    A DaggeredGate is returned automatically when employing the get_inverse-
-function on a gate which does not provide a get_inverse() member function.
+    A DaggeredGate is returned automatically when employing the getInverse-
+function on a gate which does not provide a getInverse() member function.
 
 Example:
     .. code-block:: javascript
@@ -54,7 +54,7 @@ with Dagger(eng):
 MySpecialGate | qubits
 
 will create a DaggeredGate if MySpecialGate does not implement
-get_inverse. If there is a decomposition function available, an auto-
+getInverse. If there is a decomposition function available, an auto-
 replacer engine can automatically replace the inverted gate by a call to
 the decomposition function inside a "with Dagger"-statement.
  */

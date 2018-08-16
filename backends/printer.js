@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).
  *
@@ -27,24 +26,21 @@ import {LogicalQubitIDTag} from '../meta/tag'
 import {BasicQubit} from '../types/qubit'
 import { LastEngineError } from '../meta/error'
 
+/**
+ * CommandPrinter is a compiler engine which prints commands to stdout prior
+ * to sending them on to the next compiler engine.
+ */
 export default class CommandPrinter extends BasicEngine {
-  /*
-  CommandPrinter is a compiler engine which prints commands to stdout prior
-to sending them on to the next compiler engine.
-   */
-  /*
-  Initialize a CommandPrinter.
+  /**
+   *Initialize a CommandPrinter.
 
-    Args:
-accept_input (bool): If accept_input is true, the printer queries
-the user to input measurement results if the CommandPrinter is
-the last engine. Otherwise, all measurements yield
-default_measure.
-default_measure (bool): Default measurement result (if
-    accept_input is False).
-in_place (bool): If in_place is true, all output is written on the
-same line of the terminal.
-   */
+  @param acceptInput {boolean}: If accept_input is true, the printer queries
+  the user to input measurement results if the CommandPrinter is
+  the last engine. Otherwise, all measurements yield
+  @param defaultMeasure {boolean}. Default measurement result (if accept_input is False).
+  @param inPlace {boolean}: If in_place is true, all output is written on the same line of the terminal.
+
+  */
   constructor(acceptInput = true, defaultMeasure = false, inPlace = false) {
     super()
     this._acceptInput = acceptInput
@@ -52,16 +48,12 @@ same line of the terminal.
     this._inPlace = inPlace
   }
 
-  /*
-  Specialized implementation of is_available: Returns True if the
-  CommandPrinter is the last engine (since it can print any command).
+  /**
+    Specialized implementation of is_available: Returns True if the
+    CommandPrinter is the last engine (since it can print any command).
 
-Args:
-    cmd (Command): Command of which to check availability (all
-Commands can be printed).
-Returns:
-    availability (bool): True, unless the next engine cannot handle
-the Command (if there is a next engine).
+    @param cmd {Command}: Command of which to check availability (all Commands can be printed).
+    @return {boolean} True, unless the next engine cannot handle the Command (if there is a next engine).
    */
   isAvailable(cmd) {
     try {
@@ -74,14 +66,13 @@ the Command (if there is a next engine).
     return false
   }
 
-  /*
-  Print a command or, if the command is a measurement instruction and
-the CommandPrinter is the last engine in the engine pipeline: Query
-the user for the measurement result (if accept_input = True) / Set
-the result to 0 (if it's False).
+  /**
+    Print a command or, if the command is a measurement instruction and
+    the CommandPrinter is the last engine in the engine pipeline: Query
+    the user for the measurement result (if accept_input = True) / Set
+    the result to 0 (if it's False).
 
-Args:
-    cmd (Command): Command to print.
+    @param cmd {Command}: Command to print.
    */
   printCMD(cmd) {
     if (this.isLastEngine && cmd.gate.equal(Measure)) {
@@ -111,13 +102,11 @@ Args:
     }
   }
 
-  /*
+  /**
   Receive a list of commands from the previous engine, print the
 commands, and then send them on to the next engine.
 
-    Args:
-command_list (list<Command>): List of Commands to print (and
-potentially send on to the next engine).
+    @param commandList {Array<Command>} List of Commands to print (and potentially send on to the next engine).
    */
   receive(commandList) {
     commandList.forEach((cmd) => {

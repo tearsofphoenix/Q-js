@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/*
+/**
 Contains definitions of standard gates such as
 * Hadamard (H)
 * Pauli-X (X / NOT)
@@ -70,7 +70,7 @@ export class XGate extends SelfInverseGate {
 }
 
 
-// Shortcut (instance of) :class:`projectq.ops.XGate`
+// Shortcut (instance of) `XGate`
 export const X = new XGate()
 export const NOT = X
 
@@ -88,7 +88,7 @@ export class YGate extends SelfInverseGate {
   }
 }
 
-// Shortcut (instance of) :class:`projectq.ops.YGate`
+// Shortcut (instance of) `YGate`
 export const Y = new YGate()
 
 // Pauli-Z gate class
@@ -105,7 +105,7 @@ export class ZGate extends SelfInverseGate {
   }
 }
 
-// Shortcut (instance of) :class:`projectq.ops.ZGate`
+// Shortcut (instance of) `ZGate`
 export const Z = new ZGate()
 
 // S gate class
@@ -122,7 +122,7 @@ export class SGate extends SelfInverseGate {
   }
 }
 
-// Shortcut (instance of) :class:`projectq.ops.SGate`
+// Shortcut (instance of) `SGate`
 export const S = new SGate()
 
 // T gate class
@@ -139,7 +139,7 @@ export class TGate extends BasicGate {
   }
 }
 
-// Shortcut (instance of) :class:`projectq.ops.TGate`
+// Shortcut (instance of) `TGate`
 export const T = new TGate()
 
 // Square-root X gate class
@@ -160,11 +160,13 @@ export class SqrtXGate extends BasicGate {
   }
 }
 
-// Shortcut (instance of) :class:`projectq.ops.SqrtXGate`
+// Shortcut (instance of) `SqrtXGate`
 export const SqrtX = new SqrtXGate()
 
-// Swap gate class (swaps 2 qubits)
-// also self inverse gate
+/**
+ * @class SwapGate
+ * @classdesc Swap gate class (swaps 2 qubits) also self inverse gate
+ */
 export class SwapGate extends BasicMathGate {
   constructor() {
     super((x, y) => [y, x])
@@ -191,10 +193,13 @@ export class SwapGate extends BasicMathGate {
   }
 }
 
-// Shortcut (instance of) :class:`projectq.ops.SwapGate`
+// Shortcut (instance of) `SwapGate`
 export const Swap = new SwapGate()
 
-// Square-root Swap gate class
+/**
+ * @class SqrtSwapGate
+ * @classdesc Square-root Swap gate class
+ */
 export class SqrtSwapGate extends BasicGate {
   constructor() {
     super()
@@ -215,12 +220,12 @@ export class SqrtSwapGate extends BasicGate {
   }
 }
 
-// Shortcut (instance of) :class:`projectq.ops.SqrtSwapGate`
+// Shortcut (instance of) `SqrtSwapGate`
 export const SqrtSwap = new SqrtSwapGate()
 
-/*
-Entangle gate (Hadamard on first qubit, followed by CNOTs applied to all
-other qubits).
+/**
+ * @class EntangleGate
+ * @classdesc gate (Hadamard on first qubit, followed by CNOTs applied to all other qubits).
 */
 export class EntangleGate extends BasicGate {
   toString() {
@@ -233,10 +238,13 @@ export class EntangleGate extends BasicGate {
 }
 
 
-// Shortcut (instance of) :class:`projectq.ops.EntangleGate`
+// Shortcut (instance of) `EntangleGate`
 export const Entangle = new EntangleGate()
 
-// Phase gate (global phase)
+/**
+ * @class Ph
+ * @classdesc Phase gate (global phase)
+ */
 export class Ph extends BasicPhaseGate {
   get matrix() {
     return mm([
@@ -246,6 +254,9 @@ export class Ph extends BasicPhaseGate {
   }
 }
 
+/**
+ * @class Rx
+ */
 export class Rx extends BasicRotationGate {
   get matrix() {
     return mm([
@@ -255,7 +266,9 @@ export class Rx extends BasicRotationGate {
   }
 }
 
-
+/**
+ * @class Ry
+ */
 export class Ry extends BasicRotationGate {
   get matrix() {
     return mm([
@@ -265,7 +278,10 @@ export class Ry extends BasicRotationGate {
   }
 }
 
-// RotationZ gate class
+/**
+ * @class Rz
+ * @classdesc RotationZ gate class
+ */
 export class Rz extends BasicRotationGate {
   get matrix() {
     return mm([
@@ -275,14 +291,19 @@ export class Rz extends BasicRotationGate {
   }
 }
 
-// Phase-shift gate (equivalent to Rz up to a global phase)
+/**
+ * @class R
+ * @classdesc Phase-shift gate (equivalent to Rz up to a global phase)
+ */
 export class R extends BasicPhaseGate {
   get matrix() {
     return mm([[1, 0], [0, mc(Math.cos(this.angle), Math.sin(this.angle))]])
   }
 }
 
-/*
+/**
+ * @class FlushGate
+ * @classdesc
 Flush gate (denotes the end of the circuit).
 
 Note:
@@ -306,13 +327,16 @@ export class FlushGate extends FastForwardingGate {
   }
 }
 
-// Measurement gate class (for single qubits).
+/**
+ * @class MeasureGate
+ * @classdesc Measurement gate class (for single qubits).
+ */
 export class MeasureGate extends FastForwardingGate {
   toString() {
     return 'Measure'
   }
 
-  /*
+  /**
     Previously (ProjectQ <= v0.3.6) MeasureGate/Measure was allowed to be
     applied to any number of quantum registers. Now the MeasureGate/Measure
     is strictly a single qubit gate. In the coming releases the backward
@@ -339,11 +363,14 @@ export class MeasureGate extends FastForwardingGate {
 }
 
 
-// Shortcut (instance of) :class:`projectq.ops.MeasureGate`
+// Shortcut (instance of) `MeasureGate`
 export const Measure = new MeasureGate()
 
 export let Deallocate
 
+/**
+ * @class AllocateQubitGate
+ */
 export class AllocateQubitGate extends ClassicalInstructionGate {
   toString() {
     return 'Allocate'
@@ -354,7 +381,7 @@ export class AllocateQubitGate extends ClassicalInstructionGate {
   }
 }
 
-// Shortcut (instance of) :class:`projectq.ops.AllocateQubitGate`
+// Shortcut (instance of) `AllocateQubitGate`
 export const Allocate = new AllocateQubitGate()
 
 
@@ -368,10 +395,12 @@ export class DeallocateQubitGate extends FastForwardingGate {
   }
 }
 
-// Shortcut (instance of) :class:`projectq.ops.DeallocateQubitGate`
+// Shortcut (instance of) `DeallocateQubitGate`
 Deallocate = new DeallocateQubitGate()
 
-
+/**
+ * @class AllocateDirtyQubitGate
+ */
 export class AllocateDirtyQubitGate extends ClassicalInstructionGate {
   toString() {
     return 'AllocateDirty'
@@ -382,7 +411,7 @@ export class AllocateDirtyQubitGate extends ClassicalInstructionGate {
   }
 }
 
-// Shortcut (instance of) :class:`projectq.ops.AllocateDirtyQubitGate`
+// Shortcut (instance of) AllocateDirtyQubitGate
 export const AllocateDirty = new AllocateDirtyQubitGate()
 
 export let Barrier
@@ -397,7 +426,7 @@ export class BarrierGate extends BasicGate {
   }
 }
 
-// Shortcut (instance of) :class:`projectq.ops.BarrierGate`
+// Shortcut (instance of) BarrierGate
 Barrier = new BarrierGate()
 
 const obj = {}

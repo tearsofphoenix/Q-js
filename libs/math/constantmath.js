@@ -29,12 +29,21 @@ import math from 'mathjs'
 import {Compute, CustomUncompute, Uncompute} from '../../meta/compute'
 import {QFT} from '../../ops/qftgate'
 import {R, Swap, X} from '../../ops/gates'
-import {AddConstant, AddConstantModN, SubConstant, SubConstantModN} from './gates';
+import {
+  AddConstant, AddConstantModN, SubConstant, SubConstantModN
+} from './gates';
 import {tuple} from '../util';
 import {CNOT} from '../../ops/shortcuts';
 import {Control} from '../../meta/control';
 import {len} from '../polyfill';
 
+/*
+    Adds a classical constant c to the quantum integer (qureg) quint using
+    Draper addition.
+
+    Note: Uses the Fourier-transform adder from
+          https://arxiv.org/abs/quant-ph/0008033.
+ */
 export function add_constant(eng, c, quint) {
   Compute(eng, () => QFT.or(quint))
 
@@ -59,13 +68,16 @@ export function add_constant_modN(eng, c, N, quint) {
   assert(c < N && c >= 0)
 
   new AddConstant(c).or(quint)
+
   let ancilla
+
   Compute(eng, () => {
     SubConstant(N).or(quint)
     ancilla = eng.allocateQubit()
     CNOT.or(tuple(quint[quint.length - 1], ancilla))
     Control(eng, ancilla, () => new AddConstant(N).or(quint))
   })
+
   SubConstant(c).or(quint)
 
   CustomUncompute(eng, () => {

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import {BasicMathGate} from '../../ops/basics';
+import math from 'mathjs'
+import {BasicMathGate} from '../../ops/basics'
 
 /*
 Add a constant to a quantum number represented by a quantum register,
@@ -98,7 +98,7 @@ N (int): Number modulo which the addition is carried out.
   corresponding function, so it can be emulated efficiently.
    */
   constructor(a, N) {
-    super(x => [(x + a) % N])
+    super(x => [math.mod(x + a, N)])
     this.a = a
     this.N = N
   }

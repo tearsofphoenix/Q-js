@@ -29,7 +29,7 @@ defined size.
 
     It stores all commands in a dict of lists, where each qubit has its own
 gate pipeline. After adding a gate, it tries to merge / cancel successive
-gates using the get_merged and get_inverse functions of the gate (if
+gates using the get_merged and getInverse functions of the gate (if
     available). For examples, see BasicRotationGate. Once a list corresponding
 to a qubit contains >=m gates, the pipeline is sent on to the next engine.
  */
@@ -141,7 +141,7 @@ IDs (list<int>): IDs of all qubits involved in the command
 
   /*
   Try to merge or even cancel successive gates using the get_merged and
-get_inverse functions of the gate (see, e.g., BasicRotationGate).
+getInverse functions of the gate (see, e.g., BasicRotationGate).
 
     It does so for all qubit command lists.
    */

@@ -41,7 +41,10 @@ import {NotMergeable} from '../meta/error'
 const ANGLE_PRECISION = 12
 const ANGLE_TOLERANCE = 10 ** -ANGLE_PRECISION
 
-// Base class of all gates.
+/**
+ * @class BasicGate
+ * @classdesc Base class of all gates.
+ */
 export class BasicGate {
   /*
     """
@@ -82,18 +85,30 @@ this.set_interchangeable_qubit_indices([[0,1],[2,3,4]])
     this.interchangeableQubitIndices = []
   }
 
+  /**
+   * @throws Error
+   */
   getInverse() {
     throw new Error('BasicGate: No getInverse() implemented.')
   }
 
+  /**
+   * @throws NotMergeable
+   */
   getMerged() {
     throw new NotMergeable('BasicGate: No getMerged() implemented.')
   }
 
+  /**
+   * @throws Error
+   */
   toString() {
     throw new Error('BasicGate: No toString() implemented.')
   }
 
+  /**
+   * @return {String}
+   */
   inspect() {
     return this.toString()
   }
@@ -189,18 +204,13 @@ Args:
   }
 }
 
-/*
-Self-inverse basic gate class.
-
-Automatic implementation of the get_inverse-member function for self-
-                                                                inverse gates.
-
-    Example:
-.. code-block:: javascript
-
-# get_inverse(H) == H, it is a self-inverse gate:
-    get_inverse(H) | qubit
-
+/**
+ * @class SelfInverseGate
+ * @classdesc Self-inverse basic gate class.
+ * Automatic implementation of the getInverse-member function for self-inverse gates.
+ * @code
+   // getInverse(H) == H, it is a self-inverse gate:
+    getInverse(H) | qubit
  */
 export class SelfInverseGate extends BasicGate {
   getInverse() {
@@ -208,8 +218,9 @@ export class SelfInverseGate extends BasicGate {
   }
 }
 
-/*
-
+/**
+ * @class BasicRotationGate
+ * @classdesc
 Defines a base class of a rotation gate.
 
     A rotation gate has a continuous parameter (the angle), labeled 'angle' /
@@ -219,14 +230,11 @@ this.angle. Its inverse is the same gate with the negated argument.
     [0, 4 * pi).
  */
 export class BasicRotationGate extends BasicGate {
-  /*
-
-Initialize a basic rotation gate.
-
-    Args:
-angle (float): Angle of rotation (saved modulo 4 * pi)
-
-     */
+  /**
+   * @constructor
+      Initialize a basic rotation gate.
+    @param angle {Number} Angle of rotation (saved modulo 4 * pi)
+   */
   constructor(angle, ...args) {
     super(...args)
 
@@ -237,7 +245,8 @@ angle (float): Angle of rotation (saved modulo 4 * pi)
     this.angle = rounded_angle
   }
 
-  /*
+  /**
+   * @return {BasicRotationGate}
 Return the inverse of this rotation gate (negate the angle, return new
 object).
      */
@@ -249,22 +258,16 @@ object).
     }
   }
 
-  /*
+  /**
     Return self merged with another gate.
 
     Default implementation handles rotation gate of the same type, where
 angles are simply added.
 
-    Args:
-other: Rotation gate of same type.
-
-    Raises:
-NotMergeable: For non-rotation gates or rotation gates of
-different type.
-
-    Returns:
-New object representing the merged gates.
-     */
+    @param other {(BasicRotationGate|Object)}
+    @throws NotMergeable:  For non-rotation gates or rotation gates of different type.
+    @return {BasicRotationGate} New object representing the merged gates.
+   */
   getMerged(other) {
     if (other instanceof BasicRotationGate) {
       return new this.__proto__.constructor(this.angle + other.angle)
@@ -276,7 +279,7 @@ New object representing the merged gates.
     return `${this.constructor.name}(${this.angle})`
   }
 
-  /*
+  /**
     Return the Latex string representation of a BasicRotationGate.
 
   Returns the class name and the angle as a subscript, i.e.
@@ -284,6 +287,7 @@ New object representing the merged gates.
 .. code-block:: latex
 
   [CLASSNAME]$_[ANGLE]$
+   @return {String}
    */
   texString() {
     return `${this.constructor.name}$_{${this.angle}}$`
@@ -297,8 +301,8 @@ New object representing the merged gates.
   }
 }
 
-/*
-
+/**
+ * @class BasicPhaseGate
 Defines a base class of a phase gate.
 
     A phase gate has a continuous parameter (the angle), labeled 'angle' /
@@ -376,8 +380,8 @@ New object representing the merged gates.
 
 
 // Classical instruction gates never have control qubits.
-/*
-
+/**
+ * @class ClassicalInstructionGate
 Classical instruction gate.
 
     Base class for all gates which are not quantum gates in the typical sense,
@@ -387,7 +391,8 @@ export class ClassicalInstructionGate extends BasicGate {
 
 }
 
-/*
+/**
+ * @class FastForwardingGate
 Base class for classical instruction gates which require a fast-forward
 through compiler engines that cache / buffer gates. Examples include
 Measure and Deallocate, which both should be executed asap, such
@@ -412,7 +417,8 @@ export class FastForwardingGate extends ClassicalInstructionGate {
 
 }
 
-/*
+/**
+ * @class BasicMathGate
 Base class for all math gates.
 
     It allows efficient emulation by providing a mathematical representation
@@ -478,7 +484,7 @@ return math_fun
     this.mathFunc = x => Array.from(mathFunc(...x))
   }
 
-  /*
+  /**
     Return the math function which corresponds to the action of this math
 gate, given the input to the gate (a tuple of quantum registers).
 
@@ -489,7 +495,8 @@ applied.
     Returns:
 math_fun (function): javascript function describing the action of this
 gate. (See BasicMathGate.constructor for an example).
-     */
+   @return {Function}
+   */
   getMathFunction(qubits) {
     return this.mathFunc
   }

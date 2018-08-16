@@ -33,7 +33,7 @@ describe('replacer test', () => {
   const SomeGate = new SomeGateClass()
   const make_decomposition_rule_set = () => {
     const result = new DecompositionRuleSet()
-    // BasicGate with no get_inverse used for testing:
+    // BasicGate with no getInverse used for testing:
     expect(() => SomeGate.getInverse()).to.throw()
 
     // Loading of decomposition rules:

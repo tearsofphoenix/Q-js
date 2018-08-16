@@ -29,7 +29,7 @@ export function get(key) {
 /*
 Return the inverse of a gate.
 
-    Tries to call gate.get_inverse and, upon failure, creates a DaggeredGate
+    Tries to call gate.getInverse and, upon failure, creates a DaggeredGate
 instead.
 
     Args:
@@ -38,7 +38,7 @@ gate: Gate of which to get the inverse
 Example:
     .. code-block:: javascript
 
-get_inverse(H) # returns a Hadamard gate (HGate object)
+getInverse(H) # returns a Hadamard gate (HGate object)
  */
 export function getInverse(gate) {
   try {

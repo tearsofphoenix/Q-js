@@ -21,7 +21,7 @@ import {getInverse} from '../ops/_cycle';
 import {
   BasicMathGate, QFT, Swap, Measure, All, H, X
 } from '../ops';
-import {AutoReplacer, InstructionFilter} from '../cengines';
+import {AutoReplacer, DummyEngine, InstructionFilter} from '../cengines';
 import TagRemover from '../cengines/tagremover';
 import LocalOptimizer from '../cengines/optimize';
 import MainEngine from '../cengines/main';
@@ -30,6 +30,7 @@ import {Control} from '../meta'
 import Simulator from '../backends/simulators/simulator';
 import decompositions from '../setups/decompositions'
 import mathrules from '../libs/math/defaultrules'
+import {expmod} from "../libs/polyfill";
 
 describe('test', () => {
   const rule_set = new DecompositionRuleSet([...mathrules, ...decompositions])
@@ -47,20 +48,25 @@ describe('test', () => {
   }
 
 
-  function get_main_engine(sim) {
+  function get_main_engine(sim, dummy) {
     const engine_list = [new AutoReplacer(rule_set),
       new InstructionFilter(high_level_gates),
       new TagRemover(),
       new LocalOptimizer(3),
       new AutoReplacer(rule_set),
       new TagRemover(),
-      new LocalOptimizer(3)]
+      new LocalOptimizer(3)
+    ]
+    if (dummy) {
+      engine_list.push(dummy)
+    }
     return new MainEngine(sim, engine_list)
   }
 
   it('should ', () => {
     const sim = new Simulator()
-    const eng = get_main_engine(sim)
+    const dummy = new DummyEngine(true)
+    const eng = get_main_engine(dummy, sim)
 
     const ctrl_qubit = eng.allocateQubit()
 
@@ -72,12 +78,12 @@ describe('test', () => {
 
     H.or(ctrl_qubit)
     let cheat_tpl = sim.cheat()
-    Control(eng, ctrl_qubit, () => new MultiplyByConstantModN(math.pow(a, 2 ** 7) % N, N).or(x))
+    Control(eng, ctrl_qubit, () => new MultiplyByConstantModN(expmod(a, 2 ** 7, N), N).or(x))
     cheat_tpl = sim.cheat()
     H.or(ctrl_qubit)
     cheat_tpl = sim.cheat()
     eng.flush()
-
+    dummy.receivedCommands.forEach(cmd => console.log(cmd.toString()))
     cheat_tpl = sim.cheat()
     let idx = cheat_tpl[0][ctrl_qubit[0].id]
     let vec = cheat_tpl[1]

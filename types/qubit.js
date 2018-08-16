@@ -36,43 +36,49 @@ qubit goes out of scope.
 deallocated.
 */
 import {arrayEqual} from '../libs/polyfill'
-/*
-BasicQubit objects represent qubits.
 
-    They have an id and a reference to the owning engine.
+/**
+ * @class BasicQubit
+ * objects represent qubits. They have an id and a reference to the owning engine.
  */
 export class BasicQubit {
-  /*
-
-Initialize a BasicQubit object.
-
-    Args:
-engine: Owning engine / engine that created the qubit
-idx: Unique index of the qubit referenced by this qubit
-     */
+  /**
+   *  @constructor Initialize a BasicQubit object.
+   *  @param engine {BasicEngine} Owning engine / engine that created the qubit
+   *  @param idx {number} Unique index of the qubit referenced by this qubit
+   */
   constructor(engine, idx) {
     this.engine = engine
     this.id = idx
   }
 
-  /*
+  /**
     Return string representation of this qubit.
-     */
+   @return {string}
+   */
   toString() {
     return `${this.id}`
   }
 
+  /**
+   *
+   * @return {string}
+   */
   inspect() {
     return this.toString()
   }
-  /*
-        Access the result of a previous measurement and return False / True (0 / 1)
-        @return bool
-     */
+
+  /**
+    Access the result of a previous measurement and return False / True (0 / 1)
+    @return {bool}
+  */
   toBoolean() {
     return this.engine.main.getMeasurementResult(this)
   }
 
+  /**
+   * @return {number}
+   */
   toNumber() {
     return this.toBoolean() ? 1 : 0
   }
@@ -81,27 +87,17 @@ idx: Unique index of the qubit referenced by this qubit
     return this.toBoolean()
   }
 
-  /*
-  Compare with other qubit (Returns True if equal id and engine).
-
-  Args:
-      other (BasicQubit): BasicQubit to which to compare this one
-  */
+  /**
+   * Compare with other qubit (Returns True if equal id and engine).
+   *
+   * @param other {BasicQubit|Object} BasicQubit to which to compare this one
+   * @return {bool}
+   */
   equal(other) {
-    return other instanceof BasicQubit && this.id === other.id && this.engine === other.engine
-  }
-
-  /*
-    Return the hash of this qubit.
-
-    Hash definition because of custom __eq__.
-    Enables storing a qubit in, e.g., a set.
-     */
-  Hash() {
-    if (this.id === -1) {
-      return this
+    if (this === other) {
+      return true
     }
-    return this.engine + this.id
+    return other instanceof BasicQubit && this.id === other.id && this.engine === other.engine
   }
 
   weakCopy() {
@@ -185,7 +181,7 @@ export function Qureg(...args) {
 
 Qureg.prototype = Object.create(Array.prototype)
 
-Qureg.prototype.equal = function(other) {
+Qureg.prototype.equal = function (other) {
   if (other instanceof Qureg) {
     return arrayEqual(this, other, (x, y) => x.equal(y))
   }
@@ -206,11 +202,11 @@ Qureg.prototype.toBoolean = function () {
     + '"than 1 qubit. Use __bool__(qureg[idx]) instead.')
 }
 
-Qureg.prototype.toNumber = function() {
+Qureg.prototype.toNumber = function () {
   return this.toBoolean() ? 1 : 0
 }
 
-Qureg.prototype.toString = function() {
+Qureg.prototype.toString = function () {
   if (this.length === 0) return 'Qureg[]'
   const ids = this.slice(1).map(({id}) => id)
   ids.push(null) // Forces a flush on last loop iteration.
@@ -236,12 +232,12 @@ Qureg.prototype.toString = function() {
   return `Qureg[${out_list.join(', ')}]`
 }
 
-Qureg.prototype.add = function(other) {
+Qureg.prototype.add = function (other) {
   const array = this.concat(other)
   return new Qureg(array)
 }
 
-Qureg.prototype.deallocate = function() {
+Qureg.prototype.deallocate = function () {
   this.forEach(qubit => qubit.deallocate())
   this.length = 0
 }

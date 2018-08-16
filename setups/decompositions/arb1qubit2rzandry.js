@@ -90,7 +90,8 @@ export const _find_parameters = (matrix) => {
   const mm = math.multiply
   // Case 1: sin(c/2) == 0:
   if (math.abs(matrix[0][1]) < TOLERANCE) {
-    const two_a = phase(mm(matrix[0][0], matrix[1][1])) % (2 * math.pi)
+    const t = phase(mm(matrix[0][0], matrix[1][1]))
+    const two_a = math.mod(t, 2 * math.pi)
     if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * math.pi - TOLERANCE) {
       // from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
       // w.l.g. we can choose a==0 because (see U above)
@@ -101,7 +102,7 @@ export const _find_parameters = (matrix) => {
     }
     d_half = 0 // w.l.g
     const b = phase(matrix[1][1]) - phase(matrix[0][0])
-    const possible_b_half = [(b / 2.0) % (2 * math.pi), (b / 2.0 + math.pi) % (2 * math.pi)]
+    const possible_b_half = [math.mod(b / 2.0, 2 * math.pi), math.mod(b / 2.0 + math.pi, 2 * math.pi)]
     // As we have fixed a, we need to find correct sign for cos(c/2)
     const possible_c_half = [0.0, math.pi]
     let found = false
@@ -122,7 +123,8 @@ export const _find_parameters = (matrix) => {
   }
   // Case 2: cos(c/2) == 0:
   else if (math.abs(matrix[0][0]) < TOLERANCE) {
-    const two_a = phase(mm(mm(matrix[0][1], matrix[1][0]), -1)) % (2 * math.pi)
+    const t = phase(mm(mm(matrix[0][1], matrix[1][0]), -1))
+    const two_a = math.mod(t, 2 * math.pi)
     if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * math.pi - TOLERANCE) {
       // from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
       // w.l.g. we can choose a==0 because (see U above)
@@ -133,7 +135,7 @@ export const _find_parameters = (matrix) => {
     }
     d_half = 0 // w.l.g
     const b = phase(matrix[1][0]) - phase(matrix[0][1]) + math.pi
-    const possible_b_half = [(b / 2.0) % (2 * math.pi), (b / 2.0 + math.pi) % (2 * math.pi)]
+    const possible_b_half = [math.mod(b / 2.0, 2 * math.pi), math.mod(b / 2.0 + math.pi, 2 * math.pi)]
     // As we have fixed a, we need to find correct sign for sin(c/2)
     const possible_c_half = [math.pi / 2.0, 3.0 / 2.0 * math.pi]
     let found = false
@@ -153,7 +155,8 @@ export const _find_parameters = (matrix) => {
   }
   // Case 3: sin(c/2) != 0 and cos(c/2) !=0:
   else {
-    const two_a = phase(mm(matrix[0][0], matrix[1][1])) % (2 * math.pi)
+    const t = phase(mm(matrix[0][0], matrix[1][1]))
+    const two_a = math.mod(t, 2 * math.pi)
     if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * math.pi - TOLERANCE) {
       // from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
       // w.l.g. we can choose a==0 because (see U above)
@@ -163,20 +166,23 @@ export const _find_parameters = (matrix) => {
       a = two_a / 2.0
     }
     const two_d = 2.0 * phase(matrix[0][1]) - 2.0 * phase(matrix[0][0])
-    const possible_d_half = [two_d / 4.0 % (2 * math.pi),
-      (two_d / 4.0 + math.pi / 2.0) % (2 * math.pi),
-      (two_d / 4.0 + math.pi) % (2 * math.pi),
-      (two_d / 4.0 + 3.0 / 2.0 * math.pi) % (2 * math.pi)]
+    const possible_d_half = [
+      math.mod(two_d / 4.0, 2 * math.pi),
+      math.mod(two_d / 4.0 + math.pi / 2.0, 2 * math.pi),
+      math.mod(two_d / 4.0 + math.pi, 2 * math.pi),
+      math.mod(two_d / 4.0 + 3.0 / 2.0 * math.pi, 2 * math.pi)]
     const two_b = 2.0 * phase(matrix[1][0]) - 2.0 * phase(matrix[0][0])
-    const possible_b_half = [two_b / 4.0 % (2 * math.pi),
-      (two_b / 4.0 + math.pi / 2.0) % (2 * math.pi),
-      (two_b / 4.0 + math.pi) % (2 * math.pi),
-      (two_b / 4.0 + 3.0 / 2.0 * math.pi) % (2 * math.pi)]
+    const possible_b_half = [
+      math.mod(two_b / 4.0, 2 * math.pi),
+      math.mod(two_b / 4.0 + math.pi / 2.0, 2 * math.pi),
+      math.mod(two_b / 4.0 + math.pi, 2 * math.pi),
+      math.mod(two_b / 4.0 + 3.0 / 2.0 * math.pi, 2 * math.pi)]
     const tmp = math.acos(math.abs(matrix[1][1]))
-    const possible_c_half = [tmp % (2 * math.pi),
-      (tmp + math.pi) % (2 * math.pi),
-      (-1.0 * tmp) % (2 * math.pi),
-      (-1.0 * tmp + math.pi) % (2 * math.pi)]
+    const possible_c_half = [
+      math.mod(tmp, 2 * math.pi),
+      math.mod(tmp + math.pi, 2 * math.pi),
+      math.mod(-1.0 * tmp, 2 * math.pi),
+      math.mod(-1.0 * tmp + math.pi, 2 * math.pi)]
     let found = false
     productLoop3(possible_b_half, possible_c_half, possible_d_half, (_b, _c, _d) => {
       b_half = _b

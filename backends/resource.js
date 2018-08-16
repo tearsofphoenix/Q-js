@@ -27,7 +27,8 @@ import {genString} from '../libs/util'
 function parseStringKey(key) {
   return key.split(',')
 }
-/*
+
+/**
 ResourceCounter is a compiler engine which counts the number of gates and
 max. number of active qubits.
 
@@ -43,8 +44,12 @@ given point).
 Properties:
   depth_of_dag (int): It is the longest path in the directed
 acyclic graph (DAG) of the program.
+ @class ResourceCounter
  */
 export default class ResourceCounter extends BasicEngine {
+  /**
+   * @constructor
+   */
   constructor() {
     super()
     this.gate_counts = {}
@@ -56,17 +61,12 @@ export default class ResourceCounter extends BasicEngine {
     this._previous_max_depth = 0
   }
 
-  /*
-  Specialized implementation of is_available: Returns True if the
-  ResourceCounter is the last engine (since it can count any command).
+  /**
+    Specialized implementation of is_available: Returns True if the
+    ResourceCounter is the last engine (since it can count any command).
 
-Args:
-  cmd (Command): Command for which to check availability (all
-Commands can be counted).
-
-Returns:
-  availability (bool): True, unless the next engine cannot handle
-the Command (if there is a next engine).
+    @param cmd {Command}: Command for which to check availability (all Commands can be counted).
+    @return {boolean} True, unless the next engine cannot handle the Command (if there is a next engine).
    */
   isAvailable(cmd) {
     try {
@@ -75,6 +75,7 @@ the Command (if there is a next engine).
       if (e instanceof LastEngineError) {
         return true
       }
+      return false
     }
   }
 
@@ -87,6 +88,10 @@ the Command (if there is a next engine).
     }
   }
 
+  /**
+   *
+   * @param cmd {Command}
+   */
   addCMD(cmd) {
     const qid = cmd.qubits[0][0].id
     if (cmd.gate.equal(Allocate)) {
@@ -168,13 +173,12 @@ the Command (if there is a next engine).
     })
   }
 
-  /*
+  /**
   Return the string representation of this ResourceCounter.
 
-  Returns:
-A summary (string) of resources used, including gates, number of
-calls, and max. number of qubits that were active at the same
-time.
+  @return {String}
+    A summary (string) of resources used, including gates, number of
+    calls, and max. number of qubits that were active at the same time.
    */
   toString() {
     if (Object.keys(this.gate_counts).length > 0) {

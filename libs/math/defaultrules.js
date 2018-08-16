@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import {add_constant, add_constant_modN, mul_by_constant_modN} from "./constantmath";
-import {Control} from "../../meta/control";
-import DecompositionRule from "../../cengines/replacer/decompositionrule";
-import {AddConstant, AddConstantModN, MultiplyByConstantModN} from "./gates";
+import {add_constant, add_constant_modN, mul_by_constant_modN} from './constantmath';
+import {Control} from '../../meta/control';
+import DecompositionRule from '../../cengines/replacer/decompositionrule';
+import {AddConstant, AddConstantModN, MultiplyByConstantModN} from './gates';
 
 function _replace_addconstant(cmd) {
   const eng = cmd.engine
@@ -28,7 +28,7 @@ function _replace_addconstant(cmd) {
 }
 
 
-function _replace_addconstmodN(cmd){
+function _replace_addconstmodN(cmd) {
   const eng = cmd.engine
   const c = cmd.gate.a
   const N = cmd.gate.N
