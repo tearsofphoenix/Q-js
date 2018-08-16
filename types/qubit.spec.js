@@ -38,6 +38,7 @@ describe('Qubit test', () => {
     const fakeEngine = 'Fake'
     const qubit = new BasicQubit(fakeEngine, qubitID)
     expect(qubit.toString()).to.equal(qubitID.toString())
+    expect(qubit.toString()).to.equal(qubit.inspect())
   });
 
   it('should test basic qubit measurement', () => {
@@ -49,6 +50,8 @@ describe('Qubit test', () => {
 
     expect(qubit0.toBoolean()).to.equal(false)
     expect(qubit1.toBoolean()).to.equal(true)
+    expect(qubit0.toNumber()).to.equal(0)
+    expect(qubit1.toNumber()).to.equal(1)
   });
 
   it('should test basic qubit comparison', () => {
@@ -151,6 +154,8 @@ describe('Qubit test', () => {
 
     expect(qureg0.toBoolean()).to.equal(false)
     expect(qureg1.toBoolean()).to.equal(true)
+    expect(qureg0.toNumber()).to.equal(0)
+    expect(qureg1.toNumber()).to.equal(1)
   });
 
   it('should qureg measure exception', () => {
@@ -170,7 +175,7 @@ describe('Qubit test', () => {
     const qureg = new Qureg([new Qubit(eng1, 0), new Qubit(eng1, 1)])
     expect(eng1).to.equal(qureg.engine)
     qureg.engine = eng2
-    expect(qureg[0].engine == eng2 && qureg[1].engine == eng2).to.equal(true)
+    expect(qureg[0].engine === eng2 && qureg[1].engine === eng2).to.equal(true)
   });
 
   it('should idempotent del', () => {
@@ -183,6 +188,47 @@ describe('Qubit test', () => {
     assert(rec.receivedCommands.length === 1)
     q.deallocate()
     assert(rec.receivedCommands.length === 1)
+  });
+
+  it('should test qureg deallocate', () => {
+    const rec = new DummyEngine(true)
+    const eng = new MainEngine(rec, [])
+    const q = eng.allocateQureg(1)
+    rec.receivedCommands = []
+    assert(rec.receivedCommands.length === 0)
+    q.deallocate()
+    assert(rec.receivedCommands.length === 1)
+    q.deallocate()
+    assert(rec.receivedCommands.length === 1)
+  });
+
+  it('should test qureg to Number', function () {
+    const rec = new DummyEngine(true)
+    const eng = new MainEngine(rec, [])
+    const q = eng.allocateQureg(2)
+    expect(() => q.toNumber()).to.throw()
+    expect(() => q.toBoolean()).to.throw()
+
+    const q2 = eng.allocateQureg(1)
+    expect(() => q2.toNumber()).to.throw()
+  });
+
+  it('should test qureg equal', function () {
+    const rec = new DummyEngine(true)
+    const eng = new MainEngine(rec, [])
+    const q = eng.allocateQureg(2)
+    const q2 = eng.allocateQureg(2)
+    const q3 = new Qureg(...q)
+    expect(q.equal(q2)).to.equal(false)
+    expect(q.equal(q3)).to.equal(true)
+    expect(q.equal(new Array(...q))).to.equal(false)
+  });
+
+  it('should test basic qubit array copy', function () {
+    const q = new BasicQubit(null, 0)
+    const array = [q]
+    const copy = BasicQubit.copyArray(array)
+    expect(array).to.deep.equal(copy)
   });
 
   it('should idempotent del on failure', () => {

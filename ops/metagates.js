@@ -33,7 +33,6 @@ import math from 'mathjs'
 import {BasicGate} from './basics'
 import {Control} from '../meta/control'
 import Cycle, {getInverse} from './_cycle'
-import { Y } from './gates'
 import { arrayIsTuple } from '../libs/util'
 
 /*

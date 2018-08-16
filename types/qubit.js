@@ -83,10 +83,6 @@ export class BasicQubit {
     return this.toBoolean() ? 1 : 0
   }
 
-  valueOf() {
-    return this.toBoolean()
-  }
-
   /**
    * Compare with other qubit (Returns True if equal id and engine).
    *

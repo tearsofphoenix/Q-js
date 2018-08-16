@@ -27,34 +27,6 @@ export function _recognize_carb1qubit(cmd) {
   return false
 }
 
-function matrixAllClose(m1, m2, tolerance = 1e-12) {
-  const row = m1.length
-  const column = m2.length
-  for (let i = 0; i < row; ++i) {
-    for (let j = 0; j < column; ++j) {
-      const a = m1[i][j]
-      const b = m2[i][j]
-      if (typeof a === 'number') {
-        if (typeof b === 'number') {
-          if (Math.abs(a - b) > tolerance) {
-            return false
-          }
-        } else if (Math.abs(a - b.re) > tolerance || Math.abs(b.im) > tolerance) {
-          return false
-        }
-      } else if (typeof b === 'number') {
-        if (Math.abs(a.re - b) > tolerance || Math.abs(a.im) > tolerance) {
-          return false
-        }
-      } else if (Math.abs(a.re - b.re) > tolerance || Math.abs(a.im - b.im) > tolerance) {
-        return false
-      }
-    }
-  }
-
-  return true
-}
-
 /*
 It builds matrix V with parameters (a, b, c/2) and compares against
 matrix.
