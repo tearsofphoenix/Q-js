@@ -43,21 +43,24 @@ import MainEngine from '../cengines/main';
 import Simulator from '../backends/simulators/simulator';
 import decompositions from '../setups/decompositions'
 import mathRules from '../libs/math/defaultrules'
+import {expmod} from "../libs/polyfill";
 
 function run_shor(eng, N, a, verbose = false) {
-  const n = Math.ceil(Math.log(N, 2))
+  const n = Math.ceil(Math.log2(N))
 
   const x = eng.allocateQureg(n)
 
   X.or(x[0])
 
-  const measurements = [0] * (2 * n) // will hold the 2n measurement results
-
+  const measurements = new Array(2 * n) // will hold the 2n measurement results
+  for (let i = 0; i < 2 * n; ++i) {
+    measurements[i] = 0
+  }
   const ctrl_qubit = eng.allocateQubit()
 
   for (let k = 0; k < 2 * n; ++k) {
     const t = 1 << (2 * n - 1 - k)
-    const current_a = math.mod(math.pow(a, t), N)
+    const current_a = expmod(a, t, N)
     // one iteration of 1-qubit QPE
     H.or(ctrl_qubit)
 
@@ -157,7 +160,7 @@ if (g !== 1) {
   if (r % 2 !== 0) {
     r *= 2
   }
-  const apowrhalf = math.pow(a, r >> 1) % N
+  const apowrhalf = expmod(a, r >> 1, N)
   let f1 = math.gcd(apowrhalf + 1, N)
   let f2 = math.gcd(apowrhalf - 1, N)
   if (f1 * f2 !== N && f1 * f2 > 1 && Math.floor(1.0 * N / (f1 * f2)) * f1 * f2 === N) {

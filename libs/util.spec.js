@@ -21,6 +21,7 @@ import {
 import {HGate} from '../ops/gates'
 import {BasicGate, SelfInverseGate} from '../ops/basics'
 import {Qureg} from '../types/qubit'
+import {expmod} from "./polyfill";
 
 describe('util test', () => {
   it('should test class hierachy 1', () => {
@@ -55,5 +56,13 @@ describe('util test', () => {
     const v = math.matrix([1, 2])
     const result = matrixDot(m, v)
     expect(result).to.deep.equal(math.matrix([5, 11]))
+  });
+
+  it('should test expmod', function () {
+    expect(expmod(2, 10, 3)).to.equal(1)
+    expect(expmod(3, 200, 6)).to.equal(3)
+    expect(expmod(6, 278, 65)).to.equal(36)
+    expect(expmod(7, 399, 165)).to.equal(118)
+    expect(expmod(67, 32768, 212)).to.equal(81)
   });
 })
