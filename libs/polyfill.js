@@ -173,14 +173,6 @@ Array.prototype.remove = function (target) {
   }
 }
 
-Array.prototype.discard = function (item) {
-  let idx = this.findIndex(looper => arrayEqual(looper, item))
-  while (idx !== -1) {
-    this.splice(idx, 1)
-    idx = this.findIndex(looper => arrayEqual(looper, item))
-  }
-}
-
 String.prototype.count = function (substring) {
   const exp = new RegExp(substring, 'g')
   const result = this.match(exp)

@@ -131,14 +131,6 @@ export function genString(item, n) {
   return str
 }
 
-export function matrixAppend(m, m1) {
-  const oldCount = m.size()[0]
-  m.resize([oldCount + m1.size()[0]])
-  m1.forEach((value, index) => {
-    m.subset(math.index(oldCount + index[0]), value)
-  })
-}
-
 export function matrixRangeAssign(matrix, indices, vector) {
   if (Array.isArray(vector)) {
     indices.forEach(idx => matrix.subset(math.index(idx), vector[idx]))

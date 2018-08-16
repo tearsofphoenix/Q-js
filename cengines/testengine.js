@@ -34,6 +34,9 @@ export class CompareEngine extends BasicEngine {
     return true
   }
 
+  /**
+   * @param cmd {Command}
+   */
   cacheCMD(cmd) {
     // are there qubit ids that haven't been added to the list?
     const allQubitIDList = []
@@ -67,6 +70,12 @@ export class CompareEngine extends BasicEngine {
     }
   }
 
+  /**
+   * test if c1 & c2 are equal
+   * @param c1 {Command}
+   * @param c2 {Command}
+   * @returns {boolean}
+   */
   compareCMDs(c1, c2) {
     const item = c2.copy()
     item.engine = c1.engine
@@ -108,16 +117,20 @@ export class CompareEngine extends BasicEngine {
   }
 }
 
-/*
-DummyEngine used for testing.
-
-                         The DummyEngine forwards all commands directly to next engine.
+/**
+ * @class DummyEngine
+   @classdesc DummyEngine used for testing.
+    The DummyEngine forwards all commands directly to next engine.
     If this.is_last_engine == True it just discards all gates.
     By setting save_commands == True all commands get saved as a
-list in this.received_commands. Elements are appended to this
-list so they are ordered according to when they are received.
+    list in this.received_commands. Elements are appended to this
+    list so they are ordered according to when they are received.
  */
 export class DummyEngine extends BasicEngine {
+  /**
+     * @constructor
+     * @param saveCommands {boolean} default is false
+     */
   constructor(saveCommands = false) {
     super()
     this.saveCommands = saveCommands

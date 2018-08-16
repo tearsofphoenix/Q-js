@@ -1,5 +1,4 @@
 import {expect} from 'chai'
-import math from 'mathjs'
 import {
   Measure,
   Ph, Rx, Ry, X, XGate
@@ -18,46 +17,46 @@ import {AutoReplacer, InstructionFilter} from '../../cengines/replacer/replacer'
 import {All} from '../../ops/metagates';
 
 describe('cnu 2 toffoli and cu test', () => {
-  // it('should test_recognize_correct_gates', () => {
-  //   const saving_backend = new DummyEngine(true)
-  //   const eng = new MainEngine(saving_backend)
-  //   const qubit = eng.allocateQubit()
-  //   const ctrl_qureg = eng.allocateQureg(2)
-  //   const ctrl_qureg2 = eng.allocateQureg(3)
-  //   eng.flush()
-  //   Control(eng, ctrl_qureg, () => {
-  //     new Ph(0.1).or(qubit)
-  //     new Ry(0.2).or(qubit)
-  //   })
-  //
-  //   Control(eng, ctrl_qureg2, () => {
-  //     QFT.or(qubit.concat(ctrl_qureg))
-  //     X.or(qubit)
-  //   })
-  //   eng.flush() // To make sure gates arrive before deallocate gates
-  //   eng.flush(true)
-  //   // Don't test initial 6 allocate and flush and trailing deallocate
-  //   // and two flush gates.
-  //   const cmds = saving_backend.receivedCommands
-  //   cmds.slice(7, cmds.length - 8).forEach(cmd => expect(_recognize_CnU(cmd)).to.equal(true))
-  // });
-  //
-  // it('should test_recognize_incorrect_gates', () => {
-  //   const saving_backend = new DummyEngine(true)
-  //   const eng = new MainEngine(saving_backend)
-  //   const qubit = eng.allocateQubit()
-  //   const ctrl_qubit = eng.allocateQubit()
-  //   const ctrl_qureg = eng.allocateQureg(2)
-  //   eng.flush()
-  //
-  //   Control(eng, ctrl_qubit, () => new Rx(0.3).or(qubit))
-  //   X.or(qubit)
-  //
-  //   Control(eng, ctrl_qureg, () => X.or(qubit))
-  //   eng.flush(true)
-  //
-  //   saving_backend.receivedCommands.forEach(cmd => expect(_recognize_CnU(cmd)).to.equal(false))
-  // });
+  it('should test_recognize_correct_gates', () => {
+    const saving_backend = new DummyEngine(true)
+    const eng = new MainEngine(saving_backend)
+    const qubit = eng.allocateQubit()
+    const ctrl_qureg = eng.allocateQureg(2)
+    const ctrl_qureg2 = eng.allocateQureg(3)
+    eng.flush()
+    Control(eng, ctrl_qureg, () => {
+      new Ph(0.1).or(qubit)
+      new Ry(0.2).or(qubit)
+    })
+
+    Control(eng, ctrl_qureg2, () => {
+      QFT.or(qubit.concat(ctrl_qureg))
+      X.or(qubit)
+    })
+    eng.flush() // To make sure gates arrive before deallocate gates
+    eng.flush(true)
+    // Don't test initial 6 allocate and flush and trailing deallocate
+    // and two flush gates.
+    const cmds = saving_backend.receivedCommands
+    cmds.slice(7, cmds.length - 8).forEach(cmd => expect(_recognize_CnU(cmd)).to.equal(true))
+  });
+
+  it('should test_recognize_incorrect_gates', () => {
+    const saving_backend = new DummyEngine(true)
+    const eng = new MainEngine(saving_backend)
+    const qubit = eng.allocateQubit()
+    const ctrl_qubit = eng.allocateQubit()
+    const ctrl_qureg = eng.allocateQureg(2)
+    eng.flush()
+
+    Control(eng, ctrl_qubit, () => new Rx(0.3).or(qubit))
+    X.or(qubit)
+
+    Control(eng, ctrl_qureg, () => X.or(qubit))
+    eng.flush(true)
+
+    saving_backend.receivedCommands.forEach(cmd => expect(_recognize_CnU(cmd)).to.equal(false))
+  });
 
   it('should test_decomposition', () => {
     const _decomp_gates = (eng, cmd) => {
@@ -83,10 +82,12 @@ describe('cnu 2 toffoli and cu test', () => {
       const test_eng = new MainEngine(new Simulator(), [new AutoReplacer(rule_set),
         new InstructionFilter(_decomp_gates), test_dummy_eng])
       const test_sim = test_eng.backend
+
       const correct_sim = correct_eng.backend
       const correct_qb = correct_eng.allocateQubit()
       const correct_ctrl_qureg = correct_eng.allocateQureg(3)
       correct_eng.flush()
+
       const test_qb = test_eng.allocateQubit()
       const test_ctrl_qureg = test_eng.allocateQureg(3)
       test_eng.flush()
@@ -98,13 +99,13 @@ describe('cnu 2 toffoli and cu test', () => {
       Control(test_eng, test_ctrl_qureg, () => new Ry(0.6).or(test_qb))
 
       Control(correct_eng, correct_ctrl_qureg.slice(0, 2), () => new Rx(0.4).or(correct_qb))
-      Control(correct_eng, correct_ctrl_qureg, new Ry(0.6).or(correct_qb))
+      Control(correct_eng, correct_ctrl_qureg, () => new Ry(0.6).or(correct_qb))
 
       test_eng.flush()
       correct_eng.flush()
 
       expect(len(correct_dummy_eng.receivedCommands)).to.equal(8)
-      test_dummy_eng.receivedCommands.forEach(cmd => console.log(cmd.toString()))
+      correct_dummy_eng.receivedCommands.forEach(cmd => console.log(cmd.toString()))
       expect(len(test_dummy_eng.receivedCommands)).to.equal(20)
 
       for (let fstate = 0; fstate < 16; ++fstate) {
@@ -118,7 +119,6 @@ describe('cnu 2 toffoli and cu test', () => {
 
         const test = test_sim.getAmplitude(binary_state, test_qb.concat(test_ctrl_qureg))
         const correct = correct_sim.getAmplitude(binary_state, correct_qb.concat(correct_ctrl_qureg))
-        console.log(test, correct)
         expect(test.re).to.be.closeTo(correct.re, 1e-12)
       }
 

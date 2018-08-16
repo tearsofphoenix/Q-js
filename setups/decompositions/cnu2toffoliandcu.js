@@ -42,7 +42,7 @@ export const _decompose_CnU = (cmd) => {
     }
   })
 
-  Control(eng, ancilla_qureg.slice(0, ancilla_qureg.length - 1), () => gate.or(qubits))
+  Control(eng, ancilla_qureg[ancilla_qureg.length - 1], () => gate.or(qubits))
   Uncompute(eng)
 }
 
