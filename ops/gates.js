@@ -40,6 +40,9 @@ import {getInverse} from './_cycle'
 const mc = math.complex
 const mm = math.matrix
 
+/**
+ * @class HGate
+ */
 export class HGate extends SelfInverseGate {
   toString() {
     return 'H'
@@ -55,6 +58,9 @@ export class HGate extends SelfInverseGate {
 
 export const H = new HGate()
 
+/**
+ * @class XGate
+ */
 // Pauli-X gate class
 export class XGate extends SelfInverseGate {
   toString() {
@@ -74,6 +80,9 @@ export class XGate extends SelfInverseGate {
 export const X = new XGate()
 export const NOT = X
 
+/**
+ * @class YGate
+ */
 // Pauli-Y gate class
 export class YGate extends SelfInverseGate {
   toString() {
@@ -91,6 +100,9 @@ export class YGate extends SelfInverseGate {
 // Shortcut (instance of) `YGate`
 export const Y = new YGate()
 
+/**
+ * @class ZGate
+ */
 // Pauli-Z gate class
 export class ZGate extends SelfInverseGate {
   toString() {
@@ -108,6 +120,9 @@ export class ZGate extends SelfInverseGate {
 // Shortcut (instance of) `ZGate`
 export const Z = new ZGate()
 
+/**
+ * @class SGate
+ */
 // S gate class
 export class SGate extends SelfInverseGate {
   toString() {
@@ -125,6 +140,9 @@ export class SGate extends SelfInverseGate {
 // Shortcut (instance of) `SGate`
 export const S = new SGate()
 
+/**
+ * @class TGate
+ */
 // T gate class
 export class TGate extends BasicGate {
   get matrix() {
@@ -142,6 +160,9 @@ export class TGate extends BasicGate {
 // Shortcut (instance of) `TGate`
 export const T = new TGate()
 
+/**
+ * @class SqrtXGate
+ */
 // Square-root X gate class
 export class SqrtXGate extends BasicGate {
   get matrix() {
@@ -384,7 +405,9 @@ export class AllocateQubitGate extends ClassicalInstructionGate {
 // Shortcut (instance of) `AllocateQubitGate`
 export const Allocate = new AllocateQubitGate()
 
-
+/**
+ * @class DeallocateQubitGate
+ */
 export class DeallocateQubitGate extends FastForwardingGate {
   toString() {
     return 'Deallocate'

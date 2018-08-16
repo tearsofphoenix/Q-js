@@ -28,11 +28,12 @@ import {ComputeTag, UncomputeTag} from './tag'
 import {dropEngineAfter, insertEngine} from './util'
 import {Allocate, Deallocate} from '../ops/gates'
 import {
-  unionSet, setEqual, setIsSuperSet, intersection, symmetricDifference
+  unionSet, setEqual, setIsSuperSet, intersection
 } from '../libs/polyfill'
 import {QubitManagementError} from './error'
 
-/*
+/**
+ * @class ComputeEngine
 Adds Compute-tags to all commands and stores them (to later uncompute them
 automatically)
  */
@@ -57,7 +58,7 @@ cmd (Command): Command to modify.
     return cmd
   }
 
-  /*
+  /**
     Send uncomputing gates.
 
     Sends the inverse of the stored commands in reverse order down to the
@@ -186,7 +187,7 @@ uncompute.
     })
   }
 
-  /*
+  /**
 End the compute step (exit the with Compute() - statement).
 
 Will tell the Compute-engine to stop caching. It then waits for the
@@ -231,6 +232,9 @@ command_list (list<Command>): List of commands to receive.
   }
 }
 
+/**
+ * @class Uncompute
+ */
 export class UncomputeEngine extends BasicEngine {
   constructor() {
     super()
@@ -258,7 +262,8 @@ command_list (list<Command>): List of commands to handle.
   }
 }
 
-/*
+/**
+ * @class Compute
 Start a compute-section.
 
     Example:

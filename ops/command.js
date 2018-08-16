@@ -311,19 +311,4 @@ engine: New owner of qubits and owner of this Command object
   inspect() {
     return this.toString()
   }
-
-  get description() {
-    return this.toString()
-  }
-
-  [Symbol.toStringTag]() {
-    return this.toString()
-  }
-
-  [Symbol.toPrimitive](hint) {
-    if (hint === 'string') {
-      return this.toString()
-    }
-    return true;
-  }
 }
