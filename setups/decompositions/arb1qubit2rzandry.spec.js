@@ -11,6 +11,53 @@ import {Control} from '../../meta';
 import Simulator from '../../backends/simulators/simulator';
 import DecompositionRuleSet from '../../cengines/replacer/decompositionruleset';
 
+/*
+Creates a unitary 2x2 matrix given parameters.
+
+  Any unitary 2x2 matrix can be parametrized by:
+  U = exp(ia) [[exp(j*b) * cos(d), exp(j*c) * sin(d)],
+      [-exp(-j*c) * sin(d), exp(-j*b) * cos(d)]]
+with 0 <= d <= pi/2 and 0 <= a,b,c < 2pi. If a==0, then
+det(U) == 1 and hence U is element of SU(2).
+
+  Args:
+a,b,c (float): parameters 0 <= a,b,c < 2pi
+d (float): parameter 0 <= d <= pi/2
+
+Returns:
+  2x2 matrix as nested lists
+*/
+function create_unitary_matrix(a, b, c, d) {
+  const mc = math.complex
+  const mm = math.multiply
+  const exp = math.exp
+  const ph = math.exp(mc(0, a)) // global phase
+  const cosd = math.cos(d)
+  const sind = math.sin(d)
+  const result = mm(math.matrix([
+    [mm(exp(mc(0, b)), cosd), mm(exp(mc(0, c)), sind)],
+    [mm(mm(exp(mc(0, -c)), -1), sind), mm(exp(mc(0, -b)), cosd)]]), ph)
+  return result
+}
+
+export function create_test_matrices() {
+  const params = [[0.2, 0.3, 0.5, math.pi * 0.4],
+    [1e-14, 0.3, 0.5, 0],
+    [0.4, 0.0, math.pi * 2, 0.7],
+    [0.0, 0.2, math.pi * 1.2, 1.5], // element of SU[2]
+    [0.4, 0.0, math.pi * 1.3, 0.8],
+    [0.4, 4.1, math.pi * 1.3, 0],
+    [5.1, 1.2, math.pi * 1.5, math.pi / 2.0],
+    [1e-13, 1.2, math.pi * 3.7, math.pi / 2.0],
+    [0, math.pi / 2.0, 0, 0],
+    [math.pi / 2.0, -math.pi / 2.0, 0, 0],
+    [math.pi / 2.0, math.pi / 2.0, 0.1, 0.4],
+    [math.pi * 1.5, math.pi / 2.0, 0, 0.4]]
+  const matrices = []
+  params.forEach(([a, b, c, d]) => matrices.push(create_unitary_matrix(a, b, c, d)))
+  return matrices
+}
+
 describe('arb1qubit to rz & ry test', () => {
   it('should test_recognize_correct_gates', () => {
     const saving_backend = new DummyEngine(true)
@@ -55,54 +102,6 @@ describe('arb1qubit to rz & ry test', () => {
       if ((g instanceof Ry) || (g instanceof Rz) || (g instanceof Ph)) return true
     }
     return false
-  }
-
-  /*
-Creates a unitary 2x2 matrix given parameters.
-
-    Any unitary 2x2 matrix can be parametrized by:
-    U = exp(ia) [[exp(j*b) * cos(d), exp(j*c) * sin(d)],
-        [-exp(-j*c) * sin(d), exp(-j*b) * cos(d)]]
-with 0 <= d <= pi/2 and 0 <= a,b,c < 2pi. If a==0, then
-det(U) == 1 and hence U is element of SU(2).
-
-    Args:
-a,b,c (float): parameters 0 <= a,b,c < 2pi
-d (float): parameter 0 <= d <= pi/2
-
-Returns:
-    2x2 matrix as nested lists
- */
-  function create_unitary_matrix(a, b, c, d) {
-    const mc = math.complex
-    const mm = math.multiply
-    const exp = math.exp
-    const ph = math.exp(mc(0, a)) // global phase
-    const cosd = math.cos(d)
-    const sind = math.sin(d)
-    const result = mm(math.matrix([
-      [mm(exp(mc(0, b)), cosd), mm(exp(mc(0, c)), sind)],
-      [mm(mm(exp(mc(0, -c)), -1), sind), mm(exp(mc(0, -b)), cosd)]]), ph)
-    return result
-  }
-
-
-  function create_test_matrices() {
-    const params = [[0.2, 0.3, 0.5, math.pi * 0.4],
-      [1e-14, 0.3, 0.5, 0],
-      [0.4, 0.0, math.pi * 2, 0.7],
-      [0.0, 0.2, math.pi * 1.2, 1.5], // element of SU[2]
-      [0.4, 0.0, math.pi * 1.3, 0.8],
-      [0.4, 4.1, math.pi * 1.3, 0],
-      [5.1, 1.2, math.pi * 1.5, math.pi / 2.0],
-      [1e-13, 1.2, math.pi * 3.7, math.pi / 2.0],
-      [0, math.pi / 2.0, 0, 0],
-      [math.pi / 2.0, -math.pi / 2.0, 0, 0],
-      [math.pi / 2.0, math.pi / 2.0, 0.1, 0.4],
-      [math.pi * 1.5, math.pi / 2.0, 0, 0.4]]
-    const matrices = []
-    params.forEach(([a, b, c, d]) => matrices.push(create_unitary_matrix(a, b, c, d)))
-    return matrices
   }
 
   it('should test_decomposition', () => {

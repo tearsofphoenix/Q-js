@@ -8,7 +8,10 @@ import {
 
 const TOLERANCE = 1e-12
 
-function phase(c) {
+export function phase(c) {
+  if (typeof c === 'number') {
+    return Math.atan2(0, c)
+  }
   return Math.atan2(c.im, c.re)
 }
 
@@ -77,7 +80,7 @@ Args:
 Returns:
     parameters of the matrix: (a, b/2, c/2, d/2)
  */
-const _find_parameters = (matrix) => {
+export const _find_parameters = (matrix) => {
   // Determine a, b/2, c/2 and d/2 (3 different cases).
 // Note: everything is modulo 2pi.
   let a

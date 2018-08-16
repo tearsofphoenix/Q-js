@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import arb1qubit2rzandry from './arb1qubit2rzandry'
 import barrier from './barrier'
 import cnot2cz from './cnot2cz'
 import entangle from './entangle'
@@ -30,6 +30,7 @@ import swap2cnot from './swap2cnot'
 import timeevolution from './time_evolution'
 
 export default [
+  ...arb1qubit2rzandry,
   ...barrier,
   ...cnot2cz,
   ...crz2cxandrz,
