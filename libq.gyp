@@ -15,11 +15,11 @@
     ],
     'cflags!': [
       '-fno-rtti',
-      '-fno-exceptions'
+      '-fexceptions'
     ],
     'cflags_cc!': [
       '-fno-rtti',
-      '-fno-exceptions'
+      '-fexceptions'
     ],
     'cflags_cc': [
       '-fexceptions',
