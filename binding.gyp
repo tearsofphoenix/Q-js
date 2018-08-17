@@ -9,6 +9,22 @@
       'sources': [
         'backends/simulators/cppkernels/addon.cpp'
       ],
+      'cflags': [
+        '-fexceptions',
+        '-frtti',
+      ],
+      'cflags_cc': [
+        '-fexceptions',
+        '-frtti',
+      ],
+      'cflags!': [
+        '-fno-exceptions',
+        '-fno-rtti',
+      ],
+      'cflags_cc!': [
+        '-fno-exceptions',
+        '-fno-rtti',
+      ],
       'msvs_settings': {
         'VCLinkerTool': {
            'SetChecksum': 'true'
