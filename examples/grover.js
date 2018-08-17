@@ -18,23 +18,23 @@
 /*
 Runs Grover's algorithm on n qubit using the provided quantum oracle.
 
-Args:
+@param
     eng (MainEngine): Main compiler engine to run Grover on.
 n (int): Number of bits in the solution.
 oracle (function): Function accepting the engine, an n-qubit register,
     and an output qubit which is flipped by the oracle for the correct
 bit string.
 
-    Returns:
+    @returns
 solution (list<int>): Solution bit-string.
  */
 import {
   Compute, Control, Loop, Uncompute
-} from '../meta';
+} from '../src/meta';
 import {
   All, Measure, H, X, Z
-} from '../ops';
-import MainEngine from '../cengines/main';
+} from '../src/ops';
+import MainEngine from '../src/cengines/main';
 
 function run_grover(eng, n, oracle) {
   const x = eng.allocateQureg(n)
@@ -80,7 +80,7 @@ function run_grover(eng, n, oracle) {
 Marks the solution string 1,0,1,0,...,0,1 by flipping the output qubit,
     conditioned on qubits being equal to the alternating bit-string.
 
-    Args:
+    @param
 eng (MainEngine): Main compiler engine the algorithm is being run on.
 qubits (Qureg): n-qubit quantum register Grover search is run on.
 output (Qubit): Output qubit to flip in order to mark the solution.

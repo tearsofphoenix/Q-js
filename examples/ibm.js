@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import {getEngineList} from '../setups/ibm';
-import MainEngine from '../cengines/main';
-import IBMBackend from '../backends/ibm/ibm';
-import {All, Entangle, Measure} from '../ops';
+import {getEngineList} from '../src/setups/ibm';
+import MainEngine from '../src/cengines/main';
+import IBMBackend from '../src/backends/ibm/ibm';
+import {All, Entangle, Measure} from '../src/ops';
 
 function run_entangle(eng, num_qubits = 5) {
   /*
   Runs an entangling operation on the provided compiler engine.
 
-      Args:
+      @param
   eng (MainEngine): Main compiler engine to use.
   num_qubits (int): Number of qubits to entangle.
 
-      Returns:
+      @returns
   measurement (list<int>): List of measurement outcomes.
   */
 // allocate the quantum register to entangle

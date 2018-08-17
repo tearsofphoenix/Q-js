@@ -1,7 +1,7 @@
-export {BasicQubit, Qubit, Qureg} from './types/qubit'
+export {BasicQubit, Qubit, Qureg} from './src/types/qubit'
 
-export * as cengines from './cengines'
+export * as cengines from './src/cengines'
 
-export * as meta from './meta'
+export * as meta from './src/meta'
 
-export * as ops from './ops'
+export * as ops from './src/ops'

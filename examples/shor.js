@@ -18,32 +18,32 @@
 /*
 Runs the quantum subroutine of Shor's algorithm for factoring.
 
-Args:
+@param
     eng (MainEngine): Main compiler engine to use.
 N (int): Number to factor.
 a (int): Relative prime to use as a base for a^x mod N.
 verbose (bool): If true, display intermediate measurement results.
 
-    Returns:
+    @returns
 r (float): Potential period of a.
  */
 import math from 'mathjs'
-import {AddConstant, AddConstantModN, MultiplyByConstantModN} from '../libs/math/gates';
+import {AddConstant, AddConstantModN, MultiplyByConstantModN} from '../src/libs/math/gates';
 import {
   All, H, Measure, X, R, BasicMathGate, QFT, Swap
-} from '../ops';
-import {Control} from '../meta';
-import {getInverse} from '../ops/_cycle';
-import ResourceCounter from '../backends/resource';
-import DecompositionRuleSet from '../cengines/replacer/decompositionruleset';
-import {AutoReplacer, InstructionFilter} from '../cengines';
-import TagRemover from '../cengines/tagremover';
-import LocalOptimizer from '../cengines/optimize';
-import MainEngine from '../cengines/main';
-import Simulator from '../backends/simulators/simulator';
-import decompositions from '../setups/decompositions'
-import mathRules from '../libs/math/defaultrules'
-import {expmod} from "../libs/polyfill";
+} from '../src/ops';
+import {Control} from '../src/meta';
+import {getInverse} from '../src/ops/_cycle';
+import ResourceCounter from '../src/backends/resource';
+import DecompositionRuleSet from '../src/cengines/replacer/decompositionruleset';
+import {AutoReplacer, InstructionFilter} from '../src/cengines';
+import TagRemover from '../src/cengines/tagremover';
+import LocalOptimizer from '../src/cengines/optimize';
+import MainEngine from '../src/cengines/main';
+import Simulator from '../src/backends/simulators/simulator';
+import decompositions from '../src/setups/decompositions'
+import mathRules from '../src/libs/math/defaultrules'
+import {expmod} from '../src/libs/polyfill';
 
 function run_shor(eng, N, a, verbose = false) {
   const n = Math.ceil(Math.log2(N))

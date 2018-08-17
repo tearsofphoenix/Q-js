@@ -1,7 +1,7 @@
 
 // create a main compiler engine with a simulator backend:
-import {CircuitDrawer} from '../backends/circuits/drawer';
-import MainEngine from '../cengines/main';
+import {CircuitDrawer} from '../src/backends/circuits/drawer';
+import MainEngine from '../src/cengines/main';
 import {run_teleport} from './teleport';
 
 const drawing_engine = new CircuitDrawer()

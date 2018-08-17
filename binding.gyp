@@ -7,7 +7,7 @@
       'target_name': 'binding',
       'win_delay_load_hook': 'true',
       'sources': [
-        'backends/simulators/cppkernels/addon.cpp'
+        'src/backends/simulators/cppkernels/addon.cpp'
       ],
       'cflags': [
         '-fexceptions',

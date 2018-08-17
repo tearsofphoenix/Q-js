@@ -156,7 +156,7 @@ function getInstalledBinaries() {
  * @param  {string} platform - The name of the OS platform(darwin, win32, etc...)
  * @param  {string} arch - The instruction set architecture of the Node environment
  * @param  {string} abi - The Node Application Binary Interface
- * @return {Boolean} True, if projectq supports the current platform, false otherwise
+ * @return {Boolean} true, if projectq supports the current platform, false otherwise
  *
  * @api public
  */

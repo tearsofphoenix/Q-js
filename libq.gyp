@@ -11,7 +11,7 @@
       'DEBUG'
     ],
     'sources': [
-      'backends/simulators/cppkernels/Wrapper.cpp'
+      'src/backends/simulators/cppkernels/Wrapper.cpp'
     ],
     'cflags': [
       '-fexceptions',

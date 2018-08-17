@@ -7,8 +7,8 @@
   "author": "Isaac Phoenix (tearsofphoenix@icloud.com)",
   "scripts": {
     "install": "node scripts/install.js",
-    "cover": "cross-env NODE_ENV=test nyc mocha ./**/*.spec.js",
-    "test": "mocha --require babel-register --require babel-polyfill ./**/*.spec.js",
+    "cover": "cross-env NODE_ENV=test nyc mocha ./src/**/*.spec.js",
+    "test": "mocha --require babel-register --require babel-polyfill ./src/**/*.spec.js",
     "build": "node scripts/build.js --force"
   },
   "dependencies": {
@@ -30,6 +30,8 @@
     "chai": "^4.1.2",
     "cross-env": "^5.2.0",
     "cross-spawn": "^6.0.5",
+    "esdoc": "^1.1.0",
+    "esdoc-standard-plugin": "^1.0.0",
     "eslint": "^5.2.0",
     "eslint-config-airbnb": "^17.0.0",
     "eslint-loader": "^2.1.0",

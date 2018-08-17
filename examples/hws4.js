@@ -16,11 +16,11 @@
  */
 
 // phase function
-import MainEngine from '../cengines/main'
-import {Compute, Uncompute} from '../meta'
+import MainEngine from '../src/cengines/main'
+import {Compute, Uncompute} from '../src/meta'
 import {
   All, H, X, Measure
-} from '../ops'
+} from '../src/ops'
 
 function f(a, b, c, d) {
   return (a && b) ^ (c && d)

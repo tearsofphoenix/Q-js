@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).
  *
@@ -15,21 +14,9 @@
  * limitations under the License.
  */
 
-// create a main compiler engine
-import MainEngine from '../src/cengines/main'
-import {H, Measure} from '../src/ops/gates'
+const ext = require('../../../scripts/extensions')
+const path = ext.getBinaryPath()
 
-const eng = new MainEngine()
+const All = require(path)
 
-// allocate one qubit
-const q1 = eng.allocateQubit()
-
-// put it in superposition
-H.or(q1)
-
-// measure
-Measure.or(q1)
-
-eng.flush()
-// print the result:
-console.log(`Measured: ${q1.toNumber()}`)
+export default All.Simulator

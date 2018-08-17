@@ -15,10 +15,10 @@
  */
 
 // create a main compiler engine
-import MainEngine from '../cengines/main';
-import IBMBackend from '../backends/ibm/ibm';
-import {getEngineList} from '../setups/ibm';
-import {Measure, H} from '../ops';
+import MainEngine from '../src/cengines/main';
+import IBMBackend from '../src/backends/ibm/ibm';
+import {getEngineList} from '../src/setups/ibm';
+import {Measure, H} from '../src/ops';
 
 const eng = new MainEngine(new IBMBackend({user: '', password: ''}), getEngineList())
 

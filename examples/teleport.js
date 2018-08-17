@@ -19,19 +19,19 @@ Returns a Bell-pair (two qubits in state :math:`|A\rangle \otimes |B
     \rangle = \frac 1{\sqrt 2} \left( |0\rangle\otimes|0\rangle + |1\rangle
     \otimes|1\rangle \right)`).
 
-Args:
+@param
     eng (MainEngine): MainEngine from which to allocate the qubits.
 
-    Returns:
+    @returns
 bell_pair (tuple<Qubits>): The Bell-pair.
  */
 
 import {
   CNOT, H, Measure, Rz, X, Z
-} from '../ops'
-import {tuple} from '../libs/util'
-import MainEngine from '../cengines/main';
-import {Control, Dagger} from '../meta';
+} from '../src/ops'
+import {tuple} from '../src/libs/util'
+import MainEngine from '../src/cengines/main';
+import {Control, Dagger} from '../src/meta';
 
 function create_bell_pair(eng) {
   const b1 = eng.allocateQubit()
@@ -51,12 +51,12 @@ state to Bob who then tries to uncompute his qubit using the inverse of
 the state_creation_function. If successful, deleting the qubit won't raise
 an error in the underlying Simulator back-end (else it will).
 
-Args:
+@param
     eng (MainEngine): Main compiler engine to run the circuit on.
 state_creation_function (function): Function which accepts the main
 engine and a qubit in state |0>, which it then transforms to the
 state that Alice would like to send to Bob.
-verbose (bool): If True, info messages will be printed.
+verbose (bool): If true, info messages will be printed.
  */
 export function run_teleport(eng, state_creation_function, verbose = false) {
 // make a Bell-pair

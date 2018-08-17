@@ -15,21 +15,41 @@
  * limitations under the License.
  */
 
-// create a main compiler engine
-import MainEngine from '../src/cengines/main'
-import {H, Measure} from '../src/ops/gates'
+const shared = {}
 
-const eng = new MainEngine()
+export function add(key, value) {
+  shared[key] = value
+}
 
-// allocate one qubit
-const q1 = eng.allocateQubit()
+export function get(key) {
+  return shared[key]
+}
 
-// put it in superposition
-H.or(q1)
 
-// measure
-Measure.or(q1)
+/*
+Return the inverse of a gate.
 
-eng.flush()
-// print the result:
-console.log(`Measured: ${q1.toNumber()}`)
+    Tries to call gate.getInverse and, upon failure, creates a DaggeredGate
+instead.
+
+    @param
+gate: Gate of which to get the inverse
+
+@example
+    @code
+
+getInverse(H) # returns a Hadamard gate (HGate object)
+ */
+export function getInverse(gate) {
+  try {
+    return gate.getInverse()
+  } catch (e) {
+    const DaggeredGate = get('DaggeredGate')
+    return new DaggeredGate(gate)
+  }
+}
+
+export default {
+  add,
+  get
+}
