@@ -47,11 +47,9 @@ export class ComputeEngine extends BasicEngine {
     this.deallocatedQubitIDs = new Set()
   }
 
-  /*
+  /**
     Modify the command tags, inserting an UncomputeTag.
-
-    Args:
-cmd (Command): Command to modify.
+    @param cmd {Command} Command to modify.
      */
   addUnComputeTag(cmd) {
     cmd.tags.push(new UncomputeTag())

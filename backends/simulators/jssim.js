@@ -32,7 +32,8 @@ import {
 } from '../../libs/polyfill'
 import { stringToArray } from '../../ops/qubitoperator'
 
-/*
+/**
+ * @class JSSimulator
 NodeJS implementation of a quantum computer simulator.
 
     This Simulator can be used as a backup if compiling the c++ simulator is
@@ -40,12 +41,12 @@ not an option (for some reason). It has the same features but is much
 slower, so please consider building the c++ version for larger experiments.
  */
 export default class Simulator {
-  /*
+  /**
+   * @constructor
   Initialize the simulator.
 
     Args:
 rnd_seed (int): Seed to initialize the random number generator.
-    args: Dummy argument to allow an interface identical to the c++ simulator.
    */
   constructor(rndSeed) {
     // ignore seed
@@ -67,7 +68,7 @@ to bit-locations and the second entry is the corresponding state
 vector
    */
   cheat() {
-    return [this._map, this._state]
+    return [this._map, this._state._data.slice(0)]
   }
 
   /*
@@ -404,9 +405,6 @@ allocated qubits.
       index |= (bitString[i] << this._map[item])
     })
     const ret = this._getState(index)
-    if (math.abs(math.im(ret)) < 1e-13) {
-      return math.re(ret)
-    }
     return ret
   }
 
@@ -430,22 +428,19 @@ ctrlids (list): A list of control qubit IDs.
     // Determine the (normalized) trace, which is nonzero only for identity
   // terms:
     let tr = 0
-    let tmp = 0
-    const newTerms = {}
-    Object.keys(terms_dict).forEach((t) => {
-      const key = stringToArray(t)
-      const c = terms_dict[t]
-      if (key.length === 0) {
+    let sum = 0
+    const newTerms = []
+    terms_dict.forEach(([t, c]) => {
+      if (t.length === 0) {
         tr += c
       } else {
-        newTerms[t] = c
-        tmp += math.abs(c)
+        newTerms.push([t, c])
+        sum += Math.abs(c)
       }
     })
 
     terms_dict = newTerms
-
-    const op_nrm = math.abs(time) * tmp
+    const op_nrm = math.abs(time) * sum
     // rescale the operator by s:
     const s = Math.floor(op_nrm + 1)
     const correction = math.exp(math.complex(0, -time * tr / (s * 1.0)))
@@ -460,10 +455,8 @@ ctrlids (list): A list of control qubit IDs.
         const coeff = math.divide(math.complex(0, -time), s * (j + 1))
         const current_state = math.clone(this._state)
         update = 0
-        Object.keys(terms_dict).forEach((t) => {
-          const c = terms_dict[t]
-          const keys = stringToArray(t)
-          this.applyTerm(keys, ids)
+        terms_dict.forEach(([t, c]) => {
+          this.applyTerm(t, ids)
           this._state = math.multiply(this._state, c)
 
           update = math.add(this._state, update)
@@ -503,9 +496,9 @@ ids (list[int]): Term index to Qubit ID mapping
 ctrlids (list[int]): Control qubit IDs
    */
   applyTerm(term, ids, controlIDs = []) {
-    const X = math.matrix([[0.0, 1.0], [1.0, 0.0]])
-    const Y = math.matrix([[0.0, math.complex(0, -1)], [math.complex(0, 1), 0.0]])
-    const Z = math.matrix([[1.0, 0.0], [0.0, -1.0]])
+    const X = [[0.0, 1.0], [1.0, 0.0]]
+    const Y = [[0.0, math.complex(0, -1)], [math.complex(0, 1), 0.0]]
+    const Z = [[1.0, 0.0], [0.0, -1.0]]
     const gates = {X, Y, Z}
     term.forEach((local_op) => {
       const qb_id = ids[local_op[0]]
@@ -513,7 +506,7 @@ ctrlids (list[int]): Control qubit IDs
     })
   }
 
-  /*
+  /**
   Applies the k-qubit gate matrix m to the qubits with indices ids,
     using ctrlids as control qubits.
 
@@ -537,7 +530,7 @@ only applied where these qubits are 1).
     }
   }
 
-  /*
+  /**
   Applies the single qubit gate matrix m to the qubit at position `pos`
 using `mask` to identify control qubits.
 
@@ -549,13 +542,12 @@ mask (int): Bit-mask where set bits indicate control qubits.
    */
   _singleQubitGate(m, pos, mask) {
     const kernel = (u, d, m) => {
-      const mi = math.index
       const ma = math.add
       const mm = math.multiply
       d = d || math.complex(0, 0)
       u = u || math.complex(0, 0)
-      const r1 = ma(mm(u, m.subset(mi(0, 0))), mm(d, m.subset(mi(0, 1))))
-      const r2 = ma(mm(u, m.subset(mi(1, 0))), mm(d, m.subset(mi(1, 1))))
+      const r1 = ma(mm(u, m[0][0]), mm(d, m[0][1]))
+      const r2 = ma(mm(u, m[1][0]), mm(d, m[1][1]))
       return [r1, r2]
     }
 
@@ -573,7 +565,7 @@ mask (int): Bit-mask where set bits indicate control qubits.
     }
   }
 
-  /*
+  /**
   Applies the k-qubit gate matrix m to the qubits at `pos`
 using `mask` to identify control qubits.
 

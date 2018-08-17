@@ -73,13 +73,13 @@ quantum algorithms.
 the docs which gives futher hints on how to build the C++
 extension.
    */
-  constructor(gate_fusion = false, rnd_seed = null) {
+  constructor(gate_fusion = false, rnd_seed = null, forceSimulation = false) {
     super()
     if (!rnd_seed) {
       rnd_seed = Math.random()
     }
 
-    if (CPPSimulatorBackend) {
+    if (!forceSimulation && CPPSimulatorBackend) {
       this._simulator = new CPPSimulatorBackend(rnd_seed)
     } else {
       this._simulator = new SimulatorBackend(rnd_seed)
