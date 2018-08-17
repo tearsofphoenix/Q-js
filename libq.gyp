@@ -13,6 +13,10 @@
     'sources': [
       'backends/simulators/cppkernels/Wrapper.cpp'
     ],
+    'cflags': [
+      '-fexceptions',
+      '-frtti',
+    ],
     'cflags_cc': [
       '-fexceptions',
       '-frtti',
@@ -44,7 +48,7 @@
       }],
       ['OS!="win"', {
         'cflags_cc+': [
-          '-std=c++0x'
+          '-std=c++0x -fexceptions'
         ]
       }]
     ]
