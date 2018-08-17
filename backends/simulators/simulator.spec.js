@@ -601,9 +601,6 @@ settings.forEach(([testName, gate_fusion, rndSeed, forceSimulation]) => {
       const tail = getMatrixValue(final_wavefunction, math.range(half, count))
       const head = getMatrixValue(final_wavefunction, math.range(0, half))
 
-      expect(math.multiply(hadamard_f, res)).to.deep.equal(tail)
-      expect(head).to.deep.equal(math.multiply(hadamard_f, init_wavefunction))
-
       expect(math.deepEqual(math.multiply(hadamard_f, res), tail)).to.equal(true)
       expect(math.deepEqual(head, math.multiply(hadamard_f, init_wavefunction))).to.equal(true)
     });
