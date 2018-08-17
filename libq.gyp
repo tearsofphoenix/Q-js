@@ -45,7 +45,7 @@
           '-fno-exceptions',
           '-fno-rtti'
         ]
-      }]
+      }],
       ['OS=="win"', {
         'msvs_settings': {
           'VCCLCompilerTool': {
