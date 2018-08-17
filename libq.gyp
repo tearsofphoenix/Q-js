@@ -36,6 +36,16 @@
           'MACOSX_DEPLOYMENT_TARGET': '10.7'
         }
       }],
+      ['OS=="linux"', {
+        'cflags!': [
+          '-fno-exceptions',
+          '-fno-rtti'
+        ],
+        'cflags_cc!': [
+          '-fno-exceptions',
+          '-fno-rtti'
+        ]
+      }]
       ['OS=="win"', {
         'msvs_settings': {
           'VCCLCompilerTool': {
@@ -48,7 +58,7 @@
       }],
       ['OS!="win"', {
         'cflags_cc+': [
-          '-std=c++0x -fexceptions'
+          '-std=c++0x'
         ]
       }]
     ]
