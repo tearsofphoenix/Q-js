@@ -13,14 +13,6 @@
     'sources': [
       'backends/simulators/cppkernels/Wrapper.cpp'
     ],
-    'cflags!': [
-      '-fno-rtti',
-      '-fexceptions'
-    ],
-    'cflags_cc!': [
-      '-fno-rtti',
-      '-fexceptions'
-    ],
     'cflags_cc': [
       '-fexceptions',
       '-frtti',
