@@ -51,7 +51,6 @@ private:
 
     static Nan::Persistent<v8::Function> constructor;
 
-    int _seed;
     Simulator *_simulator;
 public:
     std::ofstream _logfile;

@@ -1,4 +1,8 @@
 
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/bipartite.hpp>
+#include <boost/graph/max_cardinality_matching.hpp>
+
 #include "2dmapper.hpp"
 
 using namespace boost;
@@ -50,7 +54,6 @@ static void returnNewSwap(std::vector<Match> &matchings, int numRows, int numCol
     // Find perfect matching, remove those edges from the graph
     // and do it again:
     for (int i = 0; i < numRows; ++i) {
-        print_graph(g, get(vertex_index, g));
         Match mate(numColumns * 2);
         edmonds_maximum_cardinality_matching(g, &mate[0]);
         matchings[i] = mate;
