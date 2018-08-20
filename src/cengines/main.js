@@ -50,8 +50,8 @@ export default class MainEngine extends BasicEngine {
     Sets 'next_engine'- and 'main_engine'-attributes of all compiler
 engines and adds the back-end as the last engine.
 
-    @param backend {BasicEngine}: Backend to send the compiled circuit to.
-    @param engineList {Array<BasicEngine>}: List of engines / backends to use
+    @param {BasicEngine} backend: Backend to send the compiled circuit to.
+    @param {Array<BasicEngine>} engineList: List of engines / backends to use
 as compiler engines. Note: The engine list must not contain
 multiple mappers (instances of BasicMapperEngine).
 Default: projectq.setups.default.get_engine_list()
