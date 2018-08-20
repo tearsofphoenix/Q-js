@@ -11,7 +11,8 @@
       'DEBUG'
     ],
     'sources': [
-      'src/backends/simulators/cppkernels/Wrapper.cpp'
+      'src/backends/simulators/cppkernels/Wrapper.cpp',
+      'src/backends/simulators/cppkernels/2dmapper.cpp'
     ],
     'cflags': [
       '-fexceptions',
@@ -47,6 +48,7 @@
         ]
       }],
       ['OS=="win"', {
+        'include_dirs': ['D:/cygwin64/boost_1_68_0'],
         'msvs_settings': {
           'VCCLCompilerTool': {
             'AdditionalOptions': [

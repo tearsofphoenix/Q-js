@@ -10,10 +10,10 @@ uses Swap gates in order to move qubits next to each other.
 */
 import assert from 'assert'
 import math from 'mathjs'
-import {classes} from 'jsnetworkx'
 import {permutations} from 'itertools'
 import BasicMapperEngine from './basicmapper';
-import {return_swap_depth} from './linearmapper';
+import {return_swap_depth} from './linearmapper'
+import NativeImpl from '../backends/simulators/cppsim'
 import {
   arrayFromRange, len, randomSample, setDifference, setEqual, setFromRange
 } from '../libs/polyfill';
@@ -25,17 +25,6 @@ import {tuple} from '../libs/util';
 import Command from '../ops/command';
 import {BasicQubit} from '../types/qubit';
 import {LogicalQubitIDTag} from '../meta';
-
-function hasEdge(g, u, v) {
-  const edges = g.edges()
-  for (let i = 0; i < edges.length; ++i) {
-    const e = edges[i]
-    if (e[0] === u && e[1] === v) {
-      return true
-    }
-  }
-  return false
-}
 
 /*
 Mapper to a 2-D grid graph.
@@ -179,6 +168,10 @@ RuntimeError: if incorrect `mapped_ids_to_backend_ids` parameter
     this.num_of_swaps_per_mapping = {}
   }
 
+  get currentMapping() {
+    return super.currentMapping
+  }
+
   set currentMapping(newMapping) {
     this._currentMapping = newMapping
     if (typeof newMapping === 'undefined' || newMapping === null) {
@@ -188,7 +181,8 @@ RuntimeError: if incorrect `mapped_ids_to_backend_ids` parameter
 
       Object.keys(newMapping).forEach((logical_id) => {
         const backend_id = newMapping[logical_id]
-        this._current_row_major_mapping[logical_id] = parseInt(this._backend_ids_to_mapped_ids[backend_id], 10)
+        const value = this._backend_ids_to_mapped_ids[backend_id]
+        this._current_row_major_mapping[logical_id] = parseInt(value, 10)
       })
     }
   }
@@ -337,7 +331,7 @@ which don't store any information.
    */
   _run() {
     const num_of_stored_commands_before = len(this._stored_commands)
-    if (!this.currentMapping) {
+    if (!this._currentMapping) {
       this.currentMapping = {}
     } else {
       this._sendPossibleCommands()
@@ -351,11 +345,12 @@ which don't store any information.
     let swaps
     let lowest_cost
     const matchings_numbers = arrayFromRange(this.num_rows)
-    let ps
+    const ps = []
     if (this.num_optimization_steps <= math.factorial(this.num_rows)) {
-      ps = permutations(matchings_numbers, this.num_rows)
+      for (const looper of permutations(matchings_numbers, this.num_rows)) {
+        ps.push(looper)
+      }
     } else {
-      ps = []
       for (let i = 0; i < this.num_optimization_steps; ++i) {
         ps.push(randomSample(matchings_numbers, this.num_rows))
       }
@@ -380,9 +375,7 @@ which don't store any information.
       // i.e., contained in this._currently_allocated_ids)
       let mapped_ids_used = new Set()
       for (const logical_id of this._currently_allocated_ids) {
-        mapped_ids_used.add(
-          this._current_row_major_mapping[logical_id]
-        )
+        mapped_ids_used.add(this._current_row_major_mapping[logical_id])
       }
       const not_allocated_ids = setDifference(setFromRange(this.num_qubits), mapped_ids_used)
       for (const mapped_id of not_allocated_ids) {
@@ -421,7 +414,7 @@ which don't store any information.
       const not_needed_anymore = setDifference(setFromRange(this.num_qubits), mapped_ids_used)
       for (const mapped_id of not_needed_anymore) {
         const qb = new BasicQubit(this, this._mapped_ids_to_backend_ids[mapped_id])
-        const cmd = Command(this, new DeallocateQubitGate(), tuple([qb]))
+        const cmd = new Command(this, new DeallocateQubitGate(), tuple([qb]))
         this.send([cmd])
       }
     }
@@ -453,8 +446,8 @@ which don't store any information.
 must exist already
    */
   _sendPossibleCommands() {
-    const active_ids = new Set(this._currently_allocated_ids)
-    Object.keys(this._current_row_major_mapping).forEach(logical_id => active_ids.add(logical_id))
+    const active_ids = new Set(Array.from(this._currently_allocated_ids).map(k => parseInt(k, 10)))
+    Object.keys(this._current_row_major_mapping).forEach(logical_id => active_ids.add(parseInt(logical_id, 10)))
 
     let new_stored_commands = []
     for (let i = 0; i < this._stored_commands.length; ++i) {
@@ -492,10 +485,10 @@ must exist already
         let send_gate = true
         const mapped_ids = new Set()
 
-        for (let i = 0; i < cmd.allQubits.length; ++i) {
-          const qureg = cmd.allQubits[i]
+        for (let k = 0; k < cmd.allQubits.length; ++k) {
+          const qureg = cmd.allQubits[k]
           for (let j = 0; j < qureg.length; ++j) {
-            const qubit = qureg[i]
+            const qubit = qureg[j]
             if (!active_ids.has(qubit.id)) {
               send_gate = false
               break
@@ -507,7 +500,7 @@ must exist already
 
         // Check that mapped ids are nearest neighbour on 2D grid
         if (len(mapped_ids) === 2) {
-          const [qb0, qb1] = Array.from(mapped_ids).sort()
+          const [qb0, qb1] = Array.from(mapped_ids).sort((a, b) => a - b)
           send_gate = false
           if (qb1 - qb0 === this.num_columns) {
             send_gate = true
@@ -614,7 +607,7 @@ applied. Tuple contains the two mapped qubit ids for the Swap.
     // exchange all remaining None with the not yet used mapped ids
     const all_ids = setFromRange(this.num_qubits)
     let not_used_mapped_ids = Array.from(setDifference(all_ids, used_mapped_ids))
-    not_used_mapped_ids = not_used_mapped_ids.sort().reverse()
+    not_used_mapped_ids = not_used_mapped_ids.sort((a, b) => b - a)
 
     for (let row = 0; row < this.num_rows; ++row) {
       for (let column = 0; column < this.num_columns; ++column) {
@@ -629,50 +622,12 @@ applied. Tuple contains the two mapped qubit ids for the Swap.
     }
 
     assert(len(not_used_mapped_ids) === 0)
-    // 1. Assign column_after_step_1 for each element
-    // Matching contains the num_columns matchings
-    const matchings = new Array(this.num_rows)
-    // Build bipartite graph. Nodes are the current columns numbered
-    // (0, 1, ...) and the destination columns numbered with an offset of
-    // this.num_columns (0 + offset, 1+offset, ...)
-    const graph = new classes.Graph()
+    const positions = []
+    final_positions.forEach(row => positions.push(row.map(item => item.final_column)))
+    const matchings = NativeImpl.returnNewSwap(this.num_rows, this.num_columns, positions)
     const offset = this.num_columns
-    graph.addNodesFrom(arrayFromRange(this.num_columns), 0)
-    graph.addNodesFrom(arrayFromRange(offset, offset + this.num_columns), 1)
-    // Add an edge to the graph from (i, j+offset) for every element
-    // currently in column i which should go to column j for the new
-    // mapping
-    for (let row = 0; row < this.num_rows; ++row) {
-      for (let column = 0; column < this.num_columns; ++column) {
-        const destination_column = final_positions[row][column].final_column
-        if (!hasEdge(graph, column, destination_column + offset)) {
-          graph.addEdge(column, destination_column + offset)
-          // Keep manual track of multiple edges between nodes
-          graph[column][destination_column + offset].num = 1
-        } else {
-          graph[column][destination_column + offset].num += 1
-        }
-      }
-    }
-
-    // Find perfect matching, remove those edges from the graph
-    // and do it again:
-    for (let i = 0; i < this.num_rows; ++i) {
-      const top_nodes = arrayFromRange(this.num_columns)
-      const matching = nx.bipartite.maximum_matching(graph, top_nodes)
-      matchings[i] = matching
-      // Remove all edges of the current perfect matching
-      for (let node = 0; node < this.num_columns; ++node) {
-        if (graph[node][matching[node]].num === 1) {
-          graph.removeEdge(node, matching[node])
-        } else {
-          graph[node][matching[node]].num -= 1
-        }
-      }
-    }
-
     // permute the matchings:
-    const tmp = deepcopy(matchings)
+    const tmp = matchings.map(looper => Object.assign({}, looper))
     for (let i = 0; i < this.num_rows; ++i) {
       matchings[i] = tmp[permutation[i]]
     }

@@ -1,22 +1,20 @@
-#include <iostream>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/bipartite.hpp>
-#include <boost/graph/max_cardinality_matching.hpp>
+
+#include "2dmapper.hpp"
 
 using namespace boost;
-typedef adjacency_list <vecS, vecS, undirectedS> vector_graph_t;
-typedef std::pair <int, int> E;
+using namespace v8;
+
+typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS> Graph;
 
 typedef std::vector<int> PositionVector;
 typedef std::vector<PositionVector> PositionGrid;
 typedef std::vector<std::map<int, int>> Tracking;
+typedef std::vector<graph_traits<adjacency_list<>>::vertex_descriptor> Match;
 
-void returnNewSwap(int numRows, int numColumns, PositionGrid &finalPositions) {
+static void returnNewSwap(std::vector<Match> &matchings, int numRows, int numColumns, PositionGrid &finalPositions) {
     // 1. Assign column_after_step_1 for each element
     // Matching contains the num_columns matchings
-    adjacency_list<> g;
-    typedef std::vector<graph_traits<adjacency_list<>>::vertex_descriptor> Match;
-    std::vector<Match> matchings(numRows);
+    Graph g;
     Tracking track(numColumns);
 
     auto offset = numColumns;
@@ -44,7 +42,7 @@ void returnNewSwap(int numRows, int numColumns, PositionGrid &finalPositions) {
                 // Keep manual track of multiple edges between nodes
                 track[column][destination_column + offset] = 1;
             } else {
-                track[column][destination_column + offset] = 1;
+                track[column][destination_column + offset] += 1;
             }
         }
     }
@@ -52,9 +50,9 @@ void returnNewSwap(int numRows, int numColumns, PositionGrid &finalPositions) {
     // Find perfect matching, remove those edges from the graph
     // and do it again:
     for (int i = 0; i < numRows; ++i) {
-        Match mate(numColumns);
-        auto flag = checked_edmonds_maximum_cardinality_matching(g, &mate[0]);
-        std::cout << flag << " - " << i << std::endl;
+        print_graph(g, get(vertex_index, g));
+        Match mate(numColumns * 2);
+        edmonds_maximum_cardinality_matching(g, &mate[0]);
         matchings[i] = mate;
         // Remove all edges of the current perfect matching
         for (int node = 0; node < numColumns; ++node) {
@@ -67,25 +65,56 @@ void returnNewSwap(int numRows, int numColumns, PositionGrid &finalPositions) {
             }
         }
     }
-
-    std::cout << "end";
 }
 
-int main (int argc, char **argv)
-{
-
-//    4 3 [[0, 1, 2], [0, 1, 2], [0, 1, 2], [0, 1, 2]]
-//    [{0: 3, 1: 4, 2: 5, 3: 0, 4: 1, 5: 2}, {0: 3, 1: 4, 2: 5, 3: 0, 4: 1, 5: 2}, {0: 3, 1: 4, 2: 5, 3: 0, 4: 1, 5: 2}, {0: 3, 1: 4, 2: 5, 3: 0, 4: 1, 5: 2}]
-    int row = 4;
-    int column = 3;
-    PositionGrid positionGrid(row);
-    for (int j = 0; j < row; ++j) {
-        PositionVector vec(column);
-        for (int k = 0; k < column; ++k) {
-            vec[k] = k;
+static void jsArrayToPositions(Local<Array> &array, PositionGrid &grid) {
+    for (int j = 0; j < array->Length(); ++j) {
+        auto alooper = Local<Array>::Cast(array->Get(j));
+        PositionVector vec(alooper->Length());
+        for (int k = 0; k < alooper->Length(); ++k) {
+            vec[k] = alooper->Get(k)->Int32Value();
         }
-        positionGrid[j] = vec;
+        grid[j] = vec;
     }
-    returnNewSwap(4, 3, positionGrid);
-    return 0;
+}
+
+static void matchingsToJS(Isolate *isolate, int size, std::vector<Match> &mathings, Local<Array> &array) {
+    for (int j = 0; j < mathings.size(); ++j) {
+        auto mLooper = mathings[j];
+        auto dict = Object::New(isolate);
+        for (int k = 0; k < size; ++k) {
+            dict->Set(k, v8::Integer::New(isolate, mLooper[k]));
+        }
+
+        array->Set(j, dict);
+    }
+}
+
+static void returnNewSwapWrapper(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+
+    if (info.Length() < 2) {
+        Nan::ThrowTypeError("Wrong number of arguments");
+        return;
+    }
+
+    auto isolate = info.GetIsolate();
+    auto row = info[0]->Int32Value();
+    auto column = info[1]->Int32Value();
+    auto array = Local<Array>::Cast(info[2]);
+    PositionGrid grid(array->Length());
+
+    jsArrayToPositions(array, grid);
+
+    std::vector<Match> matchings(row);
+
+    returnNewSwap(matchings, row, column, grid);
+
+    auto result = Array::New(isolate, matchings.size());
+    matchingsToJS(isolate, column * 2, matchings, result);
+    info.GetReturnValue().Set(result);
+}
+
+void twodMapperInit(v8::Local<v8::Object> exports) {
+    exports->Set(Nan::New("returnNewSwap").ToLocalChecked(),
+                 Nan::New<v8::FunctionTemplate>(returnNewSwapWrapper)->GetFunction());
 }

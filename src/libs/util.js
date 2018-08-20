@@ -15,13 +15,6 @@
  * limitations under the License.
  */
 import math from 'mathjs'
-/*
- */
-export function arrayRangeAssign(source, target, start, end) {
-  for (let i = start; i < end; ++i) {
-    target[i] = source[i]
-  }
-}
 
 export function zeros(n) {
   const array = new Array(n)

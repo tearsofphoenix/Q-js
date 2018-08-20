@@ -19,4 +19,4 @@ const path = ext.getBinaryPath()
 
 const All = require(path)
 
-export default All.Simulator
+export default All

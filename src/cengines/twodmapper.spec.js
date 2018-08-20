@@ -1,12 +1,18 @@
 import {expect} from 'chai'
+import {permutations} from 'itertools'
 import deepEqual from 'deep-eql'
 import GridMapper from './twodmapper';
 import {BasicQubit} from '../types/qubit';
-import {Allocate, BasicGate, X} from '../ops';
+import {
+  Allocate, BasicGate, Deallocate, FlushGate, X
+} from '../ops';
 import Command from '../ops/command';
 import {tuple} from '../libs/util';
 import MainEngine from './main';
 import {DummyEngine} from './testengine';
+import {arrayFromRange, len, randomSample} from '../libs/polyfill';
+import {LogicalQubitIDTag} from '../meta';
+import LocalOptimizer from './optimize';
 
 describe('twodmapper test', () => {
   it('should test_is_available', () => {
@@ -147,401 +153,502 @@ describe('twodmapper test', () => {
       }
     })
   });
-})
 
-// @pytest.mark.parametrize("num_rows, num_columns, seed, none_old, none_new",
-//     [(2, 2, 0, 0, 0), (3, 4, 1, 0, 0), (4, 3, 2, 0, 0),
-//       (5, 5, 3, 0, 0), (5, 3, 4, 3, 0), (4, 4, 5, 0, 3),
-//       (6, 6, 7, 2, 3)])
-// function test_return_swaps_random(num_rows, num_columns, seed, none_old, none_new):
-// random.seed(seed)
-// num_qubits = num_rows * num_columns
-// old_chain = random.sample(range(num_qubits), num_qubits)
-// new_chain = random.sample(range(num_qubits), num_qubits)
-// old_mapping = {}
-// new_mapping = {}
-// for i in range(num_qubits):
-// old_mapping[old_chain[i]] = i
-// new_mapping[new_chain[i]] = i
-// # Remove certain elements from mappings:
-//     old_none_ids = set(random.sample(range(num_qubits), none_old))
-// if none_old != 0:
-// for logical_id in old_none_ids:
-// old_mapping.pop(logical_id)
-// new_none_ids = set(random.sample(range(num_qubits), none_new))
-// if none_new != 0:
-// for logical_id in new_none_ids:
-// new_mapping.pop(logical_id)
-//
-// mapper = new GridMapper(num_rows,
-//     num_columns=num_columns)
-// swaps = mapper.return_swaps(old_mapping, new_mapping)
-// # Check that Swaps are allowed
-// all_allowed_swaps = set()
-// for row in range(num_rows):
-// for column in range(num_columns-1):
-// qb_id = row * num_columns + column
-// all_allowed_swaps.add((qb_id, qb_id + 1))
-// for row in range(num_rows-1):
-// for column in range(num_columns):
-// qb_id = row * num_columns + column
-// all_allowed_swaps.add((qb_id, qb_id + num_columns))
-//
-// for swap in swaps:
-// expect(swap in all_allowed_swaps
-// test_chain = deepcopy(old_chain)
-// for pos0, pos1 in swaps:
-// tmp = test_chain[pos0]
-// test_chain[pos0] = test_chain[pos1]
-// test_chain[pos1] = tmp
-// expect(len(test_chain) == len(new_chain)
-// for i in range(len(new_chain)):
-// if new_chain[i] in old_mapping and new_chain[i] in new_mapping:
-// expect(test_chain[i] == new_chain[i]
-//
-//
-// @pytest.mark.parametrize("different_backend_ids", [false, true])
-// function test_send_possible_commands(different_backend_ids):
-// if different_backend_ids:
-// map_to_backend_ids = {0: 21, 1: 32, 2: 1, 3: 4, 4: 5, 5: 6, 6: 10,
-//   7: 7}
-// else:
-// map_to_backend_ids = null
-// mapper = new GridMapper(2,4,
-//     mapped_ids_to_backend_ids=map_to_backend_ids)
-// backend = DummyEngine(save_commands=true)
-// backend.is_last_engine = true
-// mapper.next_engine = backend
-// # mapping is identical except 5 <-> 0
-// if different_backend_ids:
-// mapper.current_mapping = {0: 6, 1: 32, 2: 1, 3: 4, 4: 5, 5: 21, 6: 10,
-//   7: 7}
-// else:
-// mapper.current_mapping = {5: 0, 1: 1, 2: 2, 3: 3, 4: 4, 0: 5, 6: 6,
-//   7: 7}
-// neighbours = [(5, 1), (1, 2), (2, 3), (4, 0), (0, 6), (6, 7),
-//   (5, 4), (1, 0), (2, 6), (3, 7)]
-// for qb0_id, qb1_id in neighbours:
-// qb0 = new BasicQubit(null, qb0_id)
-// qb1 = new BasicQubit(null, qb1_id)
-// cmd1 = new Command(null, X, tuple([qb0]), [qb1])
-// cmd2 = new Command(null, X, tuple([qb1]), [qb0])
-// mapper._stored_commands = [cmd1, cmd2]
-// mapper._sendPossibleCommands()
-// expect(len(mapper._stored_commands) == 0
-// for qb0_id, qb1_id in itertools.permutations(range(8), 2):
-// if ((qb0_id, qb1_id) not in neighbours and
-// (qb1_id, qb0_id) not in neighbours):
-// qb0 = new BasicQubit(null, qb0_id)
-// qb1 = new BasicQubit(null, qb1_id)
-// cmd = new Command(null, X, tuple([qb0]), [qb1])
-// mapper._stored_commands = [cmd]
-// mapper._sendPossibleCommands()
-// expect(len(mapper._stored_commands) == 1
-//
-//
-// @pytest.mark.parametrize("different_backend_ids", [false, true])
-// function test_send_possible_commands_allocate(different_backend_ids):
-// if different_backend_ids:
-// map_to_backend_ids = {0: 21, 1: 32, 2: 3, 3: 4, 4: 5, 5: 6}
-// else:
-// map_to_backend_ids = null
-// mapper = new GridMapper(3,2,
-//     mapped_ids_to_backend_ids=map_to_backend_ids)
-// backend = DummyEngine(save_commands=true)
-// backend.is_last_engine = true
-// mapper.next_engine = backend
-// qb0 = new BasicQubit(null, 0)
-// cmd0 = new Command(null, gate=Allocate, tuple([qb0]), [],
-//     tags=[])
-// mapper._stored_commands = [cmd0]
-// mapper._currently_allocated_ids = set([10])
-// # not in mapping:
-// mapper.current_mapping = {}
-// expect(len(backend.received_commands) == 0
-// mapper._sendPossibleCommands()
-// expect(len(backend.received_commands) == 0
-// expect(mapper._stored_commands == [cmd0]
-// # in mapping:
-//     mapper.current_mapping = {0: 3}
-// mapper._sendPossibleCommands()
-// expect(len(mapper._stored_commands) == 0
-// # Only self._run() sends Allocate gates
-// mapped0 = new BasicQubit(null, 3)
-// received_cmd = new Command(engine=mapper, gate=Allocate, tuple([mapped0],),
-//     controls=[], tags=[LogicalQubitIDTag(0)])
-// expect(backend.received_commands[0] == received_cmd
-// expect(mapper._currently_allocated_ids == set([10, 0])
-//
-//
-// @pytest.mark.parametrize("different_backend_ids", [false, true])
-// function test_send_possible_commands_deallocate(different_backend_ids):
-// if different_backend_ids:
-// map_to_backend_ids = {0: 21, 1: 32, 2: 3, 3: 4, 4: 5, 5: 6}
-// else:
-// map_to_backend_ids = null
-// mapper = new GridMapper(3,2,
-//     mapped_ids_to_backend_ids=map_to_backend_ids)
-// backend = DummyEngine(save_commands=true)
-// backend.is_last_engine = true
-// mapper.next_engine = backend
-// qb0 = new BasicQubit(null, 0)
-// cmd0 = new Command(null, gate=Deallocate, tuple([qb0]), [],
-//     tags=[])
-// mapper._stored_commands = [cmd0]
-// mapper.current_mapping = {}
-// mapper._currently_allocated_ids = set([10])
-// # not yet allocated:
-//     mapper._sendPossibleCommands()
-// expect(len(backend.received_commands) == 0
-// expect(mapper._stored_commands == [cmd0]
-// # allocated:
-// mapper.current_mapping = {0: 3}
-// mapper._currently_allocated_ids.add(0)
-// mapper._sendPossibleCommands()
-// expect(len(backend.received_commands) == 1
-// expect(len(mapper._stored_commands) == 0
-// expect(mapper.current_mapping == {}
-// expect(mapper._currently_allocated_ids == set([10])
-//
-//
-// @pytest.mark.parametrize("different_backend_ids", [false, true])
-// function test_send_possible_commands_keep_remaining_gates(different_backend_ids):
-// if different_backend_ids:
-// map_to_backend_ids = {0: 21, 1: 32, 2: 3, 3: 0, 4: 5, 5: 6}
-// else:
-// map_to_backend_ids = null
-// mapper = new GridMapper(3,2,
-//     mapped_ids_to_backend_ids=map_to_backend_ids)
-// backend = DummyEngine(save_commands=true)
-// backend.is_last_engine = true
-// mapper.next_engine = backend
-// qb0 = new BasicQubit(null, 0)
-// qb1 = new BasicQubit(null, 1)
-// cmd0 = new Command(null, gate=Allocate, tuple([qb0]), [],
-//     tags=[])
-// cmd1 = new Command(null, gate=Deallocate, tuple([qb0]), [],
-//     tags=[])
-// cmd2 = new Command(null, gate=Allocate, tuple([qb1]), [],
-//     tags=[])
-//
-// mapper._stored_commands = [cmd0, cmd1, cmd2]
-// mapper.current_mapping = {0: 0}
-// mapper._sendPossibleCommands()
-// expect(mapper._stored_commands == [cmd2]
-//
-//
-// @pytest.mark.parametrize("different_backend_ids", [false, true])
-// function test_send_possible_commands_one_inactive_qubit(different_backend_ids):
-// if different_backend_ids:
-// map_to_backend_ids = {0: 21, 1: 32, 2: 3, 3: 0, 4: 5, 5: 6}
-// else:
-// map_to_backend_ids = null
-// mapper = new GridMapper(3,2,
-//     mapped_ids_to_backend_ids=map_to_backend_ids)
-// backend = DummyEngine(save_commands=true)
-// backend.is_last_engine = true
-// mapper.next_engine = backend
-// qb0 = new BasicQubit(null, 0)
-// qb1 = new BasicQubit(null, 1)
-// cmd0 = new Command(null, gate=Allocate, tuple([qb0]), [],
-//     tags=[])
-// cmd1 = new Command(null, gate=X, tuple([qb0]), [qb1])
-// mapper._stored_commands = [cmd0, cmd1]
-// mapper.current_mapping = {0: 0}
-// mapper._sendPossibleCommands()
-// expect(mapper._stored_commands == [cmd1]
-//
-//
-// @pytest.mark.parametrize("different_backend_ids", [false, true])
-// @pytest.mark.parametrize("num_optimization_steps", [1, 10])
-// function test_run_and_receive(num_optimization_steps, different_backend_ids):
-// if different_backend_ids:
-// map_to_backend_ids = {0: 21, 1: 32, 2: 3, 3: 0}
-// else:
-// map_to_backend_ids = null
-//
-// function choose_last_permutation(swaps):
-// choose_last_permutation.counter -= 1
-// return choose_last_permutation.counter
-//
-// choose_last_permutation.counter = 100
-// mapper = new GridMapper(
-//     num_rows=2,
-//     num_columns=2,
-//     mapped_ids_to_backend_ids=map_to_backend_ids,
-//     optimization_function=choose_last_permutation,
-//     num_optimization_steps=num_optimization_steps)
-// backend = DummyEngine(save_commands=true)
-// backend.is_last_engine = true
-// mapper.next_engine = backend
-// qb0 = new BasicQubit(null, 0)
-// qb1 = new BasicQubit(null, 1)
-// qb2 = new BasicQubit(null, 2)
-// qb3 = new BasicQubit(null, 3)
-// cmd0 = new Command(null, gate=Allocate, tuple([qb0],))
-// cmd1 = new Command(null, gate=Allocate, tuple([qb1],))
-// cmd2 = new Command(null, gate=Allocate, tuple([qb2],))
-// cmd3 = new Command(null, gate=Allocate, tuple([qb3],))
-// cmd4 = new Command(null, X, tuple([qb0]), [qb1])
-// cmd5 = new Command(null, X, tuple([qb1]), [qb3])
-// cmd6 = new Command(null, X, tuple([qb3]), [qb2])
-// cmd7 = new Command(null, X, tuple([qb0]), [qb2])
-// cmd8 = new Command(null, gate=Deallocate, tuple([qb1],))
-// all_cmd = [cmd0, cmd1, cmd2, cmd3, cmd4, cmd5, cmd6, cmd7, cmd8]
-// mapper.receive(all_cmd)
-// expect(mapper._stored_commands == all_cmd
-// qb4 = new BasicQubit(null, -1)
-// cmd_flush = new Command(null, gate=FlushGate(), tuple([qb4],))
-// mapper.receive([cmd_flush])
-// expect(mapper._stored_commands == []
-// expect(len(backend.received_commands) == 10
-// expect(mapper._currently_allocated_ids == set([0, 2, 3])
-// if different_backend_ids:
-// expect((mapper.current_mapping == {0: 21, 2: 3, 3: 0} or
-// mapper.current_mapping == {0: 32, 2: 0, 3: 21} or
-// mapper.current_mapping == {0: 3, 2: 21, 3: 32} or
-// mapper.current_mapping == {0: 0, 2: 32, 3: 3})
-// else:
-// expect((mapper.current_mapping == {0: 0, 2: 2, 3: 3} or
-// mapper.current_mapping == {0: 1, 2: 3, 3: 0} or
-// mapper.current_mapping == {0: 2, 2: 0, 3: 1} or
-// mapper.current_mapping == {0: 3, 2: 1, 3: 2})
-// cmd9 = new Command(null, X, tuple([qb0]), [qb3])
-// mapper.storage = 1
-// mapper.receive([cmd9])
-// expect(mapper._currently_allocated_ids == set([0, 2, 3])
-// expect(mapper._stored_commands == []
-// expect(len(mapper.current_mapping) == 3
-// expect(0 in mapper.current_mapping
-// expect(2 in mapper.current_mapping
-// expect(3 in mapper.current_mapping
-// expect(mapper.num_mappings == 1
-//
-//
-// function test_run_infinite_loop_detection():
-// mapper = new GridMapper(2,2)
-// backend = DummyEngine(save_commands=true)
-// backend.is_last_engine = true
-// mapper.next_engine = backend
-// qb0 = new BasicQubit(null, 0)
-// qb1 = new BasicQubit(null, 1)
-// qb2 = new BasicQubit(null, 2)
-// qb3 = new BasicQubit(null, 3)
-// qb4 = new BasicQubit(null, 4)
-// cmd0 = new Command(null, gate=Allocate, tuple([qb0],))
-// cmd1 = new Command(null, gate=Allocate, tuple([qb1],))
-// cmd2 = new Command(null, gate=Allocate, tuple([qb2],))
-// cmd3 = new Command(null, gate=Allocate, tuple([qb3],))
-// cmd4 = new Command(null, gate=Allocate, tuple([qb4],))
-// cmd5 = new Command(null, X, tuple([qb0]), [qb1])
-// qb2 = new BasicQubit(null, -1)
-// cmd_flush = new Command(null, gate=FlushGate(), tuple([qb2],))
-// with pytest.raises(RuntimeError):
-// mapper.receive([cmd0, cmd1, cmd2, cmd3, cmd4, cmd5, cmd_flush])
-//
-//
-// function test_correct_stats():
-// # Should test stats for twice same mapping but depends on heuristic
-// mapper = new GridMapper(3,1)
-// backend = DummyEngine(save_commands=true)
-// backend.is_last_engine = true
-// mapper.next_engine = backend
-// qb0 = new BasicQubit(null, 0)
-// qb1 = new BasicQubit(null, 1)
-// qb2 = new BasicQubit(null, 2)
-// cmd0 = new Command(null, gate=Allocate, tuple([qb0],))
-// cmd1 = new Command(null, gate=Allocate, tuple([qb1],))
-// cmd2 = new Command(null, gate=Allocate, tuple([qb2],))
-// cmd3 = new Command(null, X, tuple([qb0]), [qb1])
-// cmd4 = new Command(null, X, tuple([qb1]), [qb2])
-// cmd5 = new Command(null, X, tuple([qb0]), [qb2])
-// cmd6 = new Command(null, X, tuple([qb2]), [qb1])
-// cmd7 = new Command(null, X, tuple([qb0]), [qb1])
-// cmd8 = new Command(null, X, tuple([qb1]), [qb2])
-// qb_flush = new BasicQubit(null, -1)
-// cmd_flush = new Command(null, gate=FlushGate(), tuple([qb_flush],))
-// mapper.receive([cmd0, cmd1, cmd2, cmd3, cmd4, cmd5, cmd6, cmd7, cmd8,
-//   cmd_flush])
-// expect(mapper.num_mappings == 2
-//
-//
-// function test_send_possible_cmds_before_new_mapping():
-// mapper = new GridMapper(3,1)
-// backend = DummyEngine(save_commands=true)
-// backend.is_last_engine = true
-// mapper.next_engine = backend
-//
-// function dont_call_mapping(): raise Exception
-//
-// mapper._return_new_mapping = dont_call_mapping
-// mapper.current_mapping = {0: 1}
-// qb0 = new BasicQubit(null, 0)
-// cmd0 = new Command(null, gate=Allocate, tuple([qb0],))
-// qb2 = new BasicQubit(null, -1)
-// cmd_flush = new Command(null, gate=FlushGate(), tuple([qb2],))
-// mapper.receive([cmd0, cmd_flush])
-//
-//
-// function test_logical_id_tags_allocate_and_deallocate():
-// mapper = new GridMapper(2,2)
-// backend = DummyEngine(save_commands=true)
-// backend.is_last_engine = true
-// mapper.next_engine = backend
-// qb0 = new BasicQubit(null, 0)
-// qb1 = new BasicQubit(null, 1)
-// cmd0 = new Command(null, gate=Allocate, tuple([qb0],))
-// cmd1 = new Command(null, gate=Allocate, tuple([qb1],))
-// cmd2 = new Command(null, X, tuple([qb0]), [qb1])
-// cmd3 = new Command(null, gate=Deallocate, tuple([qb0],))
-// cmd4 = new Command(null, gate=Deallocate, tuple([qb1],))
-// mapper.current_mapping = {0: 0, 1: 3}
-// qb_flush = new BasicQubit(null, -1)
-// cmd_flush = new Command(null, gate=FlushGate(), tuple([qb_flush],))
-// mapper.receive([cmd0, cmd1, cmd2, cmd_flush])
-// expect(backend.received_commands[0].gate == Allocate
-// expect(backend.received_commands[0].qubits[0][0].id == 0
-// expect(backend.received_commands[0].tags == [LogicalQubitIDTag(0)]
-// expect(backend.received_commands[1].gate == Allocate
-// expect(backend.received_commands[1].qubits[0][0].id == 3
-// expect(backend.received_commands[1].tags == [LogicalQubitIDTag(1)]
-// for cmd in backend.received_commands[2:]:
-// if cmd.gate == Allocate:
-// expect(cmd.tags == []
-// elif cmd.gate == Deallocate:
-// expect(cmd.tags == []
-// mapped_id_for_0 = mapper.current_mapping[0]
-// mapped_id_for_1 = mapper.current_mapping[1]
-// mapper.receive([cmd3, cmd4, cmd_flush])
-// expect(backend.received_commands[-3].gate == Deallocate
-// expect(backend.received_commands[-3].qubits[0][0].id == mapped_id_for_0
-// expect(backend.received_commands[-3].tags == [LogicalQubitIDTag(0)]
-// expect(backend.received_commands[-2].gate == Deallocate
-// expect(backend.received_commands[-2].qubits[0][0].id == mapped_id_for_1
-// expect(backend.received_commands[-2].tags == [LogicalQubitIDTag(1)]
-//
-//
-// function test_check_that_local_optimizer_doesnt_merge():
-// mapper = new GridMapper(2,2)
-// optimizer = LocalOptimizer(10)
-// backend = DummyEngine(save_commands=true)
-// backend.is_last_engine = true
-// mapper.next_engine = optimizer
-// optimizer.next_engine = backend
-// mapper.current_mapping = {0: 0}
-// mapper.storage = 1
-// qb0 = new BasicQubit(null, 0)
-// qb1 = new BasicQubit(null, 1)
-// qb_flush = new BasicQubit(null, -1)
-// cmd_flush = new Command(null, gate=FlushGate(), tuple([qb_flush],))
-// cmd0 = new Command(null, gate=Allocate, tuple([qb0],))
-// cmd1 = new Command(null, X, tuple([qb0],))
-// cmd2 = new Command(null, gate=Deallocate, tuple([qb0],))
-// mapper.receive([cmd0, cmd1, cmd2])
-// expect(len(mapper._stored_commands) == 0
-// mapper.current_mapping = {1: 0}
-// cmd3 = new Command(null, gate=Allocate, tuple([qb1],))
-// cmd4 = new Command(null, X, tuple([qb1],))
-// cmd5 = new Command(null, gate=Deallocate, tuple([qb1],))
-// mapper.receive([cmd3, cmd4, cmd5, cmd_flush])
-// expect(len(backend.received_commands) == 7
+  it('should test_return_swaps_random', () => {
+    const data = [
+      [2, 2, 0, 0, 0], [3, 4, 1, 0, 0], [4, 3, 2, 0, 0],
+      [5, 5, 3, 0, 0], [5, 3, 4, 3, 0], [4, 4, 5, 0, 3],
+      [6, 6, 7, 2, 3]]
+    data.forEach(([num_rows, num_columns, seed, none_old, none_new]) => {
+      const num_qubits = num_rows * num_columns
+      const range = arrayFromRange(num_qubits)
+      const old_chain = randomSample(range, num_qubits)
+      const new_chain = randomSample(range, num_qubits)
+      const old_mapping = {}
+      const new_mapping = {}
+      for (let i = 0; i < num_qubits; ++i) {
+        old_mapping[old_chain[i]] = i
+        new_mapping[new_chain[i]] = i
+      }
+
+      // Remove certain elements from mappings:
+      const old_none_ids = new Set(randomSample(range, none_old))
+      if (none_old !== 0) {
+        for (const logical_id of old_none_ids) {
+          delete old_mapping[logical_id]
+        }
+      }
+      const new_none_ids = new Set(randomSample(range, none_new))
+      if (none_new !== 0) {
+        for (const logical_id of new_none_ids) {
+          delete new_mapping[logical_id]
+        }
+      }
+      const mapper = new GridMapper({num_rows, num_columns})
+      const swaps = mapper.returnSwaps(old_mapping, new_mapping)
+      // Check that Swaps are allowed
+      const all_allowed_swaps = new Set()
+      for (let row = 0; row < num_rows; ++row) {
+        for (let column = 0; column < num_columns - 1; ++column) {
+          const qb_id = row * num_columns + column
+          all_allowed_swaps.add([qb_id, qb_id + 1])
+        }
+      }
+      for (let row = 0; row < num_rows - 1; ++row) {
+        for (let column = 0; column < num_columns; ++column) {
+          const qb_id = row * num_columns + column
+          all_allowed_swaps.add([qb_id, qb_id + num_columns])
+        }
+      }
+
+      function arrayInSet(set, array) {
+        for (const looper of set) {
+          if (deepEqual(looper, array)) {
+            return true
+          }
+        }
+        return false
+      }
+      swaps.forEach(swap => expect(arrayInSet(all_allowed_swaps, swap)).to.equal(true))
+
+      const test_chain = old_chain.slice(0)
+      swaps.forEach(([pos0, pos1]) => {
+        const tmp = test_chain[pos0]
+        test_chain[pos0] = test_chain[pos1]
+        test_chain[pos1] = tmp
+      })
+
+      expect(len(test_chain)).to.equal(len(new_chain))
+
+      new_chain.forEach((looper, i) => {
+        if (looper in old_mapping && looper in new_mapping) {
+          expect(test_chain[i]).to.equal(looper)
+        }
+      })
+    })
+  })
+
+  it('should test_send_possible_commands', () => {
+    const different_backend_ids = [false, true]
+    different_backend_ids.forEach((different_backend_id) => {
+      let map_to_backend_ids
+      if (different_backend_id) {
+        map_to_backend_ids = {
+          0: 21,
+          1: 32,
+          2: 1,
+          3: 4,
+          4: 5,
+          5: 6,
+          6: 10,
+          7: 7
+        }
+      }
+      const mapper = new GridMapper({
+        num_rows: 2,
+        num_columns: 4,
+        mapped_ids_to_backend_ids: map_to_backend_ids
+      })
+      const backend = new DummyEngine(true)
+      backend.isLastEngine = true
+      mapper.next = backend
+      // mapping is identical except 5 <-> 0
+      if (different_backend_id) {
+        mapper.currentMapping = {
+          0: 6,
+          1: 32,
+          2: 1,
+          3: 4,
+          4: 5,
+          5: 21,
+          6: 10,
+          7: 7
+        }
+      } else {
+        mapper.currentMapping = {
+          5: 0,
+          1: 1,
+          2: 2,
+          3: 3,
+          4: 4,
+          0: 5,
+          6: 6,
+          7: 7
+        }
+      }
+      const neighbours = [[5, 1], [1, 2], [2, 3], [4, 0], [0, 6], [6, 7],
+        [5, 4], [1, 0], [2, 6], [3, 7]]
+      neighbours.forEach(([qb0_id, qb1_id]) => {
+        const qb0 = new BasicQubit(null, qb0_id)
+        const qb1 = new BasicQubit(null, qb1_id)
+        const cmd1 = new Command(null, X, tuple([qb0]), [qb1])
+        const cmd2 = new Command(null, X, tuple([qb1]), [qb0])
+        mapper._stored_commands = [cmd1, cmd2]
+        mapper._sendPossibleCommands()
+        expect(len(mapper._stored_commands)).to.equal(0)
+      })
+
+      const r = arrayFromRange(8)
+      function arrayInSuperArray(sup, array) {
+        return sup.findIndex(looper => deepEqual(looper, array)) !== -1
+      }
+      for (const looper of permutations(r, 2)) {
+        const [qb0_id, qb1_id] = looper
+        if (!arrayInSuperArray(neighbours, [qb0_id, qb1_id]) && !arrayInSuperArray(neighbours, [qb1_id, qb0_id])) {
+          const qb0 = new BasicQubit(null, qb0_id)
+          const qb1 = new BasicQubit(null, qb1_id)
+          const cmd = new Command(null, X, tuple([qb0]), [qb1])
+          mapper._stored_commands = [cmd]
+          mapper._sendPossibleCommands()
+          expect(len(mapper._stored_commands)).to.equal(1)
+        }
+      }
+    })
+  });
+
+  it('should test_send_possible_commands_allocate', () => {
+    const different_backend_ids = [false, true]
+    different_backend_ids.forEach((different_backend_id) => {
+      let map_to_backend_ids
+      if (different_backend_id) {
+        map_to_backend_ids = {
+          0: 21, 1: 32, 2: 3, 3: 4, 4: 5, 5: 6
+        }
+      }
+      const mapper = new GridMapper({
+        num_rows: 3,
+        num_columns: 2,
+        mapped_ids_to_backend_ids: map_to_backend_ids
+      })
+      const backend = new DummyEngine(true)
+      backend.isLastEngine = true
+      mapper.next = backend
+      const qb0 = new BasicQubit(null, 0)
+      const cmd0 = new Command(null, Allocate, tuple([qb0]), [], [])
+      mapper._stored_commands = [cmd0]
+      mapper._currently_allocated_ids = new Set([10])
+      // not in mapping:
+      mapper.currentMapping = {}
+      expect(len(backend.receivedCommands)).to.equal(0)
+      mapper._sendPossibleCommands()
+      expect(len(backend.receivedCommands)).to.equal(0)
+      expect(mapper._stored_commands).to.deep.equal([cmd0])
+      // in mapping:
+      mapper.currentMapping = {0: 3}
+      mapper._sendPossibleCommands()
+      expect(len(mapper._stored_commands)).to.equal(0)
+      // Only self._run() sends Allocate gates
+      const mapped0 = new BasicQubit(null, 3)
+      const received_cmd = new Command(mapper, Allocate, tuple([mapped0]), [], [new LogicalQubitIDTag(0)])
+      expect(backend.receivedCommands[0].equal(received_cmd)).to.equal(true)
+      expect(mapper._currently_allocated_ids).to.deep.equal(new Set([10, 0]))
+    })
+  });
+
+  it('should test_send_possible_commands_deallocate', () => {
+    const different_backend_ids = [false, true]
+    different_backend_ids.forEach((different_backend_id) => {
+      let map_to_backend_ids
+      if (different_backend_id) {
+        map_to_backend_ids = {
+          0: 21, 1: 32, 2: 3, 3: 4, 4: 5, 5: 6
+        }
+      }
+      const mapper = new GridMapper({
+        num_rows: 3,
+        num_columns: 2,
+        mapped_ids_to_backend_ids: map_to_backend_ids
+      })
+      const backend = new DummyEngine(true)
+      backend.isLastEngine = true
+      mapper.next = backend
+      const qb0 = new BasicQubit(null, 0)
+      const cmd0 = new Command(null, Deallocate, tuple([qb0]), [], [])
+      mapper._stored_commands = [cmd0]
+      mapper.currentMapping = {}
+      mapper._currently_allocated_ids = new Set([10])
+      // not yet allocated:
+      mapper._sendPossibleCommands()
+      expect(len(backend.receivedCommands)).to.equal(0)
+      expect(mapper._stored_commands).to.deep.equal([cmd0])
+      // allocated:
+      mapper.currentMapping = {0: 3}
+      mapper._currently_allocated_ids.add(0)
+      mapper._sendPossibleCommands()
+      expect(len(backend.receivedCommands)).to.equal(1)
+      expect(len(mapper._stored_commands)).to.equal(0)
+      expect(mapper.currentMapping).to.deep.equal({})
+      expect(mapper._currently_allocated_ids).to.deep.equal(new Set([10]))
+    })
+  })
+
+  it('should test_send_possible_commands_keep_remaining_gates', () => {
+    const different_backend_ids = [false, true]
+    different_backend_ids.forEach((different_backend_id) => {
+      let map_to_backend_ids
+      if (different_backend_id) {
+        map_to_backend_ids = {
+          0: 21, 1: 32, 2: 3, 3: 0, 4: 5, 5: 6
+        }
+      }
+      const mapper = new GridMapper({
+        num_rows: 3,
+        num_columns: 2,
+        mapped_ids_to_backend_ids: map_to_backend_ids
+      });
+      const backend = new DummyEngine(true)
+      backend.isLastEngine = true
+      mapper.next = backend
+      const qb0 = new BasicQubit(null, 0)
+      const qb1 = new BasicQubit(null, 1)
+      const cmd0 = new Command(null, Allocate, tuple([qb0]), [], [])
+      const cmd1 = new Command(null, Deallocate, tuple([qb0]), [], [])
+      const cmd2 = new Command(null, Allocate, tuple([qb1]), [], [])
+
+      mapper._stored_commands = [cmd0, cmd1, cmd2]
+      mapper.currentMapping = {0: 0}
+      mapper._sendPossibleCommands()
+      expect(mapper._stored_commands).to.deep.equal([cmd2])
+    })
+  });
+
+  it('should test_send_possible_commands_one_inactive_qubit', () => {
+    const different_backend_ids = [false, true]
+    different_backend_ids.forEach((different_backend_id) => {
+      let map_to_backend_ids
+      if (different_backend_id) {
+        map_to_backend_ids = {
+          0: 21, 1: 32, 2: 3, 3: 0, 4: 5, 5: 6
+        }
+      }
+      const mapper = new GridMapper({
+        num_rows: 3,
+        num_columns: 2,
+        mapped_ids_to_backend_ids: map_to_backend_ids
+      })
+      const backend = new DummyEngine(true)
+      backend.isLastEngine = true
+      mapper.next = backend
+      const qb0 = new BasicQubit(null, 0)
+      const qb1 = new BasicQubit(null, 1)
+      const cmd0 = new Command(null, Allocate, tuple([qb0]), [], [])
+      const cmd1 = new Command(null, X, tuple([qb0]), [qb1])
+      mapper._stored_commands = [cmd0, cmd1]
+      mapper.currentMapping = {0: 0}
+      mapper._sendPossibleCommands()
+      expect(mapper._stored_commands).to.deep.equal([cmd1])
+    })
+  });
+
+  it('should test_run_and_receive', () => {
+    const different_backend_ids = [false, true]
+    const num_optimization_steps = [1, 10]
+    different_backend_ids.forEach((different_backend_id) => {
+      num_optimization_steps.forEach((num_optimization_step) => {
+        let map_to_backend_ids
+        if (different_backend_id) {
+          map_to_backend_ids = {
+            0: 21, 1: 32, 2: 3, 3: 0
+          }
+        }
+
+        function choose_last_permutation(swaps) {
+          choose_last_permutation.counter -= 1
+          return choose_last_permutation.counter
+        }
+
+        choose_last_permutation.counter = 100
+        const mapper = new GridMapper(
+          {
+            num_rows: 2,
+            num_columns: 2,
+            mapped_ids_to_backend_ids: map_to_backend_ids,
+            optimization_function: choose_last_permutation,
+            num_optimization_steps: num_optimization_step
+          }
+        )
+        const backend = new DummyEngine(true)
+        backend.isLastEngine = true
+        mapper.next = backend
+        const qb0 = new BasicQubit(null, 0)
+        const qb1 = new BasicQubit(null, 1)
+        const qb2 = new BasicQubit(null, 2)
+        const qb3 = new BasicQubit(null, 3)
+        const cmd0 = new Command(null, Allocate, tuple([qb0], ))
+        const cmd1 = new Command(null, Allocate, tuple([qb1], ))
+        const cmd2 = new Command(null, Allocate, tuple([qb2], ))
+        const cmd3 = new Command(null, Allocate, tuple([qb3], ))
+        const cmd4 = new Command(null, X, tuple([qb0]), [qb1])
+        const cmd5 = new Command(null, X, tuple([qb1]), [qb3])
+        const cmd6 = new Command(null, X, tuple([qb3]), [qb2])
+        const cmd7 = new Command(null, X, tuple([qb0]), [qb2])
+        const cmd8 = new Command(null, Deallocate, tuple([qb1], ))
+        const all_cmd = [cmd0, cmd1, cmd2, cmd3, cmd4, cmd5, cmd6, cmd7, cmd8]
+        mapper.receive(all_cmd)
+        expect(mapper._stored_commands).to.deep.equal(all_cmd)
+        const qb4 = new BasicQubit(null, -1)
+        const cmd_flush = new Command(null, new FlushGate(), tuple([qb4]))
+        mapper.receive([cmd_flush])
+        expect(mapper._stored_commands).to.deep.equal([])
+        expect(len(backend.receivedCommands)).to.equal(10)
+        expect(mapper._currently_allocated_ids).to.deep.equal(new Set([0, 2, 3]))
+        if (different_backend_id) {
+          const obj = mapper.currentMapping
+          const f1 = deepEqual(obj, {0: 21, 2: 3, 3: 0})
+          const f2 = deepEqual(obj, {0: 32, 2: 0, 3: 21})
+          const f3 = deepEqual(obj, {0: 3, 2: 21, 3: 32})
+          const f4 = deepEqual(obj, {0: 0, 2: 32, 3: 3})
+          expect(f1 || f2 || f3 || f4).to.equal(true)
+        } else {
+          const obj = mapper.currentMapping
+          const f1 = deepEqual(obj, {0: 0, 2: 2, 3: 3})
+          const f2 = deepEqual(obj, {0: 1, 2: 3, 3: 0})
+          const f3 = deepEqual(obj, {0: 2, 2: 0, 3: 1})
+          const f4 = deepEqual(obj, {0: 3, 2: 1, 3: 2})
+          expect(f1 || f2 || f3 || f4).to.equal(true)
+        }
+        const cmd9 = new Command(null, X, tuple([qb0]), [qb3])
+        mapper.storage = 1
+        mapper.receive([cmd9])
+        expect(mapper._currently_allocated_ids).to.deep.equal(new Set([0, 2, 3]))
+        expect(mapper._stored_commands).to.deep.equal([])
+        expect(len(mapper.currentMapping)).to.equal(3)
+        expect(0 in mapper.currentMapping).to.equal(true)
+        expect(2 in mapper.currentMapping).to.equal(true)
+        expect(3 in mapper.currentMapping).to.equal(true)
+        expect(mapper.num_mappings).to.equal(1)
+      })
+    })
+  })
+
+  it('should test_run_infinite_loop_detection', () => {
+    const mapper = new GridMapper({num_rows: 2, num_columns: 2})
+    const backend = new DummyEngine(true)
+    backend.isLastEngine = true
+    mapper.next = backend
+    const qb0 = new BasicQubit(null, 0)
+    const qb1 = new BasicQubit(null, 1)
+    let qb2 = new BasicQubit(null, 2)
+    const qb3 = new BasicQubit(null, 3)
+    const qb4 = new BasicQubit(null, 4)
+    const cmd0 = new Command(null, Allocate, tuple([qb0], ))
+    const cmd1 = new Command(null, Allocate, tuple([qb1], ))
+    const cmd2 = new Command(null, Allocate, tuple([qb2], ))
+    const cmd3 = new Command(null, Allocate, tuple([qb3], ))
+    const cmd4 = new Command(null, Allocate, tuple([qb4], ))
+    const cmd5 = new Command(null, X, tuple([qb0]), [qb1])
+    qb2 = new BasicQubit(null, -1)
+    const cmd_flush = new Command(null, new FlushGate(), tuple([qb2], ))
+
+    expect(() => mapper.receive([cmd0, cmd1, cmd2, cmd3, cmd4, cmd5, cmd_flush])).to.throw()
+  })
+
+  it('should test_correct_stats', () => {
+    // Should test stats for twice same mapping but depends on heuristic
+    const mapper = new GridMapper({num_rows: 3, num_columns: 1})
+    const backend = new DummyEngine(true)
+    backend.isLastEngine = true
+    mapper.next = backend
+    const qb0 = new BasicQubit(null, 0)
+    const qb1 = new BasicQubit(null, 1)
+    const qb2 = new BasicQubit(null, 2)
+    const cmd0 = new Command(null, Allocate, tuple([qb0]))
+    const cmd1 = new Command(null, Allocate, tuple([qb1]))
+    const cmd2 = new Command(null, Allocate, tuple([qb2]))
+    const cmd3 = new Command(null, X, tuple([qb0]), [qb1])
+    const cmd4 = new Command(null, X, tuple([qb1]), [qb2])
+    const cmd5 = new Command(null, X, tuple([qb0]), [qb2])
+    const cmd6 = new Command(null, X, tuple([qb2]), [qb1])
+    const cmd7 = new Command(null, X, tuple([qb0]), [qb1])
+    const cmd8 = new Command(null, X, tuple([qb1]), [qb2])
+    const qb_flush = new BasicQubit(null, -1)
+    const cmd_flush = new Command(null, new FlushGate(), tuple([qb_flush]))
+    mapper.receive([cmd0, cmd1, cmd2, cmd3, cmd4, cmd5, cmd6, cmd7, cmd8, cmd_flush])
+    expect(mapper.num_mappings).to.equal(2)
+  });
+
+  it('should test_send_possible_cmds_before_new_mapping', () => {
+    const mapper = new GridMapper({num_rows: 3, num_columns: 1})
+    const backend = new DummyEngine(true)
+    backend.isLastEngine = true
+    mapper.next = backend
+
+    function dont_call_mapping() {
+      throw new Error('')
+    }
+
+    mapper.returnNewMapping = dont_call_mapping
+    mapper.currentMapping = {0: 1}
+    const qb0 = new BasicQubit(null, 0)
+    const cmd0 = new Command(null, Allocate, tuple([qb0]))
+    const qb2 = new BasicQubit(null, -1)
+    const cmd_flush = new Command(null, new FlushGate(), tuple([qb2]))
+    mapper.receive([cmd0, cmd_flush])
+  })
+
+  it('should test_logical_id_tags_allocate_and_deallocate', () => {
+    const mapper = new GridMapper({num_rows: 2, num_columns: 2})
+    const backend = new DummyEngine(true)
+    backend.isLastEngine = true
+    mapper.next = backend
+    const qb0 = new BasicQubit(null, 0)
+    const qb1 = new BasicQubit(null, 1)
+    const cmd0 = new Command(null, Allocate, tuple([qb0]))
+    const cmd1 = new Command(null, Allocate, tuple([qb1]))
+    const cmd2 = new Command(null, X, tuple([qb0]), [qb1])
+    const cmd3 = new Command(null, Deallocate, tuple([qb0]))
+    const cmd4 = new Command(null, Deallocate, tuple([qb1]))
+    mapper.currentMapping = {0: 0, 1: 3}
+    const qb_flush = new BasicQubit(null, -1)
+    const cmd_flush = new Command(null, new FlushGate(), tuple([qb_flush], ))
+    mapper.receive([cmd0, cmd1, cmd2, cmd_flush])
+    expect(backend.receivedCommands[0].gate.equal(Allocate)).to.equal(true)
+    expect(backend.receivedCommands[0].qubits[0][0].id).to.equal(0)
+    expect(backend.receivedCommands[0].tags).to.deep.equal([new LogicalQubitIDTag(0)])
+    expect(backend.receivedCommands[1].gate.equal(Allocate)).to.equal(true)
+    expect(backend.receivedCommands[1].qubits[0][0].id).to.equal(3)
+    expect(backend.receivedCommands[1].tags).to.deep.equal([new LogicalQubitIDTag(1)])
+    backend.receivedCommands.slice(2).forEach((cmd) => {
+      if (cmd.gate.equal(Allocate) || cmd.gate.equal(Deallocate)) {
+        expect(cmd.tags).to.deep.equal([])
+      }
+    })
+
+    const mapped_id_for_0 = mapper.currentMapping[0]
+    const mapped_id_for_1 = mapper.currentMapping[1]
+    mapper.receive([cmd3, cmd4, cmd_flush])
+    const length = backend.receivedCommands.length
+    expect(backend.receivedCommands[length - 3].gate.equal(Deallocate)).to.equal(true)
+    expect(backend.receivedCommands[length - 3].qubits[0][0].id).to.equal(mapped_id_for_0)
+    expect(backend.receivedCommands[length - 3].tags).to.deep.equal([new LogicalQubitIDTag(0)])
+    expect(backend.receivedCommands[length - 2].gate.equal(Deallocate)).to.equal(true)
+    expect(backend.receivedCommands[length - 2].qubits[0][0].id).to.equal(mapped_id_for_1)
+    expect(backend.receivedCommands[length - 2].tags).to.deep.equal([new LogicalQubitIDTag(1)])
+  })
+
+  it('should test_check_that_local_optimizer_doesnt_merge', () => {
+    const mapper = new GridMapper({num_rows: 2, num_columns: 2})
+    const optimizer = new LocalOptimizer(10)
+    const backend = new DummyEngine(true)
+    backend.isLastEngine = true
+    mapper.next = optimizer
+    optimizer.next = backend
+    mapper.currentMapping = {0: 0}
+    mapper.storage = 1
+    const qb0 = new BasicQubit(null, 0)
+    const qb1 = new BasicQubit(null, 1)
+    const qb_flush = new BasicQubit(null, -1)
+    const cmd_flush = new Command(null, new FlushGate(), tuple([qb_flush]))
+    const cmd0 = new Command(null, Allocate, tuple([qb0]))
+    const cmd1 = new Command(null, X, tuple([qb0]))
+    const cmd2 = new Command(null, Deallocate, tuple([qb0]))
+    mapper.receive([cmd0, cmd1, cmd2])
+    expect(len(mapper._stored_commands)).to.equal(0)
+    mapper.currentMapping = {1: 0}
+    const cmd3 = new Command(null, Allocate, tuple([qb1]))
+    const cmd4 = new Command(null, X, tuple([qb1]))
+    const cmd5 = new Command(null, Deallocate, tuple([qb1]))
+    mapper.receive([cmd3, cmd4, cmd5, cmd_flush])
+    expect(len(backend.receivedCommands)).to.equal(7)
+  });
+})

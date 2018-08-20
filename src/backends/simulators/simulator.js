@@ -80,7 +80,8 @@ extension.
     }
 
     if (!forceSimulation && CPPSimulatorBackend) {
-      this._simulator = new CPPSimulatorBackend(rnd_seed)
+      const S = CPPSimulatorBackend.Simulator
+      this._simulator = new S(rnd_seed)
     } else {
       this._simulator = new SimulatorBackend(rnd_seed)
     }

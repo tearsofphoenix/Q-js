@@ -222,13 +222,6 @@ export function stringToBitArray(str) {
   return result
 }
 
-export function copyComplexArray(complexArray) {
-  if (Array.isArray(complexArray)) {
-    return complexArray.map(c => math.clone(c))
-  }
-  return []
-}
-
 export function complexVectorDot(a1, a2) {
   let real = 0
   let image = 0

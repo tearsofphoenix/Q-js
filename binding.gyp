@@ -40,6 +40,7 @@
       },
       'include_dirs': [
         '<!(node -e "require(\'nan\')")',
+        'D:/cygwin64/boost_1_68_0',
       ],
       'conditions': [
         ['libq_ext == "" or libq_ext == "no"', {
