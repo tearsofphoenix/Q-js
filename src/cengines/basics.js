@@ -176,7 +176,7 @@ returns true.
   }
 
   receive() {
-    // TODO
+    // do nothing
   }
 }
 

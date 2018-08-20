@@ -44,53 +44,41 @@ mapper (BasicMapperEngine): Access to the mapper if there is one.
  */
 export default class MainEngine extends BasicEngine {
   /**
+   * @constructor
   Initialize the main compiler engine and all compiler engines.
 
     Sets 'next_engine'- and 'main_engine'-attributes of all compiler
 engines and adds the back-end as the last engine.
 
-    @param
-backend (BasicEngine): Backend to send the compiled circuit to.
-engine_list (list<BasicEngine>): List of engines / backends to use
+    @param backend {BasicEngine}: Backend to send the compiled circuit to.
+    @param engineList {Array<BasicEngine>}: List of engines / backends to use
 as compiler engines. Note: The engine list must not contain
 multiple mappers (instances of BasicMapperEngine).
 Default: projectq.setups.default.get_engine_list()
 verbose (bool): Either print full or compact error messages.
     Default: false (i.e. compact error messages).
 
-@example
+    @example
     @code
-
-from projectq import MainEngine
-eng = MainEngine() # uses default engine_list and the Simulator
+      const eng = new MainEngine() // uses default engine_list and the Simulator
 
 Instead of the default `engine_list` one can use, e.g., one of the IBM
 setups which defines a custom `engine_list` useful for one of the IBM
 chips
 
-@example
+    @example
     @code
-
-import projectq.setups.ibm as ibm_setup
-from projectq import MainEngine
-eng = MainEngine(engine_list=ibm_setup.get_engine_list())
-# eng uses the default Simulator backend
+      const eng = new MainEngine(new Simulator, getEngineList())
+      // eng uses the default Simulator backend
 
 Alternatively, one can specify all compiler engines explicitly, e.g.,
 
     @example
-@code
-
-from projectq.cengines import (TagRemover, AutoReplacer,
-    LocalOptimizer,
-    DecompositionRuleSet)
-from projectq.backends import Simulator
-  from projectq import MainEngine
-rule_set = DecompositionRuleSet()
-engines = [AutoReplacer(rule_set), TagRemover(),
-  LocalOptimizer(3)]
-eng = MainEngine(Simulator(), engines)
-   */
+    @code
+      const rule_set = new DecompositionRuleSet()
+      const engines = [new AutoReplacer(rule_set), new TagRemover(), new LocalOptimizer(3)]
+      const eng = new MainEngine(new Simulator(), engines)
+  */
   constructor(backend, engineList, verbose = false) {
     super()
     if (!backend) {
@@ -212,11 +200,10 @@ eng.get_measurement_result(qubit[0]) == int(qubit)
   }
 
   /**
-  Returns a unique qubit id to be used for the next qubit allocation.
+    Returns a unique qubit id to be used for the next qubit allocation.
 
-    @returns
-new_qubit_id (int): New unique qubit id.
-   */
+    @returns {Number}: New unique qubit id.
+  */
   getNewQubitID() {
     this._qubitIdx += 1
     return this._qubitIdx - 1
@@ -225,9 +212,7 @@ new_qubit_id (int): New unique qubit id.
   /**
   Forward the list of commands to the first engine.
 
-    @param
-command_list (list<Command>): List of commands to receive (and
-then send on)
+    @param commandList {Array<Command>}: List of commands to receive (and then send on)
    */
   receive(commandList) {
     this.send(commandList)
@@ -250,11 +235,19 @@ then send on)
   }
 
   /**
+    Destroy the main engine.
+
+  Flushes the entire circuit down the pipeline, clearing all temporary
+  buffers (in, e.g., optimizers).
+ */
+  deallocate() {
+    this.flush(true)
+  }
+  /**
   Flush the entire circuit down the pipeline, clearing potential buffers
 (of, e.g., optimizers).
 
-    @param
-deallocate_qubits (bool): If true, deallocates all qubits that are
+    @param deallocateQubits {Boolean}: If true, deallocates all qubits that are
 still alive (invalidating references to them by setting their
 id to -1).
    */

@@ -98,7 +98,6 @@ num (int): Number of loop iterations.
             this.send(this._cmdList.map(cmd => cmd.copy()))
           } else {
             // Change local qubit ids before sending them
-            // TODO
             Object.values(this._refsToLocalQB).forEach(refs_loc_qubit => {
               const new_qb_id = this.main.getNewQubitID()
               refs_loc_qubit.forEach(qubitRef => qubitRef.id = new_qb_id)

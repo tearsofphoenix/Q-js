@@ -23,7 +23,9 @@ import {instanceOf, tuple} from '../libs/util';
 import {CNOT} from '../ops/shortcuts'
 import CommandModifier from './cmdmodifier'
 
-/*
+/**
+ * @class SwapAndCNOTFlipper
+ * @classdesc
 Flips CNOTs and translates Swaps to CNOTs where necessary.
 
     Warning:
@@ -34,11 +36,11 @@ the following engines.
 This engine cannot be used as a backend.
  */
 export default class SwapAndCNOTFlipper extends BasicEngine {
-  /*
+  /**
+   * @constructor
   Initialize the engine.
 
-    @param
-connectivity (set): Set of tuples (c, t) where if (c, t) is an
+    @param connectivity {Set<String> | Set<Array<Number>>}: Set of tuples (c, t) where if (c, t) is an
 element of the set means that a CNOT can be performed between
 the physical ids (c, t) with c being the control and t being
 the target qubit.
@@ -53,12 +55,11 @@ the target qubit.
     this.connectivity = connectivity
   }
 
-  /*
+  /**
   Check if the IBM backend can perform the Command cmd and return true
 if so.
 
-    @param
-cmd (Command): The command to check
+    @param cmd {Command}: The command to check
    */
   isAvailable(cmd) {
     return this.isSwap(cmd) || this.next.isAvailable(cmd)
@@ -117,15 +118,13 @@ cmd (Command): The command to check
     }
   }
 
-  /*
-      Receives a command list and if the command is a CNOT gate, it flips
+  /**
+     Receives a command list and if the command is a CNOT gate, it flips
     it using Hadamard gates if necessary; if it is a Swap gate, it
     decomposes it using 3 CNOTs. All other gates are simply sent to the
     next engine.
 
-        @param
-    command_list (list of Command objects): list of commands to
-    receive.
+        @param commandList {Array<Command>}: list of commands to receive.
    */
   receive(commandList) {
     commandList.forEach((cmd) => {

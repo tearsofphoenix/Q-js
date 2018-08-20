@@ -21,6 +21,9 @@ import {
   H, AllocateQubitGate, FlushGate, DeallocateQubitGate
 } from '../ops/gates'
 import BasicMapperEngine from './basicmapper'
+import Simulator from "../backends/simulators/simulator";
+import {getEngineList} from "../setups";
+import LocalOptimizer from "./optimize";
 
 describe('main engine test', () => {
   it('should test_main_engine_init', () => {
@@ -66,19 +69,19 @@ describe('main engine test', () => {
     }).to.throw()
   });
 
-  // TODO
   it('should test_main_engine_init_defaults', () => {
-    // eng = new MainEngine()
-    // eng_list = []
-    // current_engine = eng.next_engine
-    // while not current_engine.is_last_engine:
-    // eng_list.append(current_engine)
-    // current_engine = current_engine.next_engine
-    // assert isinstance(eng_list[-1].next_engine, Simulator)
-    // import projectq.setups.default
-    // default_engines = projectq.setups.default.get_engine_list()
-    // for engine, expected in zip(eng_list, default_engines):
-    // assert type(engine) == type(expected)
+    const eng = new MainEngine()
+    const eng_list = []
+    let current_engine = eng.next
+    while (!current_engine.isLastEngine) {
+      eng_list.push(current_engine)
+      current_engine = current_engine.next
+    }
+    expect(eng_list[eng_list.length - 1].next instanceof Simulator).to.equal(true)
+    const default_engines = getEngineList()
+    default_engines.forEach((looper, i) => {
+      expect(looper.constructor === eng_list[i].constructor).to.equal(true)
+    })
   });
 
   it('should test_main_engine_init_mapper', () => {
@@ -100,20 +103,20 @@ describe('main engine test', () => {
     expect(() => new MainEngine(null, engine_list3)).to.throw()
   });
 
-  // TODO
   it('should test_main_engine_del', () => {
     // Clear previous exceptions of other tests
 
     // need engine which caches commands to test that del calls flush
-    // caching_engine = LocalOptimizer(m=5)
-    // backend = DummyEngine(save_commands=true)
-    // eng = new MainEngine(backend=backend, engine_list=[caching_engine])
-    // qubit = eng.allocateQubit()
-    // H | qubit
-    // assert len(backend.received_commands) == 0
-    // eng.__del__()
-    // # Allocate, H, Deallocate, and Flush Gate
-    // assert len(backend.received_commands) == 4
+    const caching_engine = new LocalOptimizer(5)
+    const backend = new DummyEngine(true)
+    const eng = new MainEngine(backend, [caching_engine])
+    const qubit = eng.allocateQubit()
+    H.or(qubit)
+    expect(backend.receivedCommands.length).to.equal(0)
+
+    eng.deallocate()
+    // Allocate, H, Deallocate, and Flush Gate
+    expect(backend.receivedCommands.length).to.equal(4)
   });
 
   it('should test_main_engine_set_and_get_measurement_result', () => {
@@ -161,16 +164,16 @@ describe('main engine test', () => {
     expect(qubit.toString().length).not.to.equal(0)
   });
   // TODO
-  it('should test_main_engine_atexit_with_error', () => {
-    // sys.last_type = "Something"
-    const backend = new DummyEngine(true)
-    const eng = new MainEngine(backend, [])
-    const qb = eng.allocateQubit()
-    // eng._delfun(weakref.ref(eng))
-    // assert len(backend.received_commands) == 1
-    // assert backend.received_commands[0].gate == AllocateQubitGate()
-    //
-  });
+  // it('should test_main_engine_atexit_with_error', () => {
+  //   // sys.last_type = "Something"
+  //   const backend = new DummyEngine(true)
+  //   const eng = new MainEngine(backend, [])
+  //   const qb = eng.allocateQubit()
+  //   // eng._delfun(weakref.ref(eng))
+  //   // assert len(backend.received_commands) == 1
+  //   // assert backend.received_commands[0].gate == AllocateQubitGate()
+  //   //
+  // });
   it('should test_exceptions_are_forwarded', () => {
     class ErrorEngine extends DummyEngine {
       receive() {

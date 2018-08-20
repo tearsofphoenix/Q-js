@@ -331,7 +331,7 @@ automatically converts from logical qubits to mapped qubits for
     return this._simulator.collapseWavefunction(qureg.map(qb => qb.id), values)
   }
 
-  /*
+  /**
   Access the ordering of the qubits and the state vector directly.
 
     This is a cheat function which enables, e.g., more efficient
@@ -355,21 +355,17 @@ qubits.
     return this._simulator.cheat()
   }
 
-  /*
+  /**
   Handle all commands, i.e., call the member functions of the C++-
 simulator object corresponding to measurement, allocation/
 deallocation, and (controlled) single-qubit gate.
 
-    @param
-cmd (Command): Command to handle.
+    @param cmd {Command}: Command to handle.
 
-    @throws
-Exception: If a non-single-qubit gate needs to be processed
-(which should never happen due to is_available).
+    @throws Error If a non-single-qubit gate needs to be processed (which should never happen due to is_available).
    */
   handle(cmd) {
     if (cmd.gate instanceof TimeEvolution) {
-      // TODO
       const {terms} = cmd.gate.hamiltonian
       const op = []
       Object.keys(terms).forEach(k => {

@@ -194,7 +194,7 @@ RuntimeError: if incorrect `mapped_ids_to_backend_ids` parameter
     return num_qubits <= 2
   }
 
-  /*
+  /**
   Returns a new mapping of the qubits.
 
     It goes through this._saved_commands and tries to find a
@@ -320,7 +320,7 @@ mapping to apply these gates on a first come first served basis.
     return swap_operations
   }
 
-  /*
+  /**
   Creates a new mapping and executes possible gates.
 
     It first allocates all 0, ..., this.num_qubits-1 mapped qubit ids, if
@@ -439,7 +439,7 @@ which don't store any information.
     }
   }
 
-  /*
+  /**
   Sends the stored commands possible without changing the mapping.
 
     Note: this._current_row_major_mapping (hence also this.currentMapping)
@@ -524,14 +524,11 @@ must exist already
     this._stored_commands = new_stored_commands
   }
 
-  /*
+  /**
   Receives a command list and, for each command, stores it until
-we do a mapping (FlushGate || Cache of stored commands is full).
-
-@param
-    command_list (list of Command objects): list of commands to
-receive.
-   */
+  we do a mapping (FlushGate || Cache of stored commands is full).
+   @param command_list {Array<Command>}  list of commands to receive.
+  */
   receive(command_list) {
     command_list.forEach((cmd) => {
       if (cmd.gate instanceof FlushGate) {
@@ -549,18 +546,17 @@ receive.
     })
   }
 
-  /*
+  /**
   Returns the swap operation to change mapping
 
-@param
-    old_mapping: dict: keys are logical ids and values are mapped
+@param old_mapping {Object}: dict: keys are logical ids and values are mapped
 qubit ids
-new_mapping: dict: keys are logical ids and values are mapped
+@param new_mapping {Object}: dict: keys are logical ids and values are mapped
 qubit ids
-permutation: list of int from 0, 1, ..., this.num_rows-1. It is
+@param permutation {Array<Array<Number>>}: list of int from 0, 1, ..., this.num_rows-1. It is
 used to permute the found perfect matchings. Default
 is None which keeps the original order.
-    @returns
+    @returns {Array<Array<Number>>}
 List of tuples. Each tuple is a swap operation which needs to be
 applied. Tuple contains the two mapped qubit ids for the Swap.
    */

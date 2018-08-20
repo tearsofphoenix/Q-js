@@ -15,14 +15,13 @@
  */
 
 import {BasicEngine} from './basics'
-import {FlushGate} from '../ops/gates';
-import {ObjectCopy} from '../libs/util';
+import {FlushGate} from '../ops/gates'
 
-/*
-CompareEngine is an engine which saves all commands. It is only intended
-for testing purposes. Two CompareEngine backends can be compared and
-return true if they contain the same commmands.
-
+/**
+ * @class CompareEngine
+ * @classdesc CompareEngine is an engine which saves all commands. It is only intended
+ * for testing purposes. Two CompareEngine backends can be compared and
+ * return true if they contain the same commmands.
  */
 export class CompareEngine extends BasicEngine {
   constructor() {

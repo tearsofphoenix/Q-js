@@ -22,8 +22,9 @@ import {instanceOf} from '../libs/util'
 import {NotMergeable} from '../meta/error';
 
 
-/*
-LocalOptimizer is a compiler engine which optimizes locally (merging
+/**
+ * @class LocalOptimizer
+ * @classdesc is a compiler engine which optimizes locally (merging
 rotations, cancelling gates with their inverse) in a local window of user-
 defined size.
 
@@ -34,12 +35,11 @@ gates using the get_merged and getInverse functions of the gate (if
 to a qubit contains >=m gates, the pipeline is sent on to the next engine.
  */
 export default class LocalOptimizer extends BasicEngine {
-  /*
+  /**
+   * @constructor
   Initialize a LocalOptimizer object.
 
-    @param
-m (int): Number of gates to cache per qubit, before sending on the
-first gate.
+    @param m {Number}: Number of gates to cache per qubit, before sending on the first gate.
    */
   constructor(m = 5) {
     super()
@@ -47,7 +47,9 @@ first gate.
     this._m = m // wait for m gates before sending on
   }
 
-  // Send n gate operations of the qubit with index idx to the next engine.
+  /**
+   * Send n gate operations of the qubit with index idx to the next engine.
+   */
   sendQubitPipeline(idx, n) {
     if (typeof idx !== 'number') {
       idx = parseInt(idx, 10)
@@ -95,15 +97,14 @@ first gate.
     this._l[idx] = this._l[idx].slice(n)
   }
 
-  /*
-  Return all indices of a command, each index corresponding to the
-command's index in one of the qubits' command lists.
+  /**
+    Return all indices of a command, each index corresponding to the
+    command's index in one of the qubits' command lists.
 
-    @param
-idx (int): qubit index
-i (int): command position in qubit idx's command list
-IDs (list<int>): IDs of all qubits involved in the command
-   */
+    @param idx {Number}: qubit index
+    @param  i {Number}: command position in qubit idx's command list
+    @param IDs {Array<Number>}: IDs of all qubits involved in the command
+  */
   getGateIndices(idx, i, IDs) {
     if (typeof idx !== 'number') {
       idx = parseInt(idx, 10)
@@ -139,7 +140,7 @@ IDs (list<int>): IDs of all qubits involved in the command
     return indices
   }
 
-  /*
+  /**
   Try to merge or even cancel successive gates using the get_merged and
 getInverse functions of the gate (see, e.g., BasicRotationGate).
 
@@ -224,7 +225,7 @@ getInverse functions of the gate (see, e.g., BasicRotationGate).
   }
 
 
-  /*
+  /**
   Check whether a qubit pipeline must be sent on and, if so,
     optimize the pipeline and then send it on.
    */
@@ -257,9 +258,8 @@ getInverse functions of the gate (see, e.g., BasicRotationGate).
     this._l = newDict
   }
 
-  /*
-  Cache a command, i.e., inserts it into the command lists of all qubits
-involved.
+  /**
+  Cache a command, i.e., inserts it into the command lists of all qubits involved.
    */
   cacheCMD(cmd) {
     // are there qubit ids that haven't been added to the list?
@@ -277,10 +277,10 @@ involved.
     this.checkAndSend()
   }
 
-  /*
-  Receive commands from the previous engine and cache them.
+  /**
+    Receive commands from the previous engine and cache them.
     If a flush gate arrives, the entire buffer is sent on.
-   */
+  */
   receive(commandList) {
     commandList.forEach((cmd) => {
       if (instanceOf(cmd.gate, FlushGate)) {

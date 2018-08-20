@@ -381,7 +381,6 @@ neighbour_ids (dict): Key: qubit.id Value: qubit.id of neighbours
     used_mapped_ids.delete(undefined)
     const all_ids = setFromRange(this.num_qubits)
     let not_used_mapped_ids = Array.from(setDifference(all_ids, used_mapped_ids))
-    // TODO
     not_used_mapped_ids = not_used_mapped_ids.sort().reverse()
     for (let i = 0; i < final_positions.length; ++i) {
       const looper = final_positions[i]

@@ -57,8 +57,27 @@ export function stringToArray(key) {
   }
 }
 
-/*
+function checkTerm(term) {
+  term.forEach((localOperator) => {
+    if (!Array.isArray(localOperator) || localOperator.length !== 2) {
+      throw new Error('term specified incorrectly')
+    }
+    const [qubitNum, action] = localOperator
+    if (typeof action !== 'string' || 'XYZ'.indexOf(action) === -1) {
+      throw new Error('Invalid action provided: must be string \'X\', \'Y\', or \'Z\'.')
+    }
+    if (typeof qubitNum !== 'number' || qubitNum < 0) {
+      throw new Error('Invalid qubit number '
+          + 'provided to QubitTerm: '
+          + 'must be a non-negative '
+          + 'int.')
+    }
+  })
+}
 
+/**
+ * @class QubitOperator
+ * @classdesc
 A sum of terms acting on qubits, e.g., 0.5 * 'X0 X5' + 0.3 * 'Z1 Z2'.
 
     A term is an operator acting on n qubits and can be represented as:
@@ -95,26 +114,9 @@ are sorted according to the qubit number they act on,
     starting from 0.
 **value**: Coefficient of this term as a (complex) float
  */
-function checkTerm(term) {
-  term.forEach((localOperator) => {
-    if (!Array.isArray(localOperator) || localOperator.length !== 2) {
-      throw new Error('term specified incorrectly')
-    }
-    const [qubitNum, action] = localOperator
-    if (typeof action !== 'string' || 'XYZ'.indexOf(action) === -1) {
-      throw new Error('Invalid action provided: must be string \'X\', \'Y\', or \'Z\'.')
-    }
-    if (typeof qubitNum !== 'number' || qubitNum < 0) {
-      throw new Error('Invalid qubit number '
-          + 'provided to QubitTerm: '
-          + 'must be a non-negative '
-          + 'int.')
-    }
-  })
-}
-
 export default class QubitOperator {
-  /*
+  /**
+   * @constructor
     Inits a QubitOperator.
 
     The init function only allows to initialize one term. Additional terms
@@ -158,7 +160,7 @@ be sorted by the qubit number. '' is the identity.
 QubitOperatorError: Invalid operators provided to QubitOperator.
      */
   constructor(term, coefficient = 1.0) {
-    // TODO assert coefficient as numeric
+    // assert coefficient as numeric
     this.terms = {}
     if (!isNumeric(coefficient)) {
       throw new Error('Coefficient must be a numeric type.')
@@ -214,7 +216,7 @@ abs_tol(float): Absolute tolerance, must be at least 0.0
     this.terms = new_terms
   }
 
-  /*
+  /**
     Returns true if other (QubitOperator) is close to this.
 
     Comparison is done for each term individually. Return true
