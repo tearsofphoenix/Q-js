@@ -16,7 +16,7 @@ import GridMapper from '../cengines/twodmapper';
 /**
  * @desc Remove any MathGates
  */
-function high_level_gates(eng, cmd) {
+export function high_level_gates(eng, cmd) {
   const {gate} = cmd
   if (gate.equal(QFT) || getInverse(gate).equal(QFT) || gate.equal(Swap)) {
     return true
