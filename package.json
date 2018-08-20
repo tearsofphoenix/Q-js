@@ -9,7 +9,8 @@
     "install": "node scripts/install.js",
     "cover": "cross-env NODE_ENV=test nyc mocha ./src/**/*.spec.js",
     "test": "mocha --require babel-register --require babel-polyfill ./src/**/*.spec.js",
-    "build": "node scripts/build.js --force"
+    "build": "node scripts/build.js --force",
+    "doc": "./node_modules/.bin/esdoc"
   },
   "dependencies": {
     "axios": "^0.18.0",
