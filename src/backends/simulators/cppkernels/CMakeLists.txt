@@ -11,3 +11,5 @@ add_library(simulator Wrapper.cpp simulator.hpp fusion.hpp addon.cpp Wrapper.hpp
         nointrin/kernel3.hpp nointrin/kernel4.hpp nointrin/kernel5.hpp intrin/kernel1.hpp intrin/kernel2.hpp
         intrin/kernel3.hpp intrin/kernel4.hpp intrin/kernel5.hpp intrin/kernels.hpp intrin/cintrin.hpp
         intrin/alignedallocator.hpp)
+
+add_executable(2dmapper 2dmapper.cpp)
