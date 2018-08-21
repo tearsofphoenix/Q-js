@@ -119,7 +119,7 @@ describe('main engine test', () => {
     expect(backend.receivedCommands.length).to.equal(4)
   });
 
-  it('should test_main_engine_set_and_get_measurement_result', () => {
+  it('should test_main_engine_set_and_getMeasurementResult', () => {
     const eng = new MainEngine(new DummyEngine(), [])
     const qubit0 = eng.allocateQubit()
     const qubit1 = eng.allocateQubit()

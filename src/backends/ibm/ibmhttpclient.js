@@ -16,7 +16,9 @@
 
 import axios from 'axios'
 const _api_url = 'https://quantumexperience.ng.bluemix.net/api/'
-
+/**
+ * @class IBMHTTPClient
+ */
 export default class IBMHTTPClient {
   static async isOnline(device) {
     const url = `Backends/${device}/queue/status`
@@ -24,15 +26,14 @@ export default class IBMHTTPClient {
     return result.state
   }
 
-  /*
+  /**
   Retrieves a previously run job by its ID.
 
-  @param
-      device (str): Device on which the code was run / is running.
-  user (str): IBM quantum experience user (e-mail)
-  password (str): IBM quantum experience password
-  jobid (str): Id of the job to retrieve
-   */
+    @param {String} device: Device on which the code was run / is running.
+    @param {String} user: IBM quantum experience user (e-mail)
+    @param {String} password: IBM quantum experience password
+    @param {String} jobid: Id of the job to retrieve
+  */
   static async retrieve(device, user, password, jobid) {
     const [user_id, access_token] = await IBMHTTPClient.authenticate(user, password)
     return IBMHTTPClient.getResult(device, jobid, access_token)
@@ -44,16 +45,15 @@ export default class IBMHTTPClient {
     })
   }
 
-  /*
+  /**
   Sends QASM through the IBM API and runs the quantum circuit.
 
-    @param
-info: Contains QASM representation of the circuit to run.
-device (str): Either 'simulator', 'ibmqx4', or 'ibmqx5'.
-user (str): IBM quantum experience user.
-password (str): IBM quantum experience user password.
-shots (int): Number of runs of the same circuit to collect statistics.
-verbose (bool): If true, additional information is printed, such as
+   @param {String} info: Contains QASM representation of the circuit to run.
+   @param {String} device: Either 'simulator', 'ibmqx4', or 'ibmqx5'.
+   @param {String} user: IBM quantum experience user.
+   @param {String} password: IBM quantum experience user password.
+   @param {Number} shots: Number of runs of the same circuit to collect statistics.
+   @param {Boolean} verbose: If true, additional information is printed, such as
 measurement statistics. Otherwise, the backend simply registers
 one measurement result (same behavior as the projectq Simulator).
    */

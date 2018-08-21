@@ -31,7 +31,9 @@ import { BasicMathGate } from '../../ops/basics'
 import { LogicalQubitIDTag } from '../../meta/tag'
 import { instanceOf } from '../../libs/util'
 
-/*
+/**
+ * @class ClassicalSimulator
+ * @classdesc
 A simple introspective simulator that only permits classical operations.
 
   Allows allocation, deallocation, measuring (no-op), flushing (no-op),
@@ -39,17 +41,19 @@ A simple introspective simulator that only permits classical operations.
 from/to bits and registers of bits.
  */
 export default class ClassicalSimulator extends BasicEngine {
+  /**
+   * @constructor
+   */
   constructor() {
     super();
     this._state = bigInt(0)
     this._bit_positions = {}
   }
 
-  /*
+  /**
   Converts a qubit from a logical to a mapped qubit if there is a mapper.
 
-  @param
-qubit (projectq.types.Qubit): Logical quantum bit
+  @param {Qubit} qubit: Logical quantum bit
    */
   convertLogicalToMappedQubit(qubit) {
     const {mapper} = this.main
@@ -66,7 +70,7 @@ qubit (projectq.types.Qubit): Logical quantum bit
     }
   }
 
-  /*
+  /**
   Reads a bit.
 
   Note:
@@ -74,11 +78,9 @@ If there is a mapper present in the compiler, this function
 automatically converts from logical qubits to mapped qubits for
   the qureg argument.
 
-  @param
-qubit (projectq.types.Qubit): The bit to read.
+  @param {Qubit} qubit : The bit to read.
 
-  @returns
-int: 0 if the target bit is off, 1 if it's on.
+  @returns {Number} 0 if the target bit is off, 1 if it's on.
    */
   readBit(qubit) {
     qubit = this.convertLogicalToMappedQubit(qubit)
@@ -91,7 +93,7 @@ int: 0 if the target bit is off, 1 if it's on.
     return this._state.shiftRight(p).and(1).toJSNumber()
   }
 
-  /*
+  /**
   Resets/sets a bit to the given value.
 
   Note:
@@ -99,9 +101,7 @@ If there is a mapper present in the compiler, this function
 automatically converts from logical qubits to mapped qubits for
   the qureg argument.
 
-  @param
-qubit (projectq.types.Qubit): The bit to write.
-value (bool|int): Writes 1 if this value is truthy, else 0.
+  @param {Qubit} Qubit: The bit to write. value (bool|int): Writes 1 if this value is truthy, else 0.
    */
   writeBit(qubit, value) {
     qubit = this.convertLogicalToMappedQubit(qubit)
@@ -119,16 +119,13 @@ value (bool|int): Writes 1 if this value is truthy, else 0.
     }
   }
 
-  /*
+  /**
   Returns a mask, to compare against the state, with bits from the
 register set to 1 and other bits set to 0.
 
-@param
-  qureg (projectq.types.Qureg):
-The bits whose positions should be set.
+@param {Qureg} qureg : The bits whose positions should be set.
 
-  @returns
-int: The mask.
+  @returns {NUmber} The mask.
    */
   mask(qureg) {
     let t = 0
@@ -136,7 +133,7 @@ int: The mask.
     return t
   }
 
-  /*
+  /**
   Reads a group of bits as a little-endian integer.
 
   Note:
@@ -144,12 +141,9 @@ If there is a mapper present in the compiler, this function
 automatically converts from logical qubits to mapped qubits for
   the qureg argument.
 
-  @param
-qureg (projectq.types.Qureg):
-The group of bits to read, in little-endian order.
+  @param {Qureg} qureg : The group of bits to read, in little-endian order.
 
-  @returns
-int: Little-endian register value.
+  @returns {Number} Little-endian register value.
    */
   readRegister(qureg) {
     const new_qureg = []
@@ -163,7 +157,7 @@ int: Little-endian register value.
     return t
   }
 
-  /*
+  /**
   Sets a group of bits to store a little-endian integer value.
 
   Note:
@@ -171,10 +165,8 @@ If there is a mapper present in the compiler, this function
 automatically converts from logical qubits to mapped qubits for
   the qureg argument.
 
-  @param
-qureg (projectq.types.Qureg):
-The bits to write, in little-endian order.
-value (int): The integer value to store. Must fit in the register.
+   @param {Qureg} qureg : The bits to write, in little-endian order.
+   @param {Number} value : The integer value to store. Must fit in the register.
    */
   writeRegister(qureg, value) {
     const new_qureg = []
@@ -202,6 +194,10 @@ value (int): The integer value to store. Must fit in the register.
     }
   }
 
+  /**
+   *
+   * @param {Command} cmd
+   */
   handle(cmd) {
     if (cmd.gate instanceof FlushGate) {
       return

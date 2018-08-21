@@ -32,7 +32,9 @@ import { LogicalQubitIDTag } from '../../meta/tag'
 import {instanceOf} from '../../libs/util';
 import {len, stringToBitArray} from '../../libs/polyfill';
 
-/*
+/**
+ * @class Simulator
+ * @classdesc
 Simulator is a compiler engine which simulates a quantum computer using
 C++-based kernels.
 
@@ -45,16 +47,16 @@ export OMP_NUM_THREADS=4 # use 4 threads
 export OMP_PROC_BIND=spread # bind threads to processors by spreading
  */
 export default class Simulator extends BasicEngine {
-  /*
+  /**
+   * @constructor
   Construct the C++/JavaScript-simulator object and initialize it with a
   random seed.
 
-    @param
-gate_fusion (bool): If true, gates are cached and only executed
+    @param {Boolean} gate_fusion: If true, gates are cached and only executed
 once a certain gate-size has been reached (only has an effect
 for the c++ simulator).
-rnd_seed (int): Random seed (uses random.randint(0, 4294967295) by
-default).
+    @param {Number} rnd_seed: Random seed (uses random.randint(0, 4294967295) by default). Ignored currently!!!
+    @param {Boolean} forceSimulation: if true, will force use cpp simulator
 
 Example of gate_fusion: Instead of applying a Hadamard gate to 5
 qubits, the simulator calculates the kronecker product of the 1-qubit
@@ -88,19 +90,16 @@ extension.
     this._gate_fusion = gate_fusion
   }
 
-  /*
+  /**
   Specialized implementation of is_available: The simulator can deal
 with all arbitrarily-controlled gates which provide a
 gate-matrix (via gate.matrix) and acts on 5 or less qubits (not
 counting the control qubits).
 
-@param
-    cmd (Command): Command for which to check availability (single-
-    qubit gate, arbitrary controls)
+  @param {Command} cmd: Command for which to check availability (single-qubit gate, arbitrary controls)
 
-@returns
-    true if it can be simulated and false otherwise.
-   */
+  @returns {Boolean} true if it can be simulated and false otherwise.
+  */
   isAvailable(cmd) {
     if (instanceOf(cmd.gate, [MeasureGate, AllocateQubitGate, DeallocateQubitGate, BasicMathGate, TimeEvolution])) {
       return true
@@ -116,12 +115,10 @@ counting the control qubits).
     }
   }
 
-  /*
-  Converts a qureg from logical to mapped qubits if there is a mapper.
-
-    @param
-qureg (list[Qubit],Qureg): Logical quantum bits
-   */
+  /**
+    Converts a qureg from logical to mapped qubits if there is a mapper.
+    @param {Array<Qubit>|Qureg} qureg: Logical quantum bits
+  */
   convertLogicalToMappedQureg(qureg) {
     const {mapper} = this.main
     if (mapper) {
@@ -141,16 +138,14 @@ qureg (list[Qubit],Qureg): Logical quantum bits
     return qureg
   }
 
-  /*
+  /**
   Get the expectation value of qubit_operator w.r.t. the current wave
 function represented by the supplied quantum register.
 
-    @param
-qubit_operator (projectq.ops.QubitOperator): Operator to measure.
-qureg (list[Qubit],Qureg): Quantum bits to measure.
+    @param {QubitOperator} qubitOperator : Operator to measure.
+    @param {Array<Qubit>|Qureg} qureg : Quantum bits to measure.
 
-    @returns
-Expectation value
+    @returns Expectation value
 
 Note:
     Make sure all previous commands (especially allocations) have
@@ -162,9 +157,7 @@ Note:
 automatically converts from logical qubits to mapped qubits for
     the qureg argument.
 
-    @throws
-Exception: If `qubit_operator` acts on more qubits than present in
-the `qureg` argument.
+    @throws Error : If `qubit_operator` acts on more qubits than present in the `qureg` argument.
    */
   getExpectationValue(qubitOperator, qureg) {
     qureg = this.convertLogicalToMappedQureg(qureg)
@@ -180,13 +173,12 @@ the `qureg` argument.
     return this._simulator.getExpectationValue(operator, qureg.map(qb => qb.id))
   }
 
-  /*
+  /**
   Apply a (possibly non-unitary) qubit_operator to the current wave
 function represented by the supplied quantum register.
 
-    @param
-qubit_operator (projectq.ops.QubitOperator): Operator to apply.
-qureg (list[Qubit],Qureg): Quantum bits to which to apply the
+    @param {QubitOperator} qubitOperator : Operator to apply.
+    @param {Array<Qubit>|Qureg} qureg: Quantum bits to which to apply the
 operator.
 
     @throws
@@ -222,13 +214,12 @@ automatically converts from logical qubits to mapped qubits for
     return this._simulator.applyQubitOperator(operator, qureg.map(qb => qb.id))
   }
 
-  /*
+  /**
   Return the probability of the outcome `bit_string` when measuring
 the quantum register `qureg`.
 
-    @param
-bit_string (list[bool|int]|string[0|1]): Measurement outcome.
-qureg (Qureg|list[Qubit]): Quantum register.
+    @param {Array<Number>|String} bitString : Measurement outcome.
+    @param {Qureg|Array<Qubit>} qureg: Quantum register.
 
     @returns
 Probability of measuring the provided bit string.
@@ -249,14 +240,13 @@ automatically converts from logical qubits to mapped qubits for
     return this._simulator.getProbability(bit_string, qureg.map(qb => qb.id))
   }
 
-  /*
+  /**
   Return the probability amplitude of the supplied `bit_string`.
     The ordering is given by the quantum register `qureg`, which must
 contain all allocated qubits.
 
-    @param
-bit_string (list[bool|int]|string[0|1]): Computational basis state
-qureg (Qureg|list[Qubit]): Quantum register determining the
+   @param {Array<Number>|String} bitString: Computational basis state
+   @param {Qureg|Array<Qubit>} qureg: Quantum register determining the
 ordering. Must contain all allocated qubits.
 
     @returns
@@ -278,17 +268,14 @@ automatically converts from logical qubits to mapped qubits for
     return this._simulator.getAmplitude(bit_string, qureg.map(qb => qb.id))
   }
 
-  /*
+  /**
   Set the wavefunction and the qubit ordering of the simulator.
 
     The simulator will adopt the ordering of qureg (instead of reordering
 the wavefunction).
 
-@param
-    wavefunction (list[complex]): Array of complex amplitudes
-describing the wavefunction (must be normalized).
-qureg (Qureg|list[Qubit]): Quantum register determining the
-ordering. Must contain all allocated qubits.
+  @param {Array<Complex>} wavefunction : Array of complex amplitudes describing the wavefunction (must be normalized).
+  @param {Qureg|Array<Qubit>} qureg : Quantum register determining the ordering. Must contain all allocated qubits.
 
     Note:
 Make sure all previous commands (especially allocations) have
@@ -305,16 +292,14 @@ automatically converts from logical qubits to mapped qubits for
     this._simulator.setWavefunction(wavefunction, qureg.map(qb => qb.id))
   }
 
-  /*
+  /**
   Collapse a quantum register onto a classical basis state.
 
-    @param
-qureg (Qureg|list[Qubit]): Qubits to collapse.
-values (list[bool]): Measurement outcome for each of the qubits
+    @param {Qureg|Array<Qubit>} qureg: Qubits to collapse.
+    @param {Array<Boolean>} values : Measurement outcome for each of the qubits
 in `qureg`.
 
-    @throws
-RuntimeError: If an outcome has probability (approximately) 0 or
+    @throws Error : If an outcome has probability (approximately) 0 or
 if unknown qubits are provided (see note).
 
 Note:
@@ -337,7 +322,7 @@ automatically converts from logical qubits to mapped qubits for
     This is a cheat function which enables, e.g., more efficient
 evaluation of expectation values and debugging.
 
-    @returns
+    @returns {Array}
 A tuple where the first entry is a dictionary mapping qubit
 indices to bit-locations and the second entry is the corresponding
 state vector.
@@ -360,7 +345,7 @@ qubits.
 simulator object corresponding to measurement, allocation/
 deallocation, and (controlled) single-qubit gate.
 
-    @param cmd {Command}: Command to handle.
+    @param {Command} cmd: Command to handle.
 
     @throws Error If a non-single-qubit gate needs to be processed (which should never happen due to is_available).
    */
@@ -436,14 +421,12 @@ deallocation, and (controlled) single-qubit gate.
     }
   }
 
-  /*
+  /**
   Receive a list of commands from the previous engine and handle them
 (simulate them classically) prior to sending them on to the next
 engine.
 
-    @param
-command_list (list<Command>): List of commands to execute on the
-simulator.
+    @param {Array<Command>} commandList: List of commands to execute on the simulator.
    */
   receive(commandList) {
     commandList.forEach((cmd) => {

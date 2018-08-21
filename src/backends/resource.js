@@ -29,6 +29,8 @@ function parseStringKey(key) {
 }
 
 /**
+ * @class ResourceCounter
+ * @classdesc
 ResourceCounter is a compiler engine which counts the number of gates and
 max. number of active qubits.
 
@@ -65,8 +67,8 @@ export default class ResourceCounter extends BasicEngine {
     Specialized implementation of is_available: Returns true if the
     ResourceCounter is the last engine (since it can count any command).
 
-    @param cmd {Command}: Command for which to check availability (all Commands can be counted).
-    @return {boolean} true, unless the next engine cannot handle the Command (if there is a next engine).
+    @param {Command} cmd: Command for which to check availability (all Commands can be counted).
+    @return {Boolean} true, unless the next engine cannot handle the Command (if there is a next engine).
    */
   isAvailable(cmd) {
     try {
@@ -79,6 +81,9 @@ export default class ResourceCounter extends BasicEngine {
     }
   }
 
+  /**
+   * @return {Number}
+   */
   get depthOfDag() {
     if (this._depth_of_qubit) {
       const current_max = Math.max(...Object.values(this._depth_of_qubit))
@@ -90,7 +95,7 @@ export default class ResourceCounter extends BasicEngine {
 
   /**
    *
-   * @param cmd {Command}
+   * @param {Command} cmd
    */
   addCMD(cmd) {
     const qid = cmd.qubits[0][0].id
@@ -162,6 +167,10 @@ export default class ResourceCounter extends BasicEngine {
     }
   }
 
+  /**
+   *
+   * @param {Array<Command>} commandList
+   */
   receive(commandList) {
     commandList.forEach((cmd) => {
       if (!(cmd.gate instanceof FlushGate)) {

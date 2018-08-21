@@ -27,18 +27,21 @@ import {BasicQubit} from '../types/qubit'
 import { LastEngineError } from '../meta/error'
 
 /**
+ * @class CommandPrinter
+ * @classdesc
  * CommandPrinter is a compiler engine which prints commands to stdout prior
  * to sending them on to the next compiler engine.
  */
 export default class CommandPrinter extends BasicEngine {
   /**
+   * @constructor
    *Initialize a CommandPrinter.
 
-  @param acceptInput {boolean}: If accept_input is true, the printer queries
+  @param {Boolean} acceptInput: If accept_input is true, the printer queries
   the user to input measurement results if the CommandPrinter is
   the last engine. Otherwise, all measurements yield
-  @param defaultMeasure {boolean}. Default measurement result (if accept_input is false).
-  @param inPlace {boolean}: If in_place is true, all output is written on the same line of the terminal.
+  @param {Boolean} defaultMeasure. Default measurement result (if accept_input is false).
+  @param {Boolean} inPlace: If in_place is true, all output is written on the same line of the terminal.
 
   */
   constructor(acceptInput = true, defaultMeasure = false, inPlace = false) {
@@ -52,8 +55,8 @@ export default class CommandPrinter extends BasicEngine {
     Specialized implementation of is_available: Returns true if the
     CommandPrinter is the last engine (since it can print any command).
 
-    @param cmd {Command}: Command of which to check availability (all Commands can be printed).
-    @return {boolean} true, unless the next engine cannot handle the Command (if there is a next engine).
+    @param {Command} cmd: Command of which to check availability (all Commands can be printed).
+    @return {Boolean} true, unless the next engine cannot handle the Command (if there is a next engine).
    */
   isAvailable(cmd) {
     try {
@@ -72,7 +75,7 @@ export default class CommandPrinter extends BasicEngine {
     the user for the measurement result (if accept_input = true) / Set
     the result to 0 (if it's false).
 
-    @param cmd {Command}: Command to print.
+    @param {Command} cmd: Command to print.
    */
   printCMD(cmd) {
     if (this.isLastEngine && cmd.gate.equal(Measure)) {
@@ -106,7 +109,7 @@ export default class CommandPrinter extends BasicEngine {
   Receive a list of commands from the previous engine, print the
 commands, and then send them on to the next engine.
 
-    @param commandList {Array<Command>} List of Commands to print (and potentially send on to the next engine).
+    @param {Array<Command>} commandList: List of Commands to print (and potentially send on to the next engine).
    */
   receive(commandList) {
     commandList.forEach((cmd) => {

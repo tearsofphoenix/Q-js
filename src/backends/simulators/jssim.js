@@ -44,25 +44,22 @@ export default class Simulator {
   /**
    * @constructor
   Initialize the simulator.
-
-    @param
-rnd_seed (int): Seed to initialize the random number generator.
    */
-  constructor(rndSeed) {
+  constructor() {
     // ignore seed
     this._state = math.ones(1)
     this._map = {}
     this._numQubits = 0
   }
 
-  /*
+  /**
   Return the qubit index to bit location map and the corresponding state
 vector.
 
     This function can be used to measure expectation values more
 efficiently (emulation).
 
-    @returns
+    @returns {Array}
 A tuple where the first entry is a dictionary mapping qubit indices
 to bit-locations and the second entry is the corresponding state
 vector
@@ -71,15 +68,13 @@ vector
     return [this._map, this._state._data.slice(0)]
   }
 
-  /*
+  /**
   Measure the qubits with IDs ids and return a list of measurement
 outcomes (true/false).
 
-    @param
-ids (list<int>): List of qubit IDs to measure.
+    @param {Array<Number>} ids: List of qubit IDs to measure.
 
-    @returns
-List of measurement results (containing either true or false).
+    @returns {Array<Boolean>} List of measurement results (containing either true or false).
    */
   measureQubits(ids) {
     const P = Math.random()
@@ -123,11 +118,10 @@ List of measurement results (containing either true or false).
     return res
   }
 
-  /*
+  /**
   Allocate a qubit.
 
-    @param
-ID (int): ID of the qubit which is being allocated.
+    @param {Number} ID: ID of the qubit which is being allocated.
    */
   allocateQubit(ID) {
     this._map[ID] = this._numQubits
@@ -135,18 +129,15 @@ ID (int): ID of the qubit which is being allocated.
     this._state.resize([1 << this._numQubits], 0)
   }
 
-  /*
+  /**
   Return the classical value of a classical bit (i.e., a qubit which has
 been measured / uncomputed).
 
-@param
-    ID (int): ID of the qubit of which to get the classical value.
-tol (float): Tolerance for numerical errors when determining
+   @param {Number} ID: ID of the qubit of which to get the classical value.
+   @param {Number} tolerance: Tolerance for numerical errors when determining
 whether the qubit is indeed classical.
 
-    @throws
-RuntimeError: If the qubit is in a superposition, i.e., has not
-been measured / uncomputed.
+    @throws Error: If the qubit is in a superposition, i.e., has not been measured / uncomputed.
 */
   getClassicalValue(ID, tolerance = 1.e-10) {
     const pos = this._map[ID]
@@ -175,15 +166,12 @@ been measured / uncomputed.
     return down
   }
 
-  /*
+  /**
   Deallocate a qubit (if it has been measured / uncomputed).
 
-@param
-    ID (int): ID of the qubit to deallocate.
+   @param {Number} ID: ID of the qubit to deallocate.
 
-    @throws
-RuntimeError: If the qubit is in a superposition, i.e., has not
-been measured / uncomputed.
+   @throws Error: If the qubit is in a superposition, i.e., has not been measured / uncomputed.
    */
   deallocateQubit(ID) {
     const pos = this._map[ID]
@@ -210,11 +198,10 @@ been measured / uncomputed.
     this._numQubits -= 1
   }
 
-  /*
+  /**
   Get control mask from list of control qubit IDs.
 
-    @returns
-A mask which represents the control qubits in binary.
+    @returns {Number} A mask which represents the control qubits in binary.
    */
   getControlMask(ctrlids) {
     let mask = 0
@@ -225,15 +212,14 @@ A mask which represents the control qubits in binary.
     return mask
   }
 
-  /*
+  /**
   Emulate a math function (e.g., BasicMathGate).
 
-@param
-    f (function): Function executing the operation to emulate.
-qubit_ids (list<list<int>>): List of lists of qubit IDs to which
-the gate is being applied. Every gate is applied to a tuple of
-quantum registers, which corresponds to this 'list of lists'.
-ctrlqubit_ids (list<int>): List of control qubit ids.
+    @param {Function} f: Function executing the operation to emulate.
+    @param {Array<Array<Number>>} qubitIDs: List of lists of qubit IDs to which
+        the gate is being applied. Every gate is applied to a tuple of
+        quantum registers, which corresponds to this 'list of lists'.
+    @param {Array<Number>} ctrlQubitIDs: List of control qubit ids.
    */
   emulateMath(f, qubitIDs, ctrlQubitIDs) {
     const mask = this.getControlMask(ctrlQubitIDs)
@@ -277,15 +263,13 @@ ctrlqubit_ids (list<int>): List of control qubit ids.
     this._state = newstate
   }
 
-  /*
+  /**
   Return the expectation value of a qubit operator w.r.t. qubit ids.
 
-    @param
-terms_dict (dict): Operator dictionary (see QubitOperator.terms)
-ids (list[int]): List of qubit ids upon which the operator acts.
+    @param {Array<Array>} termsArray: Operator Array (see QubitOperator.terms)
+    @param {Array<Number>} IDs: List of qubit ids upon which the operator acts.
 
-    @returns
-Expectation value
+    @returns Expectation value
    */
   getExpectationValue(termsArray, IDs) {
     let expectation = 0.0
@@ -303,13 +287,12 @@ Expectation value
     return expectation
   }
 
-  /*
+  /**
   Apply a (possibly non-unitary) qubit operator to qubits.
 
-    @param
-terms_dict (dict): Operator dictionary (see QubitOperator.terms)
-ids (list[int]): List of qubit ids upon which the operator acts.
-   */
+    @param {Array<Array>} termsArray: Operator array (see QubitOperator.terms)
+    @param {Array<Number>} IDs: List of qubit ids upon which the operator acts.
+  */
   applyQubitOperator(termsArray, IDs) {
     let new_state = math.zeros(len(this._state))
     const current_state = math.clone(this._state)
@@ -322,19 +305,16 @@ ids (list[int]): List of qubit ids upon which the operator acts.
     this._state = new_state
   }
 
-  /*
+  /**
   Return the probability of the outcome `bit_string` when measuring
 the qubits given by the list of ids.
 
-    @param
-bit_string (list[bool|int]): Measurement outcome.
-ids (list[int]): List of qubit ids determining the ordering.
+    @param {Array<Boolean>|Array<Number>} bitString: Measurement outcome.
+    @param {Array<Number>} IDs: List of qubit ids determining the ordering.
 
-    @returns
-Probability of measuring the provided bit string.
+    @returns Probability of measuring the provided bit string.
 
-    @throws
-RuntimeError if an unknown qubit id was provided.
+    @throws Error if an unknown qubit id was provided.
    */
   getProbability(bitString, IDs) {
     const n = IDs.length
@@ -374,21 +354,16 @@ RuntimeError if an unknown qubit id was provided.
     this._state.subset(math.index(i), value)
   }
 
-  /*
+  /**
   Return the probability amplitude of the supplied `bit_string`.
     The ordering is given by the list of qubit ids.
 
-    @param
-bit_string (list[bool|int]): Computational basis state
-ids (list[int]): List of qubit ids determining the
-ordering. Must contain all allocated qubits.
+   @param {Array<Boolean>|Array<Number>} bitString: Computational basis state
+   @param {Array<Number>} IDs: List of qubit ids determining the ordering. Must contain all allocated qubits.
 
-    @returns
-Probability amplitude of the provided bit string.
+    @returns Probability amplitude of the provided bit string.
 
-    @throws
-RuntimeError if the second argument is not a permutation of all
-allocated qubits.
+    @throws Error if the second argument is not a permutation of all allocated qubits.
    */
   getAmplitude(bitString, IDs) {
     const s1 = new Set(IDs)
@@ -408,7 +383,7 @@ allocated qubits.
     return ret
   }
 
-  /*
+  /**
 Applies exp(-i*time*H) to the wave function, i.e., evolves under
 the Hamiltonian H for a given time. The terms in the Hamiltonian
 are not required to commute.
@@ -417,13 +392,11 @@ are not required to commute.
 ideas from Al-Mohy and Higham, 2011.
 TODO: Implement better estimates for s.
 
-                                         @param
-terms_dict (dict): Operator dictionary (see QubitOperator.terms)
-defining the Hamiltonian.
-time (scalar): Time to evolve for
-    ids (list): A list of qubit IDs to which to apply the evolution.
-ctrlids (list): A list of control qubit IDs.
-   */
+   @param {Array<Array>} terms_dict: Operator dictionary (see QubitOperator.terms) defining the Hamiltonian.
+   @param {Number} time: Time to evolve for
+   @param {Array<Number>} ids: A list of qubit IDs to which to apply the evolution.
+   @param {Array<Number>} ctrlids: A list of control qubit IDs.
+  */
   emulateTimeEvolution(terms_dict, time, ids, ctrlids) {
     // Determine the (normalized) trace, which is nonzero only for identity
   // terms:
@@ -482,19 +455,20 @@ ctrlids (list): A list of control qubit IDs.
     }
   }
 
+  /**
+   * leave it empty to keep same API with cpp simulator
+   */
   run() {
     //
   }
 
-  /*
-  Applies a QubitOperator term to the state vector.
-(Helper function for time evolution & expectation)
+  /**
+  Applies a QubitOperator term to the state vector. (Helper function for time evolution & expectation)
 
-@param
-    term: One term of QubitOperator.terms
-ids (list[int]): Term index to Qubit ID mapping
-ctrlids (list[int]): Control qubit IDs
-   */
+    @param {Array} term: One term of QubitOperator.terms
+    @param {Array<Number>} ids: Term index to Qubit ID mapping
+    @param {Array<Number>} ctrlids: Control qubit IDs
+  */
   applyTerm(term, ids, controlIDs = []) {
     const X = [[0.0, 1.0], [1.0, 0.0]]
     const Y = [[0.0, math.complex(0, -1)], [math.complex(0, 1), 0.0]]
@@ -510,13 +484,9 @@ ctrlids (list[int]): Control qubit IDs
   Applies the k-qubit gate matrix m to the qubits with indices ids,
     using ctrlids as control qubits.
 
-    @param
-m (list[list]): 2^k x 2^k complex matrix describing the k-qubit
-gate.
-ids (list): A list containing the qubit IDs to which to apply the
-gate.
-ctrlids (list): A list of control qubit IDs (i.e., the gate is
-only applied where these qubits are 1).
+    @param {Array<Array<Number>>} m: 2^k x 2^k complex matrix describing the k-qubit gate.
+    @param {Array<Number>} ids: A list containing the qubit IDs to which to apply the gate.
+    @param {Array<Number>} ctrlids: A list of control qubit IDs (i.e., the gate is only applied where these qubits are 1).
    */
   applyControlledGate(m, ids, ctrlids) {
     const mask = this.getControlMask(ctrlids)
@@ -534,11 +504,9 @@ only applied where these qubits are 1).
   Applies the single qubit gate matrix m to the qubit at position `pos`
 using `mask` to identify control qubits.
 
-    @param
-m (list[list]): 2x2 complex matrix describing the single-qubit
-gate.
-pos (int): Bit-position of the qubit.
-mask (int): Bit-mask where set bits indicate control qubits.
+   @param {Array<Array<Number>>} m: 2x2 complex matrix describing the single-qubit gate.
+    @param {Number} pos: Bit-position of the qubit.
+    @param {Number} mask: Bit-mask where set bits indicate control qubits.
    */
   _singleQubitGate(m, pos, mask) {
     const kernel = (u, d, m) => {
@@ -569,11 +537,9 @@ mask (int): Bit-mask where set bits indicate control qubits.
   Applies the k-qubit gate matrix m to the qubits at `pos`
 using `mask` to identify control qubits.
 
-    @param
-m (list[list]): 2^k x 2^k complex matrix describing the k-qubit
-gate.
-pos (list[int]): List of bit-positions of the qubits.
-mask (int): Bit-mask where set bits indicate control qubits.
+   @param {Array<Array<Number>>} m: 2^k x 2^k complex matrix describing the k-qubit gate.
+   @param {Array<Number>} pos: List of bit-positions of the qubits.
+   @param {Number} mask: Bit-mask where set bits indicate control qubits.
    */
   _multiQubitGate(m, pos, mask) {
     // follows the description in https://arxiv.org/abs/1704.01127
@@ -608,13 +574,11 @@ mask (int): Bit-mask where set bits indicate control qubits.
     }
   }
 
-  /*
+  /**
   Set wavefunction and qubit ordering.
 
-    @param
-wavefunction (list[complex]): Array of complex amplitudes
-describing the wavefunction (must be normalized).
-ordering (list): List of ids describing the new ordering of qubits
+    @param {Array<Complex>}  wavefunction: Array of complex amplitudes describing the wavefunction (must be normalized).
+    @param {Array} ordering: List of ids describing the new ordering of qubits
 (i.e., the ordering of the provided wavefunction).
    */
   setWavefunction(wavefunction, ordering) {
@@ -641,16 +605,12 @@ ordering (list): List of ids describing the new ordering of qubits
     this._map = map
   }
 
-  /*
+  /**
   Collapse a quantum register onto a classical basis state.
 
-    @param
-ids (list[int]): Qubit IDs to collapse.
-values (list[bool]): Measurement outcome for each of the qubit IDs
-in `ids`.
-    @throws
-RuntimeError: If probability of outcome is ~0 or unknown qubits
-are provided.
+    @param {Array<Number>} ids: Qubit IDs to collapse.
+    @param {Array<Boolean>} values: Measurement outcome for each of the qubit IDs in `ids`.
+    @throws Error: If probability of outcome is ~0 or unknown qubits are provided.
    */
   collapseWavefunction(ids, values) {
     assert(ids.length === values.length)

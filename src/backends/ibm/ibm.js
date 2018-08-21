@@ -26,15 +26,18 @@ import {instanceOf} from '../../libs/util'
 import '../../ops/metagates'
 
 const {Tdag, Sdag} = Gates
-/*
+/**
+ * @class IBMBackend
+ * @classdesc
 The IBM Backend class, which stores the circuit, transforms it to JSON
 QASM, and sends the circuit through the IBM API.
  */
 export default class IBMBackend extends BasicEngine {
-  /*
+  /**
+   * @constructor
   Initialize the Backend object.
 
-    @param
+    @param {}
 use_hardware (bool): If true, the code is run on the IBM quantum
 chip (instead of using the IBM simulator)
 num_runs (int): Number of runs to collect statistics.
@@ -92,14 +95,14 @@ running the circuit (e.g., if previous run timed out).
     this._retrieve_execution = retrieve_execution
   }
 
-  /*
+  /**
   Return true if the command can be executed.
 
     The IBM quantum chip can do X, Y, Z, T, Tdag, S, Sdag,
     rotation gates, barriers, and CX / CNOT.
 
-    @param
-cmd (Command): Command for which to check availability
+    @param {Command} cmd: Command for which to check availability
+    @return {Boolean}
    */
   isAvailable(cmd) {
     const g = cmd.gate
@@ -129,13 +132,12 @@ cmd (Command): Command for which to check availability
     this._measured_ids = []
   }
 
-  /*
+  /**
 Temporarily store the command cmd.
 
   Translates the command and stores it in a local variable (this._cmds).
 
-  @param
-      cmd: Command to store
+  @param {Command} cmd: Command to store
   */
   _store(cmd) {
     if (this._clear) {
@@ -213,12 +215,10 @@ Temporarily store the command cmd.
   }
 
 
-  /*
+  /**
   Return the physical location of the qubit with the given logical id.
 
-    @param
-qb_id (int): ID of the logical qubit whose position should be
-returned.
+    @param qbID {Number}: ID of the logical qubit whose position should be returned.
    */
   _logicalToPhysical(qbID) {
     assert(!!this.main.mapper)
@@ -232,7 +232,7 @@ returned.
     return v
   }
 
-  /*
+  /**
   Return the list of basis states with corresponding probabilities.
 
     The measured bits are ordered according to the supplied quantum
@@ -242,16 +242,11 @@ the first qubit in the supplied quantum register.
     Warning:
 Only call this function after the circuit has been executed!
 
-    @param
-qureg (list<Qubit>): Quantum register determining the order of the
-qubits.
+    @param {Array<Qubit>|Qureg} qureg: Quantum register determining the order of the qubits.
 
-    @returns
-probability_dict (dict): Dictionary mapping n-bit strings to
-probabilities.
+    @returns {Object}: Dictionary mapping n-bit strings to probabilities.
 
-    @throws
-RuntimeError: If no data is available (i.e., if the circuit has
+    @throws {Error}: If no data is available (i.e., if the circuit has
 not been executed). Or if a qubit was supplied which was not
 present in the circuit (might have gotten optimized away).
    */
@@ -278,7 +273,7 @@ present in the circuit (might have gotten optimized away).
     return probability_dict
   }
 
-  /*
+  /**
   Run the circuit.
 
     Send the circuit via the IBM API (JSON QASM) using the provided user
@@ -358,12 +353,11 @@ data / ask for username & password.
     }
   }
 
-  /*
+  /**
   Receives a command list and, for each command, stores it until
 completion.
 
-    @param
-command_list: List of commands to execute
+    @param {Array<Command>} commandList: List of commands to execute
    */
   receive(commandList) {
     commandList.forEach((cmd) => {
@@ -384,6 +378,9 @@ command_list: List of commands to execute
     })
   }
 
+  /**
+   * @return {Array<Error>}
+   */
   get errors() {
     return this._errors
   }
@@ -392,10 +389,16 @@ command_list: List of commands to execute
     this._errors.push(error)
   }
 
+  /**
+   * @return {Function}
+   */
   get didRunCallback() {
     return this._didRunCallback
   }
 
+  /**
+   * @param {Function} callback
+   */
   set didRunCallback(callback) {
     this._didRunCallback = callback
   }

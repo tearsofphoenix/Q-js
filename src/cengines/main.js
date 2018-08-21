@@ -50,12 +50,12 @@ export default class MainEngine extends BasicEngine {
     Sets 'next_engine'- and 'main_engine'-attributes of all compiler
 engines and adds the back-end as the last engine.
 
-    @param {BasicEngine} backend: Backend to send the compiled circuit to.
-    @param {Array<BasicEngine>} engineList: List of engines / backends to use
-as compiler engines. Note: The engine list must not contain
-multiple mappers (instances of BasicMapperEngine).
-Default: projectq.setups.default.get_engine_list()
-verbose (bool): Either print full or compact error messages.
+    @param {BasicEngine} backend Backend to send the compiled circuit to.
+    @param {Array<BasicEngine>} engineList List of engines / backends to use
+            as compiler engines. Note: The engine list must not contain
+            multiple mappers (instances of BasicMapperEngine).
+            Default: getEngineList()
+   @param {Boolean} verbose Either print full or compact error messages.
     Default: false (i.e. compact error messages).
 
     @example
@@ -175,13 +175,11 @@ registered this result previously (see setMeasurementResult).
     @example
 @code
 
-from projectq.ops import H, Measure
-from projectq import MainEngine
-eng = MainEngine()
-qubit = eng.allocateQubit() # quantum register of size 1
-H | qubit
-Measure | qubit
-eng.get_measurement_result(qubit[0]) == int(qubit)
+const eng = new MainEngine()
+const qubit = eng.allocateQubit() // quantum register of size 1
+H.or(qubit)
+Measure.or(qubit)
+eng.getMeasurementResult(qubit[0]) == qubit.toNumber()
    */
   getMeasurementResult(qubit) {
     const v = this._measurements[qubit.id]
@@ -212,7 +210,7 @@ eng.get_measurement_result(qubit[0]) == int(qubit)
   /**
   Forward the list of commands to the first engine.
 
-    @param commandList {Array<Command>}: List of commands to receive (and then send on)
+    @param {Array<Command>} commandList: List of commands to receive (and then send on)
    */
   receive(commandList) {
     this.send(commandList)
@@ -243,6 +241,7 @@ eng.get_measurement_result(qubit[0]) == int(qubit)
   deallocate() {
     this.flush(true)
   }
+
   /**
   Flush the entire circuit down the pipeline, clearing potential buffers
 (of, e.g., optimizers).
@@ -253,9 +252,7 @@ id to -1).
    */
   flush(deallocateQubits = false) {
     if (deallocateQubits) {
-      for (const qb of this.activeQubits) {
-        qb.deallocate()
-      }
+      this.activeQubits.forEach(qb => qb.deallocate())
       this.activeQubits = new Set()
     }
 
