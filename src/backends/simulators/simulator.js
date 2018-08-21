@@ -27,7 +27,6 @@ import {BasicMathGate} from '../../ops/basics';
 import TimeEvolution from '../../ops/timeevolution';
 import { BasicQubit } from '../../types/qubit'
 import { stringToArray } from '../../ops/qubitoperator'
-import { getControlCount } from '../../meta/control'
 import { LogicalQubitIDTag } from '../../meta/tag'
 import {instanceOf} from '../../libs/util';
 import {len, stringToBitArray} from '../../libs/polyfill';
@@ -362,7 +361,7 @@ deallocation, and (controlled) single-qubit gate.
       const ctrlids = cmd.controlQubits.map(qb => qb.id)
       this._simulator.emulateTimeEvolution(op, t, qubitids, ctrlids)
     } else if (cmd.gate.equal(Measure)) {
-      assert(getControlCount(cmd) === 0)
+      assert(cmd.controlCount === 0)
       const ids = []
       cmd.qubits.forEach(qr => qr.forEach(qb => ids.push(qb.id)))
       const out = this._simulator.measureQubits(ids)

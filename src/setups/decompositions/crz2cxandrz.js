@@ -1,4 +1,4 @@
-import {getControlCount} from '../../meta/control';
+;
 import {NOT, Rz} from '../../ops/gates';
 import {C} from '../../ops/metagates';
 import {tuple} from '../../libs/util';
@@ -8,7 +8,7 @@ const _decompose_CRz = (cmd) => {
   const qubit = cmd.qubits[0]
   const ctrl = cmd.controlQubits
   const gate = cmd.gate
-  const n = getControlCount(cmd)
+  const n = cmd.controlCount
 
   new Rz(0.5 * gate.angle).or(qubit)
   C(NOT, n).or(tuple(ctrl, qubit))
@@ -16,7 +16,7 @@ const _decompose_CRz = (cmd) => {
   C(NOT, n).or(tuple(ctrl, qubit))
 }
 
-const _recognize_CRz = cmd => getControlCount(cmd) >= 1
+const _recognize_CRz = cmd => cmd.controlCount >= 1
 
 export default [
   new DecompositionRule(Rz, _decompose_CRz, _recognize_CRz)

@@ -16,7 +16,7 @@
 
 export {Compute, CustomUncompute, Uncompute, UncomputeEngine, ComputeEngine} from './compute'
 
-export {Control, ControlEngine, getControlCount} from './control'
+export {Control, ControlEngine} from './control'
 
 export {Dagger, DaggerEngine} from './dagger'
 

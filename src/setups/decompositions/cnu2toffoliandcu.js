@@ -1,5 +1,5 @@
 
-import {Control, getControlCount} from '../../meta/control';
+import {Control} from '../../meta/control'
 import {XGate} from '../../ops/gates';
 import DecompositionRule from '../../cengines/replacer/decompositionrule';
 import {BasicGate} from '../../ops/basics';
@@ -11,7 +11,7 @@ import {tuple} from '../../libs/util';
  Recognize an arbitrary gate which has n>=2 control qubits, except a Toffoli gate.
 */
 export const _recognize_CnU = (cmd) => {
-  const count = getControlCount(cmd)
+  const count = cmd.controlCount
   if (count === 2) {
     if (!(cmd.gate instanceof XGate)) {
       return true
@@ -30,7 +30,7 @@ export const _decompose_CnU = (cmd) => {
   const eng = cmd.engine
   const ctrl_qureg = cmd.controlQubits
   const {qubits, gate} = cmd
-  const n = getControlCount(cmd)
+  const n = cmd.controlCount
   const ancilla_qureg = eng.allocateQureg(n - 1)
 
   Compute(eng, () => {

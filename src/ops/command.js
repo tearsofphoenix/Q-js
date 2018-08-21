@@ -222,6 +222,10 @@ the quantum registers to which the gate is applied.
     return [this._controlQubits].concat(this.qubits)
   }
 
+  get controlCount() {
+    return this.controlQubits.length
+  }
+
   get engine() {
     return this._engine
   }

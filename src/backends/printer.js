@@ -21,7 +21,6 @@ them on to the next engines (see CommandPrinter).
 import assert from 'assert'
 import {BasicEngine} from '../cengines/basics'
 import {FlushGate, Measure} from '../ops/gates'
-import {getControlCount} from '../meta/control'
 import {LogicalQubitIDTag} from '../meta/tag'
 import {BasicQubit} from '../types/qubit'
 import { LastEngineError } from '../meta/error'
@@ -78,7 +77,7 @@ export default class CommandPrinter extends BasicEngine {
    */
   printCMD(cmd) {
     if (this.isLastEngine && cmd.gate.equal(Measure)) {
-      assert(getControlCount(cmd) === 0)
+      assert(cmd.controlCount === 0)
       console.log(cmd.toString())
       cmd.qubits.forEach((qureg) => {
         qureg.forEach((qubit) => {

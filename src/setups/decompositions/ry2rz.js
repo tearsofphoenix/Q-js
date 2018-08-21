@@ -1,4 +1,4 @@
-import {Control, getControlCount} from '../../meta/control';
+import {Control} from '../../meta/control'
 import {Compute, Uncompute} from '../../meta/compute';
 import {Rx, Ry, Rz} from '../../ops/gates';
 import DecompositionRule from '../../cengines/replacer/decompositionrule';
@@ -17,7 +17,7 @@ export const _decompose_ry = (cmd) => {
   })
 }
 
-export const _recognize_RyNoCtrl = cmd => getControlCount(cmd) === 0
+export const _recognize_RyNoCtrl = cmd => cmd.controlCount === 0
 
 export default [
   new DecompositionRule(Ry, _decompose_ry, _recognize_RyNoCtrl)

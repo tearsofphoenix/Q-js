@@ -2,7 +2,7 @@
 import {tuple} from '../../libs/util';
 import Gates, {H, NOT, T} from '../../ops/gates';
 import {CNOT} from '../../ops/shortcuts';
-import {getControlCount} from '../../meta/control';
+;
 import DecompositionRule from '../../cengines/replacer/decompositionrule';
 
 const {Tdag} = Gates
@@ -31,7 +31,7 @@ const _decompose_toffoli = (cmd) => {
   H.or(target)
 }
 
-const _recognize_toffoli = cmd => getControlCount(cmd) === 2
+const _recognize_toffoli = cmd => cmd.controlCount === 2
 
 export default [
   new DecompositionRule(NOT.constructor, _decompose_toffoli, _recognize_toffoli)

@@ -19,7 +19,6 @@ import {BasicEngine} from '../../cengines/basics'
 import Gates, {
   Allocate, Barrier, Deallocate, FlushGate, H, Measure, NOT, Rx, Ry, Rz, S, T, Y, Z
 } from '../../ops/gates'
-import {getControlCount} from '../../meta/control';
 import {LogicalQubitIDTag} from '../../meta/tag';
 import IBMHTTPClient from './ibmhttpclient'
 import {instanceOf} from '../../libs/util'
@@ -106,7 +105,7 @@ running the circuit (e.g., if previous run timed out).
    */
   isAvailable(cmd) {
     const g = cmd.gate
-    const controlCount = getControlCount(cmd)
+    const controlCount = cmd.controlCount
     if (g.equal(NOT) && controlCount <= 1) {
       return true
     }
@@ -171,7 +170,7 @@ Temporarily store the command cmd.
       }
       assert(typeof logical_id !== 'undefined')
       this._measured_ids.push(logical_id)
-    } else if (gate === NOT && getControlCount(cmd) === 1) {
+    } else if (gate === NOT && cmd.controlCount === 1) {
       const ctrl_pos = cmd.controlQubits[0].id
       const qb_pos = cmd.qubits[0][0].id
       this.qasm += `\ncx q[${ctrl_pos}], q[${qb_pos}];`
@@ -186,7 +185,7 @@ Temporarily store the command cmd.
 
       this.qasm += `${qb_str.substring(0, qb_str.length - 2)};`
     } else if (instanceOf(gate, [Rx, Ry, Rz])) {
-      assert(getControlCount(cmd) === 0)
+      assert(cmd.controlCount === 0)
       const qb_pos = cmd.qubits[0][0].id
       const u_strs = {
         Rx: a => `u3(${a}, -pi/2, pi/2)`,
@@ -196,10 +195,10 @@ Temporarily store the command cmd.
       const gateASM = u_strs[gate.toString().substring(0, 2)](gate.angle)
       this.qasm += `\n${gateASM} q[${qb_pos}];`
     } else {
-      if (getControlCount(cmd) !== 0) {
+      if (cmd.controlCount !== 0) {
         console.log(187, cmd.toString())
       }
-      assert(getControlCount(cmd) === 0)
+      assert(cmd.controlCount === 0)
       const key = gate.toString()
       const v = IBMBackend.gateNames[key]
       let gate_str

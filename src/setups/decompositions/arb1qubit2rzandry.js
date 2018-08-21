@@ -1,5 +1,5 @@
 import math from 'mathjs'
-import {Control, getControlCount} from '../../meta';
+import {Control} from '../../meta';
 import {len, productLoop, productLoop3} from '../../libs/polyfill';
 import DecompositionRule from '../../cengines/replacer/decompositionrule';
 import {
@@ -27,7 +27,7 @@ carb1qubit2cnotrzandry instead.
 export const _recognize_arb1qubit = (cmd) => {
   try {
     const m = cmd.gate.matrix
-    return len(m) === 2 && getControlCount(cmd) === 0
+    return len(m) === 2 && cmd.controlCount === 0
   } catch (e) {
     return false
   }

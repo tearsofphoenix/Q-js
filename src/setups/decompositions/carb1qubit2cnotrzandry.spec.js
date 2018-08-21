@@ -2,7 +2,7 @@ import {expect} from 'chai'
 import math from 'mathjs'
 import {AutoReplacer, DummyEngine, InstructionFilter} from '../../cengines';
 import MainEngine from '../../cengines/main';
-import {Control, getControlCount} from '../../meta';
+import {Control} from '../../meta';
 import {
   All,
   BasicGate, ClassicalInstructionGate, Measure, Ph, R, Rx, Ry, Rz, X, XGate
@@ -64,7 +64,7 @@ describe('carb1qubit to cnot rz & ry test', () => {
     if (g instanceof ClassicalInstructionGate) {
       return true
     }
-    const cn = getControlCount(cmd)
+    const cn = cmd.controlCount
     if (cn === 0 && instanceOf(g, [Ry, Rz, Ph])) {
       return true
     }
