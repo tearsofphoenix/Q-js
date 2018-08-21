@@ -78,10 +78,10 @@ export class LoopEngine extends BasicEngine {
     const error_message = ('\n Error. Qubits have been allocated in with '
     + 'Loop(eng, num) context,\n which have not '
     + 'explicitely been deallocated in the Loop context.\n'
-    + 'Correct usage:\nwith Loop(eng, 5):\n'
+    + 'Correct usage:\nLoop(eng, 5):\n'
     + '    qubit = eng.allocateQubit()\n'
     + '    ...\n'
-    + '    del qubit[0]\n')
+    + '    qubit[0].deallocate()\n')
 
     if (!this._nextEnginesSupportLoopTag) {
       // Unroll the loop
@@ -183,30 +183,31 @@ unroll or, if there is a LoopTag-handling engine, add the LoopTag.
 Loop n times over an entire code block.
 
     @example
-
-with Loop(eng, 4)
-# [quantum gates to be executed 4 times]
+    Loop(eng, 4, () => { })
+    // [quantum gates to be executed 4 times]
 
 Warning:
     If the code in the loop contains allocation of qubits, those qubits
-have to be deleted prior to exiting the 'with Loop()' context.
+have to be deleted prior to exiting the 'Loop()' context.
 
     This code is **NOT VALID**:
 
  @example
 
-with Loop(eng, 4):
-qb = eng.allocateQubit()
-H | qb # qb is still available!!!
+  Loop(eng, 4, () => {
+    qb = eng.allocateQubit()
+  })
+
+  H.or(qb) // qb is still available!!!
 
 The **correct way** of handling qubit (de-)allocation is as follows:
 
  @example
-
-with Loop(eng, 4):
-qb = eng.allocateQubit()
+  Loop(eng, 4, () => {
+    qb = eng.allocateQubit()
+  })
 ...
-del qb # sends deallocate gate
+  qb.deallocate() // sends deallocate gate
  */
 export function Loop(engine, num, func) {
   if (typeof num === 'number' && num >= 0 && num % 1 === 0) {

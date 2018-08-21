@@ -539,9 +539,9 @@ using `mask` to identify control qubits.
    @param {Array.<number[]>} m 2^k x 2^k complex matrix describing the k-qubit gate.
    @param {number[]} pos List of bit-positions of the qubits.
    @param {number} mask Bit-mask where set bits indicate control qubits.
+   see follows the description in https://arxiv.org/abs/1704.01127
    */
   _multiQubitGate(m, pos, mask) {
-    // follows the description in https://arxiv.org/abs/1704.01127
     const inactive = Object.keys(this._map).map(k => parseInt(k, 10)).filter(p => !pos.includes(p))
 
     const matrix = math.matrix(m)
