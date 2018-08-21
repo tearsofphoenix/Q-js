@@ -30,7 +30,7 @@ import {
 import {Qubit} from '../types/qubit'
 import {getInverse} from './_cycle';
 import { ClassicalInstructionGate, FastForwardingGate } from './basics'
-import {makeTuple} from '../libs/util'
+import {tuple} from '../libs/util'
 
 const np = math
 const mm = math.matrix
@@ -156,7 +156,7 @@ describe('metagates test', () => {
     // Option 1:
     new ControlledGate(gate, 3).or([[qubit1], [qubit0], [qubit2], [qubit3]])
     // Option 2:
-    new ControlledGate(gate, 3).or(makeTuple(qubit1, qubit0, qubit2, qubit3))
+    new ControlledGate(gate, 3).or(tuple(qubit1, qubit0, qubit2, qubit3))
     // Option 3:
     new ControlledGate(gate, 3).or([[qubit1, qubit0], qubit2, qubit3])
     // Option 4:

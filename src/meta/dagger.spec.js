@@ -23,7 +23,7 @@ import MainEngine from '../cengines/main'
 import {DummyEngine} from '../cengines/testengine'
 import {Dagger} from './dagger'
 import {CNOT} from '../ops/shortcuts'
-import {makeTuple} from '../libs/util'
+import {tuple} from '../libs/util'
 import {QubitManagementError} from './error'
 
 describe('dagger test', () => {
@@ -39,7 +39,7 @@ describe('dagger test', () => {
     Dagger(eng, () => {
       const ancilla = eng.allocateQubit(true)
       new Rx(0.6).or(ancilla)
-      CNOT.or(makeTuple(ancilla, qubit))
+      CNOT.or(tuple(ancilla, qubit))
       H.or(qubit)
       new Rx(-0.6).or(ancilla)
       ancilla[0].deallocate()

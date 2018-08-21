@@ -15,7 +15,7 @@
  */
 
 import {expect} from 'chai'
-import { makeTuple } from '../libs/util'
+import { tuple } from '../libs/util'
 import MainEngine from './main'
 import {DummyEngine, CompareEngine} from './testengine'
 import {
@@ -30,7 +30,7 @@ describe('testengine test', () => {
     const qb0 = eng.allocateQubit()
     const qb1 = eng.allocateQubit()
     H.or(qb0)
-    CNOT.or(makeTuple(qb0, qb1))
+    CNOT.or(tuple(qb0, qb1))
     eng.flush()
     const expected = ('Qubit 0 : Allocate | Qureg[0], H | Qureg[0], '
       + 'CX | ( Qureg[0], Qureg[1] )\nQubit 1 : Allocate | Qureg[1],'
@@ -69,11 +69,11 @@ describe('testengine test', () => {
     const qb01 = eng0.allocateQubit()
     const qb02 = eng0.allocateQubit()
     H.or(qb00)
-    CNOT.or(makeTuple(qb00, qb01))
-    CNOT.or(makeTuple(qb01, qb00))
+    CNOT.or(tuple(qb00, qb01))
+    CNOT.or(tuple(qb01, qb00))
     H.or(qb00)
     new Rx(0.5).or(qb01)
-    CNOT.or(makeTuple(qb00, qb01))
+    CNOT.or(tuple(qb00, qb01))
     new Rx(0.6).or(qb02)
     eng0.flush()
     // identical circuit:
@@ -82,11 +82,11 @@ describe('testengine test', () => {
     const qb12 = eng1.allocateQubit()
     H.or(qb10)
     new Rx(0.6).or(qb12)
-    CNOT.or(makeTuple(qb10, qb11))
-    CNOT.or(makeTuple(qb11, qb10))
+    CNOT.or(tuple(qb10, qb11))
+    CNOT.or(tuple(qb11, qb10))
     new Rx(0.5).or(qb11)
     H.or(qb10)
-    CNOT.or(makeTuple(qb10, qb11))
+    CNOT.or(tuple(qb10, qb11))
     eng1.flush()
     // mistake in CNOT circuit:
     const qb20 = eng2.allocateQubit()
@@ -94,11 +94,11 @@ describe('testengine test', () => {
     const qb22 = eng2.allocateQubit()
     H.or(qb20)
     new Rx(0.6).or(qb22)
-    CNOT.or(makeTuple(qb21, qb20))
-    CNOT.or(makeTuple(qb20, qb21))
+    CNOT.or(tuple(qb21, qb20))
+    CNOT.or(tuple(qb20, qb21))
     new Rx(0.5).or(qb21)
     H.or(qb20)
-    CNOT.or(makeTuple(qb20, qb21))
+    CNOT.or(tuple(qb20, qb21))
     eng2.flush()
     // test other branch to fail
     const qb30 = eng3.allocateQubit()

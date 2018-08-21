@@ -58,16 +58,11 @@ export function markTuple(value) {
  * @param args
  * @return {Array}
  */
-export function makeTuple(...args) {
+export function tuple(...args) {
   const result = new Array(...args)
   markTuple(result)
   return result
 }
-
-/**
- * alias of makeTuple
- */
-export const tuple = makeTuple
 
 /**
  * create copy of object, with same `class`

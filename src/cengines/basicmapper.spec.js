@@ -23,7 +23,7 @@ import {
   Allocate, Deallocate, Measure, FlushGate
 } from '../ops/gates'
 import {BasicGate} from '../ops/basics'
-import { makeTuple } from '../libs/util'
+import { tuple } from '../libs/util'
 import {LogicalQubitIDTag} from '../meta/tag'
 
 describe('basic mapper test', () => {
@@ -41,11 +41,11 @@ describe('basic mapper test', () => {
     const qb2 = new BasicQubit(null, 2)
     const qb3 = new BasicQubit(null, 3)
 
-    const cmd0 = new Command(null, Allocate, makeTuple([qb0]), [], [])
-    const cmd1 = new Command(null, Deallocate, makeTuple([qb1]), [], [])
-    const cmd2 = new Command(null, Measure, makeTuple([qb2]), [], ['SomeTag'])
-    const cmd3 = new Command(null, new BasicGate(), makeTuple([qb0, qb1], [qb2]), [qb3], [])
-    const cmd4 = new Command(null, new FlushGate(), makeTuple([new BasicQubit(null, -1)]))
+    const cmd0 = new Command(null, Allocate, tuple([qb0]), [], [])
+    const cmd1 = new Command(null, Deallocate, tuple([qb1]), [], [])
+    const cmd2 = new Command(null, Measure, tuple([qb2]), [], ['SomeTag'])
+    const cmd3 = new Command(null, new BasicGate(), tuple([qb0, qb1], [qb2]), [qb3], [])
+    const cmd4 = new Command(null, new FlushGate(), tuple([new BasicQubit(null, -1)]))
     mapper.sendCMDWithMappedIDs(cmd0)
     mapper.sendCMDWithMappedIDs(cmd1)
     mapper.sendCMDWithMappedIDs(cmd2)
@@ -59,15 +59,15 @@ describe('basic mapper test', () => {
     const rcmd4 = backend.receivedCommands[4]
 
     expect(rcmd0.gate.equal(Allocate)).to.equal(true)
-    expect(rcmd0.qubits).to.deep.equal(makeTuple([qb3]))
+    expect(rcmd0.qubits).to.deep.equal(tuple([qb3]))
     expect(rcmd1.gate.equal(Deallocate)).to.equal(true)
-    expect(rcmd1.qubits).to.deep.equal(makeTuple([qb2]))
+    expect(rcmd1.qubits).to.deep.equal(tuple([qb2]))
     expect(rcmd2.gate.equal(Measure)).to.equal(true)
-    expect(rcmd2.qubits).to.deep.equal(makeTuple([qb1]))
+    expect(rcmd2.qubits).to.deep.equal(tuple([qb1]))
     expect(rcmd2.tags).to.deep.equal(['SomeTag', new LogicalQubitIDTag(2)])
 
     expect(rcmd3.gate.equal(new BasicGate())).to.equal(true)
-    expect(rcmd3.qubits).to.deep.equal(makeTuple([qb3, qb2], [qb1]))
+    expect(rcmd3.qubits).to.deep.equal(tuple([qb3, qb2], [qb1]))
     expect(rcmd3.controlQubits).to.deep.equal([qb0])
 
     expect(rcmd4.qubits.length).to.equal(1)
