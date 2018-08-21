@@ -182,7 +182,7 @@ export class CircuitDrawer extends BasicEngine {
     CircuitDrawer is the last engine (since it can print any command).
 
     @param {Command} cmd: Command for which to check availability (all Commands can be printed).
-    @return boolean: true, unless the next engine cannot handle the Command (if there is a next engine).
+    @return {boolean}: true, unless the next engine cannot handle the Command (if there is a next engine).
    */
   isAvailable(cmd) {
     try {

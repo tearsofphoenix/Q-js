@@ -66,7 +66,6 @@ export function makeTuple(...args) {
 
 /**
  * alias of makeTuple
- * @type {function(...[*]): Array}
  */
 export const tuple = makeTuple
 
