@@ -27,15 +27,13 @@ import { LastEngineError } from '../meta/error'
 
 /**
  * @class CommandPrinter
- * @classdesc
+ * @desc
  * CommandPrinter is a compiler engine which prints commands to stdout prior
  * to sending them on to the next compiler engine.
  */
 export default class CommandPrinter extends BasicEngine {
   /**
    * @constructor
-   *Initialize a CommandPrinter.
-
   @param {boolean} acceptInput: If accept_input is true, the printer queries
   the user to input measurement results if the CommandPrinter is
   the last engine. Otherwise, all measurements yield

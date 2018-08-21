@@ -174,7 +174,7 @@ returns true.
 
 /**
  * @class ForwarderEngine
- * @classdesc
+ * @desc
     A ForwarderEngine is a trivial engine which forwards all commands to the next engine.
 
     It is mainly used as a substitute for the MainEngine at lower levels such

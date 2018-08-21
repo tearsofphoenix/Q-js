@@ -27,7 +27,7 @@ import '../../ops/metagates'
 const {Tdag, Sdag} = Gates
 /**
  * @class IBMBackend
- * @classdesc
+ * @desc
 The IBM Backend class, which stores the circuit, transforms it to JSON
 QASM, and sends the circuit through the IBM API.
  */

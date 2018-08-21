@@ -48,7 +48,7 @@ import {NotMergeable} from '../meta/error'
 
 /**
  * @class Command
- * @classdesc
+ * @desc
 Class used as a container to store commands. If a gate is applied to
 qubits, then the gate and qubits are saved in a command object. Qubits
 are copied into WeakQubitRefs in order to allow early deallocation (would

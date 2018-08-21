@@ -30,8 +30,6 @@ import ToLatex from './tolatex'
 export class CircuitItem {
   /**
    * @constructor
-  Initialize a circuit item.
-
     @param {BasicGate} gate
     @param {number[]} lines Circuit lines the gate acts on.
     @param {number[]} ctrl_lines Circuit lines which control the gate.
@@ -75,7 +73,7 @@ export class CircuitItem {
 
 /**
  * @class CircuitDrawer
- * @classdesc
+ * @desc
 CircuitDrawer is a compiler engine which generates TikZ code for drawing
   quantum circuits.
 

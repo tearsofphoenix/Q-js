@@ -33,7 +33,7 @@ import {len, stringToBitArray} from '../../libs/polyfill';
 
 /**
  * @class Simulator
- * @classdesc
+ * @desc
 Simulator is a compiler engine which simulates a quantum computer using
 C++-based kernels.
 

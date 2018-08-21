@@ -43,7 +43,7 @@ const ANGLE_TOLERANCE = 10 ** -ANGLE_PRECISION
 /**
  * @abstract
  * @class BasicGate
- * @classdesc Base class of all gates.
+ * @desc Base class of all gates.
  */
 export class BasicGate {
   /**
@@ -199,7 +199,7 @@ correct input parameter of a Command object which is:
 
 /**
  * @class SelfInverseGate
- * @classdesc Self-inverse basic gate class.
+ * @desc Self-inverse basic gate class.
  * Automatic implementation of the getInverse-member function for self-inverse gates.
  * @code
    // getInverse(H) == H, it is a self-inverse gate:
@@ -213,7 +213,7 @@ export class SelfInverseGate extends BasicGate {
 
 /**
  * @class BasicRotationGate
- * @classdesc
+ * @desc
 Defines a base class of a rotation gate.
 
     A rotation gate has a continuous parameter (the angle), labeled 'angle' /
@@ -375,7 +375,7 @@ export class ClassicalInstructionGate extends BasicGate {
 
 /**
  * @class FastForwardingGate
- * @classdesc
+ * @desc
 Base class for classical instruction gates which require a fast-forward
 through compiler engines that cache / buffer gates. Examples include
 Measure and Deallocate, which both should be executed asap, such
@@ -402,7 +402,7 @@ export class FastForwardingGate extends ClassicalInstructionGate {
 
 /**
  * @class BasicMathGate
- * @classdesc
+ * @desc
 Base class for all math gates.
 
     It allows efficient emulation by providing a mathematical representation

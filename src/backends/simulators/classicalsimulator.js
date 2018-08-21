@@ -33,7 +33,7 @@ import { instanceOf } from '../../libs/util'
 
 /**
  * @class ClassicalSimulator
- * @classdesc
+ * @desc
 A simple introspective simulator that only permits classical operations.
 
   Allows allocation, deallocation, measuring (no-op), flushing (no-op),

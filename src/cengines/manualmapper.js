@@ -18,7 +18,7 @@ import BasicMapperEngine from './basicmapper'
 
 /**
  * @class ManualMapper
- * @classdesc
+ * @desc
 Manual Mapper which adds QubitPlacementTags to Allocate gate commands
 according to a user-specified mapping.
 

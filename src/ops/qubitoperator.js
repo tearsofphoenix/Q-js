@@ -77,7 +77,7 @@ function checkTerm(term) {
 
 /**
  * @class QubitOperator
- * @classdesc
+ * @desc
 A sum of terms acting on qubits, e.g., 0.5 * 'X0 X5' + 0.3 * 'Z1 Z2'.
 
     A term is an operator acting on n qubits and can be represented as:

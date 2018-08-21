@@ -186,7 +186,7 @@ export const SqrtX = new SqrtXGate()
 
 /**
  * @class SwapGate
- * @classdesc Swap gate class (swaps 2 qubits) also self inverse gate
+ * @desc Swap gate class (swaps 2 qubits) also self inverse gate
  */
 export class SwapGate extends BasicMathGate {
   constructor() {
@@ -219,7 +219,7 @@ export const Swap = new SwapGate()
 
 /**
  * @class SqrtSwapGate
- * @classdesc Square-root Swap gate class
+ * @desc Square-root Swap gate class
  */
 export class SqrtSwapGate extends BasicGate {
   constructor() {
@@ -246,7 +246,7 @@ export const SqrtSwap = new SqrtSwapGate()
 
 /**
  * @class EntangleGate
- * @classdesc gate (Hadamard on first qubit, followed by CNOTs applied to all other qubits).
+ * @desc gate (Hadamard on first qubit, followed by CNOTs applied to all other qubits).
 */
 export class EntangleGate extends BasicGate {
   toString() {
@@ -264,7 +264,7 @@ export const Entangle = new EntangleGate()
 
 /**
  * @class Ph
- * @classdesc Phase gate (global phase)
+ * @desc Phase gate (global phase)
  */
 export class Ph extends BasicPhaseGate {
   get matrix() {
@@ -301,7 +301,7 @@ export class Ry extends BasicRotationGate {
 
 /**
  * @class Rz
- * @classdesc RotationZ gate class
+ * @desc RotationZ gate class
  */
 export class Rz extends BasicRotationGate {
   get matrix() {
@@ -314,7 +314,7 @@ export class Rz extends BasicRotationGate {
 
 /**
  * @class R
- * @classdesc Phase-shift gate (equivalent to Rz up to a global phase)
+ * @desc Phase-shift gate (equivalent to Rz up to a global phase)
  */
 export class R extends BasicPhaseGate {
   get matrix() {
@@ -324,7 +324,7 @@ export class R extends BasicPhaseGate {
 
 /**
  * @class FlushGate
- * @classdesc
+ * @desc
 Flush gate (denotes the end of the circuit).
 
 Note:
@@ -350,7 +350,7 @@ export class FlushGate extends FastForwardingGate {
 
 /**
  * @class MeasureGate
- * @classdesc Measurement gate class (for single qubits).
+ * @desc Measurement gate class (for single qubits).
  */
 export class MeasureGate extends FastForwardingGate {
   toString() {

@@ -280,7 +280,7 @@ _exports.toLatex = toLatex
 
 /**
  * @class _Circ2Tikz
- * @classdesc
+ * @desc
 The Circ2Tikz class takes a circuit (list of lists of CircuitItem objects)
 and turns them into Latex/TikZ code.
 

@@ -68,7 +68,7 @@ export function return_swap_depth(swaps) {
 
 /**
  * @class LinearMapper
- * @classdesc
+ * @desc
 Maps a quantum circuit to a linear chain of nearest neighbour interactions.
 
     Maps a quantum circuit to a linear chain of qubits with nearest neighbour

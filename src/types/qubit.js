@@ -105,7 +105,7 @@ export class BasicQubit {
 
 /**
  * @class Qubit
- * @classdesc
+ * @desc
     Represents a (logical-level) qubit with a unique index provided by the
     MainEngine. Once the qubit goes out of scope (and is garbage-collected),
     it deallocates itself automatically, allowing automatic resource management.
@@ -147,7 +147,7 @@ export class Qubit extends BasicQubit {
 
 /**
  * @class Qureg
- * @classdesc Quantum register class.
+ * @desc Quantum register class.
 
 Simplifies accessing measured values for single-qubit registers (no []-
     access necessary) and enables pretty-printing of general quantum registers).

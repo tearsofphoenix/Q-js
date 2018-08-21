@@ -21,7 +21,7 @@ import {instanceOf} from '../libs/util'
 
 /**
  *  @class TagRemover
- *  @classdesc is a compiler engine which removes temporary command tags (see the tag classes such as LoopTag in `loop`).
+ *  @desc is a compiler engine which removes temporary command tags (see the tag classes such as LoopTag in `loop`).
 
 Removing tags is important (after having handled them if necessary) in
 order to enable optimizations across meta-function boundaries (compute/

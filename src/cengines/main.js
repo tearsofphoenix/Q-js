@@ -26,7 +26,7 @@ import Simulator from '../backends/simulators/simulator'
 
 /**
  * @class MainEngine
- * @classdesc
+ * @desc
 The MainEngine class provides all functionality of the main compiler
 engine.
 
