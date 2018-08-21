@@ -95,7 +95,7 @@ operations for easy manipulation of these objects by the user.
     Note for a QubitOperator to be a Hamiltonian which is a hermitian
 operator, the coefficients of all terms must be real.
 
-    @code
+ @example
 
 hamiltonian = 0.5 * QubitOperator('X0 X5') + 0.3 * QubitOperator('Z0')
 
@@ -122,7 +122,6 @@ have to be added using += (which is fast) or using + of two
 QubitOperator objects:
 
     @example
-        @code
 
 ham = ((QubitOperator('X0 Y3', 0.5)
     + 0.6 * QubitOperator('X0 Y3')))

@@ -33,7 +33,6 @@ This gate is the unitary time evolution propagator:
 factor is stored implicitely.
 
     @example
-@code
 
 wavefunction = eng.allocateQureg(5)
 hamiltonian = 0.5 * QubitOperator("X0 Z1 Y5")
@@ -155,7 +154,7 @@ works for everyone. Use, e.g., a decomposition rule for that.
   /**
   Operator| overload which enables the following syntax:
 
-    @code
+   @example
 
 TimeEvolution(...) | qureg
 TimeEvolution(...) | (qureg,)
@@ -167,8 +166,6 @@ quantum register or one qubit.
 
     @example
 
-@code
-
 wavefunction = eng.allocateQureg(5)
 hamiltonian = QubitOperator("X1 Y3", 0.5)
 TimeEvolution(time=2.0, hamiltonian=hamiltonian) | wavefunction
@@ -179,7 +176,7 @@ non-trivially on the two qubits wavefunction[1] and wavefunction[3].
     Therefore, the operator| will rescale the indices in the hamiltonian
 and sends the equivalent of the following new gate to the MainEngine:
 
-    @code
+   @example
 
 h = QubitOperator("X0 Y1", 0.5)
 TimeEvolution(2.0, h) | [wavefunction[1], wavefunction[3]]

@@ -20,7 +20,6 @@
 * ControlledGate (Represents a controlled version of an arbitrary gate)
 * Tensor/All (Applies a single qubit gate to all supplied qubits), e.g.,
     @example
-@code
 
 Tensor(H) | (qubit1, qubit2) # apply H to qubit #1 and #2
 
@@ -131,7 +130,7 @@ C(gate, 2) | ([qb0,qb2], qb3) # Is equivalent
 Note:
     Use :func:`C` rather than ControlledGate, i.e.,
 
-@code
+ @example
 
 C(X, 2) == Toffoli
  */
@@ -214,7 +213,6 @@ Return n-controlled version of the provided gate.
     @param {number} n Number of controls (default: 1)
 
 @example
-    @code
 
 C(NOT) | (c, q) # equivalent to CNOT | (c, q)
  */

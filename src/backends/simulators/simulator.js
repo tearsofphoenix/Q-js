@@ -40,7 +40,7 @@ C++-based kernels.
     OpenMP is enabled and the number of threads can be controlled using the
 OMP_NUM_THREADS environment variable, i.e.
 
-    @code
+    @example
 
 export OMP_NUM_THREADS=4 # use 4 threads
 export OMP_PROC_BIND=spread # bind threads to processors by spreading

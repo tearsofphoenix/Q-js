@@ -266,7 +266,6 @@ export class UncomputeEngine extends BasicEngine {
 Start a compute-section.
 
     @example
-@code
 
 with Compute(eng):
 do_something(qubits)
@@ -280,7 +279,7 @@ uncomputed and deallocated within that section or, alternatively,
 
     This means that the following examples are valid:
 
-    @code
+ @example
 
 with Compute(eng):
 anc = eng.allocateQubit()
@@ -294,7 +293,7 @@ do_something_else(qubits)
 Uncompute(eng)  # will allocate a new ancilla (with a different id)
 # and then deallocate it again
 
-    @code
+ @example
 
 with Compute(eng):
 anc = eng.allocateQubit()
@@ -340,7 +339,6 @@ export function Compute(engine, func) {
 Start a custom uncompute-section.
 
     @example
-@code
 
 with Compute(eng):
 do_something(qubits)
@@ -409,7 +407,6 @@ export function CustomUncompute(engine, func) {
 Uncompute automatically.
 
     @example
-@code
 
 with Compute(eng):
 do_something(qubits)

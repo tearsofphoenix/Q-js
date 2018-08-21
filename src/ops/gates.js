@@ -335,7 +335,7 @@ the flush command).
 Note:
     This gate is sent when calling
 
-    @code
+ @example
 
 eng.flush()
 

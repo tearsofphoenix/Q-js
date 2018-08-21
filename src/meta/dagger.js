@@ -17,7 +17,7 @@
 /**
 Tools to easily invert a sequence of gates.
 
-    @code
+ @example
 
 with Dagger(eng)
 H | qubit1
@@ -88,7 +88,7 @@ Invert an entire code block.
 
     Use it with a with-statement, i.e.,
 
-    @code
+ @example
     Dagger(eng, () => [code to invert])
 
 Warning:
@@ -97,7 +97,7 @@ to be deleted prior to exiting the 'with Dagger()' context.
 
     This code is **NOT VALID**:
 
-@code
+ @example
 
 with Dagger(eng):
 qb = eng.allocateQubit()
@@ -105,7 +105,7 @@ H | qb // qb is still available!!!
 
 The **correct way** of handling qubit (de-)allocation is as follows:
 
-@code
+ @example
 
 with Dagger(eng):
 qb = eng.allocateQubit()

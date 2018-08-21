@@ -97,7 +97,7 @@ decomposition rule can indeed be applied to replace the given Command.
 Pauli-X gate with 2 control qubits. The recognizer function would then
 be:
 
-    @code
+    @example
 
 function recogn_toffoli(cmd)
 // can be applied if the gate is an X-gate with 2 controls
@@ -106,7 +106,7 @@ function recogn_toffoli(cmd)
 and, given a replacement function `replace_toffoli`, the decomposition
 rule can be registered as
 
-@code
+   @example
 
 register_decomposition(X.constructor, decompose_toffoli,
     recogn_toffoli)

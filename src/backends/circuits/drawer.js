@@ -85,7 +85,7 @@ generated upon first execution. This includes adjusting the gate width,
 from qubit IDs to wire location (via the :meth:`set_qubit_locations`
 function):
 
-  @code
+  @example
 
 const circuit_backend = new CircuitDrawer()
 circuit_backend.setQubitLocations({0: 1, 1: 0}) // swap lines 0 and 1
@@ -99,7 +99,7 @@ To see the qubit IDs in the generated circuit, simply set the `draw_id`
 option in the settings.json file under "gates":"AllocateQubitGate" to
 true:
 
-   @code
+ @example
 
 "gates": {
   "AllocateQubitGate": {
@@ -113,7 +113,7 @@ true:
 
   The settings.json file has the following structure:
 
-      @code
+      @example
 
   {
     "control": { // settings for control "circle"
@@ -139,7 +139,7 @@ true:
     All gates (except for the ones requiring special treatment) support the
     following properties:
 
-    @code
+    @example
 
     "GateClassString": {
     "height": GATE_HEIGHT,
@@ -276,7 +276,7 @@ export class CircuitDrawer extends BasicEngine {
       Simply write this string into a tex-file or, alternatively, pipe the
     output directly to, e.g., pdflatex:
 
-  @code
+   @example
 
     node my_circuit.js | pdflatex
 

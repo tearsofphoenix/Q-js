@@ -241,7 +241,6 @@ class name string as a key. Every gate can have its own width, height, pre
 offset and offset.
 
     @example
-    @code
  settings['gates']['HGate'] = {'width': .5, 'offset': .15}
 
 The default settings can be acquired using the get_default_settings()

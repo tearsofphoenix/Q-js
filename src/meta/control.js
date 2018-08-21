@@ -18,7 +18,6 @@
 Contains the tools to make an entire section of operations controlled.
 
     @example
-@code
 
 with Control(eng, qubit1):
 H | qubit2
@@ -71,7 +70,6 @@ export class ControlEngine extends BasicEngine {
 Condition an entire code block on the value of qubits being 1.
 
 @example
-    @code
 
 with Control(eng, ctrlqubits)
 do_something(otherqubits)
@@ -81,7 +79,7 @@ do_something(otherqubits)
  @param {Array.<BasicQubit>} qubits Qubits to condition on
  @param {function} func
  Enter the section using a with-statement
- @code
+ @example
  Control(eng, ctrlqubits, () => ...)
  */
 export function Control(engine, qubits, func) {

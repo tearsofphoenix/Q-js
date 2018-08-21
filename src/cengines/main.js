@@ -59,7 +59,6 @@ engines and adds the back-end as the last engine.
     Default: false (i.e. compact error messages).
 
     @example
-    @code
       const eng = new MainEngine() // uses default engine_list and the Simulator
 
 Instead of the default `engine_list` one can use, e.g., one of the IBM
@@ -67,14 +66,12 @@ setups which defines a custom `engine_list` useful for one of the IBM
 chips
 
     @example
-    @code
       const eng = new MainEngine(new Simulator, getEngineList())
       // eng uses the default Simulator backend
 
 Alternatively, one can specify all compiler engines explicitly, e.g.,
 
     @example
-    @code
       const rule_set = new DecompositionRuleSet()
       const engines = [new AutoReplacer(rule_set), new TagRemover(), new LocalOptimizer(3)]
       const eng = new MainEngine(new Simulator(), engines)
@@ -169,7 +166,6 @@ registered this result previously (see setMeasurementResult).
   @param {BasicQubit} qubit Qubit of which to get the measurement result.
 
     @example
-  @code
 
 const eng = new MainEngine()
 const qubit = eng.allocateQubit() // quantum register of size 1

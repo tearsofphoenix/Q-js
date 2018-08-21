@@ -71,7 +71,7 @@ export class LoopEngine extends BasicEngine {
   Apply the loop statements to all stored commands.
    Unrolls the loop if LoopTag is not supported by any of the following engines, i.e., if
 
-   @code
+   @example
     is_meta_tag_supported(next_engine, LoopTag) == false
    */
   run() {
@@ -183,7 +183,6 @@ unroll or, if there is a LoopTag-handling engine, add the LoopTag.
 Loop n times over an entire code block.
 
     @example
-@code
 
 with Loop(eng, 4)
 # [quantum gates to be executed 4 times]
@@ -194,7 +193,7 @@ have to be deleted prior to exiting the 'with Loop()' context.
 
     This code is **NOT VALID**:
 
-@code
+ @example
 
 with Loop(eng, 4):
 qb = eng.allocateQubit()
@@ -202,7 +201,7 @@ H | qb # qb is still available!!!
 
 The **correct way** of handling qubit (de-)allocation is as follows:
 
-@code
+ @example
 
 with Loop(eng, 4):
 qb = eng.allocateQubit()

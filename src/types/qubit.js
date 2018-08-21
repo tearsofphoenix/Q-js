@@ -22,7 +22,7 @@
     MainEngine. Qubit objects are automatically deallocated if they go out of
     scope and intented to be used within Qureg objects in user code.
 
-    @code
+ @example
       import MainEngine
       const eng = new MainEngine()
       const qubit = eng.allocateQubit()

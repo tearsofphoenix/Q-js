@@ -85,13 +85,13 @@ decomposition.
     The default decomposition chooser simply returns the first list
 element, i.e., calling
 
-    @code
+   @example
 
-repl = AutoReplacer()
+repl = new AutoReplacer()
 
 Amounts to
 
-    @code
+   @example
 
   function decomposition_chooser(cmd, decomp_list) {
     return decomp_list[0]

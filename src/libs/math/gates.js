@@ -23,7 +23,6 @@ Add a constant to a quantum number represented by a quantum register,
     stored from low- to high-bit.
 
     @example
-@code
 
 qunum = eng.allocateQureg(5) # 5-qubit number
 X | qunum[1] # qunum is now equal to 2
@@ -62,8 +61,7 @@ register, stored from low- to high-bit.
 
     @param {number} a Constant to subtract
 
-@example
-    @code
+    @example
 
 qunum = eng.allocateQureg(5) # 5-qubit number
 X | qunum[2] # qunum is now equal to 4
@@ -127,7 +125,6 @@ register modulo N.
  @param {number} N Constant modulo which the addition of a should be carried out.
 
     @example
-@code
 
 qunum = eng.allocateQureg(3) # 3-qubit number
 X | qunum[1] # qunum is now equal to 2

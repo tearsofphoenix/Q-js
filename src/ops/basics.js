@@ -21,7 +21,7 @@ ClassicalInstruction gate, and the BasicMathGate class.
 
 Gates overload the | operator to allow the following syntax:
 
-   @code
+ @example
 Gate | (qureg1, qureg2, qureg2)
 Gate | (qureg, qubit)
 Gate | qureg
@@ -54,24 +54,24 @@ Set interchangeable qubit indices!
 
 As an example, consider
 
-    @code
+   @example
    ExampleGate | (a,b,c,d,e)
 
 where a and b are interchangeable. Then, call this function as
 follows:
 
-    @code
+   @example
    this.set_interchangeable_qubit_indices([[0,1]])
 
 As another example, consider
 
-    @code
+   @example
    ExampleGate2 | (a,b,c,d,e)
 
 where a and b are interchangeable and, in addition, c, d, and e
 are interchangeable among themselves. Then, call this function as
 
-    @code
+   @example
     this.set_interchangeable_qubit_indices([[0,1],[2,3,4]])
   */
   constructor() {
@@ -201,7 +201,7 @@ correct input parameter of a Command object which is:
  * @class SelfInverseGate
  * @desc Self-inverse basic gate class.
  * Automatic implementation of the getInverse-member function for self-inverse gates.
- * @code
+ * @example
    // getInverse(H) == H, it is a self-inverse gate:
     getInverse(H) | qubit
  */
@@ -277,7 +277,7 @@ angles are simply added.
 
   Returns the class name and the angle as a subscript, i.e.
 
-  @code
+   @example
   [CLASSNAME]$_[ANGLE]$
    @return {string}
    */
@@ -391,7 +391,7 @@ calling only Measure. E.g., for the IBM Quantum Experience back-end,
     sending the circuit for each Measure-gate would be too inefficient,
     which is why a final
 
-    @code
+ @example
 
 eng.flush()
 
@@ -410,7 +410,7 @@ Base class for all math gates.
 which is given by the concrete gate which derives from this base class.
 The AddConstant gate, for example, registers a function of the form
 
-    @code
+ @example
 
 function add(x)
 return (x+a,)
@@ -421,7 +421,7 @@ to the function input. As an example, consider out-of-place
 multiplication, which takes two input registers and adds the result into a
 third, i.e., (a,b,c) -> (a,b,c+a*b). The corresponding function then is
 
-    @code
+ @example
 
 function multiply(a,b,c)
 return (a,b,c+a*b)
@@ -437,7 +437,6 @@ input, as the gate takes registers. For each of these values,
 output values).
 
 @example
-    @code
 
 function add(a,b)
 return (a,a+b)
@@ -447,14 +446,13 @@ If the gate acts on, e.g., fixed point numbers, the number of bits per
 register is also required in order to describe the action of such a
 mathematical gate. For this reason, there is
 
-    @code
+   @example
 
 BasicMathGate.get_math_function(qubits)
 
 which can be overwritten by the gate deriving from BasicMathGate.
 
     @example
-@code
 
 function get_math_function(self, qubits)
 n = len(qubits[0])
