@@ -34,6 +34,7 @@ import { stringToArray } from '../../ops/qubitoperator'
 
 /**
  * @class JSSimulator
+ * @desc
 NodeJS implementation of a quantum computer simulator.
 
     This Simulator can be used as a backup if compiling the c++ simulator is
@@ -43,7 +44,6 @@ slower, so please consider building the c++ version for larger experiments.
 export default class Simulator {
   /**
    * @constructor
-  Initialize the simulator.
    */
   constructor() {
     // ignore seed
@@ -56,8 +56,7 @@ export default class Simulator {
   Return the qubit index to bit location map and the corresponding state
 vector.
 
-    This function can be used to measure expectation values more
-efficiently (emulation).
+    This function can be used to measure expectation values more efficiently (emulation).
 
     @return {Array}
 A tuple where the first entry is a dictionary mapping qubit indices

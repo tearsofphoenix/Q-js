@@ -36,6 +36,7 @@ import {arrayEqual} from '../libs/polyfill'
 
 /**
  * @class BasicQubit
+ * @desc
  * objects represent qubits. They have an id and a reference to the owning engine.
  */
 export class BasicQubit {
@@ -146,11 +147,11 @@ export class Qubit extends BasicQubit {
 }
 
 /**
+ * @interface
  * @class Qureg
  * @desc Quantum register class.
-
-Simplifies accessing measured values for single-qubit registers (no []-
-    access necessary) and enables pretty-printing of general quantum registers).
+Simplifies accessing measured values for single-qubit registers (no []-access necessary)
+ and enables pretty-printing of general quantum registers).
  */
 export function Qureg(...args) {
   const arg0 = args[0]

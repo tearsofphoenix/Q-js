@@ -24,6 +24,7 @@ import {NotMergeable} from "../meta/error";
 
 /**
  * @class TimeEvolution
+ * @desc
 Gate for time evolution under a Hamiltonian (QubitOperator object).
 
 This gate is the unitary time evolution propagator:

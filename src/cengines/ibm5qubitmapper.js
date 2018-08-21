@@ -29,6 +29,7 @@ export const ibmqx4_connections = new Set(['2,1', '4,2', '2,0', '3,2', '3,4', '1
 
 /**
  * @class IBM5QubitMapper
+ * @desc
 Mapper for the 5-qubit IBM backend.
 
   Maps a given circuit to the IBM Quantum Experience chip.

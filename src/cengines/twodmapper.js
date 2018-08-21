@@ -28,6 +28,7 @@ import {LogicalQubitIDTag} from '../meta';
 
 /**
  * @class GridMapper
+ * @desc
 Mapper to a 2-D grid graph.
 
     Mapped qubits on the grid are numbered in row-major order. E.g. for

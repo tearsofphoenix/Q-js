@@ -32,6 +32,7 @@ import {QubitManagementError} from './error';
 
 /**
  * @class DaggerEngine
+ * @desc
  *  Stores all commands and, when done, inverts the circuit & runs it.
 */
 export class DaggerEngine extends BasicEngine {

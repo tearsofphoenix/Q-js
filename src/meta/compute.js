@@ -34,8 +34,7 @@ import {QubitManagementError} from './error'
 
 /**
  * @class ComputeEngine
-Adds Compute-tags to all commands and stores them (to later uncompute them
-automatically)
+ * @desc Adds Compute-tags to all commands and stores them (to later uncompute them automatically)
  */
 export class ComputeEngine extends BasicEngine {
   /**

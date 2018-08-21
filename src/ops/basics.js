@@ -295,6 +295,7 @@ angles are simply added.
 
 /**
  * @class BasicPhaseGate
+ * @desc
 Defines a base class of a phase gate.
 
     A phase gate has a continuous parameter (the angle), labeled 'angle' /
@@ -364,7 +365,7 @@ export class BasicPhaseGate extends BasicGate {
 
 /**
  * @class ClassicalInstructionGate
-  Classical instruction gate.
+ * @desc
   Classical instruction gates never have control qubits.
     Base class for all gates which are not quantum gates in the typical sense,
     e.g., measurement, allocation/deallocation, ...

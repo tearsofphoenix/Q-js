@@ -23,6 +23,7 @@ import {NoGateDecompositionError} from '../../meta/error';
 
 /**
  * @class InstructionFilter
+ * @desc
 The InstructionFilter is a compiler engine which changes the behavior of
 isAvailable according to a filter function. All commands are passed to
 this function, which then returns whether this command can be executed
@@ -66,6 +67,7 @@ call to the filter function given to the constructor.
 
 /**
  * @class AutoReplacer
+ * @desc
 The AutoReplacer is a compiler engine which uses engine.isAvailable in
 order to determine which commands need to be replaced/decomposed/compiled
 further. The loaded setup is used to find decomposition rules appropriate

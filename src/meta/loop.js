@@ -43,6 +43,7 @@ LoopTag.loop_tag_id = 0
 
 /**
  * @class LoopEngine
+ * @desc
 Stores all commands and, when done, executes them num times if no loop tag
 handler engine is available.
     If there is one, it adds a loop_tag to the commands and sends them on.

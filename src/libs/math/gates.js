@@ -18,6 +18,7 @@ import {BasicMathGate} from '../../ops/basics'
 
 /**
  * @class AddConstant
+ * @desc
 Add a constant to a quantum number represented by a quantum register,
     stored from low- to high-bit.
 
@@ -74,13 +75,13 @@ export function SubConstant(a) {
 
 /**
  * @class AddConstantModN
+ * @desc
 Add a constant to a quantum number represented by a quantum register
 modulo N.
 
     The number is stored from low- to high-bit, i.e., qunum[0] is the LSB.
 
     @example
-@code
 
 qunum = eng.allocateQureg(5) # 5-qubit number
 X | qunum[1] # qunum is now equal to 2
@@ -138,14 +139,13 @@ export function SubConstantModN(a, N) {
 
 /**
  * @class MultiplyByConstantModN
+ * @desc
 Multiply a quantum number represented by a quantum register by a constant
 modulo N.
 
     The number is stored from low- to high-bit, i.e., qunum[0] is the LSB.
 
     @example
-@code
-
 qunum = eng.allocateQureg(5) # 5-qubit number
 X | qunum[2] # qunum is now equal to 4
 MultiplyByConstantModN(3,5) | qunum # qunum is now 2.

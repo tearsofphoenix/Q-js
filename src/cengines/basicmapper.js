@@ -23,6 +23,7 @@ import CommandModifier from './cmdmodifier'
 
 /**
  * @class BasicMapperEngine
+ * @desc
 Defines the parent class from which all mappers should be derived.
 
     There is only one engine currently allowed to be derived from

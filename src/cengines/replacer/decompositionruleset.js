@@ -60,6 +60,7 @@ containing decomposition rules to add to the rule set.
 
 /**
  * @class ModuleWithDecompositionRuleSet
+ * @desc
 Interface type for explaining one of the parameters that can be given to
 DecompositionRuleSet.
  */
@@ -70,7 +71,9 @@ class ModuleWithDecompositionRuleSet {
 }
 
 /**
+ * @private
  * @class _Decomposition
+ * @desc
 The Decomposition class can be used to register a decomposition rule (by
 calling register_decomposition)
  */
