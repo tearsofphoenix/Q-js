@@ -32,13 +32,13 @@ export default class CommandModifier extends BasicEngine {
    * @constructor
   Initialize the CommandModifier.
 
-    @param {Function} cmdModFunc: Function which, given a command cmd,
+    @param {function} cmdModFunc Function which, given a command cmd,
     returns the command it should send instead.
 
     @example
 @code
 
-function cmd_mod_fun(cmd):
+function cmd_mod_fun(cmd)
 cmd.tags += [new MyOwnTag()]
 compiler_engine = new CommandModifier(cmd_mod_fun)
    */
@@ -51,7 +51,7 @@ compiler_engine = new CommandModifier(cmd_mod_fun)
   Receive a list of commands from the previous engine, modify all
    commands, and send them on to the next engine.
 
-    @param {Command[]} cmdList: List of commands to receive and then (after modification) send on.
+    @param {Command[]} cmdList List of commands to receive and then (after modification) send on.
    */
   receive(cmdList) {
     const newList = cmdList.map(cmd => this._cmdModFunc(cmd))

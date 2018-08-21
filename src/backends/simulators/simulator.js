@@ -41,7 +41,7 @@ C++-based kernels.
     OpenMP is enabled and the number of threads can be controlled using the
 OMP_NUM_THREADS environment variable, i.e.
 
-    .. code-block:: bash
+    @code
 
 export OMP_NUM_THREADS=4 # use 4 threads
 export OMP_PROC_BIND=spread # bind threads to processors by spreading
@@ -52,11 +52,11 @@ export default class Simulator extends BasicEngine {
   Construct the C++/JavaScript-simulator object and initialize it with a
   random seed.
 
-    @param boolean gate_fusion: If true, gates are cached and only executed
+    @param {boolean} gate_fusion: If true, gates are cached and only executed
 once a certain gate-size has been reached (only has an effect
 for the c++ simulator).
     @param {number} rnd_seed: Random seed (uses random.randint(0, 4294967295) by default). Ignored currently!!!
-    @param boolean forceSimulation: if true, will force use cpp simulator
+    @param {boolean} forceSimulation: if true, will force use cpp simulator
 
 Example of gate_fusion: Instead of applying a Hadamard gate to 5
 qubits, the simulator calculates the kronecker product of the 1-qubit
@@ -96,9 +96,9 @@ with all arbitrarily-controlled gates which provide a
 gate-matrix (via gate.matrix) and acts on 5 or less qubits (not
 counting the control qubits).
 
-  @param {Command} cmd: Command for which to check availability (single-qubit gate, arbitrary controls)
+  @param {Command} cmd Command for which to check availability (single-qubit gate, arbitrary controls)
 
-  @returns boolean true if it can be simulated and false otherwise.
+  @return {boolean} true if it can be simulated and false otherwise.
   */
   isAvailable(cmd) {
     if (instanceOf(cmd.gate, [MeasureGate, AllocateQubitGate, DeallocateQubitGate, BasicMathGate, TimeEvolution])) {
@@ -117,7 +117,7 @@ counting the control qubits).
 
   /**
     Converts a qureg from logical to mapped qubits if there is a mapper.
-    @param {Array<Qubit>|Qureg} qureg: Logical quantum bits
+    @param {Array.<Qubit>|Qureg} qureg Logical quantum bits
   */
   convertLogicalToMappedQureg(qureg) {
     const {mapper} = this.main
@@ -142,10 +142,10 @@ counting the control qubits).
   Get the expectation value of qubit_operator w.r.t. the current wave
 function represented by the supplied quantum register.
 
-    @param {QubitOperator} qubitOperator : Operator to measure.
-    @param {Array<Qubit>|Qureg} qureg : Quantum bits to measure.
+    @param {QubitOperator} qubitOperator  Operator to measure.
+    @param {Array.<Qubit>|Qureg} qureg  Quantum bits to measure.
 
-    @returns Expectation value
+    @return Expectation value
 
 Note:
     Make sure all previous commands (especially allocations) have
@@ -157,7 +157,7 @@ Note:
 automatically converts from logical qubits to mapped qubits for
     the qureg argument.
 
-    @throws Error : If `qubit_operator` acts on more qubits than present in the `qureg` argument.
+    @throws {Error} If `qubit_operator` acts on more qubits than present in the `qureg` argument.
    */
   getExpectationValue(qubitOperator, qureg) {
     qureg = this.convertLogicalToMappedQureg(qureg)
@@ -177,13 +177,11 @@ automatically converts from logical qubits to mapped qubits for
   Apply a (possibly non-unitary) qubit_operator to the current wave
 function represented by the supplied quantum register.
 
-    @param {QubitOperator} qubitOperator : Operator to apply.
-    @param {Array<Qubit>|Qureg} qureg: Quantum bits to which to apply the
+    @param {QubitOperator} qubitOperator  Operator to apply.
+    @param {Array.<Qubit>|Qureg} qureg Quantum bits to which to apply the
 operator.
 
-    @throws
-Exception: If `qubit_operator` acts on more qubits than present in
-the `qureg` argument.
+    @throws {Error} If `qubit_operator` acts on more qubits than present in the `qureg` argument.
 
     Warning:
 This function allows applying non-unitary gates and it will not
@@ -218,8 +216,8 @@ automatically converts from logical qubits to mapped qubits for
   Return the probability of the outcome `bit_string` when measuring
 the quantum register `qureg`.
 
-    @param {Array<number>|string} bitString : Measurement outcome.
-    @param {Qureg|Array<Qubit>} qureg: Quantum register.
+    @param {number[]|string} bitString  Measurement outcome.
+    @param {Qureg|Array.<Qubit>} qureg Quantum register.
 
     @returns
 Probability of measuring the provided bit string.
@@ -245,8 +243,8 @@ automatically converts from logical qubits to mapped qubits for
     The ordering is given by the quantum register `qureg`, which must
 contain all allocated qubits.
 
-   @param {Array<number>|string} bitString: Computational basis state
-   @param {Qureg|Array<Qubit>} qureg: Quantum register determining the
+   @param {number[]|string} bitString Computational basis state
+   @param {Qureg|Array.<Qubit>} qureg Quantum register determining the
 ordering. Must contain all allocated qubits.
 
     @returns
@@ -274,8 +272,8 @@ automatically converts from logical qubits to mapped qubits for
     The simulator will adopt the ordering of qureg (instead of reordering
 the wavefunction).
 
-  @param {Array<Complex>} wavefunction : Array of complex amplitudes describing the wavefunction (must be normalized).
-  @param {Qureg|Array<Qubit>} qureg : Quantum register determining the ordering. Must contain all allocated qubits.
+  @param {Complex[]} wavefunction  Array of complex amplitudes describing the wavefunction (must be normalized).
+  @param {Qureg|Array.<Qubit>} qureg  Quantum register determining the ordering. Must contain all allocated qubits.
 
     Note:
 Make sure all previous commands (especially allocations) have
@@ -295,11 +293,11 @@ automatically converts from logical qubits to mapped qubits for
   /**
   Collapse a quantum register onto a classical basis state.
 
-    @param {Qureg|Array<Qubit>} qureg: Qubits to collapse.
-    @param {Array<boolean>} values : Measurement outcome for each of the qubits
+    @param {Qureg|Array.<Qubit>} qureg Qubits to collapse.
+    @param {boolean[]} values  Measurement outcome for each of the qubits
 in `qureg`.
 
-    @throws Error : If an outcome has probability (approximately) 0 or
+    @throws {Error} If an outcome has probability (approximately) 0 or
 if unknown qubits are provided (see note).
 
 Note:
@@ -322,7 +320,7 @@ automatically converts from logical qubits to mapped qubits for
     This is a cheat function which enables, e.g., more efficient
 evaluation of expectation values and debugging.
 
-    @returns {Array}
+    @return {Array}
 A tuple where the first entry is a dictionary mapping qubit
 indices to bit-locations and the second entry is the corresponding
 state vector.
@@ -345,7 +343,7 @@ qubits.
 simulator object corresponding to measurement, allocation/
 deallocation, and (controlled) single-qubit gate.
 
-    @param {Command} cmd: Command to handle.
+    @param {Command} cmd Command to handle.
 
     @throws Error If a non-single-qubit gate needs to be processed (which should never happen due to isAvailable).
    */
@@ -426,7 +424,7 @@ deallocation, and (controlled) single-qubit gate.
 (simulate them classically) prior to sending them on to the next
 engine.
 
-    @param {Command[]} commandList: List of commands to execute on the simulator.
+    @param {Command[]} commandList List of commands to execute on the simulator.
    */
   receive(commandList) {
     commandList.forEach((cmd) => {

@@ -51,7 +51,7 @@ export default class MainEngine extends BasicEngine {
 engines and adds the back-end as the last engine.
 
     @param {BasicEngine} backend Backend to send the compiled circuit to.
-    @param {Array<BasicEngine>} engineList List of engines / backends to use
+    @param {Array.<BasicEngine>} engineList List of engines / backends to use
             as compiler engines. Note: The engine list must not contain
             multiple mappers (instances of BasicMapperEngine).
             Default: getEngineList()
@@ -155,8 +155,8 @@ these results with the master engine such that they are available when
 the user calls an int() or bool() conversion operator on a measured
 qubit.
 
-    @param {BasicQubit} qubit: Qubit for which to register the measurement result.
-    @param {boolean} value: Boolean value of the measurement outcome (true / false = 1 / 0 respectively).
+    @param {BasicQubit} qubit Qubit for which to register the measurement result.
+    @param {boolean} value Boolean value of the measurement outcome (true / false = 1 / 0 respectively).
    */
   setMeasurementResult(qubit, value) {
     this._measurements[qubit.id] = !!value
@@ -166,7 +166,7 @@ qubit.
   Return the classical value of a measured qubit, given that an engine
 registered this result previously (see setMeasurementResult).
 
-  @param {BasicQubit} qubit: Qubit of which to get the measurement result.
+  @param {BasicQubit} qubit Qubit of which to get the measurement result.
 
     @example
   @code
@@ -196,7 +196,7 @@ eng.getMeasurementResult(qubit[0]) == qubit.toNumber()
   /**
     Returns a unique qubit id to be used for the next qubit allocation.
 
-    @returns {number}: New unique qubit id.
+    @return {number} New unique qubit id.
   */
   getNewQubitID() {
     this._qubitIdx += 1
@@ -205,7 +205,7 @@ eng.getMeasurementResult(qubit[0]) == qubit.toNumber()
 
   /**
   Forward the list of commands to the first engine.
-    @param {Command[]} commandList: List of commands to receive (and then send on)
+    @param {Command[]} commandList List of commands to receive (and then send on)
    */
   receive(commandList) {
     this.send(commandList)
@@ -237,7 +237,7 @@ eng.getMeasurementResult(qubit[0]) == qubit.toNumber()
   /**
     Flush the entire circuit down the pipeline, clearing potential buffers (of, e.g., optimizers).
 
-    @param {boolean} deallocateQubits: If true, deallocates all qubits that are
+    @param {boolean} deallocateQubits If true, deallocates all qubits that are
     still alive (invalidating references to them by setting their id to -1).
   */
   flush(deallocateQubits = false) {

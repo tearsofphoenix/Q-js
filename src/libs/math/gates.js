@@ -32,7 +32,7 @@ export class AddConstant extends BasicMathGate {
   /**
   Initializes the gate to the number to add.
 
-    @param {number} a: Number to add to a quantum register.
+    @param {number} a Number to add to a quantum register.
 
     It also initializes its base class, BasicMathGate, with the
   corresponding function, so it can be emulated efficiently.
@@ -59,7 +59,7 @@ export class AddConstant extends BasicMathGate {
 Subtract a constant from a quantum number represented by a quantum
 register, stored from low- to high-bit.
 
-    @param {number} a: Constant to subtract
+    @param {number} a Constant to subtract
 
 @example
     @code
@@ -91,8 +91,8 @@ export class AddConstantModN extends BasicMathGate {
    * @constructor
   Initializes the gate to the number to add modulo N.
 
-    @param {number} a: Number to add to a quantum register (0 <= a < N).
-    @param {number} N: Number modulo which the addition is carried out.
+    @param {number} a Number to add to a quantum register (0 <= a < N).
+    @param {number} N Number modulo which the addition is carried out.
 
     It also initializes its base class, BasicMathGate, with the
   corresponding function, so it can be emulated efficiently.
@@ -122,8 +122,8 @@ register modulo N.
 
     The number is stored from low- to high-bit, i.e., qunum[0] is the LSB.
 
- @param {number} a: Constant to add
- @param {number} N: Constant modulo which the addition of a should be carried out.
+ @param {number} a Constant to add
+ @param {number} N Constant modulo which the addition of a should be carried out.
 
     @example
 @code
@@ -155,8 +155,8 @@ export class MultiplyByConstantModN extends BasicMathGate {
    * @constructor
   Initializes the gate to the number to multiply with modulo N.
 
-   @param {number} a: Number by which to multiply a quantum register (0 <= a < N).
-   @param {number} N: Number modulo which the multiplication is carried out.
+   @param {number} a Number by which to multiply a quantum register (0 <= a < N).
+   @param {number} N Number modulo which the multiplication is carried out.
 
     It also initializes its base class, BasicMathGate, with the
   corresponding function, so it can be emulated efficiently.

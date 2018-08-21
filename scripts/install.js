@@ -29,7 +29,7 @@ const downloadOptions = require('./util/downloadoptions');
  *
  * @param string url
  * @param string dest
- * @param {Function} cb
+ * @param {function} cb
  * @api private
  */
 

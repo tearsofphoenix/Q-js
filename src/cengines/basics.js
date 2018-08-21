@@ -52,11 +52,11 @@ export class BasicEngine {
     Ask the next engine whether a command is available, i.e.,
     whether it can be executed by the next engine(s).
 
-    @param {Command} cmd: Command for which to check availability.
+    @param {Command} cmd Command for which to check availability.
 
-    @returns {boolean} true if the command can be executed.
+    @return {boolean} true if the command can be executed.
 
-    @throws {LastEngineError}: If is_last_engine is true but isAvailable is not implemented.
+    @throws {LastEngineError} If is_last_engine is true but isAvailable is not implemented.
      */
   isAvailable(cmd) {
     if (!this.isLastEngine) {
@@ -82,10 +82,10 @@ the JavaScript program (using atexit), deallocating all qubits which are
 still alive. Qubit ids of dirty qubits are registered in MainEngine's
 dirty_qubits set.
 
-    @param {boolean} dirty: If true, indicates that the allocated qubit may be
+    @param {boolean} dirty If true, indicates that the allocated qubit may be
     dirty (i.e., in an arbitrary initial state).
 
-    @returns {Qureg} Qureg of length 1, where the first entry is the allocated qubit.
+    @return {Qureg} Qureg of length 1, where the first entry is the allocated qubit.
   */
   allocateQubit(dirty = false) {
     const new_id = this.main.getNewQubitID()
@@ -107,8 +107,8 @@ dirty_qubits set.
     Allocate n qubits and return them as a quantum register, which is a
 list of qubit objects.
 
-    @param {number} n: Number of qubits to allocate
-    @returns {Qureg} Qureg of length n, a list of n newly allocated qubits.
+    @param {number} n Number of qubits to allocate
+    @return {Qureg} Qureg of length n, a list of n newly allocated qubits.
   */
   allocateQureg(n) {
     const array = []
@@ -124,8 +124,8 @@ list of qubit objects.
 pipeline). If the qubit was allocated as a dirty qubit, add
 DirtyQubitTag() to Deallocate command.
 
-    @param {BasicQubit} qubit: Qubit to deallocate.
-    @throws {Error}: Qubit already deallocated. Caller likely has a bug.
+    @param {BasicQubit} qubit Qubit to deallocate.
+    @throws {Error} Qubit already deallocated. Caller likely has a bug.
   */
   deallocateQubit(qubit) {
     if (qubit.id === -1) {
@@ -139,9 +139,9 @@ DirtyQubitTag() to Deallocate command.
   /**
     Check if there is a compiler engine handling the meta tag
 
-    @param {Function} metaTag: Meta tag class for which to check support
+    @param {function} metaTag Meta tag class for which to check support
 
-    @returns {boolean}: true if one of the further compiler engines is a
+    @return {boolean} true if one of the further compiler engines is a
 meta tag handler, i.e., engine.is_meta_tag_handler(meta_tag)
 returns true.
      */
@@ -185,8 +185,8 @@ export class ForwarderEngine extends BasicEngine {
    * @constructor
     Initialize a ForwarderEngine.
 
-    @param {BasicEngine} engine: Engine to forward all commands to.
-    @param {Function} cmdModFunc: Function which is called before sending a
+    @param {BasicEngine} engine Engine to forward all commands to.
+    @param {function} cmdModFunc Function which is called before sending a
 command. Each command cmd is replaced by the command it
 returns when getting called with cmd.
      */

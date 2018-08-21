@@ -68,27 +68,18 @@ export default class GridMapper extends BasicMapperEngine {
    * @constructor
   Initialize a GridMapper compiler engine.
 
-    @param
-num_rows(int): Number of rows in the grid
-num_columns(int): Number of columns in the grid.
-mapped_ids_to_backend_ids(dict): Stores a mapping from mapped ids
-which are 0,...,this.num_qubits-1
-in row-major order on the grid to
-the corresponding qubit ids of the
-backend. Key: mapped id. Value:
-corresponding backend id.
-    Default is None which means
-backend ids are identical to
-mapped ids.
-    storage: Number of gates to temporarily store
-optimization_function: Function which takes a list of swaps and
-returns a cost value. Mapper chooses a
-permutation which minimizes this cost.
-    Default optimizes for circuit depth.
-num_optimization_steps(int): Number of different permutations to
-of the matching to try and minimize
-the cost.
-    @throws {Error}: if incorrect `mapped_ids_to_backend_ids` parameter
+    @param {{num_rows: number, num_columns: number, mapped_ids_to_backend_ids: Object, storage: number, optimization_function: function, num_optimization_steps: number}} args
+      num_rows(int): Number of rows in the grid
+      num_columns(int): Number of columns in the grid.
+      mapped_ids_to_backend_ids(dict): Stores a mapping from mapped ids which are 0,...,this.num_qubits-1
+      in row-major order on the grid to the corresponding qubit ids of the backend.
+      Key: mapped id. Value: corresponding backend id. Default is None
+      which means backend ids are identical to mapped ids.
+      storage: Number of gates to temporarily store
+      optimization_function: Function which takes a list of swaps and returns a cost value. Mapper chooses a
+        permutation which minimizes this cost. Default optimizes for circuit depth.
+      num_optimization_steps(int): Number of different permutations to of the matching to try and minimize the cost.
+    @throws {Error} if incorrect `mapped_ids_to_backend_ids` parameter
    */
   constructor(args) {
     super()
@@ -206,7 +197,7 @@ mapping to apply these gates on a first come first served basis.
     One might create better mappings by specializing this function for a
   square grid.
 
-    @returns {Object} A new mapping as a dict. key is logical qubit id, value is mapped id
+    @return {Object} A new mapping as a dict. key is logical qubit id, value is mapped id
    */
   returnNewMapping() {
     // Change old mapping to 1D in order to use LinearChain heuristic
@@ -428,7 +419,7 @@ which don't store any information.
     })
 
     this.currentMapping = new_mapping
-    // Send possible gates:
+    // Send possible gates
     this._sendPossibleCommands()
     // Check that mapper actually made progress
     if (len(this._stored_commands) === num_of_stored_commands_before) {
@@ -548,11 +539,11 @@ which don't store any information.
   /**
   Returns the swap operation to change mapping
 
-    @param {Object} old_mapping: dict: keys are logical ids and values are mapped qubit ids
-    @param {Object} new_mapping: dict: keys are logical ids and values are mapped qubit ids
-    @param {Array<Array<number>>} permutation: list of int from 0, 1, ..., this.num_rows-1. It is
+    @param {Object} old_mapping dict keys are logical ids and values are mapped qubit ids
+    @param {Object} new_mapping dict keys are logical ids and values are mapped qubit ids
+    @param {Array.<number[]>} permutation list of int from 0, 1, ..., this.num_rows-1. It is
       used to permute the found perfect matchings. Default is None which keeps the original order.
-    @returns {Array<Array<number>>} List of tuples. Each tuple is a swap operation which needs to be
+    @return {Array.<number[]>} List of tuples. Each tuple is a swap operation which needs to be
       applied. Tuple contains the two mapped qubit ids for the Swap.
    */
   returnSwaps(old_mapping, new_mapping, permutation) {
@@ -617,7 +608,7 @@ which don't store any information.
     final_positions.forEach(row => positions.push(row.map(item => item.final_column)))
     const matchings = NativeImpl.returnNewSwap(this.num_rows, this.num_columns, positions)
     const offset = this.num_columns
-    // permute the matchings:
+    // permute the matchings
     const tmp = matchings.map(looper => Object.assign({}, looper))
     for (let i = 0; i < this.num_rows; ++i) {
       matchings[i] = tmp[permutation[i]]

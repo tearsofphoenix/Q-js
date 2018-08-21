@@ -29,7 +29,9 @@ Swap gates in order to move qubits next to each other.
 
 import assert from 'assert'
 import BasicMapperEngine from './basicmapper'
-import {intersection, len, setDifference, setFromRange} from '../libs/polyfill'
+import {
+  intersection, len, setDifference, setFromRange
+} from '../libs/polyfill'
 import {
   Allocate,
   AllocateQubitGate, Deallocate, DeallocateQubitGate, FlushGate, Swap
@@ -42,12 +44,9 @@ import {LogicalQubitIDTag} from '../meta'
 /**
  Returns the circuit depth to execute these swaps.
 
- @param
-   swaps(list of tuples): Each tuple contains two integers representing
- the two IDs of the qubits involved in the
- Swap operation
- @returns
-   Circuit depth to execute these swaps.
+ @param {Array.<Array>} swaps Each tuple contains two integers representing the two IDs of the qubits involved in the
+    Swap operation
+ @returns {number} Circuit depth to execute these swaps.
  */
 export function return_swap_depth(swaps) {
   const depth_of_qubits = {}
@@ -100,9 +99,9 @@ export default class LinearMapper extends BasicMapperEngine {
    * @constructor
   Initialize a LinearMapper compiler engine.
 
-    @param {Number} num_qubits: Number of physical qubits in the linear chain
-    @param {boolean} cyclic: If 1D chain is a cycle. Default is false.
-    @param {Number} storage: Number of gates to temporarily store, default is 1000
+    @param {number} num_qubits Number of physical qubits in the linear chain
+    @param {boolean} cyclic If 1D chain is a cycle. Default is false.
+    @param {number} storage Number of gates to temporarily store, default is 1000
   */
   constructor(num_qubits, cyclic = false, storage = 1000) {
     super()
@@ -137,17 +136,17 @@ export default class LinearMapper extends BasicMapperEngine {
     on a first come first served basis. More compilicated scheme could try to optimize to apply
    as many gates as possible between the Swaps.
 
-    @param {Number} num_qubits: Total number of qubits in the linear chain
-    @param {boolean} cyclic: If linear chain is a cycle.
-    @param {Set<Number>} currently_allocated_ids: Logical qubit ids for which
+    @param {number} num_qubits Total number of qubits in the linear chain
+    @param {boolean} cyclic If linear chain is a cycle.
+    @param {Set<Number>} currently_allocated_ids Logical qubit ids for which
       the Allocate gate has already been processed and sent to the next engine but which are
       not yet deallocated and hence need to be included in the new mapping.
-      stored_commands(list of Command objects): Future commands which should be applied next.
-      current_mapping: A current mapping as a dict. key is logical qubit id, value is placement id.
+    @param {Command[]} stored_commands Future commands which should be applied next.
+    @param {Object} current_mapping A current mapping as a dict. key is logical qubit id, value is placement id.
       If there are different possible maps, this current mapping is used to minimize the swaps
       to go to the new mapping by a heuristic.
 
-    @returns {Object} A new mapping as a dict. key is logical qubit id, value is placement id
+    @return {Object} A new mapping as a dict. key is logical qubit id, value is placement id
    */
   static returnNewMapping(num_qubits, cyclic, currently_allocated_ids, stored_commands, current_mapping) {
     // allocated_qubits is used as this mapper currently does not reassign
@@ -220,19 +219,19 @@ export default class LinearMapper extends BasicMapperEngine {
     It either removes the two qubits from active_qubits if the gate is not
 possible or updates the segements such that the gate is possible.
 
-   @param {Number} num_qubits: Total number of qubits in the chain
-   @param {boolean} cyclic: If linear chain is a cycle
-   @param {Number} qubit0: qubit.id of one of the qubits
-   @param {Number} qubit1: qubit.id of the other qubit
-   @param {Set<Number>} active_qubits: contains all qubit ids which for which gates can be applied in this cycle before the swaps
-   @param {Array} segments: List of segments. A segment is a list of neighbouring qubits.
-   @param {Object} neighbour_ids: Key: qubit.id Value: qubit.id of neighbours
+   @param {number} num_qubits Total number of qubits in the chain
+   @param {boolean} cyclic If linear chain is a cycle
+   @param {number} qubit0 qubit.id of one of the qubits
+   @param {number} qubit1 qubit.id of the other qubit
+   @param {Set<Number>} active_qubits contains all qubit ids which for which gates can be applied in this cycle before the swaps
+   @param {Array} segments List of segments. A segment is a list of neighbouring qubits.
+   @param {Object} neighbour_ids Key: qubit.id Value: qubit.id of neighbours
    */
   static _processTwoQubitGate(num_qubits, cyclic, qubit0, qubit1, active_qubits, segments, neighbour_ids) {
     // already connected
     if (qubit1 in neighbour_ids && neighbour_ids[qubit1].has(qubit0)) {
       // do nothing
-      return
+
     }
     // at least one qubit is not an active qubit:
     else if (!active_qubits.has(qubit0) || !active_qubits.has(qubit1)) {
@@ -346,15 +345,15 @@ possible or updates the segements such that the gate is possible.
 
   See https://en.wikipedia.org/wiki/Odd-even_sort for more info.
 
-  @param {Object} old_mapping: keys are logical ids and values are mapped qubit ids
-  @param {Object} new_mapping: dict: keys are logical ids and values are mapped qubit ids
-  @returns {Array} List of tuples. Each tuple is a swap operation which needs to be
+  @param {Object} old_mapping keys are logical ids and values are mapped qubit ids
+  @param {Object} new_mapping dict: keys are logical ids and values are mapped qubit ids
+  @return {Array} List of tuples. Each tuple is a swap operation which needs to be
   applied. Tuple contains the two MappedQubit ids for the Swap.
   */
   _oddEvenTranspositionSortSwaps(old_mapping, new_mapping) {
     const final_positions = new Array(this.num_qubits)
     // move qubits which are in both mappings
-    Object.keys(old_mapping).forEach(logical_id => {
+    Object.keys(old_mapping).forEach((logical_id) => {
       if (logical_id in new_mapping) {
         final_positions[old_mapping[logical_id]] = new_mapping[logical_id]
       }
@@ -566,7 +565,7 @@ possible or updates the segements such that the gate is possible.
   Receives a command list and, for each command, stores it until
   we do a mapping (FlushGate or Cache of stored commands is full).
 
-  @param {Command[]} command_list: list of commands to receive.
+  @param {Command[]} command_list list of commands to receive.
   */
   receive(command_list) {
     command_list.forEach((cmd) => {
@@ -597,12 +596,12 @@ possible or updates the segements such that the gate is possible.
   but helps if currently the qubits can be divided into independent
   groups without interactions between the groups.
 
-   @param {Number} num_qubits: Total number of qubits in the linear chain
-   @param {Array} segments: List of segments. A segment is a list of qubit ids which
+   @param {number} num_qubits Total number of qubits in the linear chain
+   @param {Array} segments List of segments. A segment is a list of qubit ids which
     should be nearest neighbour in the new map. Individual qubits are in allocated_qubits
     but not in any segment
-   @param {Object} allocated_qubits: A set of all qubit ids which need to be present in the new map
-   @param {Object} current_mapping: A current mapping as a dict. key is logical qubit
+   @param {Object} allocated_qubits A set of all qubit ids which need to be present in the new map
+   @param {Object} current_mapping A current mapping as a dict. key is logical qubit
   id, value is placement id. If there are different possible maps, this current mapping is used to
   minimize the swaps to go to the new mapping by a heuristic.
   @returns

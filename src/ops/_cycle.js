@@ -32,7 +32,7 @@ Return the inverse of a gate.
     Tries to call gate.getInverse and, upon failure, creates a DaggeredGate
 instead.
 
-    @param {BasicGate} gate: Gate of which to get the inverse
+    @param {BasicGate} gate Gate of which to get the inverse
 
 @example
     @code

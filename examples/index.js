@@ -19,4 +19,4 @@ require('babel-polyfill')
 
 // require('./teleport_circuit')
 
-require('./shor')
+require('./teleport')

@@ -79,7 +79,7 @@ export class CompareEngine extends BasicEngine {
    * test if c1 & c2 are equal
    * @param c1 {Command}
    * @param c2 {Command}
-   * @returns {boolean}
+   * @return {boolean}
    */
   compareCMDs(c1, c2) {
     const item = c2.copy()
@@ -138,7 +138,7 @@ export class CompareEngine extends BasicEngine {
 export class DummyEngine extends BasicEngine {
   /**
    * @constructor
-   * @param {boolean} saveCommands: default is false
+   * @param {boolean} saveCommands default is false
    */
   constructor(saveCommands = false) {
     super()

@@ -18,8 +18,8 @@
 Inserts an engine into the singly-linked list of engines.
     It also sets the correct main_engine for engine_to_insert.
 
-@param {BasicEngine} prevEngine: The engine just before the insertion point.
-@param {BasicEngine} engineToInsert: The engine to insert at the insertion point.
+@param {BasicEngine} prevEngine The engine just before the insertion point.
+@param {BasicEngine} engineToInsert The engine to insert at the insertion point.
  */
 export function insertEngine(prevEngine, engineToInsert) {
   engineToInsert.main = prevEngine.main
@@ -30,8 +30,8 @@ export function insertEngine(prevEngine, engineToInsert) {
 /**
 Removes an engine from the singly-linked list of engines.
 
-    @param {BasicEngine} engine: The engine just before the engine to drop.
-    @returns {BasicEngine}: The dropped engine.
+    @param {BasicEngine} engine The engine just before the engine to drop.
+    @return {BasicEngine} The dropped engine.
  */
 export function dropEngineAfter(engine) {
   const e = engine.next

@@ -55,7 +55,7 @@ are the mapped qubit ids.
 
     If it is a Measurement gate, then it adds a LogicalQubitID tag.
 
-    @param {Command} cmd: Command object with logical qubit ids.
+    @param {Command} cmd Command object with logical qubit ids.
    */
   sendCMDWithMappedIDs(cmd) {
     const newCMD = cmd.copy()

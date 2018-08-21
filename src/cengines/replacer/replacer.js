@@ -34,7 +34,7 @@ export class InstructionFilter extends BasicEngine {
   Initializer: The provided filterfun returns true for all commands
 which do not need replacement and false for commands that do.
 
-    @param {Function} filterFunc: Filter function which returns true for
+    @param {function} filterFunc: Filter function which returns true for
     available commands, and false otherwise. filterfun will be
     called as filterfun(self, cmd).
   */
@@ -48,7 +48,7 @@ which do not need replacement and false for commands that do.
   Specialized implementation of BasicBackend.isAvailable: Forwards this
 call to the filter function given to the constructor.
 
-    @param {Command} cmd: Command for which to check availability.
+    @param {Command} cmd Command for which to check availability.
    */
   isAvailable(cmd) {
     return this._filterFunc(this, cmd)
@@ -57,7 +57,7 @@ call to the filter function given to the constructor.
   /**
   Forward all commands to the next engine.
 
-    @param {Command[]} commandList: List of commands to receive.
+    @param {Command[]} commandList List of commands to receive.
    */
   receive(commandList) {
     this.next.receive(commandList)
@@ -75,7 +75,7 @@ export class AutoReplacer extends BasicEngine {
   /**
    * @constructor
     @param {DecompositionRuleSet} decompositionRuleSet
-    @param {Function} decomposition_chooser: A function which, given the
+    @param {function} decomposition_chooser: A function which, given the
 Command to decompose and a list of potential Decomposition
 objects, determines (and then returns) the 'best'
 decomposition.
@@ -111,7 +111,7 @@ Amounts to
 if not, replace it using the decomposition rules loaded with the setup
 (e.g., setups.default).
 
-    @param {Command} cmd: Command to process.
+    @param {Command} cmd Command to process.
 
     @throws Exception if no replacement is available in the loaded setup.
    */

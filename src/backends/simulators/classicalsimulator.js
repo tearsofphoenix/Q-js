@@ -53,7 +53,7 @@ export default class ClassicalSimulator extends BasicEngine {
   /**
   Converts a qubit from a logical to a mapped qubit if there is a mapper.
 
-  @param {Qubit} qubit: Logical quantum bit
+  @param {Qubit} qubit Logical quantum bit
    */
   convertLogicalToMappedQubit(qubit) {
     const {mapper} = this.main
@@ -78,9 +78,9 @@ If there is a mapper present in the compiler, this function
 automatically converts from logical qubits to mapped qubits for
   the qureg argument.
 
-  @param {Qubit} qubit : The bit to read.
+  @param {Qubit} qubit The bit to read.
 
-  @returns {number} 0 if the target bit is off, 1 if it's on.
+  @return {number} 0 if the target bit is off, 1 if it's on.
    */
   readBit(qubit) {
     qubit = this.convertLogicalToMappedQubit(qubit)
@@ -101,8 +101,9 @@ If there is a mapper present in the compiler, this function
 automatically converts from logical qubits to mapped qubits for
   the qureg argument.
 
-  @param {Qubit} Qubit: The bit to write. value (bool|int): Writes 1 if this value is truthy, else 0.
-   */
+    @param {Qubit} qubit The bit to write.
+    @param {boolean|number} value Writes 1 if this value is truthy, else 0.
+  */
   writeBit(qubit, value) {
     qubit = this.convertLogicalToMappedQubit(qubit)
     this.writeMappedBit(qubit, value)
@@ -123,9 +124,9 @@ automatically converts from logical qubits to mapped qubits for
   Returns a mask, to compare against the state, with bits from the
 register set to 1 and other bits set to 0.
 
-@param {Qureg} qureg : The bits whose positions should be set.
+@param {Qureg} qureg The bits whose positions should be set.
 
-  @returns {NUmber} The mask.
+  @return {number} The mask.
    */
   mask(qureg) {
     let t = 0
@@ -141,9 +142,9 @@ If there is a mapper present in the compiler, this function
 automatically converts from logical qubits to mapped qubits for
   the qureg argument.
 
-  @param {Qureg} qureg : The group of bits to read, in little-endian order.
+  @param {Qureg} qureg The group of bits to read, in little-endian order.
 
-  @returns {number} Little-endian register value.
+  @return {number} Little-endian register value.
    */
   readRegister(qureg) {
     const new_qureg = []
@@ -165,8 +166,8 @@ If there is a mapper present in the compiler, this function
 automatically converts from logical qubits to mapped qubits for
   the qureg argument.
 
-   @param {Qureg} qureg : The bits to write, in little-endian order.
-   @param {number} value : The integer value to store. Must fit in the register.
+   @param {Qureg} qureg  The bits to write, in little-endian order.
+   @param {number} value  The integer value to store. Must fit in the register.
    */
   writeRegister(qureg, value) {
     const new_qureg = []

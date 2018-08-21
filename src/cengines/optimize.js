@@ -37,7 +37,7 @@ to a qubit contains >=m gates, the pipeline is sent on to the next engine.
 export default class LocalOptimizer extends BasicEngine {
   /**
    * @constructor
-   * @param {number} m: Number of gates to cache per qubit, before sending on the first gate.
+   * @param {number} m Number of gates to cache per qubit, before sending on the first gate.
    */
   constructor(m = 5) {
     super()
@@ -47,8 +47,8 @@ export default class LocalOptimizer extends BasicEngine {
 
   /**
    * Send n gate operations of the qubit with index idx to the next engine.
-   * @param {number} idx: qubit index
-   * @param {number} i: command position in qubit idx's command list
+   * @param {number} idx qubit index
+   * @param {number} n command position in qubit idx's command list
    */
   sendQubitPipeline(idx, n) {
     if (typeof idx !== 'number') {
@@ -101,9 +101,9 @@ export default class LocalOptimizer extends BasicEngine {
     Return all indices of a command, each index corresponding to the
     command's index in one of the qubits' command lists.
 
-    @param {number} idx: qubit index
-    @param {number} i: command position in qubit idx's command list
-    @param {number[]} IDs: IDs of all qubits involved in the command
+    @param {number} idx qubit index
+    @param {number} i command position in qubit idx's command list
+    @param {number[]} IDs IDs of all qubits involved in the command
     @return {number[]}
   */
   getGateIndices(idx, i, IDs) {

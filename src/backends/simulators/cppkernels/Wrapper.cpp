@@ -93,12 +93,16 @@ Nan::Persistent<v8::Function> Wrapper::constructor;
 
 Wrapper::Wrapper(int seed) {
     _simulator = new Simulator(seed);
+#if DEBUG
     _logfile.open("./log.txt");
+#endif
 }
 
 Wrapper::~Wrapper() {
     delete _simulator;
+#if DEBUG
     _logfile.close();
+#endif
 }
 
 void Wrapper::Init(v8::Local<v8::Object> exports) {
@@ -164,7 +168,9 @@ void Wrapper::allocateQubit(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     } catch (std::runtime_error &error) {
         Nan::ThrowError(error.what());
     }
+#if DEBUG
     obj->_logfile << "allocateQubit: " << id << std::endl;
+#endif
 }
 
 void Wrapper::deallocateQubit(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -174,10 +180,14 @@ void Wrapper::deallocateQubit(const Nan::FunctionCallbackInfo<v8::Value> &info) 
     try {
         obj->_simulator->deallocate_qubit(id);
     } catch (std::runtime_error &error) {
+#if DEBUG
         obj->_logfile << "id: " << id << " exception" << error.what();
+#endif
         Nan::ThrowError(error.what());
     }
+#if DEBUG
     obj->_logfile << "deallocateQubit: " << id << std::endl;
+#endif
 }
 
 void Wrapper::getClassicalValue(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -188,10 +198,13 @@ void Wrapper::getClassicalValue(const Nan::FunctionCallbackInfo<v8::Value> &info
     try {
         bool result = obj->_simulator->get_classical_value(id, calc);
         info.GetReturnValue().Set(result);
-
+#if DEBUG
         obj->_logfile << "getClassicalValue: " << id << " result: " << result << std::endl;
+#endif
     } catch (std::runtime_error &error) {
+#if DEBUG
         obj->_logfile << "id: " << id << " exception" << error.what();
+#endif
         Nan::ThrowError(error.what());
     }
 }
@@ -203,10 +216,13 @@ void Wrapper::isClassical(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     try {
         bool result = obj->_simulator->is_classical(id, calc);
         info.GetReturnValue().Set(result);
-
+#if DEBUG
         obj->_logfile << "isClassical: " << id << " result: " << result << std::endl;
+#endif
     } catch (std::runtime_error &error) {
+#if DEBUG
         obj->_logfile << "id: " << id << " exception" << error.what();
+#endif
         Nan::ThrowError(error.what());
     }
 }
@@ -335,10 +351,13 @@ void Wrapper::measureQubits(const Nan::FunctionCallbackInfo<v8::Value> &info) {
         arrayToJS(isolate, ret, result);
 
         info.GetReturnValue().Set(ret);
-
+#if DEBUG
         obj->_logfile << "measureQubits: " << ids << " result: " << result << std::endl;
+#endif
     } catch (std::runtime_error &error) {
+#if DEBUG
         obj->_logfile << " exception" << error.what();
+#endif
         Nan::ThrowError(error.what());
     }
 }
@@ -372,7 +391,9 @@ void Wrapper::applyControlledGate(const Nan::FunctionCallbackInfo<v8::Value> &in
     } catch (std::runtime_error &error) {
         Nan::ThrowError(error.what());
     }
+#if DEBUG
     obj->_logfile << "applyControlledGate: m: " << m << " ids: " << ids << " ctrls: " << ctrl << std::endl;
+#endif
 }
 
 void Wrapper::emulateMath(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -412,7 +433,9 @@ void Wrapper::emulateMath(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     } catch (std::runtime_error &error) {
         Nan::ThrowError(error.what());
     }
+#if DEBUG
     obj->_logfile << "emulateMath: f: " << " ids: " << regs << " ctrls: " << ctrls << std::endl;
+#endif
 }
 
 void Wrapper::getExpectationValue(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -426,12 +449,15 @@ void Wrapper::getExpectationValue(const Nan::FunctionCallbackInfo<v8::Value> &in
     jsToArray<unsigned int>(a2, ids);
 
     try {
+#if DEBUG
         obj->_logfile << "getExpectationValue: terms: " << termsDict << " ids: " << ids << std::endl;
-
+#endif
         auto result = obj->_simulator->get_expectation_value(termsDict, ids);
         info.GetReturnValue().Set(result);
     } catch (std::runtime_error &error) {
+#if DEBUG
         obj->_logfile << " exception" << error.what();
+#endif
         Nan::ThrowError(error.what());
     }
 }
@@ -452,7 +478,9 @@ void Wrapper::applyQubitOperator(const Nan::FunctionCallbackInfo<v8::Value> &inf
     } catch (std::runtime_error &error) {
         Nan::ThrowError(error.what());
     }
+#if DEBUG
     obj->_logfile << "applyQubitOperator: terms: " << termsDict << " ids: " << ids << std::endl;
+#endif
 }
 
 void Wrapper::emulateTimeEvolution(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -469,8 +497,9 @@ void Wrapper::emulateTimeEvolution(const Nan::FunctionCallbackInfo<v8::Value> &i
     jsToArray<unsigned int>(a3, ids);
     std::vector<unsigned int> ctrl;
     jsToArray<unsigned int>(a4, ctrl);
-
+#if DEBUG
     obj->_logfile << "emulateTimeEvolution: terms: " << tdict << " ids: " << ids << " ctrl: " << ctrl << " time: " << time << std::endl;
+#endif
     try {
         obj->_simulator->emulate_time_evolution(tdict, time, ids, ctrl);
     } catch (std::runtime_error &error) {
@@ -491,11 +520,14 @@ void Wrapper::getProbability(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     try {
         Simulator::calc_type result = obj->_simulator->get_probability(bitString, ids);
         info.GetReturnValue().Set(result);
-
+#if DEBUG
         obj->_logfile << "getProbability: bitstring: " << bitString << " ids: " << ids << " result: " << result
                       << std::endl;
+#endif
     } catch (std::runtime_error &error) {
+#if DEBUG
         obj->_logfile << " exception" << error.what();
+#endif
         Nan::ThrowError(error.what());
     }
 }
@@ -523,10 +555,14 @@ void Wrapper::getAmplitude(const Nan::FunctionCallbackInfo<v8::Value> &info) {
 
         info.GetReturnValue().Set(ret);
 //    }
+#if DEBUG
         obj->_logfile << "getAmplitude: bitstring: " << bitString << " ids: " << ids << " result: " << result
                       << std::endl;
+#endif
     } catch (std::runtime_error &error) {
+#if DEBUG
         obj->_logfile << " exception" << error.what();
+#endif
         Nan::ThrowError(error.what());
     }
 }
@@ -548,7 +584,9 @@ void Wrapper::setWavefunction(const Nan::FunctionCallbackInfo<v8::Value> &info) 
     } catch (std::runtime_error &error) {
         Nan::ThrowError(error.what());
     }
+#if DEBUG
     obj->_logfile << "setWavefunction: wavefunction: " << vec << " ordering: " << ordering << std::endl;
+#endif
 }
 
 void Wrapper::collapseWavefunction(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -561,9 +599,9 @@ void Wrapper::collapseWavefunction(const Nan::FunctionCallbackInfo<v8::Value> &i
     Local<Array> i1 = Local<Array>::Cast(info[1]);
     std::vector<bool> bitString;
     jsToArray<bool>(i1, bitString);
-
+#if DEBUG
     obj->_logfile << "collapseWavefunction: ids: " << ids << " bitstring: " << bitString << std::endl;
-
+#endif
     try {
         obj->_simulator->collapse_wavefunction(ids, bitString);
     } catch (std::runtime_error &error) {
@@ -578,7 +616,9 @@ void Wrapper::run(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     } catch (std::runtime_error &error) {
         Nan::ThrowError(error.what());
     }
+#if DEBUG
     obj->_logfile << "run" << std::endl;
+#endif
 }
 
 void Wrapper::cheat(const Nan::FunctionCallbackInfo<v8::Value> &info) {
@@ -603,8 +643,9 @@ void Wrapper::cheat(const Nan::FunctionCallbackInfo<v8::Value> &info) {
         ret->Set(1, rs);
 
         info.GetReturnValue().Set(ret);
-
+#if DEBUG
         obj->_logfile << "cheat: " << state << std::endl;
+#endif
     } catch (std::runtime_error &error) {
         Nan::ThrowError(error.what());
     }

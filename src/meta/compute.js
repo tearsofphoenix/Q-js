@@ -52,7 +52,7 @@ export class ComputeEngine extends BasicEngine {
 
   /**
     Modify the command tags, inserting an UncomputeTag.
-    @param {Command} cmd: Command to modify.
+    @param {Command} cmd Command to modify.
      */
   addUnComputeTag(cmd) {
     cmd.tags.push(new UncomputeTag())
@@ -213,7 +213,7 @@ section which has not been allocated in Compute section
     Add ComputeTag to received cmd and send it on.
     Otherwise: send all received commands directly to next_engine.
 
-    @param {Command[]} commandList: List of commands to receive.
+    @param {Command[]} commandList List of commands to receive.
    */
   receive(commandList) {
     if (this._compute) {
@@ -248,7 +248,7 @@ export class UncomputeEngine extends BasicEngine {
   /**
   Receive commands and add an UncomputeTag to their tags.
 
-    @param {Command[]} commandList: List of commands to handle.
+    @param {Command[]} commandList List of commands to handle.
    */
   receive(commandList) {
     commandList.forEach((cmd) => {
@@ -349,8 +349,7 @@ action(qubits)
 with CustomUncompute(eng):
 do_something_inverse(qubits)
 
-@throws
-    QubitManagementError: If qubits are allocated within Compute or within
+@throws {QubitManagementError} If qubits are allocated within Compute or within
 CustomUncompute context but are not deallocated.
  */
 export function CustomUncompute(engine, func) {

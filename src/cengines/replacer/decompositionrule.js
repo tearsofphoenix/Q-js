@@ -24,7 +24,7 @@ import { isKindclassOf } from '../../libs/util'
 export default class DecompositionRule {
   /**
    * @constructor
-    @param {Function} gateClass: The type of gate that this rule decomposes.
+    @param {function} gateClass The type of gate that this rule decomposes.
 
     The gate class is redundant information used to make lookups
 faster when iterating over a circuit and deciding "which rules
@@ -34,12 +34,12 @@ apply to this gate?" again and again.
     You supply gate_class=MyGate or gate_class=MyGate().__class__,
     not gate_class=MyGate().
 
-   @param {Function<Command>} gateDecomposer: Function which,
+   @param {function} gateDecomposer Function which,
     given the command to decompose, applies a sequence of gates
 corresponding to the high-level function of a gate of type
 gate_class.
 
-   @param {Function<Command>} gateRecognizer: A
+   @param {function} gateRecognizer A
 predicate that determines if the decomposition applies to the
 given command (on top of the filtering by gate_class).
 

@@ -67,8 +67,8 @@ export default class ResourceCounter extends BasicEngine {
     Specialized implementation of isAvailable: Returns true if the
     ResourceCounter is the last engine (since it can count any command).
 
-    @param {Command} cmd: Command for which to check availability (all Commands can be counted).
-    @return boolean true, unless the next engine cannot handle the Command (if there is a next engine).
+    @param {Command} cmd Command for which to check availability (all Commands can be counted).
+    @return {boolean} true, unless the next engine cannot handle the Command (if there is a next engine).
    */
   isAvailable(cmd) {
     try {
@@ -185,7 +185,7 @@ export default class ResourceCounter extends BasicEngine {
   /**
   Return the string representation of this ResourceCounter.
 
-  @return string
+  @return {string}
     A summary (string) of resources used, including gates, number of
     calls, and max. number of qubits that were active at the same time.
    */

@@ -126,7 +126,7 @@ unrolled and ancilla qubits have been allocated within the loop body,
     then store a reference all these qubit ids (to change them when
 unrolling the loop)
 
-@param {Command[]} commandList: List of commands to store and later
+@param {Command[]} commandList List of commands to store and later
 unroll or, if there is a LoopTag-handling engine, add the LoopTag.
    */
   receive(commandList) {

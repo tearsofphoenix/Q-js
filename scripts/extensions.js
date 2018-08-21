@@ -342,7 +342,7 @@ function getBinaryPath() {
 /**
  * An array of paths suitable for use as a local disk cache of the binding.
  *
- * @return {Array<string>} an array of paths
+ * @return {string[]} an array of paths
  * @api public
  */
 function getCachePathCandidates() {

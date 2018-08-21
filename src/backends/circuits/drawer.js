@@ -34,8 +34,8 @@ export class CircuitItem {
   Initialize a circuit item.
 
     @param {BasicGate} gate
-    @param {number[]} lines: Circuit lines the gate acts on.
-    @param {number[]} ctrl_lines: Circuit lines which control the gate.
+    @param {number[]} lines Circuit lines the gate acts on.
+    @param {number[]} ctrl_lines Circuit lines which control the gate.
   */
   constructor(gate, lines, ctrl_lines) {
     this.gate = gate
@@ -56,8 +56,8 @@ export class CircuitItem {
   }
 
   /**
-   * @param {CircuitItem|Object} other
-   * @return boolean
+   * @param {(CircuitItem|Object)} other
+   * @return {boolean}
    */
   equal(other) {
     if (other instanceof CircuitItem) {
@@ -160,11 +160,11 @@ export class CircuitDrawer extends BasicEngine {
     can be altered by the user. It contains gate widths, heights, offsets,
       etc.
 
-    @param {boolean} accept_input: If accept_input is true, the printer queries
+    @param {boolean} accept_input If accept_input is true, the printer queries
     the user to input measurement results if the CircuitDrawer is
     the last engine. Otherwise, all measurements yield the result
     default_measure (0 or 1).
-    @param {number} default_measure: Default value to use as measurement
+    @param {number} default_measure Default value to use as measurement
     results if accept_input is false and there is no underlying
     backend to register real measurement results.
    */
@@ -181,8 +181,8 @@ export class CircuitDrawer extends BasicEngine {
   Specialized implementation of isAvailable: Returns true if the
     CircuitDrawer is the last engine (since it can print any command).
 
-    @param {Command} cmd: Command for which to check availability (all Commands can be printed).
-    @return {boolean}: true, unless the next engine cannot handle the Command (if there is a next engine).
+    @param {Command} cmd Command for which to check availability (all Commands can be printed).
+    @return {boolean} true, unless the next engine cannot handle the Command (if there is a next engine).
    */
   isAvailable(cmd) {
     try {
@@ -202,9 +202,9 @@ export class CircuitDrawer extends BasicEngine {
     settings file. It is located in "gates":"AllocateQubitGate".
       If draw_id is true, the qubit IDs are drawn in red.
 
-      @param {Object} idToLoc: Dictionary mapping qubit ids to qubit line numbers.
+      @param {Object} idToLoc Dictionary mapping qubit ids to qubit line numbers.
 
-      @throws {Error}: If the mapping has already begun (this function
+      @throws {Error} If the mapping has already begun (this function
   needs be called before any gates have been received).
    */
   setQubitLocations(idToLoc) {
@@ -233,7 +233,7 @@ export class CircuitDrawer extends BasicEngine {
     arrives if accept_input was set to true. Otherwise, it uses the
     default_measure parameter to register the measurement outcome.
 
-      @param {Command} cmd: Command to add to the circuit diagram.
+      @param {Command} cmd Command to add to the circuit diagram.
    */
   printCMD(cmd) {
     if (cmd.gate.equal(Allocate)) {
@@ -316,7 +316,7 @@ export class CircuitDrawer extends BasicEngine {
   Receive a list of commands from the previous engine, print the
     commands, and then send them on to the next engine.
 
-    @param {Command[]} commandList: List of Commands to print (and potentially send on to the next engine).
+    @param {Command[]} commandList List of Commands to print (and potentially send on to the next engine).
   */
   receive(commandList) {
     commandList.forEach((cmd) => {

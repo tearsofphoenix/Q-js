@@ -136,9 +136,9 @@ by in-place addition). Specifying the coefficient in the __init__
 is faster than by multiplying a QubitOperator with a scalar as
 calls an out-of-place multiplication.
 
-    @param {number|Complex} coefficient: The coefficient of the
+    @param {number|Complex} coefficient The coefficient of the
 first term of this QubitOperator. Default is 1.0.
-    @param {Array<Array>|string} term (optional, empy array, a array of arrays, or a string):
+    @param {Array.<Array>|string} term (optional, empy array, a array of arrays, or a string):
 1) Default is None which means there are no terms in the
 QubitOperator hence it is the "zero" Operator
 2) An empty tuple means there are no non-trivial Pauli
@@ -153,7 +153,7 @@ of each tuple is a string, either 'X', 'Y' or 'Z',
 qubit 0, Z on qubit 2, and Y on qubit 5. The string should
 be sorted by the qubit number. '' is the identity.
 
-    @throws {QubitOperatorError}: Invalid operators provided to QubitOperator.
+    @throws {QubitOperatorError} Invalid operators provided to QubitOperator.
      */
   constructor(term, coefficient = 1.0) {
     // assert coefficient as numeric
@@ -195,7 +195,7 @@ be sorted by the qubit number. '' is the identity.
     Eliminates all terms with coefficients close to zero and removes
 imaginary parts of coefficients that are close to zero.
 
-    @param {number} absTolerance: Absolute tolerance, must be at least 0.0
+    @param {number} absTolerance Absolute tolerance, must be at least 0.0
      */
   compress(absTolerance = 1e-12) {
     const new_terms = {}
@@ -220,12 +220,12 @@ less than the relative tolerance w.r.t. either other or self
 (symmetric test) or if the difference is less than the absolute
 tolerance.
 
-    @param {QubitOperator} other: QubitOperator to compare against.
-    @param {number} realTolerance: Relative tolerance, must be greater than 0.0
-    @param {number} absTolerance: Absolute tolerance, must be at least 0.0
+    @param {QubitOperator} other QubitOperator to compare against.
+    @param {number} realTolerance Relative tolerance, must be greater than 0.0
+    @param {number} absTolerance Absolute tolerance, must be at least 0.0
   */
   isClose(other, realTolerance = EQ_TOLERANCE, absTolerance = EQ_TOLERANCE) {
-    // terms which are in both:
+    // terms which are in both
     const otherKeys = new Set(Object.keys(other.terms))
     const myKeys = Object.keys(this.terms)
     const intersection = new Set(myKeys.filter(x => otherKeys.has(x)))
@@ -266,7 +266,7 @@ tolerance.
         Object.keys(multiplier.terms).forEach((right_term) => {
           let new_coefficient = math.multiply(this.terms[left_term], multiplier.terms[right_term])
           // Loop through local operators and create new sorted list
-          // of representing the product local operator:
+          // of representing the product local operator
           let product_operators = []
           let left_operator_index = 0
           let right_operator_index = 0
@@ -302,7 +302,7 @@ tolerance.
             }
           }
 
-          // Finish the remainding operators:
+          // Finish the remainding operators
           if (left_operator_index === n_operators_left) {
             product_operators = product_operators.concat(rightKey.slice(right_operator_index))
           } else if (right_operator_index === n_operators_right) {
@@ -335,11 +335,11 @@ tolerance.
   /**
   Return self * multiplier for a scalar, or a QubitOperator.
 
-    @param {Complex|number|QubitOperator} multiplier: A scalar, or a QubitOperator.
+    @param {Complex|number|QubitOperator} multiplier A scalar, or a QubitOperator.
 
-    @returns {QubitOperator}
+    @return {QubitOperator}
 
-    @throws {Error}: Invalid type cannot be multiply with QubitOperator.
+    @throws {Error} Invalid type cannot be multiply with QubitOperator.
    */
   mul(multiplier) {
     if (isNumeric(multiplier) || multiplier instanceof QubitOperator) {
@@ -397,8 +397,8 @@ tolerance.
 
   /**
    * in-Place dived by divisor
-   * @param {Complex|number|QubitOperator} divisor
-   * @return {*}
+   * @param {(Complex|number|QubitOperator)} divisor
+ * @return {QubitOperator}
    */
   idiv(divisor) {
     if (isNumeric(divisor)) {

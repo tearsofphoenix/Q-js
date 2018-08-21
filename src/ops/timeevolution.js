@@ -51,11 +51,11 @@ The hamiltonian must be hermitian and therefore only terms with
     real coefficients are allowed.
     Coefficients are internally converted to float.
 
-    @param {number} time: time to evolve under (can be negative).
-    @param {QubitOperator} hamiltonian: hamiltonian to evolve under.
+    @param {number} time time to evolve under (can be negative).
+    @param {QubitOperator} hamiltonian hamiltonian to evolve under.
 
-    @throws {Error}: If time is not a numeric type and hamiltonian is not a QubitOperator.
-    @throws }NotHermitianOperatorError}: If the input hamiltonian is not hermitian (only real coefficients).
+    @throws {Error} If time is not a numeric type and hamiltonian is not a QubitOperator.
+    @throws {NotHermitianOperatorError} If the input hamiltonian is not hermitian (only real coefficients).
    */
   constructor(time, hamiltonian) {
     super()
@@ -115,12 +115,12 @@ We are not comparing if terms are proportional to each other with
 to zero because we cannot choose a suitable absolute error which
 works for everyone. Use, e.g., a decomposition rule for that.
 
-   @param {TimeEvolution} other: TimeEvolution gate
+   @param {TimeEvolution} other TimeEvolution gate
 
-   @throws {NotMergeable}: If the other gate is not a TimeEvolution gate or
+   @throws {NotMergeable} If the other gate is not a TimeEvolution gate or
     hamiltonians are not suitable for merging.
 
-   @returns {TimeEvolution} New TimeEvolution gate equivalent to the two merged gates.
+   @return {TimeEvolution} New TimeEvolution gate equivalent to the two merged gates.
    */
   getMerged(other) {
     const rel_tol = 1e-9
@@ -185,7 +185,7 @@ TimeEvolution(2.0, h) | [wavefunction[1], wavefunction[3]]
 
 which is only a two qubit gate.
 
-    @param {Array<Qubit>|Qureg|Qubit} qubits: one Qubit object, one list of Qubit objects, one Qureg
+    @param {Array.<Qubit>|Qureg|Qubit} qubits one Qubit object, one list of Qubit objects, one Qureg
       object, or a tuple of the former three cases.
   */
   or(qubits) {
@@ -195,7 +195,7 @@ which is only a two qubit gate.
       throw new Error('Only one qubit or qureg allowed.')
     }
     // Check that if hamiltonian has only an identity term,
-    // apply a global phase:
+    // apply a global phase
     const keys = Object.keys(this.hamiltonian.terms)
     const v = this.hamiltonian.terms[[]]
     if (keys.length === 1 && typeof v !== 'undefined') {

@@ -82,8 +82,8 @@ export function ObjectCopy(obj) {
 
 /**
  * return class hierachy of `cls`
- * @param {Function} cls
- * @return {Array<Function>}
+ * @param {function} cls
+ * @return {function[]}
  */
 export function classHierachy(cls) {
   const result = []

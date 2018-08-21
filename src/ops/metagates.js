@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/*
+/**
 * Contains meta gates, i.e.,
 * DaggeredGate (Represents the inverse of an arbitrary gate)
 * ControlledGate (Represents a controlled version of an arbitrary gate)
@@ -50,7 +50,7 @@ function on a gate which does not provide a getInverse() member function.
 @example
     @code
 
-with Dagger(eng):
+with Dagger(eng)
 MySpecialGate | qubits
 
 will create a DaggeredGate if MySpecialGate does not implement
@@ -63,7 +63,7 @@ export class DaggeredGate extends BasicGate {
    * @constructor
     Initialize a DaggeredGate representing the inverse of the gate 'gate'.
 
-    @param {BasicGate} gate: Any gate object of which to represent the inverse.
+    @param {BasicGate} gate Any gate object of which to represent the inverse.
      */
   constructor(gate) {
     super()
@@ -138,8 +138,8 @@ C(X, 2) == Toffoli
 export class ControlledGate extends BasicGate {
   /**
    * @constructor
-    @param {BasicGate} gate: Gate to wrap.
-    @param {number} n: Number of control qubits.
+    @param {BasicGate} gate Gate to wrap.
+    @param {number} n Number of control qubits.
   */
   constructor(gate, n = 1) {
     super()
@@ -164,7 +164,7 @@ controls.
     However, the n-th control qubit needs to be the last qubit in a
 qureg. The following quregs belong to the gate.
 
-    @param {Array<Qureg>} qubits: qubits to which to apply the gate.
+    @param {Array.<Qureg>} qubits qubits to which to apply the gate.
      */
   or(qubits) {
     qubits = BasicGate.makeTupleOfQureg(qubits)
@@ -210,8 +210,8 @@ qureg. The following quregs belong to the gate.
 /**
 Return n-controlled version of the provided gate.
 
-    @param {BasicGate} gate: Gate to turn into its controlled version
-    @param {number} n: Number of controls (default: 1)
+    @param {BasicGate} gate Gate to turn into its controlled version
+    @param {number} n Number of controls (default: 1)
 
 @example
     @code

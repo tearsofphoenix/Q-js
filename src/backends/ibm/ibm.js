@@ -36,22 +36,15 @@ export default class IBMBackend extends BasicEngine {
   /**
    * @constructor
   Initialize the Backend object.
-
-    @param {}
-use_hardware (bool): If true, the code is run on the IBM quantum
-chip (instead of using the IBM simulator)
-num_runs (int): Number of runs to collect statistics.
-(default is 1024)
-verbose (bool): If true, statistics are printed, in addition to
-the measurement result being registered (at the end of the
-circuit).
-user (string): IBM Quantum Experience user name
-password (string): IBM Quantum Experience password
-device (string): Device to use ('ibmqx4', or 'ibmqx5')
-if use_hardware is set to true. Default is ibmqx4.
-retrieve_execution (int): Job ID to retrieve instead of re-
-running the circuit (e.g., if previous run timed out).
-   */
+  @param {{use_hardware: boolean, num_runs: number, verbose: boolean, user: string, password: string, device: string, retrieve_execution: ?string}} args
+    use_hardware: If true, the code is run on the IBM quantum chip (instead of using the IBM simulator)
+    num_runs: Number of runs to collect statistics. (default is 1024)
+    verbose: If true, statistics are printed, in addition to the measurement result being registered (at the end of the circuit).
+    user: IBM Quantum Experience user name
+    password: IBM Quantum Experience password
+    device: Device to use ('ibmqx4', or 'ibmqx5') if use_hardware is set to true. Default is ibmqx4.
+    retrieve_execution: Job ID to retrieve instead of re-running the circuit (e.g., if previous run timed out).
+  */
   constructor(...args) {
     super()
     this._reset()
@@ -101,8 +94,8 @@ running the circuit (e.g., if previous run timed out).
     The IBM quantum chip can do X, Y, Z, T, Tdag, S, Sdag,
     rotation gates, barriers, and CX / CNOT.
 
-    @param {Command} cmd: Command for which to check availability
-    @return boolean
+    @param {Command} cmd Command for which to check availability
+    @return {boolean}
    */
   isAvailable(cmd) {
     const g = cmd.gate
@@ -137,7 +130,7 @@ Temporarily store the command cmd.
 
   Translates the command and stores it in a local variable (this._cmds).
 
-  @param {Command} cmd: Command to store
+  @param {Command} cmd Command to store
   */
   _store(cmd) {
     if (this._clear) {
@@ -218,7 +211,7 @@ Temporarily store the command cmd.
   /**
   Return the physical location of the qubit with the given logical id.
 
-    @param qbID {number}: ID of the logical qubit whose position should be returned.
+    @param {number} qbID ID of the logical qubit whose position should be returned.
    */
   _logicalToPhysical(qbID) {
     assert(!!this.main.mapper)
@@ -242,11 +235,11 @@ the first qubit in the supplied quantum register.
     Warning:
 Only call this function after the circuit has been executed!
 
-    @param {Array<Qubit>|Qureg} qureg: Quantum register determining the order of the qubits.
+    @param {Array.<Qubit>|Qureg} qureg Quantum register determining the order of the qubits.
 
-    @returns {Object}: Dictionary mapping n-bit strings to probabilities.
+    @return {Object} Dictionary mapping n-bit strings to probabilities.
 
-    @throws {Error}: If no data is available (i.e., if the circuit has
+    @throws {Error} If no data is available (i.e., if the circuit has
 not been executed). Or if a qubit was supplied which was not
 present in the circuit (might have gotten optimized away).
    */
@@ -357,7 +350,7 @@ data / ask for username & password.
   Receives a command list and, for each command, stores it until
 completion.
 
-    @param {Command[]} commandList: List of commands to execute
+    @param {Command[]} commandList List of commands to execute
    */
   receive(commandList) {
     commandList.forEach((cmd) => {
@@ -379,7 +372,7 @@ completion.
   }
 
   /**
-   * @return {Array<Error>}
+   * @return {Error[]}
    */
   get errors() {
     return this._errors
@@ -390,14 +383,14 @@ completion.
   }
 
   /**
-   * @return {Function}
+   * @return {function}
    */
   get didRunCallback() {
     return this._didRunCallback
   }
 
   /**
-   * @param {Function} callback
+   * @param {function} callback
    */
   set didRunCallback(callback) {
     this._didRunCallback = callback

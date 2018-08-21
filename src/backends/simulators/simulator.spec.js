@@ -43,7 +43,7 @@ import TimeEvolution from '../../ops/timeevolution';
  *
  * @param m {Matrix}
  * @param idx {number}
- * @returns {Complex}
+ * @return {Complex}
  */
 function getMatrixValue(m, idx) {
   let v
@@ -600,8 +600,9 @@ settings.forEach(([testName, gate_fusion, rndSeed, forceSimulation]) => {
       // check evolution and control
       const tail = getMatrixValue(final_wavefunction, math.range(half, count))
       const head = getMatrixValue(final_wavefunction, math.range(0, half))
-
-      expect(math.deepEqual(math.multiply(hadamard_f, res), tail)).to.equal(true)
+      const ra = math.multiply(hadamard_f, res)
+      console.log(ra, tail)
+      expect(math.deepEqual(ra, tail)).to.equal(true)
       expect(math.deepEqual(head, math.multiply(hadamard_f, init_wavefunction))).to.equal(true)
     });
 

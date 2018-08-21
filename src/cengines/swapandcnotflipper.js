@@ -38,7 +38,7 @@ This engine cannot be used as a backend.
 export default class SwapAndCNOTFlipper extends BasicEngine {
   /**
    * @constructor
-   * @param {Set<string> | Set<Array<number>>} connectivity: Set of tuples (c, t) where if (c, t) is an
+   * @param {Set<string> | Set<Array.<number>>} connectivity Set of tuples (c, t) where if (c, t) is an
    *   element of the set means that a CNOT can be performed between the physical ids (c, t)
    *   with c being the control and t being the target qubit.
    */
@@ -54,7 +54,7 @@ export default class SwapAndCNOTFlipper extends BasicEngine {
 
   /**
    * Check if the IBM backend can perform the Command cmd and return true if so.
-   * @param {Command} cmd: The command to check
+   * @param {Command} cmd The command to check
    */
   isAvailable(cmd) {
     return this.isSwap(cmd) || this.next.isAvailable(cmd)
@@ -117,7 +117,7 @@ export default class SwapAndCNOTFlipper extends BasicEngine {
      Receives a command list and if the command is a CNOT gate, it flips
     it using Hadamard gates if necessary; if it is a Swap gate, it
     decomposes it using 3 CNOTs. All other gates are simply sent to the next engine.
-    @param {Command[]} commandList: list of commands to receive.
+    @param {Command[]} commandList list of commands to receive.
    */
   receive(commandList) {
     commandList.forEach((cmd) => {

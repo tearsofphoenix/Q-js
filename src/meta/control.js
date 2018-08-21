@@ -39,7 +39,7 @@ import {instanceOf} from '../libs/util'
 export class ControlEngine extends BasicEngine {
   /**
    * @constructor
-    @param {Array<BasicQubit>} qubits: qubits conditional on which the following operations are executed.
+    @param {Array.<BasicQubit>} qubits qubits conditional on which the following operations are executed.
      */
   constructor(qubits) {
     super()
@@ -73,14 +73,14 @@ Condition an entire code block on the value of qubits being 1.
 @example
     @code
 
-with Control(eng, ctrlqubits):
+with Control(eng, ctrlqubits)
 do_something(otherqubits)
  Enter a controlled section.
 
- @param {BasicEngine} engine: Engine which handles the commands (usually MainEngine)
- @param {Array<BasicQubit>} qubits: Qubits to condition on
+ @param {BasicEngine} engine Engine which handles the commands (usually MainEngine)
+ @param {Array.<BasicQubit>} qubits Qubits to condition on
  @param {function} func
- Enter the section using a with-statement:
+ Enter the section using a with-statement
  @code
  Control(eng, ctrlqubits, () => ...)
  */

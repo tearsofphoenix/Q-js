@@ -80,11 +80,11 @@ list of qubits, and command tags (Command.tags) as a list of tag-
 objects. All functions within this class also work if
     BasicQubits are supplied instead of normal Qubit objects (see BasicQubits).
 
-@param {BasicEngine} engine: engine which created the qubit (mostly the MainEngine)
-@param {BasicGate} gate: Gate to be executed
-@param {Array<Qureg>} qubits: Array of quantum registers (to which the gate is applied)
-@param {Qureg|Array<Qubit>} controls: Qubits that condition the command.
-@param {Array<any>} tags: Tags associated with the command.
+@param {BasicEngine} engine engine which created the qubit (mostly the MainEngine)
+@param {BasicGate} gate Gate to be executed
+@param {Array.<Qureg>} qubits Array of quantum registers (to which the gate is applied)
+@param {Qureg|Array.<Qubit>} controls Qubits that condition the command.
+@param {any[]} tags Tags associated with the command.
      */
   constructor(engine, gate, qubits, controls = [], tags = []) {
     const qs = qubits.map(qureg => new Qureg(...qureg.map(looper => new BasicQubit(looper.engine, looper.id))))
@@ -117,7 +117,7 @@ objects. All functions within this class also work if
     Get the command object corresponding to the inverse of this command.
     Inverts the gate (if possible) and creates a new command object from the result.
 
-    @throws {NotInvertible}: If the gate does not provide an inverse (see BasicGate.getInverse)
+    @throws {NotInvertible} If the gate does not provide an inverse (see BasicGate.getInverse)
      */
   getInverse() {
     return new Command(this.engine, getInverse(this.gate), this.qubits, this.controlQubits, this.tags.slice(0))
@@ -125,7 +125,7 @@ objects. All functions within this class also work if
 
   /**
     Merge this command with another one and return the merged command object.
-    @param {Command} other: Other command to merge with this one (self)
+    @param {Command} other Other command to merge with this one (self)
     @throws NotMergeable if the gates don't supply a get_merged()-function or can't be merged for other reasons.
      */
   getMerged(other) {
@@ -139,8 +139,8 @@ objects. All functions within this class also work if
   /**
     Order the given qubits according to their IDs (for unique comparison of commands).
 
-    @param {Array<Qubit>} qubits: Array of quantum registers (i.e., tuple of lists of qubits)
-    @returns {Array<Qubit>} Ordered tuple of quantum registers
+    @param {Array.<Qubit>} qubits Array of quantum registers (i.e., tuple of lists of qubits)
+    @return {Array.<Qubit>} Ordered tuple of quantum registers
   */
   orderQubits(qubits) {
     const orderedQubits = qubits.slice(0)
@@ -180,7 +180,7 @@ If we can interchange qubits 0,1 and qubits 3,4,5,
 
   /**
     Set control_qubits to qubits
-  @param {Qureg} nq: quantum register
+  @param {Qureg} nq quantum register
   */
   set controlQubits(nq) {
     this._controlQubits = nq.sort((a, b) => a.id - b.id).map(q => new BasicQubit(q.engine, q.id))
@@ -193,7 +193,7 @@ Add (additional) control qubits to this command object.
 are converted to WeakQubitRef objects to allow garbage collection and
 thus early deallocation of qubits.
 
-    @param {Array<Qubit>} qubits: List of qubits which control this
+    @param {Array.<Qubit>} qubits List of qubits which control this
     gate, i.e., the gate is only executed if all qubits are in state 1.
   */
   addControlQubits(qubits) {
@@ -228,7 +228,7 @@ the quantum registers to which the gate is applied.
 
   /**
     Set / Change engine of all qubits to engine.
-    @param {BasicEngine} ng: New owner of qubits and owner of this Command object
+    @param {BasicEngine} ng New owner of qubits and owner of this Command object
   */
   set engine(ng) {
     this._engine = ng
@@ -256,7 +256,7 @@ the quantum registers to which the gate is applied.
   }
 
   /**
-   * @return string
+   * @return {string}
    */
   toString() {
     let {qubits} = this
@@ -284,7 +284,7 @@ the quantum registers to which the gate is applied.
   }
 
   /**
-   * @return string
+   * @return {string}
    */
   inspect() {
     return this.toString()

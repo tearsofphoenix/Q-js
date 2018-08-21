@@ -19,7 +19,7 @@ Tools to easily invert a sequence of gates.
 
     @code
 
-with Dagger(eng):
+with Dagger(eng)
 H | qubit1
 Rz(0.5) | qubit2
 */
@@ -68,7 +68,7 @@ export class DaggerEngine extends BasicEngine {
 
   /**
     Receive a list of commands and store them for later inversion.
-    @param {Command[]} cmdList: List of commands to temporarily store.
+    @param {Command[]} cmdList List of commands to temporarily store.
   */
   receive(cmdList) {
     cmdList.forEach((cmd) => {
@@ -111,7 +111,7 @@ qb = eng.allocateQubit()
 ...
 del qb // sends deallocate gate (which becomes an allocate)
 
- @param {BasicEngine} engine: Engine which handles the commands (usually MainEngine)
+ @param {BasicEngine} engine Engine which handles the commands (usually MainEngine)
  @param {function} func
  */
 export function Dagger(engine, func) {

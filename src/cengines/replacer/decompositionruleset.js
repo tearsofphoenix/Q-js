@@ -22,7 +22,7 @@ import {Dagger} from '../../meta/dagger'
  */
 export default class DecompositionRuleSet {
   /**
-    @param {Array<DecompositionRule>} rules : Initial decomposition rules.
+    @param {Array.<DecompositionRule>} rules : Initial decomposition rules.
     @param {Array} modules: A list of
 things with an "all_defined_decomposition_rules" property
 containing decomposition rules to add to the rule set.
@@ -46,7 +46,7 @@ containing decomposition rules to add to the rule set.
   /**
     Add a decomposition rule to the rule set.
 
-    @param {DecompositionRule} rule: The decomposition rule to add.
+    @param {DecompositionRule} rule The decomposition rule to add.
      */
   addDecompositionRule(rule) {
     const decomp_obj = new _Decomposition(rule.gateDecomposer, rule.gateRecognizer)
@@ -79,8 +79,8 @@ class _Decomposition {
    * @constructor
     Construct the Decomposition object.
 
-    @param {Function} replacementFunc: Function that, when called with a `Command` object, decomposes this command.
-    @param {Function} recognizerFunc: Function that, when called with a `Command` object,
+    @param {function} replacementFunc: Function that, when called with a `Command` object, decomposes this command.
+    @param {function} recognizerFunc: Function that, when called with a `Command` object,
     returns true if and only if the replacement rule can handle this command.
 
     Every Decomposition is registered with the gate class. The
@@ -126,7 +126,7 @@ achieved by running the original decomposition inside a
     `with Dagger(engine):` statement, this is not necessary
 (and will be done automatically by the framework).
 
-  @returns {_Decomposition} Decomposition handling the inverse of the original command.
+  @return {_Decomposition} Decomposition handling the inverse of the original command.
   */
   getInverseDecomposition() {
     const decomp = (cmd) => {

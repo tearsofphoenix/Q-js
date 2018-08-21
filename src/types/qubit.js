@@ -229,7 +229,7 @@ Qureg.prototype.toString = function () {
 }
 
 /**
- * @param {Qureg|Array<Qubit>} other
+ * @param {Qureg|Array.<Qubit>} other
  * @return {Qureg}
  */
 Qureg.prototype.add = function (other) {

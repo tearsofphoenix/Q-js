@@ -137,9 +137,9 @@ export function arrayFromRange(start, end, step) {
 
 /**
  * return a random sample from `array` which length is `count`
- * @param {Array<any>} array
+ * @param {any[]} array
  * @param {number} count
- * @return {Array<any>}
+ * @return {any[]}
  */
 export function randomSample(array, count) {
   const result = []
@@ -159,7 +159,7 @@ export function randomSample(array, count) {
  * test if two array(a1, a2) are equal, support instance of classes in this library
  * @param {Array} a1
  * @param {Array} a2
- * @param {function(...):boolean}itemCompareFunc
+ * @param {function} itemCompareFunc
  * @return {boolean}
  */
 export function arrayEqual(a1, a2, itemCompareFunc) {
@@ -213,7 +213,7 @@ Array.prototype.rforEach = function (callbackFunc) {
  * @function
  * reverse version of `map`
  * @param {function} callbackFunc
- * @return {Array<any>}
+ * @return {any[]}
  */
 Array.prototype.rmap = function (callbackFunc) {
   const result = []
@@ -307,7 +307,7 @@ export function len(v) {
 /**
  * parse string contains 1/0 into bit array
  * @param {string} str
- * @return {Array<boolean>}
+ * @return {boolean[]}
  */
 export function stringToBitArray(str) {
   if (Array.isArray(str)) {
@@ -324,9 +324,9 @@ export function stringToBitArray(str) {
 
 /**
  * return dot product of two complex vector(a1, a2)
- * @param {Array<Complex>}a1
- * @param {Array<Complex>}a2
- * @return {Array<Complex>}
+ * @param {Complex[]} a1
+ * @param {Complex[]} a2
+ * @return {Complex}
  */
 export function complexVectorDot(a1, a2) {
   let real = 0

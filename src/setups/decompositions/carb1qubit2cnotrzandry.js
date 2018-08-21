@@ -34,12 +34,12 @@ matrix.
     V = [[-sin(c/2) * exp(j*a), exp(j*(a-b)) * cos(c/2)],
   [exp(j*(a+b)) * cos(c/2), exp(j*a) * sin(c/2)]]
 
-  @param {Array<Array<number>>} matrix: 2x2 matrix
-  @param {number} a: Parameter of V
-  @param {number} b: Parameter of V
-  @param {number} c_half: c/2. Parameter of V
+  @param {Array.<number[]>} matrix 2x2 matrix
+  @param {number} a Parameter of V
+  @param {number} b Parameter of V
+  @param {number} c_half c/2. Parameter of V
 
-  @returns {boolean} true if matrix elements of V and `matrix` are TOLERANCE close.
+  @return {boolean} true if matrix elements of V and `matrix` are TOLERANCE close.
  */
 function _test_parameters(matrix, a, b, c_half) {
   const {exp} = math
@@ -57,8 +57,8 @@ Recognizes a matrix which can be written in the following form:
     V = [[-sin(c/2) * exp(j*a), exp(j*(a-b)) * cos(c/2)],
       [exp(j*(a+b)) * cos(c/2), exp(j*a) * sin(c/2)]]
 
-  @param {Array<Array<number>>} matrix: 2x2 matrix
-  @returns {boolean} false if it is not possible otherwise (a, b, c/2)
+  @param {Array.<number[]>} matrix 2x2 matrix
+  @return {boolean} false if it is not possible otherwise (a, b, c/2)
  */
 export function _recognize_v(matrix) {
   let a

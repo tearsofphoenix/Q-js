@@ -54,7 +54,7 @@ export default class CommandPrinter extends BasicEngine {
     Specialized implementation of isAvailable: Returns true if the
     CommandPrinter is the last engine (since it can print any command).
 
-    @param {Command} cmd: Command of which to check availability (all Commands can be printed).
+    @param {Command} cmd Command of which to check availability (all Commands can be printed).
     @return {boolean} true, unless the next engine cannot handle the Command (if there is a next engine).
    */
   isAvailable(cmd) {
@@ -74,7 +74,7 @@ export default class CommandPrinter extends BasicEngine {
     the user for the measurement result (if accept_input = true) / Set
     the result to 0 (if it's false).
 
-    @param {Command} cmd: Command to print.
+    @param {Command} cmd Command to print.
    */
   printCMD(cmd) {
     if (this.isLastEngine && cmd.gate.equal(Measure)) {
@@ -108,7 +108,7 @@ export default class CommandPrinter extends BasicEngine {
   Receive a list of commands from the previous engine, print the
 commands, and then send them on to the next engine.
 
-    @param {Command[]} commandList: List of Commands to print (and potentially send on to the next engine).
+    @param {Command[]} commandList List of Commands to print (and potentially send on to the next engine).
    */
   receive(commandList) {
     commandList.forEach((cmd) => {

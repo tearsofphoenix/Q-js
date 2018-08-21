@@ -1,5 +1,14 @@
 {
   "source": "./src",
   "destination": "./docs/es",
-  "plugins": [{"name": "esdoc-standard-plugin"}]
+  "plugins": [
+    {"name": "esdoc-standard-plugin"},
+    {
+      "name": "esdoc-coverage-plugin",
+      "option": {
+        "enable": true,
+        "kind": ["class", "method", "member", "get", "set", "constructor", "function", "variable"]
+      }
+    }
+  ]
 }

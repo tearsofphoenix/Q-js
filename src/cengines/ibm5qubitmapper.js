@@ -58,7 +58,7 @@ Initialize an IBM 5-qubit mapper compiler engine.
   Check if the IBM backend can perform the Command cmd and return true
 if so.
 
-  @param {Command} cmd: The command to check
+  @param {Command} cmd The command to check
    */
   isAvailable(cmd) {
     return new IBMBackend().isAvailable(cmd)
@@ -73,7 +73,7 @@ if so.
   /**
   Check if the command corresponds to a CNOT (controlled NOT gate).
 
-  @param {Command} cmd: Command to check whether it is a controlled NOT gate.
+  @param {Command} cmd Command to check whether it is a controlled NOT gate.
   */
   _isCNOT(cmd) {
     return (cmd.gate instanceof NOT.constructor && getControlCount(cmd) === 1)
@@ -82,10 +82,10 @@ if so.
   /**
   Determines the cost of the circuit with the given mapping.
 
-  @param {Object} mapping: Dictionary with key, value pairs where keys are
+  @param {Object} mapping Dictionary with key, value pairs where keys are
     logical qubit ids and the corresponding value is the physical
     location on the IBM Q chip.
-  @returns {Number} Cost measure taking into account CNOT directionality or None
+  @return {number} Cost measure taking into account CNOT directionality or None
     if the circuit cannot be executed given the mapping.
   */
   determineCost(mapping) {
@@ -116,7 +116,7 @@ if so.
   /**
   Runs all stored gates.
 
-  @throws {Error}:
+  @throws {Error}
   If the mapping to the IBM backend cannot be performed or if
   the mapping was already determined but more CNOTs get sent
 down the pipeline.
@@ -160,7 +160,7 @@ down the pipeline.
   /**
   Store a command and handle CNOTs.
 
-  @param {Command} cmd: A command to store
+  @param {Command} cmd A command to store
    */
   _store(cmd) {
     let target
@@ -194,9 +194,9 @@ down the pipeline.
   Receives a command list and, for each command, stores it until
 completion.
 
-  @param {Command[]} commandList: list of commands to receive.
+  @param {Command[]} commandList list of commands to receive.
 
-  @throws {Error}: If mapping the CNOT gates to 1 qubit would require
+  @throws {Error} If mapping the CNOT gates to 1 qubit would require
 Swaps. The current version only supports remapping of CNOT
 gates without performing any Swaps due to the large costs
 associated with Swapping given the CNOT constraints.

@@ -79,28 +79,28 @@ are interchangeable among themselves. Then, call this function as
   }
 
   /**
-   * @throws Error
+   * @throws {Error}
    */
   getInverse() {
     throw new Error('BasicGate: No getInverse() implemented.')
   }
 
   /**
-   * @throws NotMergeable
+   * @throws {NotMergeable}
    */
   getMerged() {
     throw new NotMergeable('BasicGate: No getMerged() implemented.')
   }
 
   /**
-   * @throws Error
+   * @throws {Error}
    */
   toString() {
     throw new Error('BasicGate: No toString() implemented.')
   }
 
   /**
-   * @return string
+   * @return {string}
    */
   inspect() {
     return this.toString()
@@ -129,12 +129,9 @@ correct input parameter of a Command object which is:
     4) -> Gate | ([qubit], )
     5) -> Gate | (qureg, [qubit])
 
-@param
-    qubits: a Qubit object, a list of Qubit objects, a Qureg object,
+@param {Qubit|Qubit[]|Qureg|Qureg[]} qubits a Qubit object, a list of Qubit objects, a Qureg object,
     or a tuple of Qubit or Qureg objects (can be mixed).
-@returns
-    Canonical representation (tuple<qureg>): A tuple containing Qureg
-(or list of Qubits) objects.
+@returns {Qureg[]} Canonical representation A tuple containing Qureg (or list of Qubits) objects.
      */
   static makeTupleOfQureg(qubits) {
     const isTuple = arrayIsTuple(qubits)
@@ -152,7 +149,7 @@ correct input parameter of a Command object which is:
   /**
     Helper function to generate a command consisting of the gate and the qubits being acted upon.
 
-    @param qubits {Qubit | Array<Qubit> | Qureg} see BasicGate.makeTupleOfQureg(qubits)
+    @param qubits {Qubit | Array.<Qubit> | Qureg} see BasicGate.makeTupleOfQureg(qubits)
     @return {Command} A Command object containing the gate and the qubits.
   */
   generateCommand(qubits) {
@@ -175,7 +172,7 @@ correct input parameter of a Command object which is:
 4) Gate | (qubit, )
 5) Gate | (qureg, qubit)
 
-   @param qubits {Qubit | Array<Qubit> | Qureg}
+   @param qubits {Qubit | Array.<Qubit> | Qureg}
    a Qubit object, a list of Qubit objects, a Qureg object,
    or a tuple of Qubit or Qureg objects (can be mixed).
   */
@@ -261,7 +258,7 @@ object).
 angles are simply added.
 
     @param {BasicRotationGate|Object} other
-    @throws NotMergeable:  For non-rotation gates or rotation gates of different type.
+    @throws {NotMergeable}  For non-rotation gates or rotation gates of different type.
     @return {BasicRotationGate} New object representing the merged gates.
    */
   getMerged(other) {
@@ -280,8 +277,7 @@ angles are simply added.
 
   Returns the class name and the angle as a subscript, i.e.
 
-.. code-block:: latex
-
+  @code
   [CLASSNAME]$_[ANGLE]$
    @return {string}
    */
@@ -311,7 +307,7 @@ export class BasicPhaseGate extends BasicGate {
   /**
     Initialize a basic rotation gate.
 
-    @param {number} angle: Angle of rotation (saved modulo 2 * pi)
+    @param {number} angle Angle of rotation (saved modulo 2 * pi)
      */
   constructor(angle, ...args) {
     super(...args)
@@ -415,7 +411,7 @@ The AddConstant gate, for example, registers a function of the form
 
     @code
 
-function add(x):
+function add(x)
 return (x+a,)
 
 upon initialization. More generally, the function takes integers as
@@ -434,7 +430,7 @@ export class BasicMathGate extends BasicGate {
    * @constructor
     Initialize a BasicMathGate by providing the mathematical function that it implements.
 
-    @param {function} mathFunc: Function which takes as many int values as
+    @param {function} mathFunc Function which takes as many int values as
 input, as the gate takes registers. For each of these values,
     it then returns the output (i.e., it returns a list/tuple of
 output values).
@@ -442,7 +438,7 @@ output values).
 @example
     @code
 
-function add(a,b):
+function add(a,b)
 return (a,a+b)
 BasicMathGate.__init__(self, add)
 
@@ -459,10 +455,10 @@ which can be overwritten by the gate deriving from BasicMathGate.
     @example
 @code
 
-function get_math_function(self, qubits):
+function get_math_function(self, qubits)
 n = len(qubits[0])
 scal = 2.**n
-function math_fun(a):
+function math_fun(a)
 return (int(scal * (math.sin(math.pi * a / scal))),)
 return math_fun
      */
@@ -475,9 +471,9 @@ return math_fun
     Return the math function which corresponds to the action of this math
 gate, given the input to the gate (a tuple of quantum registers).
 
-  @param {Array<Qureg>} qubits: Qubits to which the math gate is being applied.
+  @param {Array.<Qureg>} qubits Qubits to which the math gate is being applied.
 
-    @returns {function}: javascript function describing the action of this
+    @return {function} javascript function describing the action of this
     gate. (See BasicMathGate.constructor for an example).
    */
   getMathFunction(qubits) {

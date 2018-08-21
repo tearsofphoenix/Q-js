@@ -40,13 +40,13 @@ matrix.
     U = [[exp(j*(a-b/2-d/2))*cos(c/2), -exp(j*(a-b/2+d/2))*sin(c/2)],
   [exp(j*(a+b/2-d/2))*sin(c/2), exp(j*(a+b/2+d/2))*cos(c/2)]]
 
-  @param {Array<Array<number>>} matrix: 2x2 matrix
-  @param {number} a: parameter of U
-  @param {number} b_half: b/2. parameter of U
-  @param {number} c_half: c/2. parameter of U
-  @param {number} d_half: d/2. parameter of U
+  @param {Array.<number[]>} matrix 2x2 matrix
+  @param {number} a parameter of U
+  @param {number} b_half b/2. parameter of U
+  @param {number} c_half c/2. parameter of U
+  @param {number} d_half d/2. parameter of U
 
-@returns {boolean} true if matrix elements of U and `matrix` are TOLERANCE close.
+@return {boolean} true if matrix elements of U and `matrix` are TOLERANCE close.
  */
 const _test_parameters = (matrix, a, b_half, c_half, d_half) => {
   const mc = math.complex
@@ -74,9 +74,9 @@ Note:
     If the matrix is element of SU(2) (determinant == 1), then
 we can choose a = 0.
 
-@param {Array<Array<number>>} matrix: 2x2 unitary matrix
+@param {Array.<number[]>} matrix 2x2 unitary matrix
 
-@returns {number[]} parameters of the matrix: (a, b/2, c/2, d/2)
+@return {number[]} parameters of the matrix: (a, b/2, c/2, d/2)
  */
 export const _find_parameters = (matrix) => {
   // Determine a, b/2, c/2 and d/2 (3 different cases).
