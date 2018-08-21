@@ -1,0 +1,955 @@
+{
+  "coverage": "47.17%",
+  "expectCount": 833,
+  "actualCount": 393,
+  "files": {
+    "src/backends/circuits/drawer.js": {
+      "expectCount": 20,
+      "actualCount": 11,
+      "undocumentLines": [
+        40,
+        41,
+        42,
+        43,
+        172,
+        173,
+        174,
+        175,
+        176
+      ]
+    },
+    "src/backends/circuits/tolatex.js": {
+      "expectCount": 25,
+      "actualCount": 17,
+      "undocumentLines": [
+        27,
+        31,
+        37,
+        47,
+        299,
+        300,
+        301,
+        302
+      ]
+    },
+    "src/backends/ibm/ibm.js": {
+      "expectCount": 27,
+      "actualCount": 11,
+      "undocumentLines": [
+        27,
+        50,
+        75,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        122,
+        123,
+        380,
+        395
+      ]
+    },
+    "src/backends/ibm/ibm.spec.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        38,
+        40,
+        44,
+        48,
+        49
+      ]
+    },
+    "src/backends/ibm/ibmhttpclient.js": {
+      "expectCount": 9,
+      "actualCount": 3,
+      "undocumentLines": [
+        18,
+        23,
+        42,
+        92,
+        98,
+        117
+      ]
+    },
+    "src/backends/ibm/ibmhttpclient.spec.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        19,
+        20
+      ]
+    },
+    "src/backends/printer.js": {
+      "expectCount": 8,
+      "actualCount": 5,
+      "undocumentLines": [
+        47,
+        48,
+        49
+      ]
+    },
+    "src/backends/resource.js": {
+      "expectCount": 14,
+      "actualCount": 7,
+      "undocumentLines": [
+        27,
+        57,
+        58,
+        59,
+        60,
+        62,
+        63
+      ]
+    },
+    "src/backends/resource.spec.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        33,
+        34
+      ]
+    },
+    "src/backends/simulators/classicalsimulator.js": {
+      "expectCount": 17,
+      "actualCount": 9,
+      "undocumentLines": [
+        49,
+        50,
+        91,
+        113,
+        155,
+        178,
+        185,
+        189
+      ]
+    },
+    "src/backends/simulators/cppsim.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        17,
+        18,
+        20
+      ]
+    },
+    "src/backends/simulators/jssim.js": {
+      "expectCount": 26,
+      "actualCount": 21,
+      "undocumentLines": [
+        50,
+        51,
+        52,
+        349,
+        353
+      ]
+    },
+    "src/backends/simulators/shared.spec.js": {
+      "expectCount": 4,
+      "actualCount": 0,
+      "undocumentLines": [
+        19,
+        20,
+        22,
+        25
+      ]
+    },
+    "src/backends/simulators/simulator.js": {
+      "expectCount": 15,
+      "actualCount": 13,
+      "undocumentLines": [
+        85,
+        89
+      ]
+    },
+    "src/backends/simulators/simulator.spec.js": {
+      "expectCount": 17,
+      "actualCount": 1,
+      "undocumentLines": [
+        61,
+        62,
+        64,
+        67,
+        73,
+        74,
+        76,
+        79,
+        85,
+        86,
+        88,
+        91,
+        97,
+        98,
+        105,
+        113
+      ]
+    },
+    "src/cengines/basicmapper.js": {
+      "expectCount": 6,
+      "actualCount": 3,
+      "undocumentLines": [
+        42,
+        45,
+        49
+      ]
+    },
+    "src/cengines/basics.js": {
+      "expectCount": 17,
+      "actualCount": 11,
+      "undocumentLines": [
+        47,
+        170,
+        195,
+        196,
+        200,
+        203
+      ]
+    },
+    "src/cengines/cmdmodifier.js": {
+      "expectCount": 4,
+      "actualCount": 3,
+      "undocumentLines": [
+        47
+      ]
+    },
+    "src/cengines/ibm5qubitmapper.js": {
+      "expectCount": 14,
+      "actualCount": 8,
+      "undocumentLines": [
+        23,
+        28,
+        53,
+        68,
+        69,
+        70
+      ]
+    },
+    "src/cengines/linearmapper.js": {
+      "expectCount": 20,
+      "actualCount": 10,
+      "undocumentLines": [
+        109,
+        110,
+        111,
+        113,
+        117,
+        119,
+        120,
+        121,
+        125,
+        490
+      ]
+    },
+    "src/cengines/main.js": {
+      "expectCount": 18,
+      "actualCount": 9,
+      "undocumentLines": [
+        98,
+        122,
+        133,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147
+      ]
+    },
+    "src/cengines/manualmapper.js": {
+      "expectCount": 5,
+      "actualCount": 3,
+      "undocumentLines": [
+        40,
+        41
+      ]
+    },
+    "src/cengines/optimize.js": {
+      "expectCount": 10,
+      "actualCount": 8,
+      "undocumentLines": [
+        44,
+        45
+      ]
+    },
+    "src/cengines/replacer/decompositionrule.js": {
+      "expectCount": 5,
+      "actualCount": 2,
+      "undocumentLines": [
+        63,
+        64,
+        65
+      ]
+    },
+    "src/cengines/replacer/decompositionruleset.js": {
+      "expectCount": 13,
+      "actualCount": 7,
+      "undocumentLines": [
+        31,
+        42,
+        67,
+        68,
+        115,
+        116
+      ]
+    },
+    "src/cengines/replacer/replacer.js": {
+      "expectCount": 11,
+      "actualCount": 7,
+      "undocumentLines": [
+        44,
+        105,
+        106,
+        213
+      ]
+    },
+    "src/cengines/swapandcnotflipper.js": {
+      "expectCount": 9,
+      "actualCount": 4,
+      "undocumentLines": [
+        51,
+        62,
+        66,
+        72,
+        90
+      ]
+    },
+    "src/cengines/tagremover.js": {
+      "expectCount": 5,
+      "actualCount": 4,
+      "undocumentLines": [
+        39
+      ]
+    },
+    "src/cengines/testengine.js": {
+      "expectCount": 15,
+      "actualCount": 8,
+      "undocumentLines": [
+        32,
+        65,
+        90,
+        145,
+        146,
+        149,
+        153
+      ]
+    },
+    "src/cengines/twodmapper.js": {
+      "expectCount": 30,
+      "actualCount": 7,
+      "undocumentLines": [
+        94,
+        95,
+        96,
+        99,
+        112,
+        121,
+        122,
+        123,
+        124,
+        132,
+        136,
+        140,
+        141,
+        158,
+        159,
+        160,
+        163,
+        167,
+        168,
+        183,
+        234,
+        254,
+        284
+      ]
+    },
+    "src/libs/math/constantmath.js": {
+      "expectCount": 4,
+      "actualCount": 3,
+      "undocumentLines": [
+        91
+      ]
+    },
+    "src/libs/math/constantmath.spec.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        32,
+        40,
+        55
+      ]
+    },
+    "src/libs/math/defaultrules.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        22,
+        31,
+        41
+      ]
+    },
+    "src/libs/math/gates.js": {
+      "expectCount": 21,
+      "actualCount": 8,
+      "undocumentLines": [
+        42,
+        45,
+        49,
+        53,
+        102,
+        103,
+        106,
+        110,
+        114,
+        166,
+        167,
+        170,
+        174
+      ]
+    },
+    "src/libs/polyfill.js": {
+      "expectCount": 26,
+      "actualCount": 23,
+      "undocumentLines": [
+        20,
+        21,
+        98
+      ]
+    },
+    "src/libs/util.js": {
+      "expectCount": 14,
+      "actualCount": 13,
+      "undocumentLines": [
+        191
+      ]
+    },
+    "src/meta/compute.js": {
+      "expectCount": 18,
+      "actualCount": 12,
+      "undocumentLines": [
+        46,
+        47,
+        49,
+        50,
+        244,
+        245
+      ]
+    },
+    "src/meta/control.js": {
+      "expectCount": 7,
+      "actualCount": 4,
+      "undocumentLines": [
+        46,
+        58,
+        65
+      ]
+    },
+    "src/meta/dagger.js": {
+      "expectCount": 8,
+      "actualCount": 5,
+      "undocumentLines": [
+        43,
+        44,
+        45
+      ]
+    },
+    "src/meta/error.js": {
+      "expectCount": 15,
+      "actualCount": 0,
+      "undocumentLines": [
+        17,
+        18,
+        20,
+        24,
+        25,
+        27,
+        31,
+        32,
+        34,
+        38,
+        39,
+        41,
+        45,
+        46,
+        48
+      ]
+    },
+    "src/meta/loop.js": {
+      "expectCount": 16,
+      "actualCount": 7,
+      "undocumentLines": [
+        32,
+        33,
+        37,
+        57,
+        58,
+        59,
+        60,
+        65,
+        66
+      ]
+    },
+    "src/meta/tag.js": {
+      "expectCount": 11,
+      "actualCount": 6,
+      "undocumentLines": [
+        21,
+        30,
+        39,
+        53,
+        56
+      ]
+    },
+    "src/meta/util.js": {
+      "expectCount": 2,
+      "actualCount": 2,
+      "undocumentLines": []
+    },
+    "src/ops/basics.js": {
+      "expectCount": 39,
+      "actualCount": 26,
+      "undocumentLines": [
+        40,
+        41,
+        78,
+        209,
+        238,
+        271,
+        288,
+        318,
+        349,
+        353,
+        357,
+        467,
+        483
+      ]
+    },
+    "src/ops/basics.spec.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        28
+      ]
+    },
+    "src/ops/command.js": {
+      "expectCount": 25,
+      "actualCount": 14,
+      "undocumentLines": [
+        91,
+        92,
+        98,
+        102,
+        103,
+        177,
+        186,
+        225,
+        229,
+        238,
+        247
+      ]
+    },
+    "src/ops/command.spec.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        32
+      ]
+    },
+    "src/ops/gates.js": {
+      "expectCount": 82,
+      "actualCount": 21,
+      "undocumentLines": [
+        40,
+        41,
+        47,
+        51,
+        59,
+        66,
+        70,
+        80,
+        81,
+        88,
+        92,
+        101,
+        108,
+        112,
+        121,
+        128,
+        132,
+        141,
+        148,
+        155,
+        161,
+        168,
+        175,
+        179,
+        185,
+        192,
+        194,
+        197,
+        201,
+        210,
+        218,
+        225,
+        227,
+        230,
+        234,
+        245,
+        252,
+        256,
+        263,
+        270,
+        282,
+        294,
+        307,
+        320,
+        346,
+        356,
+        388,
+        396,
+        400,
+        406,
+        412,
+        416,
+        428,
+        432,
+        438,
+        442,
+        443,
+        447,
+        456,
+        457,
+        455
+      ]
+    },
+    "src/ops/gates.spec.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        57,
+        58,
+        59,
+        60,
+        62
+      ]
+    },
+    "src/ops/metagates.js": {
+      "expectCount": 25,
+      "actualCount": 9,
+      "undocumentLines": [
+        70,
+        72,
+        78,
+        82,
+        97,
+        101,
+        147,
+        148,
+        155,
+        194,
+        202,
+        244,
+        247,
+        251,
+        268,
+        273
+      ]
+    },
+    "src/ops/metagates.spec.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        35,
+        36,
+        37
+      ]
+    },
+    "src/ops/qftgate.js": {
+      "expectCount": 3,
+      "actualCount": 1,
+      "undocumentLines": [
+        23,
+        28
+      ]
+    },
+    "src/ops/qubitoperator.js": {
+      "expectCount": 21,
+      "actualCount": 13,
+      "undocumentLines": [
+        22,
+        24,
+        28,
+        47,
+        60,
+        160,
+        390,
+        437
+      ]
+    },
+    "src/ops/qubitoperator.spec.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        22
+      ]
+    },
+    "src/ops/shortcuts.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        20,
+        24,
+        26,
+        28,
+        30
+      ]
+    },
+    "src/ops/timeevolution.js": {
+      "expectCount": 9,
+      "actualCount": 4,
+      "undocumentLines": [
+        70,
+        71,
+        94,
+        244,
+        248
+      ]
+    },
+    "src/ops/timeevolution.spec.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        27
+      ]
+    },
+    "src/ops/_cycle.js": {
+      "expectCount": 4,
+      "actualCount": 1,
+      "undocumentLines": [
+        18,
+        20,
+        24
+      ]
+    },
+    "src/setups/decompositions/arb1qubit2rzandry.js": {
+      "expectCount": 6,
+      "actualCount": 4,
+      "undocumentLines": [
+        9,
+        11
+      ]
+    },
+    "src/setups/decompositions/arb1qubit2rzandry.spec.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        30,
+        43
+      ]
+    },
+    "src/setups/decompositions/barrier.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        20,
+        24
+      ]
+    },
+    "src/setups/decompositions/carb1qubit2cnotrzandry.js": {
+      "expectCount": 7,
+      "actualCount": 3,
+      "undocumentLines": [
+        11,
+        12,
+        13,
+        16
+      ]
+    },
+    "src/setups/decompositions/cnot2cz.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        25,
+        35
+      ]
+    },
+    "src/setups/decompositions/cnu2toffoliandcu.js": {
+      "expectCount": 2,
+      "actualCount": 2,
+      "undocumentLines": []
+    },
+    "src/setups/decompositions/crz2cxandrz.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        7,
+        19
+      ]
+    },
+    "src/setups/decompositions/entangle.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        10
+      ]
+    },
+    "src/setups/decompositions/gates.spec.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        24
+      ]
+    },
+    "src/setups/decompositions/globalphase.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        7,
+        10
+      ]
+    },
+    "src/setups/decompositions/ph2r.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        6,
+        15
+      ]
+    },
+    "src/setups/decompositions/qft2crandhadamard.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        7
+      ]
+    },
+    "src/setups/decompositions/r2rzandph.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        5
+      ]
+    },
+    "src/setups/decompositions/rx2rz.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        6,
+        20
+      ]
+    },
+    "src/setups/decompositions/ry2rz.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        6,
+        20
+      ]
+    },
+    "src/setups/decompositions/swap2cnot.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        8
+      ]
+    },
+    "src/setups/decompositions/time_evolution.js": {
+      "expectCount": 6,
+      "actualCount": 1,
+      "undocumentLines": [
+        22,
+        47,
+        61,
+        140,
+        147
+      ]
+    },
+    "src/setups/decompositions/time_evolution.spec.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        16
+      ]
+    },
+    "src/setups/decompositions/toffoli2cnotandtgate.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        8,
+        10,
+        34
+      ]
+    },
+    "src/setups/grid.js": {
+      "expectCount": 3,
+      "actualCount": 2,
+      "undocumentLines": [
+        30
+      ]
+    },
+    "src/setups/ibm.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        26
+      ]
+    },
+    "src/setups/ibm16.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        12,
+        19,
+        39
+      ]
+    },
+    "src/setups/index.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        23
+      ]
+    },
+    "src/setups/linear.js": {
+      "expectCount": 3,
+      "actualCount": 1,
+      "undocumentLines": [
+        16,
+        26
+      ]
+    },
+    "src/setups/restrictedgateset.js": {
+      "expectCount": 3,
+      "actualCount": 1,
+      "undocumentLines": [
+        15,
+        29
+      ]
+    },
+    "src/types/qubit.js": {
+      "expectCount": 22,
+      "actualCount": 15,
+      "undocumentLines": [
+        49,
+        50,
+        97,
+        101,
+        116,
+        134,
+        240
+      ]
+    },
+    "src/types/qubit.spec.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        25,
+        26
+      ]
+    }
+  }
+}
