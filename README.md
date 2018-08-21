@@ -3,13 +3,13 @@ NodeJS version of [ProjectQ](https://github.com/ProjectQ-Framework/ProjectQ)
 
 CircleCI build status: [![CircleCI](https://circleci.com/gh/tearsofphoenix/Q-js/tree/master.svg?style=svg)](https://circleci.com/gh/tearsofphoenix/Q-js/tree/master)
 
-###install
+### install
  1. use `git` to clone the repository 
  2. run `yarn install` 
  3. run `yarn build` to build native cpp simulator 
  4. run `yarn test`, check examples 
  
-###notice
+### notice
   1. Most of the `class` have same name with the original ProjectQ project
   2. Using `camelcase` rules to renamed most class methods. `get_inverse`
      has been changed to `getInverse`.
