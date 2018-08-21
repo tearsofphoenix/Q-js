@@ -15,9 +15,8 @@
  */
 
 import assert from 'assert'
-import {LastEngineError} from '../../meta/error';
-import {arrayEqual, len} from '../../libs/polyfill';
-import {getControlCount} from '../../meta';
+import {LastEngineError} from '../../meta/error'
+import {arrayEqual, len} from '../../libs/polyfill'
 
 import {
   Allocate, Deallocate, FlushGate, Measure
@@ -248,7 +247,7 @@ export class CircuitDrawer extends BasicEngine {
       this._free_lines.push(qubit_id)
     }
     if (this.isLastEngine && cmd.gate === Measure) {
-      assert(getControlCount(cmd) === 0)
+      assert(cmd.controlCount === 0)
 
       cmd.qubits.forEach(qureg => qureg.forEach((qubit) => {
         let m

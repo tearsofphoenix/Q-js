@@ -4,7 +4,7 @@ import DecompositionRule from '../../cengines/replacer/decompositionrule';
 import {
   BasicGate, Ph, Ry, Rz, X
 } from '../../ops';
-import {Control, getControlCount} from '../../meta';
+import {Control} from '../../meta';
 import {len, productLoop} from '../../libs/polyfill';
 import {_find_parameters, phase} from './arb1qubit2rzandry'
 
@@ -14,7 +14,7 @@ const TOLERANCE = 1e-12
 
 // Recognize single controlled one qubit gates with a matrix.
 export function _recognize_carb1qubit(cmd) {
-  if (getControlCount(cmd) === 1) {
+  if (cmd.controlCount === 1) {
     try {
       const m = cmd.gate.matrix
       if (len(m) === 2) {

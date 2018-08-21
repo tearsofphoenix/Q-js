@@ -17,7 +17,7 @@
 import {permutations} from 'itertools'
 import BasicMapperEngine from './basicmapper'
 import { Allocate, FlushGate, NOT } from '../ops/gates'
-import { getControlCount } from '../meta/control'
+
 import IBMBackend from '../backends/ibm/ibm'
 
 function stringKeyToIntArray(key) {
@@ -76,7 +76,7 @@ if so.
   @param {Command} cmd Command to check whether it is a controlled NOT gate.
   */
   _isCNOT(cmd) {
-    return (cmd.gate instanceof NOT.constructor && getControlCount(cmd) === 1)
+    return (cmd.gate instanceof NOT.constructor && cmd.controlCount === 1)
   }
 
   /**

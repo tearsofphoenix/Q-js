@@ -114,7 +114,3 @@ export function Control(engine, qubits, func) {
     }
   }
 }
-
-export function getControlCount(cmd) {
-  return cmd.controlQubits.length
-}

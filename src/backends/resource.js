@@ -21,7 +21,7 @@ import {
 } from '../ops/gates'
 import { LogicalQubitIDTag } from '../meta/tag'
 import { BasicQubit } from '../types/qubit'
-import { getControlCount } from '../meta/control'
+
 import {genString} from '../libs/util'
 
 function parseStringKey(key) {
@@ -146,7 +146,7 @@ export default class ResourceCounter extends BasicEngine {
 
     this.max_width = Math.max(this.max_width, this._active_qubits)
 
-    const ctrl_cnt = getControlCount(cmd)
+    const ctrl_cnt = cmd.controlCount
     const gate_description = [cmd.gate, ctrl_cnt]
     const gate_class_description = [cmd.gate.constructor.name, ctrl_cnt]
 

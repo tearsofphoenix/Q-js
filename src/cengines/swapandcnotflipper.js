@@ -18,7 +18,6 @@ import assert from 'assert'
 import {BasicEngine, ForwarderEngine} from './basics'
 import {NOT, H, Swap} from '../ops/gates'
 import {All} from '../ops/metagates'
-import {getControlCount} from '../meta/control';
 import {instanceOf, tuple} from '../libs/util';
 import {CNOT} from '../ops/shortcuts'
 import CommandModifier from './cmdmodifier'
@@ -61,11 +60,11 @@ export default class SwapAndCNOTFlipper extends BasicEngine {
   }
 
   isCNOT(cmd) {
-    return instanceOf(cmd.gate, NOT.constructor) && getControlCount(cmd) === 1
+    return instanceOf(cmd.gate, NOT.constructor) && cmd.controlCount === 1
   }
 
   isSwap(cmd) {
-    const n = getControlCount(cmd)
+    const n = cmd.controlCount
     const f = cmd.gate.equal(Swap)
     return n === 0 && f
   }
