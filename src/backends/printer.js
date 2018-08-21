@@ -34,11 +34,11 @@ import { LastEngineError } from '../meta/error'
 export default class CommandPrinter extends BasicEngine {
   /**
    * @constructor
-  @param {boolean} acceptInput: If accept_input is true, the printer queries
+  @param {boolean} acceptInput If accept_input is true, the printer queries
   the user to input measurement results if the CommandPrinter is
   the last engine. Otherwise, all measurements yield
-  @param {boolean} defaultMeasure. Default measurement result (if accept_input is false).
-  @param {boolean} inPlace: If in_place is true, all output is written on the same line of the terminal.
+  @param {boolean} defaultMeasure Default measurement result (if accept_input is false).
+  @param {boolean} inPlace If in_place is true, all output is written on the same line of the terminal.
   */
   constructor(acceptInput = true, defaultMeasure = false, inPlace = false) {
     super()

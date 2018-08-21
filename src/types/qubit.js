@@ -189,8 +189,8 @@ Qureg.prototype.toBoolean = function () {
   if (this.length === 1) {
     return this[0].toBoolean()
   }
-  throw new Error('__bool__(qureg): Quantum register contains more "\n'
-    + '"than 1 qubit. Use __bool__(qureg[idx]) instead.')
+  throw new Error('qureg.toBoolean(): Quantum register contains more "\n'
+    + '"than 1 qubit. Use qureg[idx].toBoolean() instead.')
 }
 
 /**

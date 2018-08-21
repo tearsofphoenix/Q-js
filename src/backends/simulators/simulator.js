@@ -51,13 +51,13 @@ export default class Simulator extends BasicEngine {
   Construct the C++/JavaScript-simulator object and initialize it with a
   random seed.
 
-    @param {boolean} gate_fusion: If true, gates are cached and only executed
+    @param {boolean} gate_fusion If true, gates are cached and only executed
 once a certain gate-size has been reached (only has an effect
 for the c++ simulator).
-    @param {number} rnd_seed: Random seed (uses random.randint(0, 4294967295) by default). Ignored currently!!!
-    @param {boolean} forceSimulation: if true, will force use cpp simulator
+    @param {number} rnd_seed Random seed (uses random.randint(0, 4294967295) by default). Ignored currently!!!
+    @param {boolean} forceSimulation if true, will force use cpp simulator
 
-Example of gate_fusion: Instead of applying a Hadamard gate to 5
+Example of gate_fusion Instead of applying a Hadamard gate to 5
 qubits, the simulator calculates the kronecker product of the 1-qubit
 gate matrices and then applies one 5-qubit gate. This increases
 operational intensity and keeps the simulator from having to iterate
@@ -218,8 +218,7 @@ the quantum register `qureg`.
     @param {number[]|string} bitString  Measurement outcome.
     @param {Qureg|Array.<Qubit>} qureg Quantum register.
 
-    @returns
-Probability of measuring the provided bit string.
+    @returns {number} Probability of measuring the provided bit string.
 
     Note:
 Make sure all previous commands (especially allocations) have
@@ -246,7 +245,7 @@ contain all allocated qubits.
    @param {Qureg|Array.<Qubit>} qureg Quantum register determining the
 ordering. Must contain all allocated qubits.
 
-    @returns
+    @returns {number}
 Probability amplitude of the provided bit string.
 
     Note:

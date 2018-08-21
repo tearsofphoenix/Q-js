@@ -51,7 +51,7 @@ handler engine is available.
 export class LoopEngine extends BasicEngine {
   /**
    * @constructor
-    @param {number}num: Number of loop iterations.
+    @param {number} num Number of loop iterations.
    */
   constructor(num) {
     super()
@@ -85,7 +85,7 @@ export class LoopEngine extends BasicEngine {
 
     if (!this._nextEnginesSupportLoopTag) {
       // Unroll the loop
-      // Check that local qubits have been deallocated:
+      // Check that local qubits have been deallocated
       if (!setEqual(this._deallocatedQubitIDs, this._allocatedQubitIDs)) {
         throw new QubitManagementError(error_message)
       }
@@ -185,7 +185,7 @@ Loop n times over an entire code block.
     @example
 @code
 
-with Loop(eng, 4):
+with Loop(eng, 4)
 # [quantum gates to be executed 4 times]
 
 Warning:

@@ -35,7 +35,7 @@ export class InstructionFilter extends BasicEngine {
   Initializer: The provided filterfun returns true for all commands
 which do not need replacement and false for commands that do.
 
-    @param {function} filterFunc: Filter function which returns true for
+    @param {function} filterFunc Filter function which returns true for
     available commands, and false otherwise. filterfun will be
     called as filterfun(self, cmd).
   */
@@ -77,7 +77,7 @@ export class AutoReplacer extends BasicEngine {
   /**
    * @constructor
     @param {DecompositionRuleSet} decompositionRuleSet
-    @param {function} decomposition_chooser: A function which, given the
+    @param {function} decomposition_chooser A function which, given the
 Command to decompose and a list of potential Decomposition
 objects, determines (and then returns) the 'best'
 decomposition.
@@ -188,8 +188,7 @@ if not, replace it using the decomposition rules loaded with the setup
             necessary, replace/decompose the gates according to the decomposition
         rules in the loaded setup.
 
-            @param
-        command_list (list<Command>): List of commands to handle.
+            @param {Command} command List of commands to handle.
        */
       const cmd_mod_fun = (command) => { // Adds the tags
         command.tags = [...old_tags, ...command.tags]
