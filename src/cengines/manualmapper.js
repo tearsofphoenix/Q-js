@@ -21,10 +21,8 @@ import BasicMapperEngine from './basicmapper'
  * @desc
 Manual Mapper which adds QubitPlacementTags to Allocate gate commands
 according to a user-specified mapping.
-
-    Attributes:
-map (function): The function which maps a given qubit id to its
-location. It gets set when initializing the mapper.
+    @property {function} map The function which maps a given qubit id to its
+    location. It gets set when initializing the mapper.
  */
 export default class ManualMapper extends BasicMapperEngine {
   /**
