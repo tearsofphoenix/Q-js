@@ -81,10 +81,10 @@ function one_and_two_qubit_gates(eng, cmd) {
 
  Returns:
  A list of suitable compiler engines.
- * @param num_rows {Number}
- * @param num_columns {Number}
- * @param one_qubit_gates {String|Array<BasicGate>}
- * @param two_qubit_gates {String|Array<BasicGate>}
+ * @param num_rows {number}
+ * @param num_columns {number}
+ * @param one_qubit_gates {string|Array<BasicGate>}
+ * @param two_qubit_gates {string|Array<BasicGate>}
  */
 export function getEngineList(num_rows, num_columns, one_qubit_gates = 'any', two_qubit_gates = [CNOT, Swap]) {
   if (two_qubit_gates !== 'any' && !Array.isArray(two_qubit_gates)) {

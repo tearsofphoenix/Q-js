@@ -27,8 +27,8 @@ const downloadOptions = require('./util/downloadoptions');
 /**
  * Download file, if succeeds save, if not delete
  *
- * @param {String} url
- * @param {String} dest
+ * @param string url
+ * @param string dest
  * @param {Function} cb
  * @api private
  */

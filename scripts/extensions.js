@@ -156,7 +156,7 @@ function getInstalledBinaries() {
  * @param  {string} platform - The name of the OS platform(darwin, win32, etc...)
  * @param  {string} arch - The instruction set architecture of the Node environment
  * @param  {string} abi - The Node Application Binary Interface
- * @return {Boolean} true, if projectq supports the current platform, false otherwise
+ * @return boolean true, if projectq supports the current platform, false otherwise
  *
  * @api public
  */
@@ -171,7 +171,7 @@ function isSupportedEnvironment(platform, arch, abi) {
 /**
  * Get the value of a CLI argument
  *
- * @param {String} name
+ * @param string name
  * @param {Array} args
  * @api private
  */
@@ -342,7 +342,7 @@ function getBinaryPath() {
 /**
  * An array of paths suitable for use as a local disk cache of the binding.
  *
- * @return {[]String} an array of paths
+ * @return {Array<string>} an array of paths
  * @api public
  */
 function getCachePathCandidates() {
@@ -360,7 +360,7 @@ function getCachePathCandidates() {
  * as a prioritised list this method is deterministic, assuming no change to the
  * local environment.
  *
- * @return {String} directory to cache binding
+ * @return string directory to cache binding
  * @api public
  */
 function getBinaryCachePath() {
@@ -394,7 +394,7 @@ function getBinaryCachePath() {
  * as a prioritised list this method is deterministic, assuming no change to the
  * local environment.
  *
- * @return {String} path to cached binary
+ * @return string path to cached binary
  * @api public
  */
 function getCachedBinary() {
@@ -427,7 +427,7 @@ function getCachedBinary() {
 /**
  * Does the supplied binary path exist
  *
- * @param {String} binaryPath
+ * @param string binaryPath
  * @api public
  */
 

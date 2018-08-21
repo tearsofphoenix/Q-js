@@ -150,7 +150,7 @@ ValueError: Qubit already deallocated. Caller likely has a bug.
 
     @param metaTag {Function}: Meta tag class for which to check support
 
-    @returns {Boolean}: true if one of the further compiler engines is a
+    @returns boolean: true if one of the further compiler engines is a
 meta tag handler, i.e., engine.is_meta_tag_handler(meta_tag)
 returns true.
      */

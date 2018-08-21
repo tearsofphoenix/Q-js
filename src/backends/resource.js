@@ -68,7 +68,7 @@ export default class ResourceCounter extends BasicEngine {
     ResourceCounter is the last engine (since it can count any command).
 
     @param {Command} cmd: Command for which to check availability (all Commands can be counted).
-    @return {Boolean} true, unless the next engine cannot handle the Command (if there is a next engine).
+    @return boolean true, unless the next engine cannot handle the Command (if there is a next engine).
    */
   isAvailable(cmd) {
     try {
@@ -82,7 +82,7 @@ export default class ResourceCounter extends BasicEngine {
   }
 
   /**
-   * @return {Number}
+   * @return {number}
    */
   get depthOfDag() {
     if (this._depth_of_qubit) {
@@ -185,7 +185,7 @@ export default class ResourceCounter extends BasicEngine {
   /**
   Return the string representation of this ResourceCounter.
 
-  @return {String}
+  @return string
     A summary (string) of resources used, including gates, number of
     calls, and max. number of qubits that were active at the same time.
    */

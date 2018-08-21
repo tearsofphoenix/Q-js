@@ -152,7 +152,7 @@ Writes the Latex header using the settings file.
 
     The header includes all packages and defines all tikz styles.
 
-    @returns {String}: Header of the Latex document.
+    @returns string: Header of the Latex document.
  */
   _header(settings) {
     const packages = ('\\documentclass{standalone}\n\\usepackage[margin=1in]'
@@ -206,7 +206,7 @@ TikZ format.
 
     @param {Array<Array<CircuitItem>>} circuit: Circuit to draw.
     @param {Object} settings
-    @returns {String}: Latex string to draw the entire circuit.
+    @returns string: Latex string to draw the entire circuit.
  */
   _body(circuit, settings) {
     const code = []
@@ -220,7 +220,7 @@ TikZ format.
   /**
   Return the footer of the Latex document.
 
-      @returns {String}: Latex document footer.
+      @returns string: Latex document footer.
    */
   _footer() {
     return '\n\n\\end{tikzpicture}\n\\end{document}'
@@ -250,7 +250,7 @@ function, and written using write_settings().
     @param {Array<Array<CircuitItem>>} circuit: Each qubit line is a list of
 CircuitItem objects, i.e., in circuit[line].
 
-    @returns {String}: Latex document string which can be compiled using, e.g., pdflatex.
+    @returns string: Latex document string which can be compiled using, e.g., pdflatex.
  */
 function toLatex(circuit) {
   let content
@@ -292,7 +292,7 @@ export class _Circ2Tikz {
   Initialize a circuit to latex converter object.
 
     @param {Object} settings: Dictionary of settings to use for the TikZ image.
-    @param {Number} num_lines: Number of qubit lines to use for the entire
+    @param {number} num_lines: Number of qubit lines to use for the entire
 circuit.
    */
   constructor(settings, num_lines) {
@@ -310,11 +310,11 @@ circuit.
   drawn. It automatically switches to other lines if the gates on those
   lines have to be drawn earlier.
 
-   @param {Number} line: Line to generate the TikZ code for.
+   @param {number} line: Line to generate the TikZ code for.
    @param {Array<Array<CircuitItem>>} circuit: The circuit to draw.
-   @param {Number} end: Gate index to stop at (for recursion).
+   @param {number} end: Gate index to stop at (for recursion).
 
-  @returns {String}: TikZ code representing the current qubit line
+  @returns string: TikZ code representing the current qubit line
   and, if it was necessary to draw other lines, those lines as
   well.
    */
@@ -441,7 +441,7 @@ circuit.
     Tries to use gate.tex_str and, if that is not available, uses str(gate) instead.
 
     @param {BasicGate} gate: Gate object of which to get the name / latex representation.
-    @returns {String}: Latex gate name.
+    @returns string: Latex gate name.
   */
   _gate_name(gate) {
     let name
@@ -455,9 +455,9 @@ circuit.
   /**
   Return the TikZ code for a Square-root Swap-gate.
 
-    @param {Array<Number>} lines: List of length 2 denoting the target qubit of the Swap gate.
-    @param {Array<Number>} ctrl_lines: List of qubit lines which act as controls.
-    @param {Boolean} daggered: Show the daggered one if true.
+    @param {Array<number>} lines: List of length 2 denoting the target qubit of the Swap gate.
+    @param {Array<number>} ctrl_lines: List of qubit lines which act as controls.
+    @param boolean daggered: Show the daggered one if true.
    */
   _sqrtswap_gate(lines, ctrl_lines, daggered) {
     assert(len(lines) === 2) // sqrt swap gate acts on 2 qubits
@@ -518,8 +518,8 @@ circuit.
   /**
   Return the TikZ code for a Swap-gate.
 
-    @param {Array<Number>} lines: List of length 2 denoting the target qubit of the Swap gate.
-    @param {Array<Number>} ctrl_lines: List of qubit lines which act as controls.
+    @param {Array<number>} lines: List of length 2 denoting the target qubit of the Swap gate.
+    @param {Array<number>} ctrl_lines: List of qubit lines which act as controls.
   */
   _swap_gate(lines, ctrl_lines) {
     assert(len(lines) === 2) // swap gate acts on 2 qubits
@@ -570,8 +570,8 @@ circuit.
   /**
   Return the TikZ code for a NOT-gate.
 
-    @param {Array<Number>} lines: List of length 1 denoting the target qubit of the NOT / X gate.
-    @param {Array<Number>} ctrl_lines: List of qubit lines which act as controls.
+    @param {Array<number>} lines: List of length 1 denoting the target qubit of the NOT / X gate.
+    @param {Array<number>} ctrl_lines: List of qubit lines which act as controls.
    */
   _x_gate(lines, ctrl_lines = []) {
     assert(len(lines) === 1) // NOT gate only acts on 1 qubit
@@ -602,7 +602,7 @@ circuit.
   /**
   Return the TikZ code for an n-controlled Z-gate.
 
-    @param {Array<Number>} lines: List of all qubits involved.
+    @param {Array<number>} lines: List of all qubits involved.
    */
   _cz_gate(lines) {
     assert(len(lines) > 1)
@@ -628,7 +628,7 @@ circuit.
   /**
   Return the gate width, using the settings (if available).
 
-    @returns {Number}: Width of the gate. (settings['gates'][gate_class_name]['width'])
+    @returns {number}: Width of the gate. (settings['gates'][gate_class_name]['width'])
   */
   _gate_width(gate) {
     if (gate instanceof DaggeredGate) {
@@ -643,7 +643,7 @@ circuit.
   /**
   Return the offset to use before placing this gate.
 
-    @returns {Number}: Offset to use before the gate. (settings['gates'][gate_class_name]['pre_offset'])
+    @returns {number}: Offset to use before the gate. (settings['gates'][gate_class_name]['pre_offset'])
    */
   _gate_pre_offset(gate) {
     if (gate instanceof DaggeredGate) {
@@ -658,7 +658,7 @@ circuit.
   Return the offset to use after placing this gate and, if no pre_offset
 is defined, the same offset is used in front of the gate.
 
-    @returns {Number}: Offset. (settings['gates'][gate_class_name]['offset'])
+    @returns {number}: Offset. (settings['gates'][gate_class_name]['offset'])
    */
   _gate_offset(gate) {
     if (gate instanceof DaggeredGate) {
@@ -672,7 +672,7 @@ is defined, the same offset is used in front of the gate.
   /**
   Return the height to use for this gate.
 
-    @returns {Number} : Height of the gate. (settings['gates'][gate_class_name]['height'])
+    @returns {number} : Height of the gate. (settings['gates'][gate_class_name]['height'])
    */
   _gate_height(gate) {
     if (gate instanceof DaggeredGate) {
@@ -685,10 +685,10 @@ is defined, the same offset is used in front of the gate.
   /**
   Places a phase / control circle on a qubit line at a given position.
 
-    @param {Number} line: Qubit line at which to place the circle.
-    @param {Number} pos: Position at which to place the circle.
+    @param {number} line: Qubit line at which to place the circle.
+    @param {number} pos: Position at which to place the circle.
 
-    @returns {String}: Latex string representing a control circle at the given position.
+    @returns string: Latex string representing a control circle at the given position.
    */
   _phase(line, pos) {
     return `\n\\node[phase] (${this._op(line)}) at (${dts(pos)},-${line}) {};`
@@ -697,10 +697,10 @@ is defined, the same offset is used in front of the gate.
   /**
   Returns the gate name for placing a gate on a line.
 
-    @param {Number} line: Line number.
-    @param {Number} op: Operation number or, by default, uses the current op count.
+    @param {number} line: Line number.
+    @param {number} op: Operation number or, by default, uses the current op count.
 
-    @returns {String}: Gate name.
+    @returns string: Gate name.
    */
   _op(line, op = null, offset = 0) {
     if (op === null) {
@@ -715,11 +715,11 @@ in which case the two most recent gates are connected, or two gate
 indices, in which case line denotes the line number and the two gates
 are connected on the given line.
 
-    @param {Number} p1: Index of the first object to connect.
-    @param {Number} p2: Index of the second object to connect.
-    @param {Number} line: (int or null) Line index - if provided, p1 and p2 are gate indices.
+    @param {number} p1: Index of the first object to connect.
+    @param {number} p2: Index of the second object to connect.
+    @param {number} line: (int or null) Line index - if provided, p1 and p2 are gate indices.
 
-    @returns {String}: Latex code to draw this / these line(s).
+    @returns string: Latex code to draw this / these line(s).
    */
   _line(p1, p2, line = null) {
     const dbl_classical = this.settings.lines.double_classical
@@ -766,10 +766,10 @@ are connected on the given line.
   Draw a regular gate.
 
     @param {BasicGate} gate: Gate to draw.
-    @param {Array<Number>} lines: Lines the gate acts on.
-   @param {Array<Number>} ctrl_lines: Control lines.
+    @param {Array<number>} lines: Lines the gate acts on.
+   @param {Array<number>} ctrl_lines: Control lines.
 
-    @returns {String}: Latex string drawing a regular gate at the given location
+    @returns string: Latex string drawing a regular gate at the given location
    */
   _regular_gate(gate, lines, ctrl_lines) {
     const [imin, imax] = minmax(lines)

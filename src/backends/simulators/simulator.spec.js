@@ -42,7 +42,7 @@ import TimeEvolution from '../../ops/timeevolution';
 /**
  *
  * @param m {Matrix}
- * @param idx {Number}
+ * @param idx {number}
  * @returns {Complex}
  */
 function getMatrixValue(m, idx) {

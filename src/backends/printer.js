@@ -37,11 +37,11 @@ export default class CommandPrinter extends BasicEngine {
    * @constructor
    *Initialize a CommandPrinter.
 
-  @param {Boolean} acceptInput: If accept_input is true, the printer queries
+  @param boolean acceptInput: If accept_input is true, the printer queries
   the user to input measurement results if the CommandPrinter is
   the last engine. Otherwise, all measurements yield
-  @param {Boolean} defaultMeasure. Default measurement result (if accept_input is false).
-  @param {Boolean} inPlace: If in_place is true, all output is written on the same line of the terminal.
+  @param boolean defaultMeasure. Default measurement result (if accept_input is false).
+  @param boolean inPlace: If in_place is true, all output is written on the same line of the terminal.
 
   */
   constructor(acceptInput = true, defaultMeasure = false, inPlace = false) {
@@ -56,7 +56,7 @@ export default class CommandPrinter extends BasicEngine {
     CommandPrinter is the last engine (since it can print any command).
 
     @param {Command} cmd: Command of which to check availability (all Commands can be printed).
-    @return {Boolean} true, unless the next engine cannot handle the Command (if there is a next engine).
+    @return boolean true, unless the next engine cannot handle the Command (if there is a next engine).
    */
   isAvailable(cmd) {
     try {

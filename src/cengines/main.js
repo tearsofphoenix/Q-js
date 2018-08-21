@@ -55,7 +55,7 @@ engines and adds the back-end as the last engine.
             as compiler engines. Note: The engine list must not contain
             multiple mappers (instances of BasicMapperEngine).
             Default: getEngineList()
-   @param {Boolean} verbose Either print full or compact error messages.
+   @param boolean verbose Either print full or compact error messages.
     Default: false (i.e. compact error messages).
 
     @example
@@ -200,7 +200,7 @@ eng.getMeasurementResult(qubit[0]) == qubit.toNumber()
   /**
     Returns a unique qubit id to be used for the next qubit allocation.
 
-    @returns {Number}: New unique qubit id.
+    @returns {number}: New unique qubit id.
   */
   getNewQubitID() {
     this._qubitIdx += 1
@@ -246,7 +246,7 @@ eng.getMeasurementResult(qubit[0]) == qubit.toNumber()
   Flush the entire circuit down the pipeline, clearing potential buffers
 (of, e.g., optimizers).
 
-    @param deallocateQubits {Boolean}: If true, deallocates all qubits that are
+    @param deallocateQubits boolean: If true, deallocates all qubits that are
 still alive (invalidating references to them by setting their
 id to -1).
    */

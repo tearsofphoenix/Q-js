@@ -182,7 +182,7 @@ Qureg.prototype.equal = function (other) {
 
     @throws Error if more than 1 qubit resides in this register (then you
     need to specify which value to get using qureg[???])
-  @return {Boolean}
+  @return boolean
 */
 Qureg.prototype.toBoolean = function () {
   if (this.length === 1) {
@@ -193,7 +193,7 @@ Qureg.prototype.toBoolean = function () {
 }
 
 /**
- * @return {Number}
+ * @return {number}
  */
 Qureg.prototype.toNumber = function () {
   return this.toBoolean() ? 1 : 0

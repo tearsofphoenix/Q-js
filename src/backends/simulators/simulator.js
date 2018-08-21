@@ -52,11 +52,11 @@ export default class Simulator extends BasicEngine {
   Construct the C++/JavaScript-simulator object and initialize it with a
   random seed.
 
-    @param {Boolean} gate_fusion: If true, gates are cached and only executed
+    @param boolean gate_fusion: If true, gates are cached and only executed
 once a certain gate-size has been reached (only has an effect
 for the c++ simulator).
-    @param {Number} rnd_seed: Random seed (uses random.randint(0, 4294967295) by default). Ignored currently!!!
-    @param {Boolean} forceSimulation: if true, will force use cpp simulator
+    @param {number} rnd_seed: Random seed (uses random.randint(0, 4294967295) by default). Ignored currently!!!
+    @param boolean forceSimulation: if true, will force use cpp simulator
 
 Example of gate_fusion: Instead of applying a Hadamard gate to 5
 qubits, the simulator calculates the kronecker product of the 1-qubit
@@ -98,7 +98,7 @@ counting the control qubits).
 
   @param {Command} cmd: Command for which to check availability (single-qubit gate, arbitrary controls)
 
-  @returns {Boolean} true if it can be simulated and false otherwise.
+  @returns boolean true if it can be simulated and false otherwise.
   */
   isAvailable(cmd) {
     if (instanceOf(cmd.gate, [MeasureGate, AllocateQubitGate, DeallocateQubitGate, BasicMathGate, TimeEvolution])) {
@@ -218,7 +218,7 @@ automatically converts from logical qubits to mapped qubits for
   Return the probability of the outcome `bit_string` when measuring
 the quantum register `qureg`.
 
-    @param {Array<Number>|String} bitString : Measurement outcome.
+    @param {Array<number>|string} bitString : Measurement outcome.
     @param {Qureg|Array<Qubit>} qureg: Quantum register.
 
     @returns
@@ -245,7 +245,7 @@ automatically converts from logical qubits to mapped qubits for
     The ordering is given by the quantum register `qureg`, which must
 contain all allocated qubits.
 
-   @param {Array<Number>|String} bitString: Computational basis state
+   @param {Array<number>|string} bitString: Computational basis state
    @param {Qureg|Array<Qubit>} qureg: Quantum register determining the
 ordering. Must contain all allocated qubits.
 
@@ -296,7 +296,7 @@ automatically converts from logical qubits to mapped qubits for
   Collapse a quantum register onto a classical basis state.
 
     @param {Qureg|Array<Qubit>} qureg: Qubits to collapse.
-    @param {Array<Boolean>} values : Measurement outcome for each of the qubits
+    @param {Array<boolean>} values : Measurement outcome for each of the qubits
 in `qureg`.
 
     @throws Error : If an outcome has probability (approximately) 0 or

@@ -100,7 +100,7 @@ are interchangeable among themselves. Then, call this function as
   }
 
   /**
-   * @return {String}
+   * @return string
    */
   inspect() {
     return this.toString()
@@ -229,7 +229,7 @@ export class BasicRotationGate extends BasicGate {
   /**
    * @constructor
       Initialize a basic rotation gate.
-    @param angle {Number} Angle of rotation (saved modulo 4 * pi)
+    @param angle {number} Angle of rotation (saved modulo 4 * pi)
    */
   constructor(angle, ...args) {
     super(...args)
@@ -283,7 +283,7 @@ angles are simply added.
 .. code-block:: latex
 
   [CLASSNAME]$_[ANGLE]$
-   @return {String}
+   @return string
    */
   texString() {
     return `${this.constructor.name}$_{${this.angle}}$`

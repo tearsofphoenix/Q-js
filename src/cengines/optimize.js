@@ -39,7 +39,7 @@ export default class LocalOptimizer extends BasicEngine {
    * @constructor
   Initialize a LocalOptimizer object.
 
-    @param m {Number}: Number of gates to cache per qubit, before sending on the first gate.
+    @param m {number}: Number of gates to cache per qubit, before sending on the first gate.
    */
   constructor(m = 5) {
     super()
@@ -101,9 +101,9 @@ export default class LocalOptimizer extends BasicEngine {
     Return all indices of a command, each index corresponding to the
     command's index in one of the qubits' command lists.
 
-    @param idx {Number}: qubit index
-    @param  i {Number}: command position in qubit idx's command list
-    @param IDs {Array<Number>}: IDs of all qubits involved in the command
+    @param idx {number}: qubit index
+    @param  i {number}: command position in qubit idx's command list
+    @param IDs {Array<number>}: IDs of all qubits involved in the command
   */
   getGateIndices(idx, i, IDs) {
     if (typeof idx !== 'number') {

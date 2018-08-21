@@ -29,10 +29,10 @@ export default class IBMHTTPClient {
   /**
   Retrieves a previously run job by its ID.
 
-    @param {String} device: Device on which the code was run / is running.
-    @param {String} user: IBM quantum experience user (e-mail)
-    @param {String} password: IBM quantum experience password
-    @param {String} jobid: Id of the job to retrieve
+    @param string device: Device on which the code was run / is running.
+    @param string user: IBM quantum experience user (e-mail)
+    @param string password: IBM quantum experience password
+    @param string jobid: Id of the job to retrieve
   */
   static async retrieve(device, user, password, jobid) {
     const [user_id, access_token] = await IBMHTTPClient.authenticate(user, password)
@@ -48,12 +48,12 @@ export default class IBMHTTPClient {
   /**
   Sends QASM through the IBM API and runs the quantum circuit.
 
-   @param {String} info: Contains QASM representation of the circuit to run.
-   @param {String} device: Either 'simulator', 'ibmqx4', or 'ibmqx5'.
-   @param {String} user: IBM quantum experience user.
-   @param {String} password: IBM quantum experience user password.
-   @param {Number} shots: Number of runs of the same circuit to collect statistics.
-   @param {Boolean} verbose: If true, additional information is printed, such as
+   @param string info: Contains QASM representation of the circuit to run.
+   @param string device: Either 'simulator', 'ibmqx4', or 'ibmqx5'.
+   @param string user: IBM quantum experience user.
+   @param string password: IBM quantum experience user password.
+   @param {number} shots: Number of runs of the same circuit to collect statistics.
+   @param boolean verbose: If true, additional information is printed, such as
 measurement statistics. Otherwise, the backend simply registers
 one measurement result (same behavior as the projectq Simulator).
    */

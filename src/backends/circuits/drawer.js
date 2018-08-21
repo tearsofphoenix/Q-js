@@ -34,8 +34,8 @@ export class CircuitItem {
   Initialize a circuit item.
 
     @param {BasicGate} gate
-    @param {Array<Number>} lines: Circuit lines the gate acts on.
-    @param {Array<Number>} ctrl_lines: Circuit lines which control the gate.
+    @param {Array<number>} lines: Circuit lines the gate acts on.
+    @param {Array<number>} ctrl_lines: Circuit lines which control the gate.
   */
   constructor(gate, lines, ctrl_lines) {
     this.gate = gate
@@ -57,7 +57,7 @@ export class CircuitItem {
 
   /**
    * @param {CircuitItem|Object} other
-   * @return {Boolean}
+   * @return boolean
    */
   equal(other) {
     if (other instanceof CircuitItem) {
@@ -160,11 +160,11 @@ export class CircuitDrawer extends BasicEngine {
     can be altered by the user. It contains gate widths, heights, offsets,
       etc.
 
-    @param {Boolean} accept_input: If accept_input is true, the printer queries
+    @param boolean accept_input: If accept_input is true, the printer queries
     the user to input measurement results if the CircuitDrawer is
     the last engine. Otherwise, all measurements yield the result
     default_measure (0 or 1).
-    @param {Number} default_measure: Default value to use as measurement
+    @param {number} default_measure: Default value to use as measurement
     results if accept_input is false and there is no underlying
     backend to register real measurement results.
    */
@@ -182,7 +182,7 @@ export class CircuitDrawer extends BasicEngine {
     CircuitDrawer is the last engine (since it can print any command).
 
     @param {Command} cmd: Command for which to check availability (all Commands can be printed).
-    @return {Boolean}: true, unless the next engine cannot handle the Command (if there is a next engine).
+    @return boolean: true, unless the next engine cannot handle the Command (if there is a next engine).
    */
   isAvailable(cmd) {
     try {
@@ -284,7 +284,7 @@ export class CircuitDrawer extends BasicEngine {
     node my_circuit.js | pdflatex
 
     where my_circuit.js calls this function and prints it to the terminal.
-   @return {String}
+   @return string
    */
   getLatex() {
     const qubit_lines = {}

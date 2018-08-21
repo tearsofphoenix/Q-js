@@ -276,7 +276,7 @@ the quantum registers to which the gate is applied.
   }
 
   /**
-   * @return {String}
+   * @return string
    */
   toString() {
     let {qubits} = this
@@ -304,7 +304,7 @@ the quantum registers to which the gate is applied.
   }
 
   /**
-   * @return {String}
+   * @return string
    */
   inspect() {
     return this.toString()

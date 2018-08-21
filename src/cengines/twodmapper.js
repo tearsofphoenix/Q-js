@@ -553,10 +553,10 @@ must exist already
 qubit ids
 @param new_mapping {Object}: dict: keys are logical ids and values are mapped
 qubit ids
-@param permutation {Array<Array<Number>>}: list of int from 0, 1, ..., this.num_rows-1. It is
+@param permutation {Array<Array<number>>}: list of int from 0, 1, ..., this.num_rows-1. It is
 used to permute the found perfect matchings. Default
 is None which keeps the original order.
-    @returns {Array<Array<Number>>}
+    @returns {Array<Array<number>>}
 List of tuples. Each tuple is a swap operation which needs to be
 applied. Tuple contains the two mapped qubit ids for the Swap.
    */

@@ -40,7 +40,7 @@ export default class SwapAndCNOTFlipper extends BasicEngine {
    * @constructor
   Initialize the engine.
 
-    @param connectivity {Set<String> | Set<Array<Number>>}: Set of tuples (c, t) where if (c, t) is an
+    @param connectivity {Set<string> | Set<Array<Number>>}: Set of tuples (c, t) where if (c, t) is an
 element of the set means that a CNOT can be performed between
 the physical ids (c, t) with c being the control and t being
 the target qubit.

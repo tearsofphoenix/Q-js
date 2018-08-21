@@ -27,7 +27,7 @@
  *
  * Otherwise we can trust request to the right thing.
  *
- * @return {String} the proxy configured by npm or an empty string
+ * @return string the proxy configured by npm or an empty string
  * @api private
  */
 module.exports = function() {

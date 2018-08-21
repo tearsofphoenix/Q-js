@@ -80,7 +80,7 @@ automatically converts from logical qubits to mapped qubits for
 
   @param {Qubit} qubit : The bit to read.
 
-  @returns {Number} 0 if the target bit is off, 1 if it's on.
+  @returns {number} 0 if the target bit is off, 1 if it's on.
    */
   readBit(qubit) {
     qubit = this.convertLogicalToMappedQubit(qubit)
@@ -143,7 +143,7 @@ automatically converts from logical qubits to mapped qubits for
 
   @param {Qureg} qureg : The group of bits to read, in little-endian order.
 
-  @returns {Number} Little-endian register value.
+  @returns {number} Little-endian register value.
    */
   readRegister(qureg) {
     const new_qureg = []
@@ -166,7 +166,7 @@ automatically converts from logical qubits to mapped qubits for
   the qureg argument.
 
    @param {Qureg} qureg : The bits to write, in little-endian order.
-   @param {Number} value : The integer value to store. Must fit in the register.
+   @param {number} value : The integer value to store. Must fit in the register.
    */
   writeRegister(qureg, value) {
     const new_qureg = []

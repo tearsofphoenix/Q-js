@@ -102,7 +102,7 @@ running the circuit (e.g., if previous run timed out).
     rotation gates, barriers, and CX / CNOT.
 
     @param {Command} cmd: Command for which to check availability
-    @return {Boolean}
+    @return boolean
    */
   isAvailable(cmd) {
     const g = cmd.gate
@@ -218,7 +218,7 @@ Temporarily store the command cmd.
   /**
   Return the physical location of the qubit with the given logical id.
 
-    @param qbID {Number}: ID of the logical qubit whose position should be returned.
+    @param qbID {number}: ID of the logical qubit whose position should be returned.
    */
   _logicalToPhysical(qbID) {
     assert(!!this.main.mapper)
