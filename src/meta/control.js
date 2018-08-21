@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/*
+/**
 Contains the tools to make an entire section of operations controlled.
 
     @example
@@ -33,25 +33,23 @@ import {dropEngineAfter, insertEngine} from './util'
 import {UncomputeTag, ComputeTag} from './tag'
 import {instanceOf} from '../libs/util'
 
+/**
+ * @class ControlEngine
+ */
 export class ControlEngine extends BasicEngine {
-  /*
-    Initialize the control engine.
-
-    @param
-qubits (list of Qubit objects): qubits conditional on which the
-following operations are executed.
+  /**
+   * @constructor
+    @param {Array<BasicQubit>} qubits: qubits conditional on which the following operations are executed.
      */
   constructor(qubits) {
     super()
     this.qubits = qubits
   }
 
-  /*
+  /**
     Return true if command cmd has a compute/uncompute tag.
-
-    @param
-cmd (Command object): a command object.
-     */
+    @param {Command} cmd
+  */
   hasComputeUnComputeTag(cmd) {
     const tagClass = [UncomputeTag, ComputeTag]
     return cmd.tags.some(looper => instanceOf(looper, tagClass))
@@ -69,7 +67,7 @@ cmd (Command object): a command object.
   }
 }
 
-/*
+/**
 Condition an entire code block on the value of qubits being 1.
 
 @example
@@ -77,23 +75,16 @@ Condition an entire code block on the value of qubits being 1.
 
 with Control(eng, ctrlqubits):
 do_something(otherqubits)
+ Enter a controlled section.
+
+ @param {BasicEngine} engine: Engine which handles the commands (usually MainEngine)
+ @param {Array<BasicQubit>} qubits: Qubits to condition on
+ @param {function} func
+ Enter the section using a with-statement:
+ @code
+ Control(eng, ctrlqubits, () => ...)
  */
 export function Control(engine, qubits, func) {
-  /*
-    Enter a controlled section.
-
-    @param
-engine: Engine which handles the commands (usually MainEngine)
-qubits (list of Qubit objects): Qubits to condition on
-
-Enter the section using a with-statement:
-
-@code
-
-with Control(eng, ctrlqubits):
-...
-     */
-
   if (qubits instanceof BasicQubit) {
     qubits = [qubits]
   }

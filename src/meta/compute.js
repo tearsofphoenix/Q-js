@@ -38,6 +38,9 @@ Adds Compute-tags to all commands and stores them (to later uncompute them
 automatically)
  */
 export class ComputeEngine extends BasicEngine {
+  /**
+   * @constructor
+   */
   constructor() {
     super()
     this._l = []
@@ -49,7 +52,7 @@ export class ComputeEngine extends BasicEngine {
 
   /**
     Modify the command tags, inserting an UncomputeTag.
-    @param cmd {Command} Command to modify.
+    @param {Command} cmd: Command to modify.
      */
   addUnComputeTag(cmd) {
     cmd.tags.push(new UncomputeTag())
@@ -192,8 +195,7 @@ Will tell the Compute-engine to stop caching. It then waits for the
     uncompute instruction, which is when it sends all cached commands
 inverted and in reverse order down to the next compiler engine.
 
-    @throws
-QubitManagementError: If qubit has been deallocated in Compute
+    @throws {QubitManagementError} If qubit has been deallocated in Compute
 section which has not been allocated in Compute section
 */
   endCompute() {
@@ -206,13 +208,12 @@ section which has not been allocated in Compute section
     }
   }
 
-  /*
+  /**
   If in compute-mode: Receive commands and store deepcopy of each cmd.
     Add ComputeTag to received cmd and send it on.
     Otherwise: send all received commands directly to next_engine.
 
-    @param
-command_list (list<Command>): List of commands to receive.
+    @param {Array<Command>} commandList: List of commands to receive.
    */
   receive(commandList) {
     if (this._compute) {
@@ -234,6 +235,9 @@ command_list (list<Command>): List of commands to receive.
  * @class Uncompute
  */
 export class UncomputeEngine extends BasicEngine {
+  /**
+   * @constructor
+   */
   constructor() {
     super()
     // Save all qubit ids from qubits which are created or destroyed.
@@ -241,11 +245,10 @@ export class UncomputeEngine extends BasicEngine {
     this.deallocatedQubitIDs = new Set()
   }
 
-  /*
+  /**
   Receive commands and add an UncomputeTag to their tags.
 
-    @param
-command_list (list<Command>): List of commands to handle.
+    @param {Array<Command>} commandList: List of commands to handle.
    */
   receive(commandList) {
     commandList.forEach((cmd) => {
@@ -261,7 +264,6 @@ command_list (list<Command>): List of commands to handle.
 }
 
 /**
- * @class Compute
 Start a compute-section.
 
     @example
@@ -335,7 +337,7 @@ export function Compute(engine, func) {
   }
 }
 
-/*
+/**
 Start a custom uncompute-section.
 
     @example
@@ -405,7 +407,7 @@ export function CustomUncompute(engine, func) {
   }
 }
 
-/*
+/**
 Uncompute automatically.
 
     @example

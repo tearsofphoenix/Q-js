@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/*
+/**
 Tools to easily invert a sequence of gates.
 
     @code
@@ -28,10 +28,16 @@ import {BasicEngine} from '../cengines/basics'
 import {Allocate, Deallocate} from '../ops/gates'
 import {insertEngine, dropEngineAfter} from './util'
 import {setEqual} from '../libs/polyfill';
-import {QubitManagementError} from "./error";
+import {QubitManagementError} from './error';
 
-// Stores all commands and, when done, inverts the circuit & runs it.
+/**
+ * @class DaggerEngine
+ *  Stores all commands and, when done, inverts the circuit & runs it.
+*/
 export class DaggerEngine extends BasicEngine {
+  /**
+   * @constructor
+   */
   constructor() {
     super()
     this.commands = []
@@ -39,10 +45,9 @@ export class DaggerEngine extends BasicEngine {
     this.deallocateQubitIDs = new Set()
   }
 
-  /*
-    Run the stored circuit in reverse and check that local qubits
-have been deallocated.
-     */
+  /**
+    Run the stored circuit in reverse and check that local qubits have been deallocated.
+   */
   run() {
     if (!setEqual(this.deallocateQubitIDs, this.allocateQubitIDs)) {
       throw new QubitManagementError(
@@ -61,13 +66,10 @@ have been deallocated.
     })
   }
 
-  /*
+  /**
     Receive a list of commands and store them for later inversion.
-
-    @param
-command_list (list<Command>): List of commands to temporarily
-store.
-     */
+    @param {Array<Command>} cmdList: List of commands to temporarily store.
+  */
   receive(cmdList) {
     cmdList.forEach((cmd) => {
       if (cmd.gate.equal(Allocate)) {
@@ -80,15 +82,13 @@ store.
   }
 }
 
-/*
+/**
 Invert an entire code block.
 
     Use it with a with-statement, i.e.,
 
     @code
-
-with Dagger(eng):
-[code to invert]
+    Dagger(eng, () => [code to invert])
 
 Warning:
     If the code to invert contains allocation of qubits, those qubits have
@@ -100,7 +100,7 @@ to be deleted prior to exiting the 'with Dagger()' context.
 
 with Dagger(eng):
 qb = eng.allocateQubit()
-H | qb # qb is still available!!!
+H | qb // qb is still available!!!
 
 The **correct way** of handling qubit (de-)allocation is as follows:
 
@@ -109,24 +109,12 @@ The **correct way** of handling qubit (de-)allocation is as follows:
 with Dagger(eng):
 qb = eng.allocateQubit()
 ...
-del qb # sends deallocate gate (which becomes an allocate)
+del qb // sends deallocate gate (which becomes an allocate)
 
+ @param {BasicEngine} engine: Engine which handles the commands (usually MainEngine)
+ @param {function} func
  */
 export function Dagger(engine, func) {
-  /*
-    Enter an inverted section.
-
-    @param
-engine: Engine which handles the commands (usually MainEngine)
-
-Example (executes an inverse QFT):
-
-@code
-
-with Dagger(eng):
-QFT | qubits
-     */
-
   let daggerEngine = null
 
   const enter = () => {

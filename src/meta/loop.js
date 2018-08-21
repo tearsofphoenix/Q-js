@@ -20,7 +20,14 @@ import {dropEngineAfter, insertEngine} from './util';
 import {Allocate, Deallocate} from '../ops/gates'
 import {QubitManagementError} from './error'
 
+/**
+ * @class LoopTag
+ */
 export class LoopTag {
+  /**
+   * @constructor
+   * @param {number} num
+   */
   constructor(num) {
     this.num = num
     this.id = LoopTag.loop_tag_id
@@ -34,17 +41,16 @@ export class LoopTag {
 
 LoopTag.loop_tag_id = 0
 
-/*
+/**
+ * @class LoopEngine
 Stores all commands and, when done, executes them num times if no loop tag
 handler engine is available.
     If there is one, it adds a loop_tag to the commands and sends them on.
  */
 export class LoopEngine extends BasicEngine {
-  /*
-  Initialize a LoopEngine.
-
-    @param
-num (int): Number of loop iterations.
+  /**
+   * @constructor
+    @param {number}num: Number of loop iterations.
    */
   constructor(num) {
     super()
@@ -60,13 +66,11 @@ num (int): Number of loop iterations.
     this._nextEnginesSupportLoopTag = false
   }
 
-  /*
+  /**
   Apply the loop statements to all stored commands.
+   Unrolls the loop if LoopTag is not supported by any of the following engines, i.e., if
 
-        Unrolls the loop if LoopTag is not supported by any of the following
-    engines, i.e., if
-
-        @code
+   @code
     is_meta_tag_supported(next_engine, LoopTag) == false
    */
   run() {
@@ -111,7 +115,7 @@ num (int): Number of loop iterations.
     }
   }
 
-  /*
+  /**
   Receive (and potentially temporarily store) all commands.
 
     Add LoopTag to all receiving commands and send to the next engine if
@@ -122,10 +126,8 @@ unrolled and ancilla qubits have been allocated within the loop body,
     then store a reference all these qubit ids (to change them when
 unrolling the loop)
 
-@param
-    command_list (list<Command>): List of commands to store and later
-unroll or, if there is a LoopTag-handling engine, add the
-LoopTag.
+@param {Array<Command>} commandList: List of commands to store and later
+unroll or, if there is a LoopTag-handling engine, add the LoopTag.
    */
   receive(commandList) {
     if (this._nextEnginesSupportLoopTag || this.next.isMetaTagSupported(LoopTag)) {
@@ -176,7 +178,7 @@ LoopTag.
 }
 
 
-/*
+/**
 Loop n times over an entire code block.
 
     @example
