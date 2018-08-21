@@ -17,7 +17,7 @@
 
 // Draper's addition by constant https://arxiv.org/abs/quant-ph/0008033
 
-/*
+/**
 Adds a classical constant c to the quantum integer (qureg) quint using
 Draper addition.
 
@@ -37,12 +37,9 @@ import {CNOT} from '../../ops/shortcuts';
 import {Control} from '../../meta/control';
 import {len} from '../polyfill';
 
-/*
-    Adds a classical constant c to the quantum integer (qureg) quint using
-    Draper addition.
-
-    Note: Uses the Fourier-transform adder from
-          https://arxiv.org/abs/quant-ph/0008033.
+/**
+ * Adds a classical constant c to the quantum integer (qureg) quint using Draper addition.
+ * Note: Uses the Fourier-transform adder from `https://arxiv.org/abs/quant-ph/0008033`.
  */
 export function add_constant(eng, c, quint) {
   Compute(eng, () => QFT.or(quint))
@@ -59,10 +56,9 @@ export function add_constant(eng, c, quint) {
 }
 
 // Modular adder by Beauregard https://arxiv.org/abs/quant-ph/0205095
-/*
+/**
 Adds a classical constant c to a quantum integer (qureg) quint modulo N
-using Draper addition and the construction from
-https://arxiv.org/abs/quant-ph/0205095.
+using Draper addition and the construction from `https://arxiv.org/abs/quant-ph/0205095`.
  */
 export function add_constant_modN(eng, c, N, quint) {
   assert(c < N && c >= 0)
@@ -112,7 +108,7 @@ function inv_mod_N(a, N) {
 // Modular multiplication by modular addition & shift, followed by uncompute
 // from https://arxiv.org/abs/quant-ph/0205095
 
-/*
+/**
 Multiplies a quantum integer by a classical number a modulo N, i.e.,
 
 |x> -> |a*x mod N>

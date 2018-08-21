@@ -20,18 +20,40 @@ import {instanceOf} from './util';
 const Complex = math.complex().constructor
 const Matrix = math.matrix().constructor
 
+/**
+ * check if value is complex number
+ * @param {Object} value
+ * @return {boolean}
+ */
 export function isComplex(value) {
   return value instanceof Complex
 }
 
+/**
+ * check if value is number or complex number
+ * @param {Object} value
+ * @return {boolean}
+ */
 export function isNumeric(value) {
   return (typeof value === 'number' || value instanceof Complex)
 }
 
+/**
+ * return intersection of s1 & s2
+ * @param {Set} s1
+ * @param {Set} s2
+ * @return {Set}
+ */
 export function intersection(s1, s2) {
   return new Set([...s1].filter(x => s2.has(x)))
 }
 
+/**
+ * return union set of s1 & s2
+ * @param {Set} s1
+ * @param {Set} s2
+ * @return {Set<any>}
+ */
 export function unionSet(s1, s2) {
   const s = [...s2].filter(x => !s1.has(x))
   const result = new Set(s1)
@@ -39,6 +61,12 @@ export function unionSet(s1, s2) {
   return result
 }
 
+/**
+ * return symmetric difference of s1 & s2
+ * @param {Set} s1
+ * @param {Set} s2
+ * @return {Set<*>}
+ */
 export function symmetricDifference(s1, s2) {
   const inset = intersection(s1, s2)
   const a = [...s1].filter(x => !inset.has(x))
@@ -46,10 +74,22 @@ export function symmetricDifference(s1, s2) {
   return new Set([...a, ...b])
 }
 
+/**
+ * check if s1 is equal to s2
+ * @param {Set} s1
+ * @param {Set} s2
+ * @return {boolean}
+ */
 export function setEqual(s1, s2) {
   return symmetricDifference(s1, s2).size === 0
 }
 
+/**
+ * check if `superset` is the super set of `s`
+ * @param {Set} superset
+ * @param {Set} s
+ * @return {boolean}
+ */
 export function setIsSuperSet(superset, s) {
   const result = [...s].filter(x => !superset.has(x))
   return result.length === 0
@@ -59,6 +99,11 @@ export function setDifference(s1, s2) {
   return new Set([...s1].filter(x => !s2.has(x)))
 }
 
+/**
+ * create a Set contains numbers in range from 0 to n
+ * @param {number} n
+ * @return {Set<number>}
+ */
 export function setFromRange(n) {
   const result = new Set()
   for (let i = 0; i < n; i++) {
@@ -67,6 +112,13 @@ export function setFromRange(n) {
   return result
 }
 
+/**
+ * create an array filled by number in range, active like python does
+ * @param {number} start
+ * @param {number} end
+ * @param {number} step
+ * @return {Array<number>}
+ */
 export function arrayFromRange(start, end, step) {
   if (typeof end === 'undefined') {
     end = start
@@ -83,6 +135,12 @@ export function arrayFromRange(start, end, step) {
   return result
 }
 
+/**
+ * return a random sample from `array` which length is `count`
+ * @param {Array<any>} array
+ * @param {number} count
+ * @return {Array<any>}
+ */
 export function randomSample(array, count) {
   const result = []
   const {length} = array
@@ -97,6 +155,13 @@ export function randomSample(array, count) {
   return result
 }
 
+/**
+ * test if two array(a1, a2) are equal, support instance of classes in this library
+ * @param {Array} a1
+ * @param {Array} a2
+ * @param {function(...):boolean}itemCompareFunc
+ * @return {boolean}
+ */
 export function arrayEqual(a1, a2, itemCompareFunc) {
   if (a1 === a2) {
     return true
@@ -130,6 +195,11 @@ export function arrayEqual(a1, a2, itemCompareFunc) {
   return false
 }
 
+/**
+ * @function
+ * reverse version of `forEach`
+ * @param {function} callbackFunc
+ */
 Array.prototype.rforEach = function (callbackFunc) {
   if (typeof callbackFunc === 'function') {
     const count = this.length
@@ -139,6 +209,12 @@ Array.prototype.rforEach = function (callbackFunc) {
   }
 }
 
+/**
+ * @function
+ * reverse version of `map`
+ * @param {function} callbackFunc
+ * @return {Array<any>}
+ */
 Array.prototype.rmap = function (callbackFunc) {
   const result = []
   if (typeof callbackFunc === 'function') {
@@ -150,6 +226,11 @@ Array.prototype.rmap = function (callbackFunc) {
   return result
 }
 
+/**
+ * @function
+ * return total exist count of `item` in array
+ * @param {any} item
+ */
 Array.prototype.count = function (item) {
   let count = 0
   for (let i = 0; i < this.length; ++i) {
@@ -160,6 +241,10 @@ Array.prototype.count = function (item) {
   return count
 }
 
+/**
+ * remove all existance of `target` from array
+ * @param {any} target
+ */
 Array.prototype.remove = function (target) {
   let idx = -1
   for (let i = 0; i < this.length; ++i) {
@@ -173,6 +258,11 @@ Array.prototype.remove = function (target) {
   }
 }
 
+/**
+ * return all regular expression match count of `substring` in string
+ * @param {string} substring
+ * @return {number}
+ */
 String.prototype.count = function (substring) {
   const exp = new RegExp(substring, 'g')
   const result = this.match(exp)
@@ -180,6 +270,11 @@ String.prototype.count = function (substring) {
   return 0
 }
 
+/**
+ * return `length` of v, act like python
+ * @param {any} v
+ * @return {number}
+ */
 export function len(v) {
   if (typeof v === 'undefined' || v === null) {
     return 0
@@ -209,6 +304,11 @@ export function len(v) {
   return 0
 }
 
+/**
+ * parse string contains 1/0 into bit array
+ * @param {string} str
+ * @return {Array<boolean>}
+ */
 export function stringToBitArray(str) {
   if (Array.isArray(str)) {
     return str
@@ -222,6 +322,12 @@ export function stringToBitArray(str) {
   return result
 }
 
+/**
+ * return dot product of two complex vector(a1, a2)
+ * @param {Array<Complex>}a1
+ * @param {Array<Complex>}a2
+ * @return {Array<Complex>}
+ */
 export function complexVectorDot(a1, a2) {
   let real = 0
   let image = 0
@@ -237,6 +343,12 @@ export function complexVectorDot(a1, a2) {
   return math.complex(real, image)
 }
 
+/**
+ * return n-length Array filled by item
+ * @param {Function|any} item
+ * @param {number} count
+ * @return {Array}
+ */
 export function narray(item, count) {
   const result = []
   if (typeof item === 'function') {
@@ -251,6 +363,12 @@ export function narray(item, count) {
   return result
 }
 
+/**
+ * product loop on two Arrays p1 & p2
+ * @param {Array} p1
+ * @param {Array} p2
+ * @param {function} func
+ */
 export function productLoop(p1, p2, func) {
   for (let i = 0; i < p1.length; ++i) {
     for (let j = 0; j < p2.length; ++j) {
@@ -262,6 +380,13 @@ export function productLoop(p1, p2, func) {
   }
 }
 
+/**
+ * product loop on three Arrays p1 & p2 & p3
+ * @param {Array} p1
+ * @param {Array} p2
+ * @param {Array} p3
+ * @param {function} func
+ */
 export function productLoop3(p1, p2, p3, func) {
   for (let i = 0; i < p1.length; ++i) {
     for (let j = 0; j < p2.length; ++j) {
@@ -275,6 +400,13 @@ export function productLoop3(p1, p2, p3, func) {
   }
 }
 
+/**
+ * return (base ^ exp) % mod, it's fast and support big number
+ * @param {number} base
+ * @param {number}  exp
+ * @param  {number} mod
+ * @return {number}
+ */
 export function expmod(base, exp, mod) {
   if (exp === 0) return 1
   if (exp % 2 === 0) {

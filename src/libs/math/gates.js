@@ -16,7 +16,8 @@
 import math from 'mathjs'
 import {BasicMathGate} from '../../ops/basics'
 
-/*
+/**
+ * @class AddConstant
 Add a constant to a quantum number represented by a quantum register,
     stored from low- to high-bit.
 
@@ -28,11 +29,10 @@ X | qunum[1] # qunum is now equal to 2
 AddConstant(3) | qunum # qunum is now equal to 5
  */
 export class AddConstant extends BasicMathGate {
-  /*
+  /**
   Initializes the gate to the number to add.
 
-    @param
-a (int): Number to add to a quantum register.
+    @param {number} a: Number to add to a quantum register.
 
     It also initializes its base class, BasicMathGate, with the
   corresponding function, so it can be emulated efficiently.
@@ -55,12 +55,11 @@ a (int): Number to add to a quantum register.
   }
 }
 
-/*
+/**
 Subtract a constant from a quantum number represented by a quantum
 register, stored from low- to high-bit.
 
-    @param
-a (int): Constant to subtract
+    @param {number} a: Constant to subtract
 
 @example
     @code
@@ -73,7 +72,8 @@ export function SubConstant(a) {
   return new AddConstant(-a)
 }
 
-/*
+/**
+ * @class AddConstantModN
 Add a constant to a quantum number represented by a quantum register
 modulo N.
 
@@ -87,12 +87,12 @@ X | qunum[1] # qunum is now equal to 2
 AddConstantModN(3, 4) | qunum # qunum is now equal to 1
  */
 export class AddConstantModN extends BasicMathGate {
-  /*
+  /**
+   * @constructor
   Initializes the gate to the number to add modulo N.
 
-    @param
-a (int): Number to add to a quantum register (0 <= a < N).
-N (int): Number modulo which the addition is carried out.
+    @param {number} a: Number to add to a quantum register (0 <= a < N).
+    @param {number} N: Number modulo which the addition is carried out.
 
     It also initializes its base class, BasicMathGate, with the
   corresponding function, so it can be emulated efficiently.
@@ -116,16 +116,14 @@ N (int): Number modulo which the addition is carried out.
   }
 }
 
-/*
+/**
 Subtract a constant from a quantum number represented by a quantum
 register modulo N.
 
     The number is stored from low- to high-bit, i.e., qunum[0] is the LSB.
 
-    @param
-a (int): Constant to add
-N (int): Constant modulo which the addition of a should be carried
-out.
+ @param {number} a: Constant to add
+ @param {number} N: Constant modulo which the addition of a should be carried out.
 
     @example
 @code
@@ -138,7 +136,8 @@ export function SubConstantModN(a, N) {
   return new AddConstantModN(N - a, N)
 }
 
-/*
+/**
+ * @class MultiplyByConstantModN
 Multiply a quantum number represented by a quantum register by a constant
 modulo N.
 
@@ -152,13 +151,12 @@ X | qunum[2] # qunum is now equal to 4
 MultiplyByConstantModN(3,5) | qunum # qunum is now 2.
  */
 export class MultiplyByConstantModN extends BasicMathGate {
-  /*
+  /**
+   * @constructor
   Initializes the gate to the number to multiply with modulo N.
 
-    @param
-a (int): Number by which to multiply a quantum register
-(0 <= a < N).
-N (int): Number modulo which the multiplication is carried out.
+   @param {number} a: Number by which to multiply a quantum register (0 <= a < N).
+   @param {number} N: Number modulo which the multiplication is carried out.
 
     It also initializes its base class, BasicMathGate, with the
   corresponding function, so it can be emulated efficiently.

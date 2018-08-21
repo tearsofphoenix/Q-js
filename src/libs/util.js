@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).
  *
@@ -16,6 +15,11 @@
  */
 import math from 'mathjs'
 
+/**
+ * generate a n-Length Array filled by `0`
+ * @param {number} n
+ * @return {Array<number>}
+ */
 export function zeros(n) {
   const array = new Array(n)
   for (let i = 0; i < n; ++i) {
@@ -24,6 +28,11 @@ export function zeros(n) {
   return array
 }
 
+/**
+ * check if an array is `tuple`
+ * @param {Array} value
+ * @return {boolean}
+ */
 export function arrayIsTuple(value) {
   let isTuple = false
   if (typeof value.$$__tuple !== 'undefined') {
@@ -36,24 +45,47 @@ export function arrayIsTuple(value) {
   return isTuple
 }
 
+/**
+ * force mark a value as `tuple`, internal usage only
+ * @param value
+ */
 export function markTuple(value) {
   value.$$__tuple = true
 }
 
+/**
+ * create `tuple` from arguments
+ * @param args
+ * @return {Array}
+ */
 export function makeTuple(...args) {
   const result = new Array(...args)
   markTuple(result)
   return result
 }
 
+/**
+ * alias of makeTuple
+ * @type {function(...[*]): Array}
+ */
 export const tuple = makeTuple
 
+/**
+ * create copy of object, with same `class`
+ * @param {Object} obj
+ * @return {Object}
+ */
 export function ObjectCopy(obj) {
   const copy = Object.create(obj.__proto__)
   Object.assign(copy, obj)
   return copy
 }
 
+/**
+ * return class hierachy of `cls`
+ * @param {Function} cls
+ * @return {Array<Function>}
+ */
 export function classHierachy(cls) {
   const result = []
   if (typeof cls === 'function') {
@@ -67,6 +99,12 @@ export function classHierachy(cls) {
   return result
 }
 
+/**
+ * check if `cls` is subclass of `superClass`, will return false if cls is superClass
+ * @param {function} cls
+ * @param {function} superClass
+ * @return {boolean}
+ */
 export function isSubclassOf(cls, superClass) {
   if (typeof cls === 'function' && typeof superClass === 'function') {
     const targetName = superClass.name
@@ -84,6 +122,12 @@ export function isSubclassOf(cls, superClass) {
   return false
 }
 
+/**
+ * check if `cls` is kind of `superClass`, will return true if cls is superClass
+ * @param {function} cls
+ * @param {function} superClass
+ * @return {boolean}
+ */
 export function isKindclassOf(cls, superClass) {
   if (typeof cls === 'function' && typeof superClass === 'function') {
     const targetName = superClass.name
@@ -99,6 +143,12 @@ export function isKindclassOf(cls, superClass) {
   return false
 }
 
+/**
+ * check if `inst` is instance of `cls`, specialized for some class
+ * @param {any} inst
+ * @param {function} cls
+ * @return {boolean}
+ */
 export function instanceOf(inst, cls) {
   if (Array.isArray(cls)) {
     return cls.some(looper => instanceOf(inst, looper))
@@ -116,6 +166,12 @@ export function instanceOf(inst, cls) {
   }
 }
 
+/**
+ * return item * n string like python does.
+ * @param {string} item
+ * @param {number} n
+ * @return {string}
+ */
 export function genString(item, n) {
   let str = ''
   for (let i = 0; i < n; ++i) {
@@ -124,6 +180,12 @@ export function genString(item, n) {
   return str
 }
 
+/**
+ * assign value in `vector` into `matrix` by index in `indices`
+ * @param {math.matrix} matrix
+ * @param {Array<number>} indices
+ * @param {Array<number>} vector
+ */
 export function matrixRangeAssign(matrix, indices, vector) {
   if (Array.isArray(vector)) {
     indices.forEach(idx => matrix.subset(math.index(idx), vector[idx]))
@@ -144,11 +206,23 @@ export function matrixRangeIndicesAssign(matrix, mstart, mend, vector, vstart) {
   }
 }
 
+/**
+ * return a row of matrix
+ * @param {math.matrix} matrix
+ * @param {number} index
+ * @return {Array<number>}
+ */
 export function matrixGetRow(matrix, index) {
   const rows = math.size(matrix).valueOf()[1];
   return math.flatten(math.subset(matrix, math.index(index, math.range(0, rows))));
 }
 
+/**
+ * dot product of matrix & vector
+ * @param {math.matrix} matrix
+ * @param {Array<number>} vector
+ * @return {math.matrix}
+ */
 export function matrixDot(matrix, vector) {
   const [rows] = matrix.size()
   const result = []
