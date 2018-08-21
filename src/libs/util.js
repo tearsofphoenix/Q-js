@@ -18,7 +18,7 @@ import math from 'mathjs'
 /**
  * generate a n-Length Array filled by `0`
  * @param {number} n
- * @return {Array<number>}
+ * @return {number[]}
  */
 export function zeros(n) {
   const array = new Array(n)
@@ -182,8 +182,8 @@ export function genString(item, n) {
 /**
  * assign value in `vector` into `matrix` by index in `indices`
  * @param {math.matrix} matrix
- * @param {Array<number>} indices
- * @param {Array<number>} vector
+ * @param {number[]} indices
+ * @param {number[]} vector
  */
 export function matrixRangeAssign(matrix, indices, vector) {
   if (Array.isArray(vector)) {
@@ -209,7 +209,7 @@ export function matrixRangeIndicesAssign(matrix, mstart, mend, vector, vstart) {
  * return a row of matrix
  * @param {math.matrix} matrix
  * @param {number} index
- * @return {Array<number>}
+ * @return {number[]}
  */
 export function matrixGetRow(matrix, index) {
   const rows = math.size(matrix).valueOf()[1];
@@ -219,7 +219,7 @@ export function matrixGetRow(matrix, index) {
 /**
  * dot product of matrix & vector
  * @param {math.matrix} matrix
- * @param {Array<number>} vector
+ * @param {number[]} vector
  * @return {math.matrix}
  */
 export function matrixDot(matrix, vector) {

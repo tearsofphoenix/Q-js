@@ -194,7 +194,7 @@ down the pipeline.
   Receives a command list and, for each command, stores it until
 completion.
 
-  @param {Array<Command>} commandList: list of commands to receive.
+  @param {Command[]} commandList: list of commands to receive.
 
   @throws {Error}: If mapping the CNOT gates to 1 qubit would require
 Swaps. The current version only supports remapping of CNOT

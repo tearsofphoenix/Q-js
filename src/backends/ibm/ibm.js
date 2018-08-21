@@ -357,7 +357,7 @@ data / ask for username & password.
   Receives a command list and, for each command, stores it until
 completion.
 
-    @param {Array<Command>} commandList: List of commands to execute
+    @param {Command[]} commandList: List of commands to execute
    */
   receive(commandList) {
     commandList.forEach((cmd) => {

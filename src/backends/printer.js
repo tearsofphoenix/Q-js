@@ -37,12 +37,11 @@ export default class CommandPrinter extends BasicEngine {
    * @constructor
    *Initialize a CommandPrinter.
 
-  @param boolean acceptInput: If accept_input is true, the printer queries
+  @param {boolean} acceptInput: If accept_input is true, the printer queries
   the user to input measurement results if the CommandPrinter is
   the last engine. Otherwise, all measurements yield
-  @param boolean defaultMeasure. Default measurement result (if accept_input is false).
-  @param boolean inPlace: If in_place is true, all output is written on the same line of the terminal.
-
+  @param {boolean} defaultMeasure. Default measurement result (if accept_input is false).
+  @param {boolean} inPlace: If in_place is true, all output is written on the same line of the terminal.
   */
   constructor(acceptInput = true, defaultMeasure = false, inPlace = false) {
     super()
@@ -52,11 +51,11 @@ export default class CommandPrinter extends BasicEngine {
   }
 
   /**
-    Specialized implementation of is_available: Returns true if the
+    Specialized implementation of isAvailable: Returns true if the
     CommandPrinter is the last engine (since it can print any command).
 
     @param {Command} cmd: Command of which to check availability (all Commands can be printed).
-    @return boolean true, unless the next engine cannot handle the Command (if there is a next engine).
+    @return {boolean} true, unless the next engine cannot handle the Command (if there is a next engine).
    */
   isAvailable(cmd) {
     try {
@@ -109,7 +108,7 @@ export default class CommandPrinter extends BasicEngine {
   Receive a list of commands from the previous engine, print the
 commands, and then send them on to the next engine.
 
-    @param {Array<Command>} commandList: List of Commands to print (and potentially send on to the next engine).
+    @param {Command[]} commandList: List of Commands to print (and potentially send on to the next engine).
    */
   receive(commandList) {
     commandList.forEach((cmd) => {

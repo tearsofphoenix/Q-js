@@ -91,7 +91,7 @@ extension.
   }
 
   /**
-  Specialized implementation of is_available: The simulator can deal
+  Specialized implementation of isAvailable: The simulator can deal
 with all arbitrarily-controlled gates which provide a
 gate-matrix (via gate.matrix) and acts on 5 or less qubits (not
 counting the control qubits).
@@ -347,7 +347,7 @@ deallocation, and (controlled) single-qubit gate.
 
     @param {Command} cmd: Command to handle.
 
-    @throws Error If a non-single-qubit gate needs to be processed (which should never happen due to is_available).
+    @throws Error If a non-single-qubit gate needs to be processed (which should never happen due to isAvailable).
    */
   handle(cmd) {
     if (cmd.gate instanceof TimeEvolution) {
@@ -426,7 +426,7 @@ deallocation, and (controlled) single-qubit gate.
 (simulate them classically) prior to sending them on to the next
 engine.
 
-    @param {Array<Command>} commandList: List of commands to execute on the simulator.
+    @param {Command[]} commandList: List of commands to execute on the simulator.
    */
   receive(commandList) {
     commandList.forEach((cmd) => {

@@ -68,7 +68,7 @@ export class DaggerEngine extends BasicEngine {
 
   /**
     Receive a list of commands and store them for later inversion.
-    @param {Array<Command>} cmdList: List of commands to temporarily store.
+    @param {Command[]} cmdList: List of commands to temporarily store.
   */
   receive(cmdList) {
     cmdList.forEach((cmd) => {

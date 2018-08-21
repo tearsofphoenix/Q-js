@@ -51,7 +51,7 @@ compiler_engine = new CommandModifier(cmd_mod_fun)
   Receive a list of commands from the previous engine, modify all
    commands, and send them on to the next engine.
 
-    @param {Array<Command>} cmdList: List of commands to receive and then (after modification) send on.
+    @param {Command[]} cmdList: List of commands to receive and then (after modification) send on.
    */
   receive(cmdList) {
     const newList = cmdList.map(cmd => this._cmdModFunc(cmd))

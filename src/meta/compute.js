@@ -213,7 +213,7 @@ section which has not been allocated in Compute section
     Add ComputeTag to received cmd and send it on.
     Otherwise: send all received commands directly to next_engine.
 
-    @param {Array<Command>} commandList: List of commands to receive.
+    @param {Command[]} commandList: List of commands to receive.
    */
   receive(commandList) {
     if (this._compute) {
@@ -248,7 +248,7 @@ export class UncomputeEngine extends BasicEngine {
   /**
   Receive commands and add an UncomputeTag to their tags.
 
-    @param {Array<Command>} commandList: List of commands to handle.
+    @param {Command[]} commandList: List of commands to handle.
    */
   receive(commandList) {
     commandList.forEach((cmd) => {

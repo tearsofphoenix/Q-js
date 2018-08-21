@@ -76,7 +76,7 @@ we can choose a = 0.
 
 @param {Array<Array<number>>} matrix: 2x2 unitary matrix
 
-@returns {Array<number>} parameters of the matrix: (a, b/2, c/2, d/2)
+@returns {number[]} parameters of the matrix: (a, b/2, c/2, d/2)
  */
 export const _find_parameters = (matrix) => {
   // Determine a, b/2, c/2 and d/2 (3 different cases).

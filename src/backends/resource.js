@@ -64,7 +64,7 @@ export default class ResourceCounter extends BasicEngine {
   }
 
   /**
-    Specialized implementation of is_available: Returns true if the
+    Specialized implementation of isAvailable: Returns true if the
     ResourceCounter is the last engine (since it can count any command).
 
     @param {Command} cmd: Command for which to check availability (all Commands can be counted).
@@ -169,7 +169,7 @@ export default class ResourceCounter extends BasicEngine {
 
   /**
    *
-   * @param {Array<Command>} commandList
+   * @param {Command[]} commandList
    */
   receive(commandList) {
     commandList.forEach((cmd) => {

@@ -103,7 +103,8 @@ export default class LocalOptimizer extends BasicEngine {
 
     @param {number} idx: qubit index
     @param {number} i: command position in qubit idx's command list
-    @param {Array<number>} IDs: IDs of all qubits involved in the command
+    @param {number[]} IDs: IDs of all qubits involved in the command
+    @return {number[]}
   */
   getGateIndices(idx, i, IDs) {
     if (typeof idx !== 'number') {

@@ -205,7 +205,7 @@ eng.getMeasurementResult(qubit[0]) == qubit.toNumber()
 
   /**
   Forward the list of commands to the first engine.
-    @param {Array<Command>} commandList: List of commands to receive (and then send on)
+    @param {Command[]} commandList: List of commands to receive (and then send on)
    */
   receive(commandList) {
     this.send(commandList)

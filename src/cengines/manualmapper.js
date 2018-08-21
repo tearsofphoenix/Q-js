@@ -45,7 +45,7 @@ an integer describing the physical location (must be constant).
     Receives a command list and passes it to the next engine, adding
     qubit placement tags to allocate gates.
 
-    @param {Array<Command>} command_list: list of commands to receive.
+    @param {Command[]} command_list: list of commands to receive.
   */
   receive(command_list) {
     command_list.forEach((cmd) => {

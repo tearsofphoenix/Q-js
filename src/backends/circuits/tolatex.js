@@ -152,7 +152,7 @@ Writes the Latex header using the settings file.
 
     The header includes all packages and defines all tikz styles.
 
-    @returns string: Header of the Latex document.
+    @returns {string}: Header of the Latex document.
  */
   _header(settings) {
     const packages = ('\\documentclass{standalone}\n\\usepackage[margin=1in]'
@@ -204,9 +204,9 @@ Writes the Latex header using the settings file.
 Return the body of the Latex document, including the entire circuit in
 TikZ format.
 
-    @param {Array<Array<CircuitItem>>} circuit: Circuit to draw.
+    @param {Array.<CircuitItem[]>} circuit: Circuit to draw.
     @param {Object} settings
-    @returns string: Latex string to draw the entire circuit.
+    @returns {string}: Latex string to draw the entire circuit.
  */
   _body(circuit, settings) {
     const code = []
@@ -220,7 +220,7 @@ TikZ format.
   /**
   Return the footer of the Latex document.
 
-      @returns string: Latex document footer.
+      @returns {string}: Latex document footer.
    */
   _footer() {
     return '\n\n\\end{tikzpicture}\n\\end{document}'
@@ -247,10 +247,10 @@ offset and offset.
 The default settings can be acquired using the get_default_settings()
 function, and written using write_settings().
 
-    @param {Array<Array<CircuitItem>>} circuit: Each qubit line is a list of
+    @param {Array.<CircuitItem[]>} circuit: Each qubit line is a list of
 CircuitItem objects, i.e., in circuit[line].
 
-    @returns string: Latex document string which can be compiled using, e.g., pdflatex.
+    @returns {string}: Latex document string which can be compiled using, e.g., pdflatex.
  */
 function toLatex(circuit) {
   let content
@@ -311,10 +311,10 @@ circuit.
   lines have to be drawn earlier.
 
    @param {number} line: Line to generate the TikZ code for.
-   @param {Array<Array<CircuitItem>>} circuit: The circuit to draw.
+   @param {Array.<CircuitItem[]>} circuit: The circuit to draw.
    @param {number} end: Gate index to stop at (for recursion).
 
-  @returns string: TikZ code representing the current qubit line
+  @returns {string}: TikZ code representing the current qubit line
   and, if it was necessary to draw other lines, those lines as
   well.
    */
@@ -441,7 +441,7 @@ circuit.
     Tries to use gate.tex_str and, if that is not available, uses str(gate) instead.
 
     @param {BasicGate} gate: Gate object of which to get the name / latex representation.
-    @returns string: Latex gate name.
+    @returns {string}: Latex gate name.
   */
   _gate_name(gate) {
     let name
@@ -455,9 +455,9 @@ circuit.
   /**
   Return the TikZ code for a Square-root Swap-gate.
 
-    @param {Array<number>} lines: List of length 2 denoting the target qubit of the Swap gate.
-    @param {Array<number>} ctrl_lines: List of qubit lines which act as controls.
-    @param boolean daggered: Show the daggered one if true.
+    @param {number[]} lines: List of length 2 denoting the target qubit of the Swap gate.
+    @param {number[]} ctrl_lines: List of qubit lines which act as controls.
+    @param {boolean} daggered: Show the daggered one if true.
    */
   _sqrtswap_gate(lines, ctrl_lines, daggered) {
     assert(len(lines) === 2) // sqrt swap gate acts on 2 qubits
@@ -518,8 +518,8 @@ circuit.
   /**
   Return the TikZ code for a Swap-gate.
 
-    @param {Array<number>} lines: List of length 2 denoting the target qubit of the Swap gate.
-    @param {Array<number>} ctrl_lines: List of qubit lines which act as controls.
+    @param {number[]} lines: List of length 2 denoting the target qubit of the Swap gate.
+    @param {number[]} ctrl_lines: List of qubit lines which act as controls.
   */
   _swap_gate(lines, ctrl_lines) {
     assert(len(lines) === 2) // swap gate acts on 2 qubits
@@ -570,8 +570,8 @@ circuit.
   /**
   Return the TikZ code for a NOT-gate.
 
-    @param {Array<number>} lines: List of length 1 denoting the target qubit of the NOT / X gate.
-    @param {Array<number>} ctrl_lines: List of qubit lines which act as controls.
+    @param {number[]} lines: List of length 1 denoting the target qubit of the NOT / X gate.
+    @param {number[]} ctrl_lines: List of qubit lines which act as controls.
    */
   _x_gate(lines, ctrl_lines = []) {
     assert(len(lines) === 1) // NOT gate only acts on 1 qubit
@@ -602,7 +602,7 @@ circuit.
   /**
   Return the TikZ code for an n-controlled Z-gate.
 
-    @param {Array<number>} lines: List of all qubits involved.
+    @param {number[]} lines: List of all qubits involved.
    */
   _cz_gate(lines) {
     assert(len(lines) > 1)
@@ -766,10 +766,10 @@ are connected on the given line.
   Draw a regular gate.
 
     @param {BasicGate} gate: Gate to draw.
-    @param {Array<number>} lines: Lines the gate acts on.
-   @param {Array<number>} ctrl_lines: Control lines.
+    @param {number[]} lines: Lines the gate acts on.
+   @param {number[]} ctrl_lines: Control lines.
 
-    @returns string: Latex string drawing a regular gate at the given location
+    @returns {string}: Latex string drawing a regular gate at the given location
    */
   _regular_gate(gate, lines, ctrl_lines) {
     const [imin, imax] = minmax(lines)

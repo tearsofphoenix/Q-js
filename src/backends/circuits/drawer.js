@@ -34,8 +34,8 @@ export class CircuitItem {
   Initialize a circuit item.
 
     @param {BasicGate} gate
-    @param {Array<number>} lines: Circuit lines the gate acts on.
-    @param {Array<number>} ctrl_lines: Circuit lines which control the gate.
+    @param {number[]} lines: Circuit lines the gate acts on.
+    @param {number[]} ctrl_lines: Circuit lines which control the gate.
   */
   constructor(gate, lines, ctrl_lines) {
     this.gate = gate
@@ -160,7 +160,7 @@ export class CircuitDrawer extends BasicEngine {
     can be altered by the user. It contains gate widths, heights, offsets,
       etc.
 
-    @param boolean accept_input: If accept_input is true, the printer queries
+    @param {boolean} accept_input: If accept_input is true, the printer queries
     the user to input measurement results if the CircuitDrawer is
     the last engine. Otherwise, all measurements yield the result
     default_measure (0 or 1).
@@ -178,7 +178,7 @@ export class CircuitDrawer extends BasicEngine {
   }
 
   /**
-  Specialized implementation of is_available: Returns true if the
+  Specialized implementation of isAvailable: Returns true if the
     CircuitDrawer is the last engine (since it can print any command).
 
     @param {Command} cmd: Command for which to check availability (all Commands can be printed).
@@ -284,7 +284,7 @@ export class CircuitDrawer extends BasicEngine {
     node my_circuit.js | pdflatex
 
     where my_circuit.js calls this function and prints it to the terminal.
-   @return string
+   @return {string}
    */
   getLatex() {
     const qubit_lines = {}
@@ -316,7 +316,7 @@ export class CircuitDrawer extends BasicEngine {
   Receive a list of commands from the previous engine, print the
     commands, and then send them on to the next engine.
 
-    @param {Array<Command>} commandList: List of Commands to print (and potentially send on to the next engine).
+    @param {Command[]} commandList: List of Commands to print (and potentially send on to the next engine).
   */
   receive(commandList) {
     commandList.forEach((cmd) => {

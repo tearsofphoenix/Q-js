@@ -48,7 +48,7 @@ export class BasicEngine {
   }
 
   /**
-    Default implementation of is_available:
+    Default implementation of isAvailable:
     Ask the next engine whether a command is available, i.e.,
     whether it can be executed by the next engine(s).
 
@@ -56,7 +56,7 @@ export class BasicEngine {
 
     @returns {boolean} true if the command can be executed.
 
-    @throws {LastEngineError}: If is_last_engine is true but is_available is not implemented.
+    @throws {LastEngineError}: If is_last_engine is true but isAvailable is not implemented.
      */
   isAvailable(cmd) {
     if (!this.isLastEngine) {
@@ -161,7 +161,7 @@ returns true.
 
   /**
     Forward the list of commands to the next engine in the pipeline.
-   @param {Array<Command>} commandList
+   @param {Command[]} commandList
   */
   send(commandList) {
     this.next.receive(commandList)

@@ -117,7 +117,7 @@ export function setFromRange(n) {
  * @param {number} start
  * @param {number} end
  * @param {number} step
- * @return {Array<number>}
+ * @return {number[]}
  */
 export function arrayFromRange(start, end, step) {
   if (typeof end === 'undefined') {

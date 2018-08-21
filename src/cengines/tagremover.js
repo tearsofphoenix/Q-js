@@ -51,7 +51,7 @@ export default class TagRemover extends BasicEngine {
 which are an instance of at least one of the meta tags provided in the
 constructor, and then send them on to the next compiler engine.
 
-    @param {Array<Command>} commandList: List of commands to receive and then (after removing tags) send on.
+    @param {Command[]} commandList: List of commands to receive and then (after removing tags) send on.
   */
   receive(commandList) {
     commandList.forEach((cmd) => {

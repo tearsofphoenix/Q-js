@@ -41,6 +41,7 @@ const ANGLE_PRECISION = 12
 const ANGLE_TOLERANCE = 10 ** -ANGLE_PRECISION
 
 /**
+ * @abstract
  * @class BasicGate
  * @classdesc Base class of all gates.
  */

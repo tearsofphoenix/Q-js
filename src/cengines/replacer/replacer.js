@@ -24,7 +24,7 @@ import {NoGateDecompositionError} from '../../meta/error';
 /**
  * @class InstructionFilter
 The InstructionFilter is a compiler engine which changes the behavior of
-is_available according to a filter function. All commands are passed to
+isAvailable according to a filter function. All commands are passed to
 this function, which then returns whether this command can be executed
 (true) or needs replacement (false).
  */
@@ -45,7 +45,7 @@ which do not need replacement and false for commands that do.
   }
 
   /**
-  Specialized implementation of BasicBackend.is_available: Forwards this
+  Specialized implementation of BasicBackend.isAvailable: Forwards this
 call to the filter function given to the constructor.
 
     @param {Command} cmd: Command for which to check availability.
@@ -57,7 +57,7 @@ call to the filter function given to the constructor.
   /**
   Forward all commands to the next engine.
 
-    @param {Array<Command>} commandList: List of commands to receive.
+    @param {Command[]} commandList: List of commands to receive.
    */
   receive(commandList) {
     this.next.receive(commandList)
@@ -66,7 +66,7 @@ call to the filter function given to the constructor.
 
 /**
  * @class AutoReplacer
-The AutoReplacer is a compiler engine which uses engine.is_available in
+The AutoReplacer is a compiler engine which uses engine.isAvailable in
 order to determine which commands need to be replaced/decomposed/compiled
 further. The loaded setup is used to find decomposition rules appropriate
 for each command (e.g., setups.default).

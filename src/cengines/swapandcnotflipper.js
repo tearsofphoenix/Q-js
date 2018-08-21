@@ -117,7 +117,7 @@ export default class SwapAndCNOTFlipper extends BasicEngine {
      Receives a command list and if the command is a CNOT gate, it flips
     it using Hadamard gates if necessary; if it is a Swap gate, it
     decomposes it using 3 CNOTs. All other gates are simply sent to the next engine.
-    @param {Array<Command>} commandList: list of commands to receive.
+    @param {Command[]} commandList: list of commands to receive.
    */
   receive(commandList) {
     commandList.forEach((cmd) => {

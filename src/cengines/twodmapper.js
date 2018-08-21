@@ -526,7 +526,7 @@ which don't store any information.
   /**
   Receives a command list and, for each command, stores it until
   we do a mapping (FlushGate || Cache of stored commands is full).
-   @param {Array<Command>} command_list  list of commands to receive.
+   @param {Command[]} command_list  list of commands to receive.
   */
   receive(command_list) {
     command_list.forEach((cmd) => {
