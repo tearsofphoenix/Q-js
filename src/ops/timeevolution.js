@@ -22,7 +22,8 @@ import {setEqual, isComplex, isNumeric} from '../libs/polyfill'
 import {Ph} from './gates'
 import {NotMergeable} from "../meta/error";
 
-/*
+/**
+ * @class TimeEvolution
 Gate for time evolution under a Hamiltonian (QubitOperator object).
 
 This gate is the unitary time evolution propagator:
@@ -43,23 +44,18 @@ Attributes:
 hamiltonian(QubitOperator): hamiltonaian H
  */
 export default class TimeEvolution extends BasicGate {
-  /*
-  Initialize time evolution gate.
-
+  /**
+   * @constructor
     Note:
 The hamiltonian must be hermitian and therefore only terms with
     real coefficients are allowed.
     Coefficients are internally converted to float.
 
-    @param
-time (float, or int): time to evolve under (can be negative).
-hamiltonian (QubitOperator): hamiltonian to evolve under.
+    @param {number} time: time to evolve under (can be negative).
+    @param {QubitOperator} hamiltonian: hamiltonian to evolve under.
 
-    @throws
-TypeError: If time is not a numeric type and hamiltonian is not a
-QubitOperator.
-    NotHermitianOperatorError: If the input hamiltonian is not
-hermitian (only real coefficients).
+    @throws {Error}: If time is not a numeric type and hamiltonian is not a QubitOperator.
+    @throws }NotHermitianOperatorError}: If the input hamiltonian is not hermitian (only real coefficients).
    */
   constructor(time, hamiltonian) {
     super()
@@ -99,7 +95,7 @@ hermitian (only real coefficients).
     return new TimeEvolution(-this.time, this.hamiltonian)
   }
 
-  /*
+  /**
   Return self merged with another TimeEvolution gate if possible.
 
     Two TimeEvolution gates are merged if:
@@ -119,15 +115,12 @@ We are not comparing if terms are proportional to each other with
 to zero because we cannot choose a suitable absolute error which
 works for everyone. Use, e.g., a decomposition rule for that.
 
-                                                            @param
-other: TimeEvolution gate
+   @param {TimeEvolution} other: TimeEvolution gate
 
-@throws
-    NotMergeable: If the other gate is not a TimeEvolution gate or
-hamiltonians are not suitable for merging.
+   @throws {NotMergeable}: If the other gate is not a TimeEvolution gate or
+    hamiltonians are not suitable for merging.
 
-                                      @returns
-New TimeEvolution gate equivalent to the two merged gates.
+   @returns {TimeEvolution} New TimeEvolution gate equivalent to the two merged gates.
    */
   getMerged(other) {
     const rel_tol = 1e-9
@@ -158,7 +151,7 @@ New TimeEvolution gate equivalent to the two merged gates.
     }
   }
 
-  /*
+  /**
   Operator| overload which enables the following syntax:
 
     @code
@@ -192,10 +185,9 @@ TimeEvolution(2.0, h) | [wavefunction[1], wavefunction[3]]
 
 which is only a two qubit gate.
 
-    @param
-qubits: one Qubit object, one list of Qubit objects, one Qureg
-object, or a tuple of the former three cases.
-   */
+    @param {Array<Qubit>|Qureg|Qubit} qubits: one Qubit object, one list of Qubit objects, one Qureg
+      object, or a tuple of the former three cases.
+  */
   or(qubits) {
     // Check that input is only one qureg or one qubit
     qubits = BasicGate.makeTupleOfQureg(qubits)

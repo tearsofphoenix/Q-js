@@ -117,8 +117,6 @@ are sorted according to the qubit number they act on,
 export default class QubitOperator {
   /**
    * @constructor
-    Inits a QubitOperator.
-
     The init function only allows to initialize one term. Additional terms
 have to be added using += (which is fast) or using + of two
 QubitOperator objects:
@@ -138,10 +136,9 @@ by in-place addition). Specifying the coefficient in the __init__
 is faster than by multiplying a QubitOperator with a scalar as
 calls an out-of-place multiplication.
 
-    @param
-coefficient (complex float, optional): The coefficient of the
+    @param {number|Complex} coefficient: The coefficient of the
 first term of this QubitOperator. Default is 1.0.
-term (optional, empy tuple, a tuple of tuples, or a string):
+    @param {Array<Array>|string} term (optional, empy array, a array of arrays, or a string):
 1) Default is None which means there are no terms in the
 QubitOperator hence it is the "zero" Operator
 2) An empty tuple means there are no non-trivial Pauli
@@ -156,8 +153,7 @@ of each tuple is a string, either 'X', 'Y' or 'Z',
 qubit 0, Z on qubit 2, and Y on qubit 5. The string should
 be sorted by the qubit number. '' is the identity.
 
-    @throws
-QubitOperatorError: Invalid operators provided to QubitOperator.
+    @throws {QubitOperatorError}: Invalid operators provided to QubitOperator.
      */
   constructor(term, coefficient = 1.0) {
     // assert coefficient as numeric
@@ -195,12 +191,11 @@ QubitOperatorError: Invalid operators provided to QubitOperator.
     }
   }
 
-  /*
+  /**
     Eliminates all terms with coefficients close to zero and removes
 imaginary parts of coefficients that are close to zero.
 
-    @param
-abs_tol(float): Absolute tolerance, must be at least 0.0
+    @param {number} absTolerance: Absolute tolerance, must be at least 0.0
      */
   compress(absTolerance = 1e-12) {
     const new_terms = {}
@@ -225,11 +220,10 @@ less than the relative tolerance w.r.t. either other or self
 (symmetric test) or if the difference is less than the absolute
 tolerance.
 
-    @param
-other(QubitOperator): QubitOperator to compare against.
-rel_tol(float): Relative tolerance, must be greater than 0.0
-abs_tol(float): Absolute tolerance, must be at least 0.0
-     */
+    @param {QubitOperator} other: QubitOperator to compare against.
+    @param {number} realTolerance: Relative tolerance, must be greater than 0.0
+    @param {number} absTolerance: Absolute tolerance, must be at least 0.0
+  */
   isClose(other, realTolerance = EQ_TOLERANCE, absTolerance = EQ_TOLERANCE) {
     // terms which are in both:
     const otherKeys = new Set(Object.keys(other.terms))
@@ -259,12 +253,10 @@ abs_tol(float): Absolute tolerance, must be at least 0.0
     return true
   }
 
-  /*
+  /**
     In-place multiply (*=) terms with scalar or QubitOperator.
-
-    @param
-multiplier(complex float, or QubitOperator): multiplier
-     */
+    @param {Complex|number|QubitOperator} multiplier
+  */
   imul(multiplier) {
     // Handle QubitOperator.
     if (multiplier instanceof QubitOperator) {
@@ -340,17 +332,14 @@ multiplier(complex float, or QubitOperator): multiplier
     }
   }
 
-  /*
+  /**
   Return self * multiplier for a scalar, or a QubitOperator.
 
-    @param
-multiplier: A scalar, or a QubitOperator.
+    @param {Complex|number|QubitOperator} multiplier: A scalar, or a QubitOperator.
 
-    @returns
-product: A QubitOperator.
+    @returns {QubitOperator}
 
-    @throws
-TypeError: Invalid type cannot be multiply with QubitOperator.
+    @throws {Error}: Invalid type cannot be multiply with QubitOperator.
    */
   mul(multiplier) {
     if (isNumeric(multiplier) || multiplier instanceof QubitOperator) {
@@ -360,6 +349,11 @@ TypeError: Invalid type cannot be multiply with QubitOperator.
     throw new Error('Object of invalid type cannot multiply with QubitOperator.')
   }
 
+  /**
+   * in-Place add
+   * @param {Complex|number|QubitOperator} addend
+   * @return {QubitOperator}
+   */
   iadd(addend) {
     if (addend instanceof QubitOperator) {
       Object.keys(addend.terms).forEach((key) => {
@@ -382,6 +376,11 @@ TypeError: Invalid type cannot be multiply with QubitOperator.
     return this
   }
 
+  /**
+   *
+   * @param {Complex|number|QubitOperator} addend
+   * @return {QubitOperator}
+   */
   add(addend) {
     const inst = this.copy()
     inst.iadd(addend)
@@ -396,6 +395,11 @@ TypeError: Invalid type cannot be multiply with QubitOperator.
     }
   }
 
+  /**
+   * in-Place dived by divisor
+   * @param {Complex|number|QubitOperator} divisor
+   * @return {*}
+   */
   idiv(divisor) {
     if (isNumeric(divisor)) {
       return this.imul(math.divide(1.0, divisor))
@@ -404,6 +408,11 @@ TypeError: Invalid type cannot be multiply with QubitOperator.
     }
   }
 
+  /**
+   * in-Place subtract
+   * @param {Complex|number|QubitOperator} subtrahend
+   * @return {QubitOperator}
+   */
   isub(subtrahend) {
     if (subtrahend instanceof QubitOperator) {
       Object.keys(subtrahend.terms).forEach((key) => {
@@ -430,10 +439,18 @@ TypeError: Invalid type cannot be multiply with QubitOperator.
     return ret.isub(subtrahend)
   }
 
+  /**
+   * return negative of current qubit operator
+   * @return {QubitOperator}
+   */
   negative() {
     return this.mul(-1.0)
   }
 
+  /**
+   * return copy of current qubit operator
+   * @return {QubitOperator}
+   */
   copy() {
     const terms = {}
     Object.assign(terms, this.terms)
@@ -442,6 +459,10 @@ TypeError: Invalid type cannot be multiply with QubitOperator.
     return inst
   }
 
+  /**
+   * string description of current qubit operator
+   * @return {string}
+   */
   toString() {
     const keys = Object.keys(this.terms)
     if (keys.length === 0) {

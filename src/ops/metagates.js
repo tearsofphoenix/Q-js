@@ -35,7 +35,8 @@ import {Control} from '../meta/control'
 import Cycle, {getInverse} from './_cycle'
 import { arrayIsTuple } from '../libs/util'
 
-/*
+/**
+ * @class DaggeredGate
 Wrapper class allowing to execute the inverse of a gate, even when it does
 not define one.
 
@@ -58,11 +59,11 @@ replacer engine can automatically replace the inverted gate by a call to
 the decomposition function inside a "with Dagger"-statement.
  */
 export class DaggeredGate extends BasicGate {
-  /*
+  /**
+   * @constructor
     Initialize a DaggeredGate representing the inverse of the gate 'gate'.
 
-    @param
-gate: Any gate object of which to represent the inverse.
+    @param {BasicGate} gate: Any gate object of which to represent the inverse.
      */
   constructor(gate) {
     super()
@@ -86,10 +87,9 @@ gate: Any gate object of which to represent the inverse.
   }
 
 
-  /*
-  Return true if self is equal to other, i.e., same type and
-  representing the inverse of the same gate.
-   */
+  /**
+    Return true if self is equal to other, i.e., same type and representing the inverse of the same gate.
+  */
   equal(other) {
     return other instanceof DaggeredGate && other.gate.equal(this.gate)
   }
@@ -109,8 +109,8 @@ gate: Any gate object of which to represent the inverse.
 
 Cycle.add('DaggeredGate', DaggeredGate)
 
-/*
-
+/**
+ * @class ControlledGate
 Controlled version of a gate.
 
     Note:
@@ -136,13 +136,11 @@ Note:
 C(X, 2) == Toffoli
  */
 export class ControlledGate extends BasicGate {
-  /*
-    Initialize a ControlledGate object.
-
-    @param
-gate: Gate to wrap.
-n (int): Number of control qubits.
-     */
+  /**
+   * @constructor
+    @param {BasicGate} gate: Gate to wrap.
+    @param {number} n: Number of control qubits.
+  */
   constructor(gate, n = 1) {
     super()
     if (gate instanceof ControlledGate) {
@@ -158,7 +156,7 @@ n (int): Number of control qubits.
     return new ControlledGate(getInverse(this.gate), this.n)
   }
 
-  /*
+  /**
     Apply the controlled gate to qubits, using the first n qubits as
 controls.
 
@@ -166,9 +164,7 @@ controls.
     However, the n-th control qubit needs to be the last qubit in a
 qureg. The following quregs belong to the gate.
 
-    @param
-qubits (tuple of lists of Qubit objects): qubits to which to apply
-the gate.
+    @param {Array<Qureg>} qubits: qubits to which to apply the gate.
      */
   or(qubits) {
     qubits = BasicGate.makeTupleOfQureg(qubits)
@@ -184,8 +180,8 @@ the gate.
       }
     })
 
-    // # Test that there were enough control quregs and that that
-    // # the last control qubit was the last qubit in a qureg.
+    // Test that there were enough control quregs and that that
+    // the last control qubit was the last qubit in a qureg.
     if (ctrl.length !== this.n) {
       throw new Error('Wrong number of control qubits. '
             + 'First qureg(s) need to contain exactly '
@@ -211,12 +207,11 @@ the gate.
   }
 }
 
-/*
+/**
 Return n-controlled version of the provided gate.
 
-    @param
-gate: Gate to turn into its controlled version
-n: Number of controls (default: 1)
+    @param {BasicGate} gate: Gate to turn into its controlled version
+    @param {number} n: Number of controls (default: 1)
 
 @example
     @code
@@ -227,7 +222,8 @@ export function C(gate, n = 1) {
   return new ControlledGate(gate, n)
 }
 
-/*
+/**
+ * @class Tensor
 Wrapper class allowing to apply a (single-qubit) gate to every qubit in a
 quantum register. Allowed syntax is to supply either a qureg or a tuple
 which contains only one qureg.
@@ -239,6 +235,10 @@ Tensor(H) | x # applies H to every qubit in the list of qubits x
 Tensor(H) | (x,) # alternative to be consistent with other syntax
  */
 export class Tensor extends BasicGate {
+  /**
+   * @constructor
+   * @param {BasicGate} gate
+   */
   constructor(gate) {
     super()
     this.gate = gate

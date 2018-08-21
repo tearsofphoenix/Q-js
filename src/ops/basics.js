@@ -46,8 +46,7 @@ const ANGLE_TOLERANCE = 10 ** -ANGLE_PRECISION
  */
 export class BasicGate {
   /**
-Initialize a basic gate.
-
+   * @constructor
     Note:
 Set interchangeable qubit indices!
     (gate.interchangeable_qubit_indices)
@@ -185,7 +184,7 @@ correct input parameter of a Command object which is:
   }
 
   /**
-   * @param other {BasicGate | Object}
+   * @param {BasicGate | Object} other
    * @return {boolean}
    */
   equal(other) {
@@ -260,7 +259,7 @@ object).
     Default implementation handles rotation gate of the same type, where
 angles are simply added.
 
-    @param other {(BasicRotationGate|Object)}
+    @param {BasicRotationGate|Object} other
     @throws NotMergeable:  For non-rotation gates or rotation gates of different type.
     @return {BasicRotationGate} New object representing the merged gates.
    */
@@ -283,7 +282,7 @@ angles are simply added.
 .. code-block:: latex
 
   [CLASSNAME]$_[ANGLE]$
-   @return string
+   @return {string}
    */
   texString() {
     return `${this.constructor.name}$_{${this.angle}}$`
@@ -311,8 +310,7 @@ export class BasicPhaseGate extends BasicGate {
   /**
     Initialize a basic rotation gate.
 
-    @param
-angle (float): Angle of rotation (saved modulo 2 * pi)
+    @param {number} angle: Angle of rotation (saved modulo 2 * pi)
      */
   constructor(angle, ...args) {
     super(...args)
@@ -324,9 +322,9 @@ angle (float): Angle of rotation (saved modulo 2 * pi)
   }
 
   /**
-    Return the inverse of this rotation gate (negate the angle, return new
-object).
-     */
+    Return the inverse of this rotation gate (negate the angle, return new object).
+    @return {BasicPhaseGate}
+   */
   getInverse() {
     if (this.angle == 0) {
       return new this.__proto__.constructor(0)
@@ -340,7 +338,7 @@ object).
 
     Default implementation handles rotation gate of the same type, where angles are simply added.
 
-    @param other {BasicPhaseGate} Phase gate of same type.
+    @param {BasicPhaseGate} other Phase gate of same type.
     @throws NotMergeable For non-rotation gates or rotation gates of different type.
     @return {BasicPhaseGate} New object representing the merged gates.
   */
@@ -367,12 +365,10 @@ object).
   }
 }
 
-
-// Classical instruction gates never have control qubits.
 /**
  * @class ClassicalInstructionGate
-Classical instruction gate.
-
+  Classical instruction gate.
+  Classical instruction gates never have control qubits.
     Base class for all gates which are not quantum gates in the typical sense,
     e.g., measurement, allocation/deallocation, ...
  */
@@ -434,11 +430,10 @@ return (a,b,c+a*b)
  */
 export class BasicMathGate extends BasicGate {
   /**
-    Initialize a BasicMathGate by providing the mathematical function that
-it implements.
+   * @constructor
+    Initialize a BasicMathGate by providing the mathematical function that it implements.
 
-    @param
-math_fun (function): Function which takes as many int values as
+    @param {function} mathFunc: Function which takes as many int values as
 input, as the gate takes registers. For each of these values,
     it then returns the output (i.e., it returns a list/tuple of
 output values).
@@ -479,14 +474,10 @@ return math_fun
     Return the math function which corresponds to the action of this math
 gate, given the input to the gate (a tuple of quantum registers).
 
-@param
-    qubits (tuple<Qureg>): Qubits to which the math gate is being
-applied.
+  @param {Array<Qureg>} qubits: Qubits to which the math gate is being applied.
 
-    @returns
-math_fun (function): javascript function describing the action of this
-gate. (See BasicMathGate.constructor for an example).
-   @return {Function}
+    @returns {function}: javascript function describing the action of this
+    gate. (See BasicMathGate.constructor for an example).
    */
   getMathFunction(qubits) {
     return this.mathFunc

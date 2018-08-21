@@ -16,8 +16,8 @@
 
 import {BasicGate} from './basics'
 
-/*
-Quantum Fourier Transform gate
+/**
+ * Quantum Fourier Transform gate
  */
 export default class QFTGate extends BasicGate {
   toString() {

@@ -74,27 +74,17 @@ and hence adds its LoopTag to the end.
 export default class Command {
   /**
    * @constructor
-Initialize a Command object.
-
     Note:
 control qubits (Command.control_qubits) are stored as a
 list of qubits, and command tags (Command.tags) as a list of tag-
 objects. All functions within this class also work if
-    WeakQubitRefs are supplied instead of normal Qubit objects
-(see WeakQubitRef).
+    BasicQubits are supplied instead of normal Qubit objects (see BasicQubits).
 
-@param
-    engine (projectq.cengines.BasicEngine):
-engine which created the qubit (mostly the MainEngine)
-gate (projectq.ops.Gate):
-Gate to be executed
-qubits (tuple[Qureg]):
-Tuple of quantum registers (to which the gate is applied)
-controls (Qureg|list[Qubit]):
-Qubits that condition the command.
-tags (list[object]):
-Tags associated with the command.
-
+@param {BasicEngine} engine: engine which created the qubit (mostly the MainEngine)
+@param {BasicGate} gate: Gate to be executed
+@param {Array<Qureg>} qubits: Array of quantum registers (to which the gate is applied)
+@param {Qureg|Array<Qubit>} controls: Qubits that condition the command.
+@param {Array<any>} tags: Tags associated with the command.
      */
   constructor(engine, gate, qubits, controls = [], tags = []) {
     const qs = qubits.map(qureg => new Qureg(...qureg.map(looper => new BasicQubit(looper.engine, looper.id))))
@@ -113,6 +103,10 @@ Tags associated with the command.
     this._qubits = this.orderQubits(nq)
   }
 
+  /**
+   * return the copy of current command
+   * @return {Command}
+   */
   copy() {
     const qubits = this.qubits.map(looper => BasicQubit.copyArray(looper))
     const controlQubits = BasicQubit.copyArray(this.controlQubits)
@@ -121,13 +115,9 @@ Tags associated with the command.
 
   /**
     Get the command object corresponding to the inverse of this command.
+    Inverts the gate (if possible) and creates a new command object from the result.
 
-    Inverts the gate (if possible) and creates a new command object from
-the result.
-
-    @throws
-NotInvertible: If the gate does not provide an inverse (see
-BasicGate.getInverse)
+    @throws {NotInvertible}: If the gate does not provide an inverse (see BasicGate.getInverse)
      */
   getInverse() {
     return new Command(this.engine, getInverse(this.gate), this.qubits, this.controlQubits, this.tags.slice(0))
@@ -135,7 +125,7 @@ BasicGate.getInverse)
 
   /**
     Merge this command with another one and return the merged command object.
-    @param other {Command} Other command to merge with this one (self)
+    @param {Command} other: Other command to merge with this one (self)
     @throws NotMergeable if the gates don't supply a get_merged()-function or can't be merged for other reasons.
      */
   getMerged(other) {
@@ -147,14 +137,11 @@ BasicGate.getInverse)
   }
 
   /**
-    Order the given qubits according to their IDs (for unique comparison of
-commands).
+    Order the given qubits according to their IDs (for unique comparison of commands).
 
-@param
-    qubits: Tuple of quantum registers (i.e., tuple of lists of qubits)
-
-@returns Ordered tuple of quantum registers
-     */
+    @param {Array<Qubit>} qubits: Array of quantum registers (i.e., tuple of lists of qubits)
+    @returns {Array<Qubit>} Ordered tuple of quantum registers
+  */
   orderQubits(qubits) {
     const orderedQubits = qubits.slice(0)
     const iqi = this.interchangeableQubitIndices
@@ -193,27 +180,22 @@ If we can interchange qubits 0,1 and qubits 3,4,5,
 
   /**
     Set control_qubits to qubits
-
-@param
-    control_qubits (Qureg): quantum register
-     */
+  @param {Qureg} nq: quantum register
+  */
   set controlQubits(nq) {
     this._controlQubits = nq.sort((a, b) => a.id - b.id).map(q => new BasicQubit(q.engine, q.id))
   }
 
   /**
-
 Add (additional) control qubits to this command object.
 
     They are sorted to ensure a canonical order. Also Qubit objects
 are converted to WeakQubitRef objects to allow garbage collection and
 thus early deallocation of qubits.
 
-    @param
-qubits (list of Qubit objects): List of qubits which control this
-gate, i.e., the gate is only executed if all qubits are
-in state 1.
-     */
+    @param {Array<Qubit>} qubits: List of qubits which control this
+    gate, i.e., the gate is only executed if all qubits are in state 1.
+  */
   addControlQubits(qubits) {
     assert(Array.isArray(qubits))
     this._controlQubits = this._controlQubits.concat(BasicQubit.copyArray(qubits))
@@ -223,21 +205,19 @@ in state 1.
   /**
   Apply a command.
 
-    Extracts the qubits-owning (target) engine from the Command object
-and sends the Command to it.
+    Extracts the qubits-owning (target) engine from the Command object and sends the Command to it.
    */
   apply() {
     this.engine.receive([this])
   }
 
   /**
-
 Get all qubits (gate and control qubits).
 
 Returns a tuple T where T[0] is a quantum register (a list of
 WeakQubitRef objects) containing the control qubits and T[1:] contains
 the quantum registers to which the gate is applied.
-     */
+  */
   get allQubits() {
     return [this._controlQubits].concat(this.qubits)
   }
@@ -248,7 +228,7 @@ the quantum registers to which the gate is applied.
 
   /**
     Set / Change engine of all qubits to engine.
-    @param engine {BasicEngine} New owner of qubits and owner of this Command object
+    @param {BasicEngine} ng: New owner of qubits and owner of this Command object
   */
   set engine(ng) {
     this._engine = ng

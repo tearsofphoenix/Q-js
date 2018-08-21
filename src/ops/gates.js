@@ -102,8 +102,8 @@ export const Y = new YGate()
 
 /**
  * @class ZGate
+ * Pauli-Z gate class
  */
-// Pauli-Z gate class
 export class ZGate extends SelfInverseGate {
   toString() {
     return 'Z'

@@ -26,19 +26,18 @@ export function get(key) {
 }
 
 
-/*
+/**
 Return the inverse of a gate.
 
     Tries to call gate.getInverse and, upon failure, creates a DaggeredGate
 instead.
 
-    @param
-gate: Gate of which to get the inverse
+    @param {BasicGate} gate: Gate of which to get the inverse
 
 @example
     @code
 
-getInverse(H) # returns a Hadamard gate (HGate object)
+getInverse(H) // returns a Hadamard gate (HGate object)
  */
 export function getInverse(gate) {
   try {
