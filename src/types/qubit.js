@@ -42,8 +42,8 @@ export class BasicQubit {
   /**
    *  @constructor
    *  Initialize a BasicQubit object.
-   *  @param engine {BasicEngine} Owning engine / engine that created the qubit
-   *  @param idx {number} Unique index of the qubit referenced by this qubit
+   *  @param {BasicEngine} engine Owning engine / engine that created the qubit
+   *  @param {number} idx Unique index of the qubit referenced by this qubit
    */
   constructor(engine, idx) {
     this.engine = engine
@@ -68,7 +68,7 @@ export class BasicQubit {
 
   /**
     Access the result of a previous measurement and return false / true (0 / 1)
-    @return {bool}
+    @return {boolean}
   */
   toBoolean() {
     return this.engine.main.getMeasurementResult(this)
@@ -85,7 +85,7 @@ export class BasicQubit {
    * Compare with other qubit (Returns true if equal id and engine).
    *
    * @param other {BasicQubit|Object} BasicQubit to which to compare this one
-   * @return {bool}
+   * @return {boolean}
    */
   equal(other) {
     if (this === other) {
@@ -167,7 +167,7 @@ export function Qureg(...args) {
 Qureg.prototype = Object.create(Array.prototype)
 
 /**
- * @param other {Qureg|Object}
+ * @param {Qureg|Object} other
  * @return {boolean}
  */
 Qureg.prototype.equal = function (other) {
@@ -180,9 +180,9 @@ Qureg.prototype.equal = function (other) {
 /**
   Return measured value if Qureg consists of 1 qubit only.
 
-    @throws Error if more than 1 qubit resides in this register (then you
+ @throws {Error} if more than 1 qubit resides in this register (then you
     need to specify which value to get using qureg[???])
-  @return boolean
+  @return {boolean}
 */
 Qureg.prototype.toBoolean = function () {
   if (this.length === 1) {
@@ -229,7 +229,7 @@ Qureg.prototype.toString = function () {
 }
 
 /**
- * @param other {Qureg|Array<Qubit>}
+ * @param {Qureg|Array<Qubit>} other
  * @return {Qureg}
  */
 Qureg.prototype.add = function (other) {
@@ -246,7 +246,7 @@ Qureg.prototype.deallocate = function () {
 Qureg.__proto__ = Array
 
 /**
- * @property engine {BasicEngine}
+ * @property {BasicEngine} engine
  */
 Object.defineProperty(Qureg.prototype, 'engine', {
   get() {

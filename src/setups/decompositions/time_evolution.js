@@ -7,7 +7,6 @@ if the hamiltonian has only one term or if all the terms commute with each
   other in which case one can implement each term individually.
 */
 
-// Recognize all TimeEvolution gates with >1 terms but which all commute.
 import assert from 'assert'
 import QubitOperator, {stringToArray} from '../../ops/qubitoperator';
 import {len, setEqual, setFromRange} from '../../libs/polyfill';
@@ -19,6 +18,7 @@ import {
   CNOT, Rx, Ry, Rz, H
 } from '../../ops';
 
+// Recognize all TimeEvolution gates with >1 terms but which all commute.
 function _recognize_time_evolution_commuting_terms(cmd) {
   const {hamiltonian} = cmd.gate
   if (len(hamiltonian.terms) === 1) {
@@ -62,7 +62,7 @@ function _recognize_time_evolution_individual_terms(cmd) {
   return len(cmd.gate.hamiltonian.terms) === 1
 }
 
-/*
+/**
 Implements a TimeEvolution gate with a hamiltonian having only one term.
 
     To implement exp(-i * t * hamiltonian), where the hamiltonian is only one
@@ -78,6 +78,7 @@ Simulation of electronic structure Hamiltonians using quantum computers,
     or
 
 Nielsen and Chuang, Quantum Computation and Information.
+ @param {Command} cmd
  */
 function _decompose_time_evolution_individual_terms(cmd) {
   assert(len(cmd.qubits) === 1)

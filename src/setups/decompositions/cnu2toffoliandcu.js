@@ -1,8 +1,4 @@
 
-/*
-Recognize an arbitrary gate which has n>=2 control qubits, except a
-Toffoli gate.
- */
 import {Control, getControlCount} from '../../meta/control';
 import {XGate} from '../../ops/gates';
 import DecompositionRule from '../../cengines/replacer/decompositionrule';
@@ -11,6 +7,9 @@ import {Compute, Uncompute} from '../../meta/compute';
 import {Toffoli} from '../../ops/shortcuts';
 import {tuple} from '../../libs/util';
 
+/**
+ Recognize an arbitrary gate which has n>=2 control qubits, except a Toffoli gate.
+*/
 export const _recognize_CnU = (cmd) => {
   const count = getControlCount(cmd)
   if (count === 2) {
@@ -23,9 +22,8 @@ export const _recognize_CnU = (cmd) => {
   return false
 }
 
-/*
+/**
 Decompose a multi-controlled gate U into a single-controlled U.
-
     It uses (n-1) work qubits and 2 * (n-1) Toffoli gates.
  */
 export const _decompose_CnU = (cmd) => {

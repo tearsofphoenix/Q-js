@@ -27,21 +27,19 @@ export function _recognize_carb1qubit(cmd) {
   return false
 }
 
-/*
+/**
 It builds matrix V with parameters (a, b, c/2) and compares against
 matrix.
 
     V = [[-sin(c/2) * exp(j*a), exp(j*(a-b)) * cos(c/2)],
   [exp(j*(a+b)) * cos(c/2), exp(j*a) * sin(c/2)]]
 
-@param
-    matrix(list): 2x2 matrix
-a: Parameter of V
-b: Parameter of V
-c_half: c/2. Parameter of V
+  @param {Array<Array<number>>} matrix: 2x2 matrix
+  @param {number} a: Parameter of V
+  @param {number} b: Parameter of V
+  @param {number} c_half: c/2. Parameter of V
 
-@returns
-    true if matrix elements of V and `matrix` are TOLERANCE close.
+  @returns {boolean} true if matrix elements of V and `matrix` are TOLERANCE close.
  */
 function _test_parameters(matrix, a, b, c_half) {
   const {exp} = math
@@ -53,16 +51,14 @@ function _test_parameters(matrix, a, b, c_half) {
   return math.deepEqual(V, matrix)
 }
 
-/*
+/**
 Recognizes a matrix which can be written in the following form:
 
     V = [[-sin(c/2) * exp(j*a), exp(j*(a-b)) * cos(c/2)],
       [exp(j*(a+b)) * cos(c/2), exp(j*a) * sin(c/2)]]
 
-@param
-    matrix(list): 2x2 matrix
-@returns
-    false if it is not possible otherwise (a, b, c/2)
+  @param {Array<Array<number>>} matrix: 2x2 matrix
+  @returns {boolean} false if it is not possible otherwise (a, b, c/2)
  */
 export function _recognize_v(matrix) {
   let a
@@ -153,7 +149,7 @@ export function _recognize_v(matrix) {
   }
 }
 
-/*
+/**
 Decompose the single controlled 1 qubit gate into CNOT, Rz, Ry, C(Ph).
 
     See Nielsen and Chuang chapter 4.3.
@@ -181,6 +177,7 @@ D = Ry(-c/2)Rz(-b)
 This improvement is important for C(Y) or C(Z)
 
 For a proof follow Lemma 5.5 of Barenco et al.
+ @param {Command} cmd
  */
 function _decompose_carb1qubit(cmd) {
   const matrix = cmd.gate.matrix._data

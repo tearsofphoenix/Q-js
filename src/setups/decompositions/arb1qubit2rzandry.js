@@ -15,12 +15,14 @@ export function phase(c) {
   return Math.atan2(c.im, c.re)
 }
 
-/*
+/**
 Recognize an arbitrary one qubit gate which has a matrix property.
 
     It does not allow gates which have control qubits as otherwise the
 AutoReplacer might go into an infinite loop. Use
 carb1qubit2cnotrzandry instead.
+ @param {Command} cmd
+ @return {boolean}
  */
 export const _recognize_arb1qubit = (cmd) => {
   try {
@@ -31,22 +33,20 @@ export const _recognize_arb1qubit = (cmd) => {
   }
 }
 
-/*
+/**
 It builds matrix U with parameters (a, b/2, c/2, d/2) and compares against
 matrix.
 
     U = [[exp(j*(a-b/2-d/2))*cos(c/2), -exp(j*(a-b/2+d/2))*sin(c/2)],
   [exp(j*(a+b/2-d/2))*sin(c/2), exp(j*(a+b/2+d/2))*cos(c/2)]]
 
-@param
-    matrix(list): 2x2 matrix
-a: parameter of U
-b_half: b/2. parameter of U
-c_half: c/2. parameter of U
-d_half: d/2. parameter of U
+  @param {Array<Array<number>>} matrix: 2x2 matrix
+  @param {number} a: parameter of U
+  @param {number} b_half: b/2. parameter of U
+  @param {number} c_half: c/2. parameter of U
+  @param {number} d_half: d/2. parameter of U
 
-@returns
-    true if matrix elements of U and `matrix` are TOLERANCE close.
+@returns {boolean} true if matrix elements of U and `matrix` are TOLERANCE close.
  */
 const _test_parameters = (matrix, a, b_half, c_half, d_half) => {
   const mc = math.complex
@@ -64,7 +64,7 @@ const _test_parameters = (matrix, a, b_half, c_half, d_half) => {
   return math.deepEqual(U, matrix)
 }
 
-/*
+/**
 Given a 2x2 unitary matrix, find the parameters
 a, b/2, c/2, and d/2 such that
 matrix == [[exp(j*(a-b/2-d/2))*cos(c/2), -exp(j*(a-b/2+d/2))*sin(c/2)],
@@ -74,11 +74,9 @@ Note:
     If the matrix is element of SU(2) (determinant == 1), then
 we can choose a = 0.
 
-@param
-    matrix(list): 2x2 unitary matrix
+@param {Array<Array<number>>} matrix: 2x2 unitary matrix
 
-@returns
-    parameters of the matrix: (a, b/2, c/2, d/2)
+@returns {Array<number>} parameters of the matrix: (a, b/2, c/2, d/2)
  */
 export const _find_parameters = (matrix) => {
   // Determine a, b/2, c/2 and d/2 (3 different cases).
@@ -202,7 +200,8 @@ export const _find_parameters = (matrix) => {
   return [a, b_half, c_half, d_half]
 }
 
-/*
+/**
+ * @param {Command} cmd
 Use Z-Y decomposition of Nielsen and Chuang (Theorem 4.1).
 
 An arbitrary one qubit gate matrix can be writen as
