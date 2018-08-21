@@ -28,6 +28,7 @@ function stringKeyToIntArray(key) {
 export const ibmqx4_connections = new Set(['2,1', '4,2', '2,0', '3,2', '3,4', '1,0'])
 
 /**
+ * @class IBM5QubitMapper
 Mapper for the 5-qubit IBM backend.
 
   Maps a given circuit to the IBM Quantum Experience chip.
@@ -42,6 +43,7 @@ without performing Swaps, the mapping procedure
  */
 export default class IBM5QubitMapper extends BasicMapperEngine {
   /**
+   * @constructor
 Initialize an IBM 5-qubit mapper compiler engine.
 
   Resets the mapping.
@@ -56,8 +58,7 @@ Initialize an IBM 5-qubit mapper compiler engine.
   Check if the IBM backend can perform the Command cmd and return true
 if so.
 
-  @param
-cmd (Command): The command to check
+  @param {Command} cmd: The command to check
    */
   isAvailable(cmd) {
     return new IBMBackend().isAvailable(cmd)
@@ -72,10 +73,8 @@ cmd (Command): The command to check
   /**
   Check if the command corresponds to a CNOT (controlled NOT gate).
 
-@param
-  cmd (Command): Command to check whether it is a controlled NOT
-gate.
-   */
+  @param {Command} cmd: Command to check whether it is a controlled NOT gate.
+  */
   _isCNOT(cmd) {
     return (cmd.gate instanceof NOT.constructor && getControlCount(cmd) === 1)
   }
@@ -83,14 +82,12 @@ gate.
   /**
   Determines the cost of the circuit with the given mapping.
 
-  @param
-mapping (dict): Dictionary with key, value pairs where keys are
-logical qubit ids and the corresponding value is the physical
-location on the IBM Q chip.
-  @returns
-Cost measure taking into account CNOT directionality or None
-if the circuit cannot be executed given the mapping.
-   */
+  @param {Object} mapping: Dictionary with key, value pairs where keys are
+    logical qubit ids and the corresponding value is the physical
+    location on the IBM Q chip.
+  @returns {Number} Cost measure taking into account CNOT directionality or None
+    if the circuit cannot be executed given the mapping.
+  */
   determineCost(mapping) {
     let cost = 0
     const connections = ibmqx4_connections
@@ -119,8 +116,7 @@ if the circuit cannot be executed given the mapping.
   /**
   Runs all stored gates.
 
-  @throws
-Exception:
+  @throws {Error}:
   If the mapping to the IBM backend cannot be performed or if
   the mapping was already determined but more CNOTs get sent
 down the pipeline.
@@ -164,8 +160,7 @@ down the pipeline.
   /**
   Store a command and handle CNOTs.
 
-  @param
-cmd (Command): A command to store
+  @param {Command} cmd: A command to store
    */
   _store(cmd) {
     let target
@@ -199,12 +194,9 @@ cmd (Command): A command to store
   Receives a command list and, for each command, stores it until
 completion.
 
-  @param
-command_list (list of Command objects): list of commands to
-receive.
+  @param {Array<Command>} commandList: list of commands to receive.
 
-  @throws
-Exception: If mapping the CNOT gates to 1 qubit would require
+  @throws {Error}: If mapping the CNOT gates to 1 qubit would require
 Swaps. The current version only supports remapping of CNOT
 gates without performing any Swaps due to the large costs
 associated with Swapping given the CNOT constraints.

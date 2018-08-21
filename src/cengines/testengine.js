@@ -24,17 +24,23 @@ import {FlushGate} from '../ops/gates'
  * return true if they contain the same commmands.
  */
 export class CompareEngine extends BasicEngine {
+  /**
+   * @constructor
+   */
   constructor() {
     super()
     this._l = [[]]
   }
 
+  /**
+   * @return {boolean}
+   */
   isAvailable() {
     return true
   }
 
   /**
-   * @param cmd {Command}
+   * @param {Command} cmd
    */
   cacheCMD(cmd) {
     // are there qubit ids that haven't been added to the list?
@@ -103,6 +109,10 @@ export class CompareEngine extends BasicEngine {
     return true
   }
 
+  /**
+   * string description
+   * @return {string}
+   */
   toString() {
     let string = ''
     this._l.forEach((cmds, qubit_id) => {
@@ -127,9 +137,9 @@ export class CompareEngine extends BasicEngine {
  */
 export class DummyEngine extends BasicEngine {
   /**
-     * @constructor
-     * @param saveCommands {boolean} default is false
-     */
+   * @constructor
+   * @param {boolean} saveCommands: default is false
+   */
   constructor(saveCommands = false) {
     super()
     this.saveCommands = saveCommands

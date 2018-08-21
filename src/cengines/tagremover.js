@@ -30,7 +30,7 @@ action/uncompute or loops after unrolling)
 export default class TagRemover extends BasicEngine {
   /**
     @constructor
-    @param tags {Array<Function>}: A list of meta tag classes (e.g., [ComputeTag, UncomputeTag])
+    @param {Array<Function>} tags: A list of meta tag classes (e.g., [ComputeTag, UncomputeTag])
     denoting the tags to remove
   */
   constructor(tags = [ComputeTag, UncomputeTag]) {
@@ -39,6 +39,9 @@ export default class TagRemover extends BasicEngine {
     this._tags = tags
   }
 
+  /**
+   * @param {Function} tag
+   */
   _isTagIn(tag) {
     return instanceOf(tag, this._tags)
   }
@@ -48,9 +51,8 @@ export default class TagRemover extends BasicEngine {
 which are an instance of at least one of the meta tags provided in the
 constructor, and then send them on to the next compiler engine.
 
-    @param commandList {Array<Command>}: List of commands to receive and then
-(after removing tags) send on.
-     */
+    @param {Array<Command>} commandList: List of commands to receive and then (after removing tags) send on.
+  */
   receive(commandList) {
     commandList.forEach((cmd) => {
       cmd.tags = cmd.tags.filter(t => !this._isTagIn(t))

@@ -26,7 +26,8 @@ import Command from '../ops/command';
 import {BasicQubit} from '../types/qubit';
 import {LogicalQubitIDTag} from '../meta';
 
-/*
+/**
+ * @class GridMapper
 Mapper to a 2-D grid graph.
 
     Mapped qubits on the grid are numbered in row-major order. E.g. for
@@ -63,7 +64,8 @@ mapping, value is the number of such
 mappings which have been applied
  */
 export default class GridMapper extends BasicMapperEngine {
-  /*
+  /**
+   * @constructor
   Initialize a GridMapper compiler engine.
 
     @param
@@ -86,8 +88,7 @@ permutation which minimizes this cost.
 num_optimization_steps(int): Number of different permutations to
 of the matching to try and minimize
 the cost.
-    @throws
-RuntimeError: if incorrect `mapped_ids_to_backend_ids` parameter
+    @throws {Error}: if incorrect `mapped_ids_to_backend_ids` parameter
    */
   constructor(args) {
     super()
@@ -205,8 +206,7 @@ mapping to apply these gates on a first come first served basis.
     One might create better mappings by specializing this function for a
   square grid.
 
-    @returns A new mapping as a dict. key is logical qubit id,
-    value is mapped id
+    @returns {Object} A new mapping as a dict. key is logical qubit id, value is mapped id
    */
   returnNewMapping() {
     // Change old mapping to 1D in order to use LinearChain heuristic
@@ -442,8 +442,7 @@ which don't store any information.
   /**
   Sends the stored commands possible without changing the mapping.
 
-    Note: this._current_row_major_mapping (hence also this.currentMapping)
-must exist already
+    Note: this._current_row_major_mapping (hence also this.currentMapping) must exist already
    */
   _sendPossibleCommands() {
     const active_ids = new Set(Array.from(this._currently_allocated_ids).map(k => parseInt(k, 10)))
@@ -527,7 +526,7 @@ must exist already
   /**
   Receives a command list and, for each command, stores it until
   we do a mapping (FlushGate || Cache of stored commands is full).
-   @param command_list {Array<Command>}  list of commands to receive.
+   @param {Array<Command>} command_list  list of commands to receive.
   */
   receive(command_list) {
     command_list.forEach((cmd) => {
@@ -549,16 +548,12 @@ must exist already
   /**
   Returns the swap operation to change mapping
 
-@param old_mapping {Object}: dict: keys are logical ids and values are mapped
-qubit ids
-@param new_mapping {Object}: dict: keys are logical ids and values are mapped
-qubit ids
-@param permutation {Array<Array<number>>}: list of int from 0, 1, ..., this.num_rows-1. It is
-used to permute the found perfect matchings. Default
-is None which keeps the original order.
-    @returns {Array<Array<number>>}
-List of tuples. Each tuple is a swap operation which needs to be
-applied. Tuple contains the two mapped qubit ids for the Swap.
+    @param {Object} old_mapping: dict: keys are logical ids and values are mapped qubit ids
+    @param {Object} new_mapping: dict: keys are logical ids and values are mapped qubit ids
+    @param {Array<Array<number>>} permutation: list of int from 0, 1, ..., this.num_rows-1. It is
+      used to permute the found perfect matchings. Default is None which keeps the original order.
+    @returns {Array<Array<number>>} List of tuples. Each tuple is a swap operation which needs to be
+      applied. Tuple contains the two mapped qubit ids for the Swap.
    */
   returnSwaps(old_mapping, new_mapping, permutation) {
     if (typeof permutation === 'undefined') {

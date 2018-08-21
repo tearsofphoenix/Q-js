@@ -52,15 +52,11 @@ export class BasicEngine {
     Ask the next engine whether a command is available, i.e.,
     whether it can be executed by the next engine(s).
 
-    @param
-cmd (Command): Command for which to check availability.
+    @param {Command} cmd: Command for which to check availability.
 
-    @returns
-true if the command can be executed.
+    @returns {boolean} true if the command can be executed.
 
-    @throws
-LastEngineError: If is_last_engine is true but is_available
-is not implemented.
+    @throws {LastEngineError}: If is_last_engine is true but is_available is not implemented.
      */
   isAvailable(cmd) {
     if (!this.isLastEngine) {
@@ -86,13 +82,11 @@ the JavaScript program (using atexit), deallocating all qubits which are
 still alive. Qubit ids of dirty qubits are registered in MainEngine's
 dirty_qubits set.
 
-    @param
-dirty (bool): If true, indicates that the allocated qubit may be
-dirty (i.e., in an arbitrary initial state).
+    @param {boolean} dirty: If true, indicates that the allocated qubit may be
+    dirty (i.e., in an arbitrary initial state).
 
-@returns
-    Qureg of length 1, where the first entry is the allocated qubit.
-     */
+    @returns {Qureg} Qureg of length 1, where the first entry is the allocated qubit.
+  */
   allocateQubit(dirty = false) {
     const new_id = this.main.getNewQubitID()
     const qubit = new Qubit(this, new_id)
@@ -113,11 +107,9 @@ dirty (i.e., in an arbitrary initial state).
     Allocate n qubits and return them as a quantum register, which is a
 list of qubit objects.
 
-    @param
-n (int): Number of qubits to allocate
-@returns
-    Qureg of length n, a list of n newly allocated qubits.
-     */
+    @param {number} n: Number of qubits to allocate
+    @returns {Qureg} Qureg of length n, a list of n newly allocated qubits.
+  */
   allocateQureg(n) {
     const array = []
     for (let i = 0; i < n; ++i) {
@@ -132,10 +124,9 @@ n (int): Number of qubits to allocate
 pipeline). If the qubit was allocated as a dirty qubit, add
 DirtyQubitTag() to Deallocate command.
 
-    @param qubit (BasicQubit): Qubit to deallocate.
-    @throws
-ValueError: Qubit already deallocated. Caller likely has a bug.
-     */
+    @param {BasicQubit} qubit: Qubit to deallocate.
+    @throws {Error}: Qubit already deallocated. Caller likely has a bug.
+  */
   deallocateQubit(qubit) {
     if (qubit.id === -1) {
       throw new Error('Already deallocated.')
@@ -148,9 +139,9 @@ ValueError: Qubit already deallocated. Caller likely has a bug.
   /**
     Check if there is a compiler engine handling the meta tag
 
-    @param metaTag {Function}: Meta tag class for which to check support
+    @param {Function} metaTag: Meta tag class for which to check support
 
-    @returns boolean: true if one of the further compiler engines is a
+    @returns {boolean}: true if one of the further compiler engines is a
 meta tag handler, i.e., engine.is_meta_tag_handler(meta_tag)
 returns true.
      */
@@ -170,6 +161,7 @@ returns true.
 
   /**
     Forward the list of commands to the next engine in the pipeline.
+   @param {Array<Command>} commandList
   */
   send(commandList) {
     this.next.receive(commandList)
@@ -190,11 +182,11 @@ that meta operations still work (e.g., with Compute).
  */
 export class ForwarderEngine extends BasicEngine {
   /**
+   * @constructor
     Initialize a ForwarderEngine.
 
-    @param
-engine (BasicEngine): Engine to forward all commands to.
-cmd_mod_fun (function): Function which is called before sending a
+    @param {BasicEngine} engine: Engine to forward all commands to.
+    @param {Function} cmdModFunc: Function which is called before sending a
 command. Each command cmd is replaced by the command it
 returns when getting called with cmd.
      */
@@ -213,13 +205,16 @@ returns when getting called with cmd.
     this.send(newCommandList)
   }
 
+  /**
+   * internal usaged for deallocate qubits after `Uncompute`
+   */
   autoDeallocateQubits() {
     const copy = new Set(this.main.activeQubits)
-    for (const qb of copy) {
+    copy.forEach((qb) => {
       if (qb.engine === this) {
         // need to
         qb.deallocate()
       }
-    }
+    })
   }
 }

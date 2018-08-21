@@ -34,12 +34,12 @@ apply to this gate?" again and again.
     You supply gate_class=MyGate or gate_class=MyGate().__class__,
     not gate_class=MyGate().
 
-   @param {(Command) => } gate_decomposer (function[projectq.ops.Command]): Function which,
+   @param {Function<Command>} gateDecomposer: Function which,
     given the command to decompose, applies a sequence of gates
 corresponding to the high-level function of a gate of type
 gate_class.
 
-gate_recognizer (function[projectq.ops.Command] : boolean): A
+   @param {Function<Command>} gateRecognizer: A
 predicate that determines if the decomposition applies to the
 given command (on top of the filtering by gate_class).
 

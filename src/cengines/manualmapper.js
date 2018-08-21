@@ -32,7 +32,7 @@ export default class ManualMapper extends BasicMapperEngine {
     Initialize the mapper to a given mapping. If no mapping function is
 provided, the qubit id is used as the location.
 
-    @param mapFunc {Function}: Function which, given the qubit id, returns
+    @param {Function} mapFunc: Function which, given the qubit id, returns
 an integer describing the physical location (must be constant).
      */
   constructor(mapFunc = x => x) {
@@ -45,7 +45,7 @@ an integer describing the physical location (must be constant).
     Receives a command list and passes it to the next engine, adding
     qubit placement tags to allocate gates.
 
-    @param command_list {Array<Command>}: list of commands to receive.
+    @param {Array<Command>} command_list: list of commands to receive.
   */
   receive(command_list) {
     command_list.forEach((cmd) => {

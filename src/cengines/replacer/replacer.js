@@ -19,64 +19,63 @@ import {FlushGate} from '../../ops/gates'
 import CommandModifier from '../cmdmodifier'
 import {classHierachy} from '../../libs/util';
 import {getInverse} from '../../ops/_cycle';
-import {NoGateDecompositionError} from "../../meta/error";
+import {NoGateDecompositionError} from '../../meta/error';
 
-/*
+/**
+ * @class InstructionFilter
 The InstructionFilter is a compiler engine which changes the behavior of
 is_available according to a filter function. All commands are passed to
 this function, which then returns whether this command can be executed
 (true) or needs replacement (false).
  */
 export class InstructionFilter extends BasicEngine {
-  /*
+  /**
+   * @constructor
   Initializer: The provided filterfun returns true for all commands
 which do not need replacement and false for commands that do.
 
-    @param
-filterfun (function): Filter function which returns true for
+    @param {Function} filterFunc: Filter function which returns true for
     available commands, and false otherwise. filterfun will be
-called as filterfun(self, cmd).
-   */
+    called as filterfun(self, cmd).
+  */
   constructor(filterFunc) {
     super()
 
     this._filterFunc = filterFunc
   }
 
-  /*
+  /**
   Specialized implementation of BasicBackend.is_available: Forwards this
 call to the filter function given to the constructor.
 
-    @param
-cmd (Command): Command for which to check availability.
+    @param {Command} cmd: Command for which to check availability.
    */
   isAvailable(cmd) {
     return this._filterFunc(this, cmd)
   }
 
-  /*
+  /**
   Forward all commands to the next engine.
 
-    @param
-command_list (list<Command>): List of commands to receive.
+    @param {Array<Command>} commandList: List of commands to receive.
    */
   receive(commandList) {
     this.next.receive(commandList)
   }
 }
 
-/*
+/**
+ * @class AutoReplacer
 The AutoReplacer is a compiler engine which uses engine.is_available in
 order to determine which commands need to be replaced/decomposed/compiled
 further. The loaded setup is used to find decomposition rules appropriate
 for each command (e.g., setups.default).
  */
 export class AutoReplacer extends BasicEngine {
-  /*
-  Initialize an AutoReplacer.
-
-    @param
-decomposition_chooser (function): A function which, given the
+  /**
+   * @constructor
+    @param {DecompositionRuleSet} decompositionRuleSet
+    @param {Function} decomposition_chooser: A function which, given the
 Command to decompose and a list of potential Decomposition
 objects, determines (and then returns) the 'best'
 decomposition.
@@ -92,10 +91,11 @@ Amounts to
 
     @code
 
-function decomposition_chooser(cmd, decomp_list):
-return decomp_list[0]
-repl = AutoReplacer(decomposition_chooser)
-   */
+  function decomposition_chooser(cmd, decomp_list) {
+    return decomp_list[0]
+  }
+  const repl = new AutoReplacer(decomposition_chooser)
+  */
   constructor(decompositionRuleSet, decomposition_chooser) {
     if (!decomposition_chooser) {
       decomposition_chooser = (cmd, decomposition_list) => decomposition_list[0]
@@ -106,16 +106,14 @@ repl = AutoReplacer(decomposition_chooser)
     this.decompositionRuleSet = decompositionRuleSet
   }
 
-  /*
+  /**
   Check whether a command cmd can be handled by further engines and,
 if not, replace it using the decomposition rules loaded with the setup
 (e.g., setups.default).
 
-    @param
-cmd (Command): Command to process.
+    @param {Command} cmd: Command to process.
 
-    @throws
-Exception if no replacement is available in the loaded setup.
+    @throws Exception if no replacement is available in the loaded setup.
    */
   _processCommand(cmd) {
     if (this.isAvailable(cmd)) {

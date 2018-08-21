@@ -37,9 +37,7 @@ to a qubit contains >=m gates, the pipeline is sent on to the next engine.
 export default class LocalOptimizer extends BasicEngine {
   /**
    * @constructor
-  Initialize a LocalOptimizer object.
-
-    @param m {number}: Number of gates to cache per qubit, before sending on the first gate.
+   * @param {number} m: Number of gates to cache per qubit, before sending on the first gate.
    */
   constructor(m = 5) {
     super()
@@ -49,6 +47,8 @@ export default class LocalOptimizer extends BasicEngine {
 
   /**
    * Send n gate operations of the qubit with index idx to the next engine.
+   * @param {number} idx: qubit index
+   * @param {number} i: command position in qubit idx's command list
    */
   sendQubitPipeline(idx, n) {
     if (typeof idx !== 'number') {
@@ -101,9 +101,9 @@ export default class LocalOptimizer extends BasicEngine {
     Return all indices of a command, each index corresponding to the
     command's index in one of the qubits' command lists.
 
-    @param idx {number}: qubit index
-    @param  i {number}: command position in qubit idx's command list
-    @param IDs {Array<number>}: IDs of all qubits involved in the command
+    @param {number} idx: qubit index
+    @param {number} i: command position in qubit idx's command list
+    @param {Array<number>} IDs: IDs of all qubits involved in the command
   */
   getGateIndices(idx, i, IDs) {
     if (typeof idx !== 'number') {
@@ -145,6 +145,8 @@ export default class LocalOptimizer extends BasicEngine {
 getInverse functions of the gate (see, e.g., BasicRotationGate).
 
     It does so for all qubit command lists.
+   @param {number} idx
+   @param {number} lim
    */
   optimize(idx, lim) {
     if (typeof idx !== 'number') {
@@ -259,8 +261,9 @@ getInverse functions of the gate (see, e.g., BasicRotationGate).
   }
 
   /**
-  Cache a command, i.e., inserts it into the command lists of all qubits involved.
-   */
+    Cache a command, i.e., inserts it into the command lists of all qubits involved.
+    @param {Command} cmd
+  */
   cacheCMD(cmd) {
     // are there qubit ids that haven't been added to the list?
     const ids = []

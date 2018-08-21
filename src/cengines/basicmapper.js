@@ -14,13 +14,6 @@
  * limitations under the License.
  */
 
-/*
-Defines the parent class from which all mappers should be derived.
-
-    There is only one engine currently allowed to be derived from
-BasicMapperEngine. This allows the simulator to automatically translate
-logical qubit ids to mapped ids.
-*/
 
 import {BasicEngine} from './basics'
 import {LogicalQubitIDTag} from '../meta/tag'
@@ -28,11 +21,19 @@ import {dropEngineAfter, insertEngine} from '../meta/util'
 import {MeasureGate} from '../ops/gates'
 import CommandModifier from './cmdmodifier'
 
+/**
+ * @class BasicMapperEngine
+Defines the parent class from which all mappers should be derived.
+
+    There is only one engine currently allowed to be derived from
+BasicMapperEngine. This allows the simulator to automatically translate
+logical qubit ids to mapped ids.
+*/
 export default class BasicMapperEngine extends BasicEngine {
-  /*
+  /**
+   * @constructor
   Parent class for all Mappers.
 
-    Attributes:
 this.current_mapping (dict): Keys are the logical qubit ids and values
 are the mapped qubit ids.
    */
@@ -49,13 +50,12 @@ are the mapped qubit ids.
     this._currentMapping = newMap
   }
 
-  /*
+  /**
   Send this Command using the mapped qubit ids of this.current_mapping.
 
     If it is a Measurement gate, then it adds a LogicalQubitID tag.
 
-    @param
-cmd: Command object with logical qubit ids.
+    @param {Command} cmd: Command object with logical qubit ids.
    */
   sendCMDWithMappedIDs(cmd) {
     const newCMD = cmd.copy()

@@ -55,7 +55,7 @@ engines and adds the back-end as the last engine.
             as compiler engines. Note: The engine list must not contain
             multiple mappers (instances of BasicMapperEngine).
             Default: getEngineList()
-   @param boolean verbose Either print full or compact error messages.
+   @param {boolean} verbose Either print full or compact error messages.
     Default: false (i.e. compact error messages).
 
     @example
@@ -155,11 +155,8 @@ these results with the master engine such that they are available when
 the user calls an int() or bool() conversion operator on a measured
 qubit.
 
-    @param
-qubit (BasicQubit): Qubit for which to register the measurement
-result.
-value (bool): Boolean value of the measurement outcome
-(true / false = 1 / 0 respectively).
+    @param {BasicQubit} qubit: Qubit for which to register the measurement result.
+    @param {boolean} value: Boolean value of the measurement outcome (true / false = 1 / 0 respectively).
    */
   setMeasurementResult(qubit, value) {
     this._measurements[qubit.id] = !!value
@@ -169,11 +166,10 @@ value (bool): Boolean value of the measurement outcome
   Return the classical value of a measured qubit, given that an engine
 registered this result previously (see setMeasurementResult).
 
-@param
-    qubit (BasicQubit): Qubit of which to get the measurement result.
+  @param {BasicQubit} qubit: Qubit of which to get the measurement result.
 
     @example
-@code
+  @code
 
 const eng = new MainEngine()
 const qubit = eng.allocateQubit() // quantum register of size 1
@@ -209,7 +205,6 @@ eng.getMeasurementResult(qubit[0]) == qubit.toNumber()
 
   /**
   Forward the list of commands to the first engine.
-
     @param {Array<Command>} commandList: List of commands to receive (and then send on)
    */
   receive(commandList) {
@@ -218,7 +213,6 @@ eng.getMeasurementResult(qubit[0]) == qubit.toNumber()
 
   /**
   Forward the list of commands to the next engine in the pipeline.
-
     It also shortens exception stack traces if this.verbose is false.
    */
   send(commandList) {
@@ -234,22 +228,18 @@ eng.getMeasurementResult(qubit[0]) == qubit.toNumber()
 
   /**
     Destroy the main engine.
-
-  Flushes the entire circuit down the pipeline, clearing all temporary
-  buffers (in, e.g., optimizers).
+   Flushes the entire circuit down the pipeline, clearing all temporary buffers (in, e.g., optimizers).
  */
   deallocate() {
     this.flush(true)
   }
 
   /**
-  Flush the entire circuit down the pipeline, clearing potential buffers
-(of, e.g., optimizers).
+    Flush the entire circuit down the pipeline, clearing potential buffers (of, e.g., optimizers).
 
-    @param deallocateQubits boolean: If true, deallocates all qubits that are
-still alive (invalidating references to them by setting their
-id to -1).
-   */
+    @param {boolean} deallocateQubits: If true, deallocates all qubits that are
+    still alive (invalidating references to them by setting their id to -1).
+  */
   flush(deallocateQubits = false) {
     if (deallocateQubits) {
       this.activeQubits.forEach(qb => qb.deallocate())
