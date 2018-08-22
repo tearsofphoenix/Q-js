@@ -10,3 +10,4 @@ docs/es
 *.node
 settings.json
 log.txt
+dist/

@@ -1,16 +1,18 @@
 {
   "name": "projectq",
-  "version": "0.0.1",
-  "libq": "0.0.1",
+  "version": "0.1.1",
+  "libq": "0.1.1",
   "private": false,
   "license": "Apache",
   "author": "Isaac Phoenix (tearsofphoenix@icloud.com)",
+  "main": "./dist/index.js",
   "scripts": {
     "install": "node scripts/install.js",
     "cover": "cross-env NODE_ENV=test nyc mocha --recursive ./src",
     "test": "mocha --require babel-register --require babel-polyfill --recursive ./src",
     "build": "node scripts/build.js --force",
-    "doc": "./node_modules/.bin/esdoc"
+    "doc": "./node_modules/.bin/esdoc",
+    "prepublish": "rimraf dist/* && babel ./src -d ./dist"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -20,6 +22,7 @@
     "mathjs": "^5.1.0"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.6",
     "babel-plugin-istanbul": "^4.1.6",
