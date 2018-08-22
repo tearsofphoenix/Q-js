@@ -162,7 +162,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ibmqx5_connections">ibmqx5_connections</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#types">types</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/types/qubit.js~BasicQubit.html">BasicQubit</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Qureg">Qureg</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span></span></li>
 </ul>
 </div>
 </nav>
@@ -337,7 +337,7 @@ export OMP_PROC_BIND=spread # bind threads to processors by spreading</code></pr
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html#instance-method-applyQubitOperator">applyQubitOperator</a></span></span><span class="code" data-ice="signature">(qubitOperator: <span><a href="class/src/ops/qubitoperator.js~QubitOperator.html">QubitOperator</a></span>, qureg: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="function/index.html#static-function-Qureg">Qureg</a></span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html#instance-method-applyQubitOperator">applyQubitOperator</a></span></span><span class="code" data-ice="signature">(qubitOperator: <span><a href="class/src/ops/qubitoperator.js~QubitOperator.html">QubitOperator</a></span>, qureg: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -396,7 +396,7 @@ function represented by the supplied quantum register.</p>
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html#instance-method-collapseWavefunction">collapseWavefunction</a></span></span><span class="code" data-ice="signature">(qureg: <span><a href="function/index.html#static-function-Qureg">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;, values: <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span><span>[]</span></span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html#instance-method-collapseWavefunction">collapseWavefunction</a></span></span><span class="code" data-ice="signature">(qureg: <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;, values: <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span><span>[]</span></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -425,7 +425,7 @@ function represented by the supplied quantum register.</p>
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html#instance-method-convertLogicalToMappedQureg">convertLogicalToMappedQureg</a></span></span><span class="code" data-ice="signature">(qureg: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="function/index.html#static-function-Qureg">Qureg</a></span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html#instance-method-convertLogicalToMappedQureg">convertLogicalToMappedQureg</a></span></span><span class="code" data-ice="signature">(qureg: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -454,7 +454,7 @@ function represented by the supplied quantum register.</p>
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html#instance-method-getAmplitude">getAmplitude</a></span></span><span class="code" data-ice="signature">(bitString: <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span><span>[]</span></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, qureg: <span><a href="function/index.html#static-function-Qureg">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html#instance-method-getAmplitude">getAmplitude</a></span></span><span class="code" data-ice="signature">(bitString: <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span><span>[]</span></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, qureg: <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
         </p>
       </div>
       <div>
@@ -483,7 +483,7 @@ function represented by the supplied quantum register.</p>
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html#instance-method-getExpectationValue">getExpectationValue</a></span></span><span class="code" data-ice="signature">(qubitOperator: <span><a href="class/src/ops/qubitoperator.js~QubitOperator.html">QubitOperator</a></span>, qureg: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="function/index.html#static-function-Qureg">Qureg</a></span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html#instance-method-getExpectationValue">getExpectationValue</a></span></span><span class="code" data-ice="signature">(qubitOperator: <span><a href="class/src/ops/qubitoperator.js~QubitOperator.html">QubitOperator</a></span>, qureg: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -512,7 +512,7 @@ function represented by the supplied quantum register.</p>
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html#instance-method-getProbability">getProbability</a></span></span><span class="code" data-ice="signature">(bitString: <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span><span>[]</span></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, qureg: <span><a href="function/index.html#static-function-Qureg">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html#instance-method-getProbability">getProbability</a></span></span><span class="code" data-ice="signature">(bitString: <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span><span>[]</span></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, qureg: <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
         </p>
       </div>
       <div>
@@ -636,7 +636,7 @@ engine.</p>
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html#instance-method-setWavefunction">setWavefunction</a></span></span><span class="code" data-ice="signature">(wavefunction: <span><span>Complex</span><span>[]</span></span>, qureg: <span><a href="function/index.html#static-function-Qureg">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;)</span>
+          <span class="code" data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html#instance-method-setWavefunction">setWavefunction</a></span></span><span class="code" data-ice="signature">(wavefunction: <span><span>Complex</span><span>[]</span></span>, qureg: <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;)</span>
         </p>
       </div>
       <div>
@@ -701,7 +701,7 @@ engine.</p>
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/cengines/basics.js~BasicEngine.html#instance-method-allocateQubit">allocateQubit</a></span></span><span class="code" data-ice="signature">(dirty: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>): <span><a href="function/index.html#static-function-Qureg">Qureg</a></span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/cengines/basics.js~BasicEngine.html#instance-method-allocateQubit">allocateQubit</a></span></span><span class="code" data-ice="signature">(dirty: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>): <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span></span>
         </p>
       </div>
       <div>
@@ -731,7 +731,7 @@ register of size 1).</p>
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/cengines/basics.js~BasicEngine.html#instance-method-allocateQureg">allocateQureg</a></span></span><span class="code" data-ice="signature">(n: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span><a href="function/index.html#static-function-Qureg">Qureg</a></span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/cengines/basics.js~BasicEngine.html#instance-method-allocateQureg">allocateQureg</a></span></span><span class="code" data-ice="signature">(n: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span></span>
         </p>
       </div>
       <div>
@@ -1092,7 +1092,7 @@ extension.</p>
     
     
     
-    <span class="code" data-ice="name">applyQubitOperator</span><span class="code" data-ice="signature">(qubitOperator: <span><a href="class/src/ops/qubitoperator.js~QubitOperator.html">QubitOperator</a></span>, qureg: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="function/index.html#static-function-Qureg">Qureg</a></span>): <span>*</span></span>
+    <span class="code" data-ice="name">applyQubitOperator</span><span class="code" data-ice="signature">(qubitOperator: <span><a href="class/src/ops/qubitoperator.js~QubitOperator.html">QubitOperator</a></span>, qureg: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
@@ -1126,7 +1126,7 @@ function represented by the supplied quantum register.</p>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">qureg</td>
-      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="function/index.html#static-function-Qureg">Qureg</a></span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"><p>Quantum bits to which to apply the
 operator.</p>
@@ -1266,7 +1266,7 @@ qubits.</p>
     
     
     
-    <span class="code" data-ice="name">collapseWavefunction</span><span class="code" data-ice="signature">(qureg: <span><a href="function/index.html#static-function-Qureg">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;, values: <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span><span>[]</span></span>): <span>*</span></span>
+    <span class="code" data-ice="name">collapseWavefunction</span><span class="code" data-ice="signature">(qureg: <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;, values: <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span><span>[]</span></span>): <span>*</span></span>
     <span class="right-info">
       
       
@@ -1292,7 +1292,7 @@ qubits.</p>
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">qureg</td>
-      <td data-ice="type" class="code"><span><a href="function/index.html#static-function-Qureg">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;</td>
+      <td data-ice="type" class="code"><span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;</td>
       <td data-ice="appendix"></td>
       <td data-ice="description"><p>Qubits to collapse.</p>
 </td>
@@ -1367,7 +1367,7 @@ the qureg argument.</p>
     
     
     
-    <span class="code" data-ice="name">convertLogicalToMappedQureg</span><span class="code" data-ice="signature">(qureg: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="function/index.html#static-function-Qureg">Qureg</a></span>): <span>*</span></span>
+    <span class="code" data-ice="name">convertLogicalToMappedQureg</span><span class="code" data-ice="signature">(qureg: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
@@ -1393,7 +1393,7 @@ the qureg argument.</p>
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">qureg</td>
-      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="function/index.html#static-function-Qureg">Qureg</a></span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"><p>Logical quantum bits</p>
 </td>
@@ -1440,7 +1440,7 @@ the qureg argument.</p>
     
     
     
-    <span class="code" data-ice="name">getAmplitude</span><span class="code" data-ice="signature">(bitString: <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span><span>[]</span></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, qureg: <span><a href="function/index.html#static-function-Qureg">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+    <span class="code" data-ice="name">getAmplitude</span><span class="code" data-ice="signature">(bitString: <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span><span>[]</span></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, qureg: <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
     <span class="right-info">
       
       
@@ -1475,7 +1475,7 @@ contain all allocated qubits.</p>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">qureg</td>
-      <td data-ice="type" class="code"><span><a href="function/index.html#static-function-Qureg">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;</td>
+      <td data-ice="type" class="code"><span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;</td>
       <td data-ice="appendix"></td>
       <td data-ice="description"><p>Quantum register determining the
 ordering. Must contain all allocated qubits.</p>
@@ -1532,7 +1532,7 @@ the qureg argument.</p>
     
     
     
-    <span class="code" data-ice="name">getExpectationValue</span><span class="code" data-ice="signature">(qubitOperator: <span><a href="class/src/ops/qubitoperator.js~QubitOperator.html">QubitOperator</a></span>, qureg: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="function/index.html#static-function-Qureg">Qureg</a></span>): <span>*</span></span>
+    <span class="code" data-ice="name">getExpectationValue</span><span class="code" data-ice="signature">(qubitOperator: <span><a href="class/src/ops/qubitoperator.js~QubitOperator.html">QubitOperator</a></span>, qureg: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
@@ -1566,7 +1566,7 @@ function represented by the supplied quantum register.</p>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">qureg</td>
-      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="function/index.html#static-function-Qureg">Qureg</a></span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"><p>Quantum bits to measure.</p>
 </td>
@@ -1634,7 +1634,7 @@ the qureg argument.</p>
     
     
     
-    <span class="code" data-ice="name">getProbability</span><span class="code" data-ice="signature">(bitString: <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span><span>[]</span></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, qureg: <span><a href="function/index.html#static-function-Qureg">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+    <span class="code" data-ice="name">getProbability</span><span class="code" data-ice="signature">(bitString: <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span><span>[]</span></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, qureg: <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
     <span class="right-info">
       
       
@@ -1668,7 +1668,7 @@ the quantum register <code>qureg</code>.</p>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">qureg</td>
-      <td data-ice="type" class="code"><span><a href="function/index.html#static-function-Qureg">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;</td>
+      <td data-ice="type" class="code"><span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;</td>
       <td data-ice="appendix"></td>
       <td data-ice="description"><p>Quantum register.</p>
 </td>
@@ -1939,7 +1939,7 @@ engine.</p>
     
     
     
-    <span class="code" data-ice="name">setWavefunction</span><span class="code" data-ice="signature">(wavefunction: <span><span>Complex</span><span>[]</span></span>, qureg: <span><a href="function/index.html#static-function-Qureg">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;)</span>
+    <span class="code" data-ice="name">setWavefunction</span><span class="code" data-ice="signature">(wavefunction: <span><span>Complex</span><span>[]</span></span>, qureg: <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;)</span>
     <span class="right-info">
       
       
@@ -1974,7 +1974,7 @@ the wavefunction).</p>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">qureg</td>
-      <td data-ice="type" class="code"><span><a href="function/index.html#static-function-Qureg">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;</td>
+      <td data-ice="type" class="code"><span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt;</td>
       <td data-ice="appendix"></td>
       <td data-ice="description"><p>Quantum register determining the ordering. Must contain all allocated qubits.</p>
 <p>Note:

@@ -1,7 +1,7 @@
 {
-  "coverage": "50.47%",
-  "expectCount": 840,
-  "actualCount": 424,
+  "coverage": "51%",
+  "expectCount": 845,
+  "actualCount": 431,
   "files": {
     "src/backends/circuits/drawer.js": {
       "expectCount": 20,
@@ -217,14 +217,13 @@
     },
     "src/cengines/ibm5qubitmapper.js": {
       "expectCount": 14,
-      "actualCount": 8,
+      "actualCount": 9,
       "undocumentLines": [
         23,
-        28,
-        54,
-        69,
-        70,
-        71
+        57,
+        72,
+        73,
+        74
       ]
     },
     "src/cengines/linearmapper.js": {
@@ -902,24 +901,23 @@
       ]
     },
     "src/types/qubit.js": {
-      "expectCount": 22,
-      "actualCount": 15,
+      "expectCount": 27,
+      "actualCount": 21,
       "undocumentLines": [
-        50,
-        51,
-        98,
-        102,
-        117,
-        135,
-        241
+        54,
+        101,
+        105,
+        120,
+        138,
+        256
       ]
     },
     "src/types/qubit.spec.js": {
       "expectCount": 2,
       "actualCount": 0,
       "undocumentLines": [
-        25,
-        26
+        26,
+        27
       ]
     }
   }

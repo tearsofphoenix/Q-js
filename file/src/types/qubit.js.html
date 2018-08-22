@@ -162,7 +162,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ibmqx5_connections">ibmqx5_connections</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#types">types</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/types/qubit.js~BasicQubit.html">BasicQubit</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Qureg">Qureg</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span></span></li>
 </ul>
 </div>
 </nav>
@@ -217,6 +217,9 @@ export class BasicQubit {
    *  @param {number} idx Unique index of the qubit referenced by this qubit
    */
   constructor(engine, idx) {
+    /**
+     * @type {BasicEngine}
+     */
     this.engine = engine
     this.id = idx
   }
@@ -317,116 +320,126 @@ export class Qubit extends BasicQubit {
 }
 
 /**
- * @interface
- * @class Qureg
- * @desc Quantum register class.
+ * Quantum register class.
 Simplifies accessing measured values for single-qubit registers (no []-access necessary)
  and enables pretty-printing of general quantum registers).
+ @class Qureg
  */
-export function Qureg(...args) {
-  const arg0 = args[0]
-  let inst
-  if (Array.isArray(arg0)) {
-    inst = Array.from(arg0)
-  } else {
-    inst = new Array(...args)
-  }
-  inst.__proto__ = Qureg.prototype
-  return inst
-}
-
-Qureg.prototype = Object.create(Array.prototype)
-
-/**
- * @param {Qureg|Object} other
- * @return {boolean}
- */
-Qureg.prototype.equal = function (other) {
-  if (other instanceof Qureg) {
-    return arrayEqual(this, other, (x, y) =&gt; x.equal(y))
-  }
-  return false
-}
-
-/**
-  Return measured value if Qureg consists of 1 qubit only.
-
- @throws {Error} if more than 1 qubit resides in this register (then you
-    need to specify which value to get using qureg[???])
-  @return {boolean}
-*/
-Qureg.prototype.toBoolean = function () {
-  if (this.length === 1) {
-    return this[0].toBoolean()
-  }
-  throw new Error(&apos;qureg.toBoolean(): Quantum register contains more &quot;\n&apos;
-    + &apos;&quot;than 1 qubit. Use qureg[idx].toBoolean() instead.&apos;)
-}
-
-/**
- * @return {number}
- */
-Qureg.prototype.toNumber = function () {
-  return this.toBoolean() ? 1 : 0
-}
-
-/**
- * @return {string}
- */
-Qureg.prototype.toString = function () {
-  if (this.length === 0) return &apos;Qureg[]&apos;
-  const ids = this.slice(1).map(({id}) =&gt; id)
-  ids.push(null) // Forces a flush on last loop iteration.
-
-  const out_list = []
-  let start_id = this[0].id
-  let count = 1
-  ids.forEach((qubit_id) =&gt; {
-    if (qubit_id === start_id + count) {
-      count += 1
+export class Qureg extends Array {
+  /**
+   * a little different with `Array`: when pass an array as argument, will copy the passed array
+   * @constructor
+   * @param {...any|number|Array} args
+   */
+  constructor(...args) {
+    const arg0 = args[0]
+    if (Array.isArray(arg0)) {
+      super(...arg0)
     } else {
-      // TODO
-      if (count &gt; 1) {
-        out_list.push(`${start_id}-${start_id + count - 1}`)
-      } else {
-        out_list.push(`${start_id}`)
-      }
-      start_id = qubit_id
-      count = 1
+      super(...args)
     }
-  })
+    /**
+     * @ignore
+     * @private
+     */
+    this.__proto__ = Qureg.prototype
+  }
 
-  return `Qureg[${out_list.join(&apos;, &apos;)}]`
-}
+  /**
+   * test if two Quregs are equal
+   * @param {Qureg|Object} other
+   * @return {boolean}
+   */
+  equal(other) {
+    if (other instanceof Qureg) {
+      return arrayEqual(this, other, (x, y) =&gt; x.equal(y))
+    }
+    return false
+  }
 
-/**
- * @param {Qureg|Array.&lt;Qubit&gt;} other
- * @return {Qureg}
- */
-Qureg.prototype.add = function (other) {
-  const array = this.concat(other)
-  return new Qureg(array)
-}
+  /**
+   * only supported when `length === 1`, use the qubit value as qureg value
+   * @throws {Error} will throw when `length !== 1`
+   * @return {boolean}
+   */
+  toBoolean() {
+    if (this.length === 1) {
+      return this[0].toBoolean()
+    }
+    throw new Error(&apos;qureg.toBoolean(): Quantum register contains more &quot;\n&apos;
+        + &apos;&quot;than 1 qubit. Use qureg[idx].toBoolean() instead.&apos;)
+  }
 
-Qureg.prototype.deallocate = function () {
-  this.forEach(qubit =&gt; qubit.deallocate())
-  this.length = 0
-}
+  /**
+   * number representation
+   * @return {number}
+   */
+  toNumber() {
+    return this.toBoolean() ? 1 : 0
+  }
 
-// fix class hierarchy
-Qureg.__proto__ = Array
+  /**
+   * add qubits from `other`, return a new Qureg instance
+   * @param {Array&lt;Qubit&gt;|Qureg} other
+   * @return {Qureg}
+   */
+  add(other) {
+    const array = this.concat(other)
+    return new Qureg(array)
+  }
 
-/**
- * @property {BasicEngine} engine
- */
-Object.defineProperty(Qureg.prototype, &apos;engine&apos;, {
-  get() {
+  /**
+   * string description
+   * @return {string}
+   */
+  toString() {
+    if (this.length === 0) return &apos;Qureg[]&apos;
+    const ids = this.slice(1).map(({id}) =&gt; id)
+    ids.push(null) // Forces a flush on last loop iteration.
+
+    const out_list = []
+    let start_id = this[0].id
+    let count = 1
+    ids.forEach((qubit_id) =&gt; {
+      if (qubit_id === start_id + count) {
+        count += 1
+      } else {
+        // TODO
+        if (count &gt; 1) {
+          out_list.push(`${start_id}-${start_id + count - 1}`)
+        } else {
+          out_list.push(`${start_id}`)
+        }
+        start_id = qubit_id
+        count = 1
+      }
+    })
+
+    return `Qureg[${out_list.join(&apos;, &apos;)}]`
+  }
+
+  /**
+   * deallocate all qubit, then clear the qureg
+   */
+  deallocate() {
+    this.forEach(qubit =&gt; qubit.deallocate())
+    this.length = 0
+  }
+
+  /**
+   * @return {BasicEngine}
+   */
+  get engine() {
     return this[0].engine
-  },
-  set(newEngine) {
+  }
+
+  /**
+   * @param {BasicEngine} newEngine
+   */
+  set engine(newEngine) {
     this.forEach(looper =&gt; looper.engine = newEngine)
   }
-})
+}
 </code></pre>
 
 </div>

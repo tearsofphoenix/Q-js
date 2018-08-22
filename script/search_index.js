@@ -475,9 +475,9 @@ window.esdocSearchIndex = [
   ],
   [
     "projectq/src/types/qubit.js~qureg",
-    "function/index.html#static-function-Qureg",
+    "class/src/types/qubit.js~Qureg.html",
     "<span>Qureg</span> <span class=\"search-result-import-path\">projectq/src/types/qubit.js</span>",
-    "function"
+    "class"
   ],
   [
     "projectq/src/ops/gates.js~r",
@@ -1441,13 +1441,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/backends/ibm/ibm.js~ibmbackend#didruncallback",
-    "class/src/backends/ibm/ibm.js~IBMBackend.html#instance-get-didRunCallback",
+    "class/src/backends/ibm/ibm.js~IBMBackend.html#instance-set-didRunCallback",
     "src/backends/ibm/ibm.js~IBMBackend#didRunCallback",
     "member"
   ],
   [
     "src/backends/ibm/ibm.js~ibmbackend#didruncallback",
-    "class/src/backends/ibm/ibm.js~IBMBackend.html#instance-set-didRunCallback",
+    "class/src/backends/ibm/ibm.js~IBMBackend.html#instance-get-didRunCallback",
     "src/backends/ibm/ibm.js~IBMBackend#didRunCallback",
     "member"
   ],
@@ -4003,13 +4003,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/ops/command.js~command#controlqubits",
-    "class/src/ops/command.js~Command.html#instance-get-controlQubits",
+    "class/src/ops/command.js~Command.html#instance-set-controlQubits",
     "src/ops/command.js~Command#controlQubits",
     "member"
   ],
   [
     "src/ops/command.js~command#controlqubits",
-    "class/src/ops/command.js~Command.html#instance-set-controlQubits",
+    "class/src/ops/command.js~Command.html#instance-get-controlQubits",
     "src/ops/command.js~Command#controlQubits",
     "member"
   ],
@@ -4075,13 +4075,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/ops/command.js~command#qubits",
-    "class/src/ops/command.js~Command.html#instance-set-qubits",
+    "class/src/ops/command.js~Command.html#instance-get-qubits",
     "src/ops/command.js~Command#qubits",
     "member"
   ],
   [
     "src/ops/command.js~command#qubits",
-    "class/src/ops/command.js~Command.html#instance-get-qubits",
+    "class/src/ops/command.js~Command.html#instance-set-qubits",
     "src/ops/command.js~Command#qubits",
     "member"
   ],
@@ -4996,6 +4996,66 @@ window.esdocSearchIndex = [
     "class/src/types/qubit.js~Qubit.html#instance-member-id",
     "src/types/qubit.js~Qubit#id",
     "member"
+  ],
+  [
+    "src/types/qubit.js~qureg#add",
+    "class/src/types/qubit.js~Qureg.html#instance-method-add",
+    "src/types/qubit.js~Qureg#add",
+    "method"
+  ],
+  [
+    "src/types/qubit.js~qureg#constructor",
+    "class/src/types/qubit.js~Qureg.html#instance-constructor-constructor",
+    "src/types/qubit.js~Qureg#constructor",
+    "method"
+  ],
+  [
+    "src/types/qubit.js~qureg#deallocate",
+    "class/src/types/qubit.js~Qureg.html#instance-method-deallocate",
+    "src/types/qubit.js~Qureg#deallocate",
+    "method"
+  ],
+  [
+    "src/types/qubit.js~qureg#engine",
+    "class/src/types/qubit.js~Qureg.html#instance-get-engine",
+    "src/types/qubit.js~Qureg#engine",
+    "member"
+  ],
+  [
+    "src/types/qubit.js~qureg#engine",
+    "class/src/types/qubit.js~Qureg.html#instance-set-engine",
+    "src/types/qubit.js~Qureg#engine",
+    "member"
+  ],
+  [
+    "src/types/qubit.js~qureg#equal",
+    "class/src/types/qubit.js~Qureg.html#instance-method-equal",
+    "src/types/qubit.js~Qureg#equal",
+    "method"
+  ],
+  [
+    "src/types/qubit.js~qureg#length",
+    "class/src/types/qubit.js~Qureg.html#instance-member-length",
+    "src/types/qubit.js~Qureg#length",
+    "member"
+  ],
+  [
+    "src/types/qubit.js~qureg#toboolean",
+    "class/src/types/qubit.js~Qureg.html#instance-method-toBoolean",
+    "src/types/qubit.js~Qureg#toBoolean",
+    "method"
+  ],
+  [
+    "src/types/qubit.js~qureg#tonumber",
+    "class/src/types/qubit.js~Qureg.html#instance-method-toNumber",
+    "src/types/qubit.js~Qureg#toNumber",
+    "method"
+  ],
+  [
+    "src/types/qubit.js~qureg#tostring",
+    "class/src/types/qubit.js~Qureg.html#instance-method-toString",
+    "src/types/qubit.js~Qureg#toString",
+    "method"
   ],
   [
     "src/types/qubit.spec.js",

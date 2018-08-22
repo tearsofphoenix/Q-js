@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <base data-ice="baseUrl" href="../../../">
-  <title data-ice="title">src/setups/linear.js | projectq</title>
+  <title data-ice="title">Qureg | projectq</title>
   <link type="text/css" rel="stylesheet" href="css/style.css">
   <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
   <script src="script/prettify/prettify.js"></script>
@@ -167,156 +167,941 @@
 </div>
 </nav>
 
-<div class="content" data-ice="content"><h1 data-ice="title">src/setups/linear.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import assert from &apos;assert&apos;
-import {
-  BasicMathGate, ClassicalInstructionGate, CNOT, ControlledGate, QFT, Swap
-} from &apos;../ops&apos;;
-import {getInverse} from &apos;../ops/_cycle&apos;;
-import DecompositionRuleSet from &apos;../cengines/replacer/decompositionruleset&apos;;
-import {instanceOf, isKindclassOf, tuple} from &apos;../libs/util&apos;;
-import {len} from &apos;../libs/polyfill&apos;;
-import {AutoReplacer, InstructionFilter} from &apos;../cengines&apos;;
-import TagRemover from &apos;../cengines/tagremover&apos;;
-import LocalOptimizer from &apos;../cengines/optimize&apos;;
-import LinearMapper from &apos;../cengines/linearmapper&apos;;
-import math from &apos;../libs/math/defaultrules&apos;
-import decompositions from &apos;./decompositions&apos;
+<div class="content" data-ice="content"><div class="header-notice">
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {Qureg} from &apos;<span><a href="file/src/types/qubit.js.html#lineNumber158">projectq/src/types/qubit.js</a></span>&apos;</code></pre></div>
+  <span data-ice="access">public</span>
+  <span data-ice="kind">class</span>
+  
+  
+  
+  <span data-ice="source">| <span><a href="file/src/types/qubit.js.html#lineNumber158">source</a></span></span>
+</div>
 
-function high_level_gates(eng, cmd) {
-  const g = cmd.gate
-  if (g.equal(QFT) || getInverse(g).equal(QFT) || g.equal(Swap)) {
-    return true
-  } else if (g instanceof BasicMathGate) {
-    return false
-  }
-  return true
-}
+<div class="self-detail detail">
+  <h1 data-ice="name">Qureg</h1>
 
-function one_and_two_qubit_gates(eng, cmd) {
-  const all_qubits = []
-  cmd.allQubits.forEach(qr =&gt; qr.forEach(q =&gt; all_qubits.push(q)))
+  
 
-  if (cmd.gate instanceof ClassicalInstructionGate) {
-    // This is required to allow Measure, Allocate, Deallocate, Flush
-    return true
-  } else if (all_qubits.length &lt;= 2) {
-    return true
-  } else {
-    return false
-  }
-}
+  
+  
+  <div class="flat-list" data-ice="extendsChain"><h4>Extends:</h4><div><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span> &#x2192; Qureg</div></div>
+  
+  
+  
+  
+  
+  
 
-/**
-Returns an engine list to compile to a linear chain of qubits.
+  
+  
+  <div class="description" data-ice="description"><p>Quantum register class.
+Simplifies accessing measured values for single-qubit registers (no []-access necessary)
+and enables pretty-printing of general quantum registers).</p>
+</div>
+  
 
-    Note:
-If you choose a new gate set for which the compiler does not yet have
-standard rules, it raises an `NoGateDecompositionError` or a
-    `RuntimeError: maximum recursion depth exceeded...`. Also note that
-even the gate sets which work might not yet be optimized. So make sure
-to double check and potentially extend the decomposition rules.
-    This implemention currently requires that the one qubit gates must
-contain Rz and at least one of {Ry(best), Rx, H} and the two qubit gate
-must contain CNOT (recommended) or CZ.
+  
 
-    Note:
-Classical instructions gates such as e.g. Flush and Measure are
-automatically allowed.
+  
 
-    @example
-    getEngineList(10, false, tuple(Rz, Ry, Rx, H), tuple(CNOT))
+  
 
-  @param {number} num_qubits Number of qubits in the chain
-  @param {boolean} cyclic If a circle or not. Default is false
-  @param {string|Array.&lt;BasicGate&gt;} one_qubit_gates &quot;any&quot; allows any one qubit gate, otherwise provide
-a tuple of the allowed gates. If the gates are instances of a class (e.g. X), it allows all gates
-which are equal to it. If the gate is a class (Rz), it allows all instances of this class. Default is &quot;any&quot;
-  @param {string|Array.&lt;BasicGate&gt;} two_qubit_gates &quot;any&quot; allows any two qubit gate, otherwise provide
-a tuple of the allowed gates. If the gates are instances of a class (e.g. CNOT), it allows all gates
-which are equal to it. If the gate is a class, it allows all instances of this class.
-Default is (CNOT, Swap).
-    @throws {Error} If input is for the gates is not &quot;any&quot; or a tuple.
+  
+</div>
 
-    @return {Array&lt;BasicEngine&gt;} A list of suitable compiler engines.
- */
-export function getEngineList(num_qubits, cyclic = false, one_qubit_gates = &apos;any&apos;, two_qubit_gates = [CNOT, Swap]) {
-  if (two_qubit_gates !== &apos;any&apos; &amp;&amp; !Array.isArray(two_qubit_gates)) {
-    throw new Error(&quot;two_qubit_gates parameter must be &apos;any&apos; or a tuple. &quot;
-    + &apos;When supplying only one gate, make sure to correctly &apos;
-    + &quot;create the tuple (don&apos;t miss the comma), &quot;
-    + &apos;e.g. tuple(CNOT)&apos;)
-  }
-  if (one_qubit_gates !== &apos;any&apos; &amp;&amp; !Array.isArray(one_qubit_gates)) {
-    throw new Error(&quot;one_qubit_gates parameter must be &apos;any&apos; or a tuple.&quot;)
-  }
-  const rule_set = new DecompositionRuleSet([...math, ...decompositions])
-  const allowed_gate_classes = []
-  const allowed_gate_instances = []
-  if (one_qubit_gates !== &apos;any&apos;) {
-    one_qubit_gates.forEach((gate) =&gt; {
-      if (typeof gate === &apos;function&apos;) {
-        allowed_gate_classes.push(gate)
-      } else {
-        allowed_gate_instances.push([gate, 0])
-      }
-    })
-  }
-  if (two_qubit_gates !== &apos;any&apos;) {
-    two_qubit_gates.forEach((gate) =&gt; {
-      if (typeof gate === &apos;function&apos;) {
-        //  Controlled gate classes don&apos;t yet exists and would require
-        //  separate treatment
-        assert(!isKindclassOf(gate, ControlledGate))
-        allowed_gate_classes.push(gate)
-      } else if (gate instanceof ControlledGate) {
-        allowed_gate_instances.push([gate.gate, gate.n])
-      } else {
-        allowed_gate_instances.push([gate, 0])
-      }
-    })
-  }
 
-  function low_level_gates(eng, cmd) {
-    const all_qubits = []
-    cmd.allQubits.forEach(qr =&gt; qr.forEach(q =&gt; all_qubits.push(q)))
 
-    assert(all_qubits.length &lt;= 2)
-    if (cmd.gate instanceof ClassicalInstructionGate) {
-      // This is required to allow Measure, Allocate, Deallocate, Flush
-      return true
-    } else if (one_qubit_gates === &apos;any&apos; &amp;&amp; len(all_qubits) === 1) {
-      return true
-    } else if (two_qubit_gates === &apos;any&apos; &amp;&amp; len(all_qubits) === 2) {
-      return true
-    } else if (instanceOf(cmd.gate, allowed_gate_classes)) {
-      return true
-    } else {
-      const cn = cmd.controlQubits.length
-      const idx = allowed_gate_instances.findIndex(looper =&gt; cmd.gate.equal(looper[0]) &amp;&amp; cn === looper[1])
-      if (idx !== -1) {
-        return true
-      }
-    }
-    return false
-  }
-  return [new AutoReplacer(rule_set),
-    new TagRemover(),
-    new InstructionFilter(high_level_gates),
-    new LocalOptimizer(5),
-    new AutoReplacer(rule_set),
-    new TagRemover(),
-    new InstructionFilter(one_and_two_qubit_gates),
-    new LocalOptimizer(5),
-    new LinearMapper(num_qubits, cyclic),
-    new AutoReplacer(rule_set),
-    new TagRemover(),
-    new InstructionFilter(low_level_gates),
-    new LocalOptimizer(5),
-  ]
-}
-</code></pre>
+<div data-ice="constructorSummary"><h2>Constructor Summary</h2><table class="summary" data-ice="summary">
+  <thead><tr><td data-ice="title" colspan="3">Public Constructor</td></tr></thead>
+  <tbody>
+  
+  <tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/types/qubit.js~Qureg.html#instance-constructor-constructor">constructor</a></span></span><span class="code" data-ice="signature">(args: ...<span>any</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>a little different with <code>Array</code>: when pass an array as argument, will copy the passed array</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+</tbody>
+</table>
+</div>
+<div data-ice="memberSummary"><h2>Member Summary</h2><table class="summary" data-ice="summary">
+  <thead><tr><td data-ice="title" colspan="3">Public Members</td></tr></thead>
+  <tbody>
+  
+  <tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      <span class="kind" data-ice="kind">get</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/types/qubit.js~Qureg.html#instance-get-engine">engine</a></span></span><span class="code" data-ice="signature">: <span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span>: <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      <span class="kind" data-ice="kind">set</span>
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/types/qubit.js~Qureg.html#instance-set-engine">engine</a></span></span><span class="code" data-ice="signature">(newEngine: <span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/types/qubit.js~Qureg.html#instance-member-length">length</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+</tbody>
+</table>
+</div>
+<div data-ice="methodSummary"><h2>Method Summary</h2><table class="summary" data-ice="summary">
+  <thead><tr><td data-ice="title" colspan="3">Public Methods</td></tr></thead>
+  <tbody>
+  
+  <tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/types/qubit.js~Qureg.html#instance-method-add">add</a></span></span><span class="code" data-ice="signature">(other: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span>): <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>add qubits from <code>other</code>, return a new Qureg instance</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/types/qubit.js~Qureg.html#instance-method-deallocate">deallocate</a></span></span><span class="code" data-ice="signature">()</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>deallocate all qubit, then clear the qureg</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/types/qubit.js~Qureg.html#instance-method-equal">equal</a></span></span><span class="code" data-ice="signature">(other: <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>test if two Quregs are equal</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/types/qubit.js~Qureg.html#instance-method-toBoolean">toBoolean</a></span></span><span class="code" data-ice="signature">(): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>only supported when <code>length === 1</code>, use the qubit value as qureg value</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/types/qubit.js~Qureg.html#instance-method-toNumber">toNumber</a></span></span><span class="code" data-ice="signature">(): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>number representation</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/types/qubit.js~Qureg.html#instance-method-toString">toString</a></span></span><span class="code" data-ice="signature">(): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>string description</p>
+</div>
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+</tbody>
+</table>
+</div>
 
+
+
+
+
+<div data-ice="constructorDetails"><h2 data-ice="title">Public Constructors</h2>
+
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-constructor-constructor">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">constructor</span><span class="code" data-ice="signature">(args: ...<span>any</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>)</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/types/qubit.js.html#lineNumber164">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  <div data-ice="description"><p>a little different with <code>Array</code>: when pass an array as argument, will copy the passed array</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">args</td>
+      <td data-ice="type" class="code">...<span>any</span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+</div>
+<div data-ice="memberDetails"><h2 data-ice="title">Public Members</h2>
+
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-get-engine">
+    <span class="access" data-ice="access">public</span>
+    
+    <span class="kind" data-ice="kind">get</span>
+    
+    
+    
+    <span class="code" data-ice="name">engine</span><span class="code" data-ice="signature">: <span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span>: <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/types/qubit.js.html#lineNumber262">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-set-engine">
+    <span class="access" data-ice="access">public</span>
+    
+    <span class="kind" data-ice="kind">set</span>
+    
+    
+    
+    <span class="code" data-ice="name">engine</span><span class="code" data-ice="signature">(newEngine: <span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span>)</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/types/qubit.js.html#lineNumber269">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-member-length">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">length</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/types/qubit.js.html#lineNumber256">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+</div>
+<div data-ice="methodDetails"><h2 data-ice="title">Public Methods</h2>
+
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-add">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">add</span><span class="code" data-ice="signature">(other: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span>): <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/types/qubit.js.html#lineNumber216">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  <div data-ice="description"><p>add qubits from <code>other</code>, return a new Qureg instance</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">other</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span>&gt; | <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-deallocate">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">deallocate</span><span class="code" data-ice="signature">()</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/types/qubit.js.html#lineNumber254">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  <div data-ice="description"><p>deallocate all qubit, then clear the qureg</p>
+</div>
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-equal">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">equal</span><span class="code" data-ice="signature">(other: <span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/types/qubit.js.html#lineNumber183">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  <div data-ice="description"><p>test if two Quregs are equal</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">other</td>
+      <td data-ice="type" class="code"><span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-toBoolean">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">toBoolean</span><span class="code" data-ice="signature">(): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/types/qubit.js.html#lineNumber195">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  <div data-ice="description"><p>only supported when <code>length === 1</code>, use the qubit value as qureg value</p>
+</div>
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  <div data-ice="throwWrap">
+    <h4>Throw:</h4>
+    <table>
+      <tbody>
+      
+      <tr class="throw" data-ice="throw">
+        <td><p data-ice="throwName"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></span></p></td>
+        <td data-ice="throwDesc"><p>will throw when <code>length !== 1</code></p>
+</td>
+      </tr>
+</tbody>
+    </table>
+  </div>
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-toNumber">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">toNumber</span><span class="code" data-ice="signature">(): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/types/qubit.js.html#lineNumber207">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  <div data-ice="description"><p>number representation</p>
+</div>
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-toString">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">toString</span><span class="code" data-ice="signature">(): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/types/qubit.js.html#lineNumber225">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  <div data-ice="description"><p>string description</p>
+</div>
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+</div>
 </div>
 
 <footer class="footer">

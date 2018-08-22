@@ -162,7 +162,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ibmqx5_connections">ibmqx5_connections</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#types">types</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/types/qubit.js~BasicQubit.html">BasicQubit</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Qureg">Qureg</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span></span></li>
 </ul>
 </div>
 </nav>
@@ -387,35 +387,6 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-Qureg">Qureg</a></span></span><span class="code" data-ice="signature">(args: ...<span>*</span>): <span>*</span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        <div data-ice="description"><p>Quantum register class.</p>
-</div>
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-<tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-          
-          
-          
           <span class="code" data-ice="name"><span><a href="function/index.html#static-function-SubConstant">SubConstant</a></span></span><span class="code" data-ice="signature">(a: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span>*</span></span>
         </p>
       </div>
@@ -563,13 +534,13 @@ register modulo N.</p>
           
           
           
-          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getEngineList">getEngineList</a></span></span><span class="code" data-ice="signature">(one_qubit_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;, two_qubit_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;, other_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span>&gt;</span>
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getEngineList">getEngineList</a></span></span><span class="code" data-ice="signature">(num_qubits: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, cyclic: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>, one_qubit_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;, two_qubit_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span>&gt;</span>
         </p>
       </div>
       <div>
         
         
-        <div data-ice="description"><p>Returns an engine list to compile to a restricted gate set.</p>
+        <div data-ice="description"><p>Returns an engine list to compile to a linear chain of qubits.</p>
 </div>
       </div>
     </td>
@@ -592,13 +563,41 @@ register modulo N.</p>
           
           
           
-          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getEngineList">getEngineList</a></span></span><span class="code" data-ice="signature">(num_qubits: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, cyclic: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>, one_qubit_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;, two_qubit_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span>&gt;</span>
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getEngineList">getEngineList</a></span></span><span class="code" data-ice="signature">(): <span><span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span><span>[]</span></span></span>
         </p>
       </div>
       <div>
         
         
-        <div data-ice="description"><p>Returns an engine list to compile to a linear chain of qubits.</p>
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getEngineList">getEngineList</a></span></span><span class="code" data-ice="signature">(one_qubit_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;, two_qubit_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;, other_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span>&gt;</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        <div data-ice="description"><p>Returns an engine list to compile to a restricted gate set.</p>
 </div>
       </div>
     </td>
@@ -685,34 +684,6 @@ register modulo N.</p>
         
         <div data-ice="description"><p>Returns an engine list to compile to a 2-D grid of qubits.</p>
 </div>
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-<tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-          
-          
-          
-          <span class="code" data-ice="name"><span><a href="function/index.html#static-function-getEngineList">getEngineList</a></span></span><span class="code" data-ice="signature">(): <span><span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span><span>[]</span></span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        
       </div>
     </td>
     <td>
@@ -1620,80 +1591,6 @@ qb.deallocate() // sends deallocate gate
   
 </div>
 <div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-function-Qureg">
-    <span class="access" data-ice="access">public</span>
-    
-    
-    
-    
-    
-    <span class="code" data-ice="name">Qureg</span><span class="code" data-ice="signature">(args: ...<span>*</span>): <span>*</span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/src/types/qubit.js.html#lineNumber156">source</a></span></span>
-    </span>
-  </h3>
-
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {Qureg} from &apos;<span><a href="file/src/types/qubit.js.html#lineNumber156">projectq/src/types/qubit.js</a></span>&apos;</code></pre></div>
-  
-  
-  <div data-ice="description"><p>Quantum register class.
-Simplifies accessing measured values for single-qubit registers (no []-access necessary)
-and enables pretty-printing of general quantum registers).</p>
-</div>
-
-  
-
-  <div data-ice="properties"><div data-ice="properties">
-  <h4 data-ice="title">Params:</h4>
-  <table class="params">
-    <thead>
-    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
-    </thead>
-    <tbody>
-    
-    <tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">args</td>
-      <td data-ice="type" class="code">...<span>*</span></td>
-      <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
-    </tr>
-</tbody>
-  </table>
-</div>
-</div>
-
-  <div class="return-params" data-ice="returnParams">
-    <h4>Return:</h4>
-    <table>
-      <tbody>
-        <tr>
-          <td class="return-type code" data-ice="returnType"><span>*</span></td>
-          
-        </tr>
-      </tbody>
-    </table>
-    <div data-ice="returnProperties">
-</div>
-  </div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-</div>
-<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="static-function-SubConstant">
     <span class="access" data-ice="access">public</span>
     
@@ -2094,132 +1991,6 @@ Uncompute(eng) // runs inverse of the compute section</code></pre>
     
     
     
-    <span class="code" data-ice="name">getEngineList</span><span class="code" data-ice="signature">(one_qubit_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;, two_qubit_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;, other_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span>&gt;</span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/src/setups/restrictedgateset.js.html#lineNumber79">source</a></span></span>
-    </span>
-  </h3>
-
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getEngineList} from &apos;<span><a href="file/src/setups/restrictedgateset.js.html#lineNumber79">projectq/src/setups/restrictedgateset.js</a></span>&apos;</code></pre></div>
-  
-  
-  <div data-ice="description"><p>Returns an engine list to compile to a restricted gate set.</p>
-<p>Note:
-If you choose a new gate set for which the compiler does not yet have
-standard rules, it raises an <code>NoGateDecompositionError</code> or a
-<code>RuntimeError: maximum recursion depth exceeded...</code>. Also note that
-even the gate sets which work might not yet be optimized. So make sure
-to double check and potentially extend the decomposition rules.
-This implemention currently requires that the one qubit gates must
-contain Rz and at least one of {Ry(best), Rx, H} and the two qubit gate
-must contain CNOT (recommended) or CZ.</p>
-<p>Note:
-Classical instructions gates such as e.g. Flush and Measure are
-automatically allowed.</p>
-</div>
-
-  
-
-  <div data-ice="properties"><div data-ice="properties">
-  <h4 data-ice="title">Params:</h4>
-  <table class="params">
-    <thead>
-    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
-    </thead>
-    <tbody>
-    
-    <tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">one_qubit_gates</td>
-      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;</td>
-      <td data-ice="appendix"></td>
-      <td data-ice="description"><p>&quot;any&quot; allows any one qubit gate, otherwise provide
-a tuple of the allowed gates. If the gates are instances of a class (e.g. X), it allows all gates
-which are equal to it. If the gate is a class (Rz), it allows all instances of this class. Default is &quot;any&quot;</p>
-</td>
-    </tr>
-<tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">two_qubit_gates</td>
-      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;</td>
-      <td data-ice="appendix"></td>
-      <td data-ice="description"><p>&quot;any&quot; allows any two qubit gate, otherwise provide
-a tuple of the allowed gates. If the gates are instances of a class (e.g. CNOT), it allows all gates
-which are equal to it. If the gate is a class, it allows all instances of this class.
-Default is (CNOT,).</p>
-</td>
-    </tr>
-<tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">other_gates</td>
-      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;</td>
-      <td data-ice="appendix"></td>
-      <td data-ice="description"><p>A tuple of the allowed gates. If the gates are
-instances of a class (e.g. QFT), it allows all gates which are equal to it. If the gate is a
-class, it allows all instances of this class.</p>
-</td>
-    </tr>
-</tbody>
-  </table>
-</div>
-</div>
-
-  <div class="return-params" data-ice="returnParams">
-    <h4>Return:</h4>
-    <table>
-      <tbody>
-        <tr>
-          <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span>&gt;</td>
-          <td class="return-desc" data-ice="returnDescription"><p>A list of suitable compiler engines.</p>
-</td>
-        </tr>
-      </tbody>
-    </table>
-    <div data-ice="returnProperties">
-</div>
-  </div>
-
-  
-
-  
-
-  <div data-ice="throwWrap">
-    <h4>Throw:</h4>
-    <table>
-      <tbody>
-      
-      <tr class="throw" data-ice="throw">
-        <td><p data-ice="throwName"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></span></p></td>
-        <td data-ice="throwDesc"><p>If input is for the gates is not &quot;any&quot; or a tuple.</p>
-</td>
-      </tr>
-</tbody>
-    </table>
-  </div>
-
-  
-
-  <div data-ice="example">
-    <h4>Example:</h4>
-    
-  <div class="example-doc" data-ice="exampleDoc">
-      
-      <pre class="prettyprint source-code"><code data-ice="exampleCode">getEngineList(tuple(Rz, Ry, Rx, H), tuple(CNOT), tuple(TimeEvolution))</code></pre>
-    </div>
-</div>
-
-  
-
-  
-  
-</div>
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-function-getEngineList">
-    <span class="access" data-ice="access">public</span>
-    
-    
-    
-    
-    
     <span class="code" data-ice="name">getEngineList</span><span class="code" data-ice="signature">(num_qubits: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, cyclic: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>, one_qubit_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;, two_qubit_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span>&gt;</span>
     <span class="right-info">
       
@@ -2335,6 +2106,187 @@ Default is (CNOT, Swap).</p>
   <div class="example-doc" data-ice="exampleDoc">
       
       <pre class="prettyprint source-code"><code data-ice="exampleCode">getEngineList(10, false, tuple(Rz, Ry, Rx, H), tuple(CNOT))</code></pre>
+    </div>
+</div>
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-getEngineList">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">getEngineList</span><span class="code" data-ice="signature">(): <span><span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span><span>[]</span></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/setups/ibm.js.html#lineNumber30">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getEngineList} from &apos;<span><a href="file/src/setups/ibm.js.html#lineNumber30">projectq/src/setups/ibm.js</a></span>&apos;</code></pre></div>
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span><span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span><span>[]</span></span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-function-getEngineList">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">getEngineList</span><span class="code" data-ice="signature">(one_qubit_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;, two_qubit_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;, other_gates: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span>&gt;</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/setups/restrictedgateset.js.html#lineNumber79">source</a></span></span>
+    </span>
+  </h3>
+
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getEngineList} from &apos;<span><a href="file/src/setups/restrictedgateset.js.html#lineNumber79">projectq/src/setups/restrictedgateset.js</a></span>&apos;</code></pre></div>
+  
+  
+  <div data-ice="description"><p>Returns an engine list to compile to a restricted gate set.</p>
+<p>Note:
+If you choose a new gate set for which the compiler does not yet have
+standard rules, it raises an <code>NoGateDecompositionError</code> or a
+<code>RuntimeError: maximum recursion depth exceeded...</code>. Also note that
+even the gate sets which work might not yet be optimized. So make sure
+to double check and potentially extend the decomposition rules.
+This implemention currently requires that the one qubit gates must
+contain Rz and at least one of {Ry(best), Rx, H} and the two qubit gate
+must contain CNOT (recommended) or CZ.</p>
+<p>Note:
+Classical instructions gates such as e.g. Flush and Measure are
+automatically allowed.</p>
+</div>
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">one_qubit_gates</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;</td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>&quot;any&quot; allows any one qubit gate, otherwise provide
+a tuple of the allowed gates. If the gates are instances of a class (e.g. X), it allows all gates
+which are equal to it. If the gate is a class (Rz), it allows all instances of this class. Default is &quot;any&quot;</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">two_qubit_gates</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;</td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>&quot;any&quot; allows any two qubit gate, otherwise provide
+a tuple of the allowed gates. If the gates are instances of a class (e.g. CNOT), it allows all gates
+which are equal to it. If the gate is a class, it allows all instances of this class.
+Default is (CNOT,).</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">other_gates</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span>&gt;</td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>A tuple of the allowed gates. If the gates are
+instances of a class (e.g. QFT), it allows all gates which are equal to it. If the gate is a
+class, it allows all instances of this class.</p>
+</td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span>&gt;</td>
+          <td class="return-desc" data-ice="returnDescription"><p>A list of suitable compiler engines.</p>
+</td>
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  <div data-ice="throwWrap">
+    <h4>Throw:</h4>
+    <table>
+      <tbody>
+      
+      <tr class="throw" data-ice="throw">
+        <td><p data-ice="throwName"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></span></p></td>
+        <td data-ice="throwDesc"><p>If input is for the gates is not &quot;any&quot; or a tuple.</p>
+</td>
+      </tr>
+</tbody>
+    </table>
+  </div>
+
+  
+
+  <div data-ice="example">
+    <h4>Example:</h4>
+    
+  <div class="example-doc" data-ice="exampleDoc">
+      
+      <pre class="prettyprint source-code"><code data-ice="exampleCode">getEngineList(tuple(Rz, Ry, Rx, H), tuple(CNOT), tuple(TimeEvolution))</code></pre>
     </div>
 </div>
 
@@ -2578,61 +2530,6 @@ Default is (CNOT, Swap).</p>
       <pre class="prettyprint source-code"><code data-ice="exampleCode">getEngineList(2, 3, tuple(Rz, Ry, Rx, H), tuple(CNOT))</code></pre>
     </div>
 </div>
-
-  
-
-  
-  
-</div>
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-function-getEngineList">
-    <span class="access" data-ice="access">public</span>
-    
-    
-    
-    
-    
-    <span class="code" data-ice="name">getEngineList</span><span class="code" data-ice="signature">(): <span><span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span><span>[]</span></span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/src/setups/ibm.js.html#lineNumber30">source</a></span></span>
-    </span>
-  </h3>
-
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import {getEngineList} from &apos;<span><a href="file/src/setups/ibm.js.html#lineNumber30">projectq/src/setups/ibm.js</a></span>&apos;</code></pre></div>
-  
-  
-  
-
-  
-
-  <div data-ice="properties">
-</div>
-
-  <div class="return-params" data-ice="returnParams">
-    <h4>Return:</h4>
-    <table>
-      <tbody>
-        <tr>
-          <td class="return-type code" data-ice="returnType"><span><span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span><span>[]</span></span></td>
-          
-        </tr>
-      </tbody>
-    </table>
-    <div data-ice="returnProperties">
-</div>
-  </div>
-
-  
-
-  
-
-  
-
-  
-
-  
 
   
 

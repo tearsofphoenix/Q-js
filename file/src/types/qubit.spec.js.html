@@ -162,7 +162,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ibmqx5_connections">ibmqx5_connections</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#types">types</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/types/qubit.js~BasicQubit.html">BasicQubit</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Qureg">Qureg</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/types/qubit.js~Qureg.html">Qureg</a></span></span></li>
 </ul>
 </div>
 </nav>
@@ -191,11 +191,15 @@ import {BasicEngine} from &apos;../cengines/basics&apos;
 import MainEngine from &apos;../cengines/main&apos;
 import {DummyEngine} from &apos;../cengines/testengine&apos;
 import {Deallocate} from &apos;../ops/gates&apos;;
+import {arrayEqual} from &apos;../libs/polyfill&apos;;
 
 const mc = math.complex
 const mm = math.matrix
 
 describe(&apos;Qubit test&apos;, () =&gt; {
+  it(&apos;should test subclass array&apos;, () =&gt; {
+
+  });
   it(&apos;should test math complex type&apos;, () =&gt; {
     const c = mc(1, -1)
     console.log(c.re, c.im)
@@ -372,7 +376,7 @@ describe(&apos;Qubit test&apos;, () =&gt; {
     assert(rec.receivedCommands.length === 1)
   });
 
-  it(&apos;should test qureg to Number&apos;, function () {
+  it(&apos;should test qureg to Number&apos;, () =&gt; {
     const rec = new DummyEngine(true)
     const eng = new MainEngine(rec, [])
     const q = eng.allocateQureg(2)
@@ -383,7 +387,7 @@ describe(&apos;Qubit test&apos;, () =&gt; {
     expect(() =&gt; q2.toNumber()).to.throw()
   });
 
-  it(&apos;should test qureg equal&apos;, function () {
+  it(&apos;should test qureg equal&apos;, () =&gt; {
     const rec = new DummyEngine(true)
     const eng = new MainEngine(rec, [])
     const q = eng.allocateQureg(2)
@@ -394,7 +398,7 @@ describe(&apos;Qubit test&apos;, () =&gt; {
     expect(q.equal(new Array(...q))).to.equal(false)
   });
 
-  it(&apos;should test basic qubit array copy&apos;, function () {
+  it(&apos;should test basic qubit array copy&apos;, () =&gt; {
     const q = new BasicQubit(null, 0)
     const array = [q]
     const copy = BasicQubit.copyArray(array)

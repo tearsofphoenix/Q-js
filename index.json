@@ -6909,7 +6909,7 @@
     "__docId__": 336,
     "kind": "file",
     "name": "src/cengines/ibm5qubitmapper.js",
-    "content": "/*\r\n * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).\r\n *\r\n * Licensed under the Apache License, Version 2.0 (the \"License\");\r\n * you may not use this file except in compliance with the License.\r\n * You may obtain a copy of the License at\r\n *\r\n * http://www.apache.org/licenses/LICENSE-2.0\r\n *\r\n * Unless required by applicable law or agreed to in writing, software\r\n * distributed under the License is distributed on an \"AS IS\" BASIS,\r\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\r\n * See the License for the specific language governing permissions and\r\n * limitations under the License.\r\n */\r\n\r\nimport {permutations} from 'itertools'\r\nimport BasicMapperEngine from './basicmapper'\r\nimport { Allocate, FlushGate, NOT } from '../ops/gates'\r\n\r\nimport IBMBackend from '../backends/ibm/ibm'\r\n\r\nfunction stringKeyToIntArray(key) {\r\n  return key.split(',').map(i => parseInt(i, 10))\r\n}\r\n\r\n// export const ibmqx4_connections = new Set([2, 1], [4, 2], [2, 0], [3, 2], [3, 4], [1, 0])\r\nexport const ibmqx4_connections = new Set(['2,1', '4,2', '2,0', '3,2', '3,4', '1,0'])\r\n\r\n/**\r\n * @class IBM5QubitMapper\r\n * @desc\r\nMapper for the 5-qubit IBM backend.\r\n\r\n  Maps a given circuit to the IBM Quantum Experience chip.\r\n\r\n  Note:\r\nThe mapper has to be run once on the entire circuit.\r\n\r\n  Warning:\r\nIf the provided circuit cannot be mapped to the hardware layout\r\nwithout performing Swaps, the mapping procedure\r\n**raises an Exception**.\r\n */\r\nexport default class IBM5QubitMapper extends BasicMapperEngine {\r\n  /**\r\n   * @constructor\r\nInitialize an IBM 5-qubit mapper compiler engine.\r\n\r\n  Resets the mapping.\r\n   */\r\n  constructor() {\r\n    super();\r\n    this.currentMapping = {}\r\n    this._reset()\r\n  }\r\n\r\n  /**\r\n  Check if the IBM backend can perform the Command cmd and return true\r\nif so.\r\n\r\n  @param {Command} cmd The command to check\r\n   */\r\n  isAvailable(cmd) {\r\n    return new IBMBackend().isAvailable(cmd)\r\n  }\r\n\r\n  // Reset the mapping parameters so the next circuit can be mapped.\r\n  _reset() {\r\n    this._cmds = []\r\n    this._interactions = {}\r\n  }\r\n\r\n  /**\r\n  Check if the command corresponds to a CNOT (controlled NOT gate).\r\n\r\n  @param {Command} cmd Command to check whether it is a controlled NOT gate.\r\n  */\r\n  _isCNOT(cmd) {\r\n    return (cmd.gate instanceof NOT.constructor && cmd.controlCount === 1)\r\n  }\r\n\r\n  /**\r\n  Determines the cost of the circuit with the given mapping.\r\n\r\n  @param {Object} mapping Dictionary with key, value pairs where keys are\r\n    logical qubit ids and the corresponding value is the physical\r\n    location on the IBM Q chip.\r\n  @return {number} Cost measure taking into account CNOT directionality or None\r\n    if the circuit cannot be executed given the mapping.\r\n  */\r\n  determineCost(mapping) {\r\n    let cost = 0\r\n    const connections = ibmqx4_connections\r\n    const keys = Object.keys(this._interactions)\r\n    for (let i = 0; i < keys.length; ++i) {\r\n      const tpl = stringKeyToIntArray(keys[i])\r\n      const ctrl_id = tpl[0]\r\n      const target_id = tpl[1]\r\n      const ctrl_pos = mapping[ctrl_id]\r\n      const target_pos = mapping[target_id]\r\n      let k = `${ctrl_pos},${target_pos}`\r\n      let v = connections.has(k)\r\n      if (!v) {\r\n        k = `${target_pos},${ctrl_pos}`\r\n        v = connections.has(k)\r\n        if (v) {\r\n          cost += this._interactions[tpl]\r\n        } else {\r\n          return undefined\r\n        }\r\n      }\r\n    }\r\n    return cost\r\n  }\r\n\r\n  /**\r\n  Runs all stored gates.\r\n\r\n  @throws {Error}\r\n  If the mapping to the IBM backend cannot be performed or if\r\n  the mapping was already determined but more CNOTs get sent\r\ndown the pipeline.\r\n   */\r\n  run() {\r\n    if (Object.keys(this._currentMapping).length > 0 && Math.max(...Object.values(this._currentMapping)) > 4) {\r\n      throw new Error('Too many qubits allocated. The IBM Q '\r\n      + 'device supports at most 5 qubits and no '\r\n      + 'intermediate measurements / '\r\n      + 'reallocations.')\r\n    }\r\n    if (Object.keys(this._interactions).length > 0) {\r\n      const logical_ids = Object.keys(this._currentMapping).map(k => parseInt(k, 10))\r\n      let best_mapping = this._currentMapping\r\n      let best_cost\r\n\r\n      for (const physical_ids of permutations([0, 1, 2, 3, 4], logical_ids.length)) {\r\n        const mapping = {}\r\n        physical_ids.forEach((looper, i) => mapping[logical_ids[i]] = looper)\r\n        const new_cost = this.determineCost(mapping)\r\n        if (new_cost) {\r\n          if (!best_cost || new_cost < best_cost) {\r\n            best_cost = new_cost\r\n            best_mapping = mapping\r\n          }\r\n        }\r\n      }\r\n\r\n      if (!best_cost) {\r\n        throw new Error('Circuit cannot be mapped without using Swaps. Mapping failed.')\r\n      }\r\n      this._interactions = {}\r\n      this.currentMapping = best_mapping\r\n    }\r\n\r\n    this._cmds.forEach(cmd => this.sendCMDWithMappedIDs(cmd))\r\n\r\n    this._cmds = []\r\n  }\r\n\r\n  /**\r\n  Store a command and handle CNOTs.\r\n\r\n  @param {Command} cmd A command to store\r\n   */\r\n  _store(cmd) {\r\n    let target\r\n    if (!(cmd.gate instanceof FlushGate)) {\r\n      target = cmd.qubits[0][0].id\r\n    }\r\n\r\n    if (this._isCNOT(cmd)) {\r\n      // CNOT encountered\r\n      const ctrl = cmd.controlQubits[0].id\r\n      const key = [ctrl, target]\r\n      const v = this._interactions[key]\r\n      if (typeof v === 'undefined') {\r\n        this._interactions[key] = 0\r\n      }\r\n      this._interactions[key] += 1\r\n    } else if (cmd.gate.equal(Allocate)) {\r\n      const v = this._currentMapping[target]\r\n      if (typeof v === 'undefined') {\r\n        let newMax = 0\r\n        if (Object.keys(this._currentMapping).length > 0) {\r\n          newMax = Math.max(...Object.values(this._currentMapping)) + 1\r\n        }\r\n        this._currentMapping[target] = newMax\r\n      }\r\n    }\r\n    this._cmds.push(cmd)\r\n  }\r\n\r\n  /**\r\n  Receives a command list and, for each command, stores it until\r\ncompletion.\r\n\r\n  @param {Command[]} commandList list of commands to receive.\r\n\r\n  @throws {Error} If mapping the CNOT gates to 1 qubit would require\r\nSwaps. The current version only supports remapping of CNOT\r\ngates without performing any Swaps due to the large costs\r\nassociated with Swapping given the CNOT constraints.\r\n   */\r\n  receive(commandList) {\r\n    commandList.forEach((cmd) => {\r\n      this._store(cmd)\r\n      if (cmd.gate instanceof FlushGate) {\r\n        this.run()\r\n        this._reset()\r\n      }\r\n    })\r\n  }\r\n}\r\n",
+    "content": "/*\r\n * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).\r\n *\r\n * Licensed under the Apache License, Version 2.0 (the \"License\");\r\n * you may not use this file except in compliance with the License.\r\n * You may obtain a copy of the License at\r\n *\r\n * http://www.apache.org/licenses/LICENSE-2.0\r\n *\r\n * Unless required by applicable law or agreed to in writing, software\r\n * distributed under the License is distributed on an \"AS IS\" BASIS,\r\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\r\n * See the License for the specific language governing permissions and\r\n * limitations under the License.\r\n */\r\n\r\nimport {permutations} from 'itertools'\r\nimport BasicMapperEngine from './basicmapper'\r\nimport { Allocate, FlushGate, NOT } from '../ops/gates'\r\n\r\nimport IBMBackend from '../backends/ibm/ibm'\r\n\r\nfunction stringKeyToIntArray(key) {\r\n  return key.split(',').map(i => parseInt(i, 10))\r\n}\r\n\r\n// export const ibmqx4_connections = new Set([2, 1], [4, 2], [2, 0], [3, 2], [3, 4], [1, 0])\r\n/**\r\n * @type {Set<string>}\r\n */\r\nexport const ibmqx4_connections = new Set(['2,1', '4,2', '2,0', '3,2', '3,4', '1,0'])\r\n\r\n/**\r\n * @class IBM5QubitMapper\r\n * @desc\r\nMapper for the 5-qubit IBM backend.\r\n\r\n  Maps a given circuit to the IBM Quantum Experience chip.\r\n\r\n  Note:\r\nThe mapper has to be run once on the entire circuit.\r\n\r\n  Warning:\r\nIf the provided circuit cannot be mapped to the hardware layout\r\nwithout performing Swaps, the mapping procedure\r\n**raises an Exception**.\r\n */\r\nexport default class IBM5QubitMapper extends BasicMapperEngine {\r\n  /**\r\n   * @constructor\r\nInitialize an IBM 5-qubit mapper compiler engine.\r\n\r\n  Resets the mapping.\r\n   */\r\n  constructor() {\r\n    super();\r\n    this.currentMapping = {}\r\n    this._reset()\r\n  }\r\n\r\n  /**\r\n  Check if the IBM backend can perform the Command cmd and return true\r\nif so.\r\n\r\n  @param {Command} cmd The command to check\r\n   */\r\n  isAvailable(cmd) {\r\n    return new IBMBackend().isAvailable(cmd)\r\n  }\r\n\r\n  // Reset the mapping parameters so the next circuit can be mapped.\r\n  _reset() {\r\n    this._cmds = []\r\n    this._interactions = {}\r\n  }\r\n\r\n  /**\r\n  Check if the command corresponds to a CNOT (controlled NOT gate).\r\n\r\n  @param {Command} cmd Command to check whether it is a controlled NOT gate.\r\n  */\r\n  _isCNOT(cmd) {\r\n    return (cmd.gate instanceof NOT.constructor && cmd.controlCount === 1)\r\n  }\r\n\r\n  /**\r\n  Determines the cost of the circuit with the given mapping.\r\n\r\n  @param {Object} mapping Dictionary with key, value pairs where keys are\r\n    logical qubit ids and the corresponding value is the physical\r\n    location on the IBM Q chip.\r\n  @return {number} Cost measure taking into account CNOT directionality or None\r\n    if the circuit cannot be executed given the mapping.\r\n  */\r\n  determineCost(mapping) {\r\n    let cost = 0\r\n    const connections = ibmqx4_connections\r\n    const keys = Object.keys(this._interactions)\r\n    for (let i = 0; i < keys.length; ++i) {\r\n      const tpl = stringKeyToIntArray(keys[i])\r\n      const ctrl_id = tpl[0]\r\n      const target_id = tpl[1]\r\n      const ctrl_pos = mapping[ctrl_id]\r\n      const target_pos = mapping[target_id]\r\n      let k = `${ctrl_pos},${target_pos}`\r\n      let v = connections.has(k)\r\n      if (!v) {\r\n        k = `${target_pos},${ctrl_pos}`\r\n        v = connections.has(k)\r\n        if (v) {\r\n          cost += this._interactions[tpl]\r\n        } else {\r\n          return undefined\r\n        }\r\n      }\r\n    }\r\n    return cost\r\n  }\r\n\r\n  /**\r\n  Runs all stored gates.\r\n\r\n  @throws {Error}\r\n  If the mapping to the IBM backend cannot be performed or if\r\n  the mapping was already determined but more CNOTs get sent\r\ndown the pipeline.\r\n   */\r\n  run() {\r\n    if (Object.keys(this._currentMapping).length > 0 && Math.max(...Object.values(this._currentMapping)) > 4) {\r\n      throw new Error('Too many qubits allocated. The IBM Q '\r\n      + 'device supports at most 5 qubits and no '\r\n      + 'intermediate measurements / '\r\n      + 'reallocations.')\r\n    }\r\n    if (Object.keys(this._interactions).length > 0) {\r\n      const logical_ids = Object.keys(this._currentMapping).map(k => parseInt(k, 10))\r\n      let best_mapping = this._currentMapping\r\n      let best_cost\r\n\r\n      for (const physical_ids of permutations([0, 1, 2, 3, 4], logical_ids.length)) {\r\n        const mapping = {}\r\n        physical_ids.forEach((looper, i) => mapping[logical_ids[i]] = looper)\r\n        const new_cost = this.determineCost(mapping)\r\n        if (new_cost) {\r\n          if (!best_cost || new_cost < best_cost) {\r\n            best_cost = new_cost\r\n            best_mapping = mapping\r\n          }\r\n        }\r\n      }\r\n\r\n      if (!best_cost) {\r\n        throw new Error('Circuit cannot be mapped without using Swaps. Mapping failed.')\r\n      }\r\n      this._interactions = {}\r\n      this.currentMapping = best_mapping\r\n    }\r\n\r\n    this._cmds.forEach(cmd => this.sendCMDWithMappedIDs(cmd))\r\n\r\n    this._cmds = []\r\n  }\r\n\r\n  /**\r\n  Store a command and handle CNOTs.\r\n\r\n  @param {Command} cmd A command to store\r\n   */\r\n  _store(cmd) {\r\n    let target\r\n    if (!(cmd.gate instanceof FlushGate)) {\r\n      target = cmd.qubits[0][0].id\r\n    }\r\n\r\n    if (this._isCNOT(cmd)) {\r\n      // CNOT encountered\r\n      const ctrl = cmd.controlQubits[0].id\r\n      const key = [ctrl, target]\r\n      const v = this._interactions[key]\r\n      if (typeof v === 'undefined') {\r\n        this._interactions[key] = 0\r\n      }\r\n      this._interactions[key] += 1\r\n    } else if (cmd.gate.equal(Allocate)) {\r\n      const v = this._currentMapping[target]\r\n      if (typeof v === 'undefined') {\r\n        let newMax = 0\r\n        if (Object.keys(this._currentMapping).length > 0) {\r\n          newMax = Math.max(...Object.values(this._currentMapping)) + 1\r\n        }\r\n        this._currentMapping[target] = newMax\r\n      }\r\n    }\r\n    this._cmds.push(cmd)\r\n  }\r\n\r\n  /**\r\n  Receives a command list and, for each command, stores it until\r\ncompletion.\r\n\r\n  @param {Command[]} commandList list of commands to receive.\r\n\r\n  @throws {Error} If mapping the CNOT gates to 1 qubit would require\r\nSwaps. The current version only supports remapping of CNOT\r\ngates without performing any Swaps due to the large costs\r\nassociated with Swapping given the CNOT constraints.\r\n   */\r\n  receive(commandList) {\r\n    commandList.forEach((cmd) => {\r\n      this._store(cmd)\r\n      if (cmd.gate instanceof FlushGate) {\r\n        this.run()\r\n        this._reset()\r\n      }\r\n    })\r\n  }\r\n}\r\n",
     "static": true,
     "longname": "E:/workpace/Q/src/cengines/ibm5qubitmapper.js",
     "access": "public",
@@ -6958,13 +6958,15 @@
     "export": true,
     "importPath": "projectq/src/cengines/ibm5qubitmapper.js",
     "importStyle": "{ibmqx4_connections}",
-    "description": null,
-    "lineNumber": 28,
-    "undocument": true,
+    "description": "",
+    "lineNumber": 31,
     "type": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "Set<string>"
+      ],
+      "spread": false,
+      "description": null
     }
   },
   {
@@ -6979,7 +6981,7 @@
     "importPath": "projectq/src/cengines/ibm5qubitmapper.js",
     "importStyle": "IBM5QubitMapper",
     "description": "Mapper for the 5-qubit IBM backend.\n\nMaps a given circuit to the IBM Quantum Experience chip.\n\nNote:\nThe mapper has to be run once on the entire circuit.\n\nWarning:\nIf the provided circuit cannot be mapped to the hardware layout\nwithout performing Swaps, the mapping procedure\n*raises an Exception**.",
-    "lineNumber": 45,
+    "lineNumber": 48,
     "unknown": [
       {
         "tagName": "@class",
@@ -7002,7 +7004,7 @@
     "longname": "src/cengines/ibm5qubitmapper.js~IBM5QubitMapper#constructor",
     "access": "public",
     "description": "",
-    "lineNumber": 52,
+    "lineNumber": 55,
     "unknown": [
       {
         "tagName": "@constructor",
@@ -7019,7 +7021,7 @@
     "longname": "src/cengines/ibm5qubitmapper.js~IBM5QubitMapper#currentMapping",
     "access": "public",
     "description": null,
-    "lineNumber": 54,
+    "lineNumber": 57,
     "undocument": true,
     "type": {
       "types": [
@@ -7038,7 +7040,7 @@
     "longname": "src/cengines/ibm5qubitmapper.js~IBM5QubitMapper#isAvailable",
     "access": "public",
     "description": "Check if the IBM backend can perform the Command cmd and return true\nif so.",
-    "lineNumber": 64,
+    "lineNumber": 67,
     "params": [
       {
         "nullable": null,
@@ -7068,7 +7070,7 @@
     "longname": "src/cengines/ibm5qubitmapper.js~IBM5QubitMapper#_reset",
     "access": "private",
     "description": null,
-    "lineNumber": 69,
+    "lineNumber": 72,
     "undocument": true,
     "params": [],
     "return": null
@@ -7082,7 +7084,7 @@
     "longname": "src/cengines/ibm5qubitmapper.js~IBM5QubitMapper#_cmds",
     "access": "private",
     "description": null,
-    "lineNumber": 70,
+    "lineNumber": 73,
     "undocument": true,
     "type": {
       "types": [
@@ -7099,7 +7101,7 @@
     "longname": "src/cengines/ibm5qubitmapper.js~IBM5QubitMapper#_interactions",
     "access": "private",
     "description": null,
-    "lineNumber": 71,
+    "lineNumber": 74,
     "undocument": true,
     "type": {
       "types": [
@@ -7118,7 +7120,7 @@
     "longname": "src/cengines/ibm5qubitmapper.js~IBM5QubitMapper#_isCNOT",
     "access": "private",
     "description": "Check if the command corresponds to a CNOT (controlled NOT gate).",
-    "lineNumber": 79,
+    "lineNumber": 82,
     "params": [
       {
         "nullable": null,
@@ -7148,7 +7150,7 @@
     "longname": "src/cengines/ibm5qubitmapper.js~IBM5QubitMapper#determineCost",
     "access": "public",
     "description": "Determines the cost of the circuit with the given mapping.",
-    "lineNumber": 92,
+    "lineNumber": 95,
     "params": [
       {
         "nullable": null,
@@ -7181,7 +7183,7 @@
     "longname": "src/cengines/ibm5qubitmapper.js~IBM5QubitMapper#run",
     "access": "public",
     "description": "Runs all stored gates.",
-    "lineNumber": 125,
+    "lineNumber": 128,
     "throws": [
       {
         "types": [
@@ -7204,7 +7206,7 @@
     "longname": "src/cengines/ibm5qubitmapper.js~IBM5QubitMapper#_store",
     "access": "private",
     "description": "Store a command and handle CNOTs.",
-    "lineNumber": 166,
+    "lineNumber": 169,
     "params": [
       {
         "nullable": null,
@@ -7230,7 +7232,7 @@
     "longname": "src/cengines/ibm5qubitmapper.js~IBM5QubitMapper#receive",
     "access": "public",
     "description": "Receives a command list and, for each command, stores it until\ncompletion.",
-    "lineNumber": 205,
+    "lineNumber": 208,
     "params": [
       {
         "nullable": null,
@@ -23958,7 +23960,7 @@
     "__docId__": 1061,
     "kind": "file",
     "name": "src/types/qubit.js",
-    "content": "/*\r\n * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).\r\n *\r\n * Licensed under the Apache License, Version 2.0 (the \"License\");\r\n * you may not use this file except in compliance with the License.\r\n * You may obtain a copy of the License at\r\n *\r\n * http://www.apache.org/licenses/LICENSE-2.0\r\n *\r\n * Unless required by applicable law or agreed to in writing, software\r\n * distributed under the License is distributed on an \"AS IS\" BASIS,\r\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\r\n * See the License for the specific language governing permissions and\r\n * limitations under the License.\r\n */\r\n\r\n/**\r\n    This file defines BasicQubit, Qubit, WeakQubit and Qureg.\r\n\r\n    A Qureg represents a list of Qubit or WeakQubit objects.\r\n    Qubit represents a (logical-level) qubit with a unique index provided by the\r\n    MainEngine. Qubit objects are automatically deallocated if they go out of\r\n    scope and intented to be used within Qureg objects in user code.\r\n\r\n @example\r\n      import MainEngine\r\n      const eng = new MainEngine()\r\n      const qubit = eng.allocateQubit()\r\n\r\n    qubit is a Qureg of size 1 with one Qubit object which is deallocated once\r\n    qubit goes out of scope.\r\n\r\n    WeakQubit are used inside the Command object and are not automatically deallocated.\r\n*/\r\nimport {arrayEqual} from '../libs/polyfill'\r\n\r\n/**\r\n * @class BasicQubit\r\n * @desc\r\n * objects represent qubits. They have an id and a reference to the owning engine.\r\n */\r\nexport class BasicQubit {\r\n  /**\r\n   *  @constructor\r\n   *  Initialize a BasicQubit object.\r\n   *  @param {BasicEngine} engine Owning engine / engine that created the qubit\r\n   *  @param {number} idx Unique index of the qubit referenced by this qubit\r\n   */\r\n  constructor(engine, idx) {\r\n    this.engine = engine\r\n    this.id = idx\r\n  }\r\n\r\n  /**\r\n    Return string representation of this qubit.\r\n   @return {string}\r\n   */\r\n  toString() {\r\n    return `${this.id}`\r\n  }\r\n\r\n  /**\r\n   *\r\n   * @return {string}\r\n   */\r\n  inspect() {\r\n    return this.toString()\r\n  }\r\n\r\n  /**\r\n    Access the result of a previous measurement and return false / true (0 / 1)\r\n    @return {boolean}\r\n  */\r\n  toBoolean() {\r\n    return this.engine.main.getMeasurementResult(this)\r\n  }\r\n\r\n  /**\r\n   * @return {number}\r\n   */\r\n  toNumber() {\r\n    return this.toBoolean() ? 1 : 0\r\n  }\r\n\r\n  /**\r\n   * Compare with other qubit (Returns true if equal id and engine).\r\n   *\r\n   * @param other {BasicQubit|Object} BasicQubit to which to compare this one\r\n   * @return {boolean}\r\n   */\r\n  equal(other) {\r\n    if (this === other) {\r\n      return true\r\n    }\r\n    return other instanceof BasicQubit && this.id === other.id && this.engine === other.engine\r\n  }\r\n\r\n  weakCopy() {\r\n    return new BasicQubit(this.engine, this.id)\r\n  }\r\n\r\n  static copyArray(array) {\r\n    return array.map(i => i.weakCopy())\r\n  }\r\n}\r\n\r\n/**\r\n * @class Qubit\r\n * @desc\r\n    Represents a (logical-level) qubit with a unique index provided by the\r\n    MainEngine. Once the qubit goes out of scope (and is garbage-collected),\r\n    it deallocates itself automatically, allowing automatic resource management.\r\n\r\n    Thus the qubit is not copyable only returns a reference to the same object.\r\n */\r\nexport class Qubit extends BasicQubit {\r\n  deallocate() {\r\n    // # If a user directly calls this function, then the qubit gets id == -1\r\n    // # but stays in active_qubits as it is not yet deleted, hence remove\r\n    // # it manually (if the garbage collector calls this function, then the\r\n    // # WeakRef in active qubits is already gone):\r\n    if (this.id === -1) {\r\n      return\r\n    }\r\n\r\n    try {\r\n      const qubits = this.engine.main.activeQubits\r\n      if (qubits.has(this)) {\r\n        qubits.delete(this)\r\n      }\r\n      this.engine.deallocateQubit(this)\r\n    } catch (e) {\r\n      throw e\r\n    } finally {\r\n      this.id = -1\r\n    }\r\n  }\r\n\r\n  /**\r\n    Non-copyable (returns reference to self).\r\n    Note:\r\n      To prevent problems with automatic deallocation, qubits are not copyable!\r\n  */\r\n  copy() {\r\n    return this\r\n  }\r\n}\r\n\r\n/**\r\n * @interface\r\n * @class Qureg\r\n * @desc Quantum register class.\r\nSimplifies accessing measured values for single-qubit registers (no []-access necessary)\r\n and enables pretty-printing of general quantum registers).\r\n */\r\nexport function Qureg(...args) {\r\n  const arg0 = args[0]\r\n  let inst\r\n  if (Array.isArray(arg0)) {\r\n    inst = Array.from(arg0)\r\n  } else {\r\n    inst = new Array(...args)\r\n  }\r\n  inst.__proto__ = Qureg.prototype\r\n  return inst\r\n}\r\n\r\nQureg.prototype = Object.create(Array.prototype)\r\n\r\n/**\r\n * @param {Qureg|Object} other\r\n * @return {boolean}\r\n */\r\nQureg.prototype.equal = function (other) {\r\n  if (other instanceof Qureg) {\r\n    return arrayEqual(this, other, (x, y) => x.equal(y))\r\n  }\r\n  return false\r\n}\r\n\r\n/**\r\n  Return measured value if Qureg consists of 1 qubit only.\r\n\r\n @throws {Error} if more than 1 qubit resides in this register (then you\r\n    need to specify which value to get using qureg[???])\r\n  @return {boolean}\r\n*/\r\nQureg.prototype.toBoolean = function () {\r\n  if (this.length === 1) {\r\n    return this[0].toBoolean()\r\n  }\r\n  throw new Error('qureg.toBoolean(): Quantum register contains more \"\\n'\r\n    + '\"than 1 qubit. Use qureg[idx].toBoolean() instead.')\r\n}\r\n\r\n/**\r\n * @return {number}\r\n */\r\nQureg.prototype.toNumber = function () {\r\n  return this.toBoolean() ? 1 : 0\r\n}\r\n\r\n/**\r\n * @return {string}\r\n */\r\nQureg.prototype.toString = function () {\r\n  if (this.length === 0) return 'Qureg[]'\r\n  const ids = this.slice(1).map(({id}) => id)\r\n  ids.push(null) // Forces a flush on last loop iteration.\r\n\r\n  const out_list = []\r\n  let start_id = this[0].id\r\n  let count = 1\r\n  ids.forEach((qubit_id) => {\r\n    if (qubit_id === start_id + count) {\r\n      count += 1\r\n    } else {\r\n      // TODO\r\n      if (count > 1) {\r\n        out_list.push(`${start_id}-${start_id + count - 1}`)\r\n      } else {\r\n        out_list.push(`${start_id}`)\r\n      }\r\n      start_id = qubit_id\r\n      count = 1\r\n    }\r\n  })\r\n\r\n  return `Qureg[${out_list.join(', ')}]`\r\n}\r\n\r\n/**\r\n * @param {Qureg|Array.<Qubit>} other\r\n * @return {Qureg}\r\n */\r\nQureg.prototype.add = function (other) {\r\n  const array = this.concat(other)\r\n  return new Qureg(array)\r\n}\r\n\r\nQureg.prototype.deallocate = function () {\r\n  this.forEach(qubit => qubit.deallocate())\r\n  this.length = 0\r\n}\r\n\r\n// fix class hierarchy\r\nQureg.__proto__ = Array\r\n\r\n/**\r\n * @property {BasicEngine} engine\r\n */\r\nObject.defineProperty(Qureg.prototype, 'engine', {\r\n  get() {\r\n    return this[0].engine\r\n  },\r\n  set(newEngine) {\r\n    this.forEach(looper => looper.engine = newEngine)\r\n  }\r\n})\r\n",
+    "content": "/*\r\n * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).\r\n *\r\n * Licensed under the Apache License, Version 2.0 (the \"License\");\r\n * you may not use this file except in compliance with the License.\r\n * You may obtain a copy of the License at\r\n *\r\n * http://www.apache.org/licenses/LICENSE-2.0\r\n *\r\n * Unless required by applicable law or agreed to in writing, software\r\n * distributed under the License is distributed on an \"AS IS\" BASIS,\r\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\r\n * See the License for the specific language governing permissions and\r\n * limitations under the License.\r\n */\r\n\r\n/**\r\n    This file defines BasicQubit, Qubit, WeakQubit and Qureg.\r\n\r\n    A Qureg represents a list of Qubit or WeakQubit objects.\r\n    Qubit represents a (logical-level) qubit with a unique index provided by the\r\n    MainEngine. Qubit objects are automatically deallocated if they go out of\r\n    scope and intented to be used within Qureg objects in user code.\r\n\r\n @example\r\n      import MainEngine\r\n      const eng = new MainEngine()\r\n      const qubit = eng.allocateQubit()\r\n\r\n    qubit is a Qureg of size 1 with one Qubit object which is deallocated once\r\n    qubit goes out of scope.\r\n\r\n    WeakQubit are used inside the Command object and are not automatically deallocated.\r\n*/\r\nimport {arrayEqual} from '../libs/polyfill'\r\n\r\n/**\r\n * @class BasicQubit\r\n * @desc\r\n * objects represent qubits. They have an id and a reference to the owning engine.\r\n */\r\nexport class BasicQubit {\r\n  /**\r\n   *  @constructor\r\n   *  Initialize a BasicQubit object.\r\n   *  @param {BasicEngine} engine Owning engine / engine that created the qubit\r\n   *  @param {number} idx Unique index of the qubit referenced by this qubit\r\n   */\r\n  constructor(engine, idx) {\r\n    /**\r\n     * @type {BasicEngine}\r\n     */\r\n    this.engine = engine\r\n    this.id = idx\r\n  }\r\n\r\n  /**\r\n    Return string representation of this qubit.\r\n   @return {string}\r\n   */\r\n  toString() {\r\n    return `${this.id}`\r\n  }\r\n\r\n  /**\r\n   *\r\n   * @return {string}\r\n   */\r\n  inspect() {\r\n    return this.toString()\r\n  }\r\n\r\n  /**\r\n    Access the result of a previous measurement and return false / true (0 / 1)\r\n    @return {boolean}\r\n  */\r\n  toBoolean() {\r\n    return this.engine.main.getMeasurementResult(this)\r\n  }\r\n\r\n  /**\r\n   * @return {number}\r\n   */\r\n  toNumber() {\r\n    return this.toBoolean() ? 1 : 0\r\n  }\r\n\r\n  /**\r\n   * Compare with other qubit (Returns true if equal id and engine).\r\n   *\r\n   * @param other {BasicQubit|Object} BasicQubit to which to compare this one\r\n   * @return {boolean}\r\n   */\r\n  equal(other) {\r\n    if (this === other) {\r\n      return true\r\n    }\r\n    return other instanceof BasicQubit && this.id === other.id && this.engine === other.engine\r\n  }\r\n\r\n  weakCopy() {\r\n    return new BasicQubit(this.engine, this.id)\r\n  }\r\n\r\n  static copyArray(array) {\r\n    return array.map(i => i.weakCopy())\r\n  }\r\n}\r\n\r\n/**\r\n * @class Qubit\r\n * @desc\r\n    Represents a (logical-level) qubit with a unique index provided by the\r\n    MainEngine. Once the qubit goes out of scope (and is garbage-collected),\r\n    it deallocates itself automatically, allowing automatic resource management.\r\n\r\n    Thus the qubit is not copyable only returns a reference to the same object.\r\n */\r\nexport class Qubit extends BasicQubit {\r\n  deallocate() {\r\n    // # If a user directly calls this function, then the qubit gets id == -1\r\n    // # but stays in active_qubits as it is not yet deleted, hence remove\r\n    // # it manually (if the garbage collector calls this function, then the\r\n    // # WeakRef in active qubits is already gone):\r\n    if (this.id === -1) {\r\n      return\r\n    }\r\n\r\n    try {\r\n      const qubits = this.engine.main.activeQubits\r\n      if (qubits.has(this)) {\r\n        qubits.delete(this)\r\n      }\r\n      this.engine.deallocateQubit(this)\r\n    } catch (e) {\r\n      throw e\r\n    } finally {\r\n      this.id = -1\r\n    }\r\n  }\r\n\r\n  /**\r\n    Non-copyable (returns reference to self).\r\n    Note:\r\n      To prevent problems with automatic deallocation, qubits are not copyable!\r\n  */\r\n  copy() {\r\n    return this\r\n  }\r\n}\r\n\r\n/**\r\n * Quantum register class.\r\nSimplifies accessing measured values for single-qubit registers (no []-access necessary)\r\n and enables pretty-printing of general quantum registers).\r\n @class Qureg\r\n */\r\nexport class Qureg extends Array {\r\n  /**\r\n   * a little different with `Array`: when pass an array as argument, will copy the passed array\r\n   * @constructor\r\n   * @param {...any|number|Array} args\r\n   */\r\n  constructor(...args) {\r\n    const arg0 = args[0]\r\n    if (Array.isArray(arg0)) {\r\n      super(...arg0)\r\n    } else {\r\n      super(...args)\r\n    }\r\n    /**\r\n     * @ignore\r\n     * @private\r\n     */\r\n    this.__proto__ = Qureg.prototype\r\n  }\r\n\r\n  /**\r\n   * test if two Quregs are equal\r\n   * @param {Qureg|Object} other\r\n   * @return {boolean}\r\n   */\r\n  equal(other) {\r\n    if (other instanceof Qureg) {\r\n      return arrayEqual(this, other, (x, y) => x.equal(y))\r\n    }\r\n    return false\r\n  }\r\n\r\n  /**\r\n   * only supported when `length === 1`, use the qubit value as qureg value\r\n   * @throws {Error} will throw when `length !== 1`\r\n   * @return {boolean}\r\n   */\r\n  toBoolean() {\r\n    if (this.length === 1) {\r\n      return this[0].toBoolean()\r\n    }\r\n    throw new Error('qureg.toBoolean(): Quantum register contains more \"\\n'\r\n        + '\"than 1 qubit. Use qureg[idx].toBoolean() instead.')\r\n  }\r\n\r\n  /**\r\n   * number representation\r\n   * @return {number}\r\n   */\r\n  toNumber() {\r\n    return this.toBoolean() ? 1 : 0\r\n  }\r\n\r\n  /**\r\n   * add qubits from `other`, return a new Qureg instance\r\n   * @param {Array<Qubit>|Qureg} other\r\n   * @return {Qureg}\r\n   */\r\n  add(other) {\r\n    const array = this.concat(other)\r\n    return new Qureg(array)\r\n  }\r\n\r\n  /**\r\n   * string description\r\n   * @return {string}\r\n   */\r\n  toString() {\r\n    if (this.length === 0) return 'Qureg[]'\r\n    const ids = this.slice(1).map(({id}) => id)\r\n    ids.push(null) // Forces a flush on last loop iteration.\r\n\r\n    const out_list = []\r\n    let start_id = this[0].id\r\n    let count = 1\r\n    ids.forEach((qubit_id) => {\r\n      if (qubit_id === start_id + count) {\r\n        count += 1\r\n      } else {\r\n        // TODO\r\n        if (count > 1) {\r\n          out_list.push(`${start_id}-${start_id + count - 1}`)\r\n        } else {\r\n          out_list.push(`${start_id}`)\r\n        }\r\n        start_id = qubit_id\r\n        count = 1\r\n      }\r\n    })\r\n\r\n    return `Qureg[${out_list.join(', ')}]`\r\n  }\r\n\r\n  /**\r\n   * deallocate all qubit, then clear the qureg\r\n   */\r\n  deallocate() {\r\n    this.forEach(qubit => qubit.deallocate())\r\n    this.length = 0\r\n  }\r\n\r\n  /**\r\n   * @return {BasicEngine}\r\n   */\r\n  get engine() {\r\n    return this[0].engine\r\n  }\r\n\r\n  /**\r\n   * @param {BasicEngine} newEngine\r\n   */\r\n  set engine(newEngine) {\r\n    this.forEach(looper => looper.engine = newEngine)\r\n  }\r\n}\r\n",
     "static": true,
     "longname": "E:/workpace/Q/src/types/qubit.js",
     "access": "public",
@@ -24035,13 +24037,15 @@
     "static": false,
     "longname": "src/types/qubit.js~BasicQubit#engine",
     "access": "public",
-    "description": null,
-    "lineNumber": 50,
-    "undocument": true,
+    "description": "",
+    "lineNumber": 53,
     "type": {
+      "nullable": null,
       "types": [
-        "*"
-      ]
+        "BasicEngine"
+      ],
+      "spread": false,
+      "description": null
     }
   },
   {
@@ -24053,7 +24057,7 @@
     "longname": "src/types/qubit.js~BasicQubit#id",
     "access": "public",
     "description": null,
-    "lineNumber": 51,
+    "lineNumber": 54,
     "undocument": true,
     "type": {
       "types": [
@@ -24072,7 +24076,7 @@
     "longname": "src/types/qubit.js~BasicQubit#toString",
     "access": "public",
     "description": "Return string representation of this qubit.",
-    "lineNumber": 58,
+    "lineNumber": 61,
     "return": {
       "nullable": null,
       "types": [
@@ -24094,7 +24098,7 @@
     "longname": "src/types/qubit.js~BasicQubit#inspect",
     "access": "public",
     "description": "",
-    "lineNumber": 66,
+    "lineNumber": 69,
     "return": {
       "nullable": null,
       "types": [
@@ -24116,7 +24120,7 @@
     "longname": "src/types/qubit.js~BasicQubit#toBoolean",
     "access": "public",
     "description": "Access the result of a previous measurement and return false / true (0 / 1)",
-    "lineNumber": 74,
+    "lineNumber": 77,
     "return": {
       "nullable": null,
       "types": [
@@ -24138,7 +24142,7 @@
     "longname": "src/types/qubit.js~BasicQubit#toNumber",
     "access": "public",
     "description": "",
-    "lineNumber": 81,
+    "lineNumber": 84,
     "return": {
       "nullable": null,
       "types": [
@@ -24160,7 +24164,7 @@
     "longname": "src/types/qubit.js~BasicQubit#equal",
     "access": "public",
     "description": "Compare with other qubit (Returns true if equal id and engine).",
-    "lineNumber": 91,
+    "lineNumber": 94,
     "params": [
       {
         "nullable": null,
@@ -24193,7 +24197,7 @@
     "longname": "src/types/qubit.js~BasicQubit#weakCopy",
     "access": "public",
     "description": null,
-    "lineNumber": 98,
+    "lineNumber": 101,
     "undocument": true,
     "params": [],
     "return": {
@@ -24213,7 +24217,7 @@
     "longname": "src/types/qubit.js~BasicQubit.copyArray",
     "access": "public",
     "description": null,
-    "lineNumber": 102,
+    "lineNumber": 105,
     "undocument": true,
     "params": [
       {
@@ -24241,7 +24245,7 @@
     "importPath": "projectq/src/types/qubit.js",
     "importStyle": "{Qubit}",
     "description": "Represents a (logical-level) qubit with a unique index provided by the\nMainEngine. Once the qubit goes out of scope (and is garbage-collected),\nit deallocates itself automatically, allowing automatic resource management.\n\nThus the qubit is not copyable only returns a reference to the same object.",
-    "lineNumber": 116,
+    "lineNumber": 119,
     "unknown": [
       {
         "tagName": "@class",
@@ -24264,7 +24268,7 @@
     "longname": "src/types/qubit.js~Qubit#deallocate",
     "access": "public",
     "description": null,
-    "lineNumber": 117,
+    "lineNumber": 120,
     "undocument": true,
     "params": [],
     "return": null
@@ -24278,7 +24282,7 @@
     "longname": "src/types/qubit.js~Qubit#id",
     "access": "public",
     "description": null,
-    "lineNumber": 135,
+    "lineNumber": 138,
     "undocument": true,
     "type": {
       "types": [
@@ -24297,7 +24301,7 @@
     "longname": "src/types/qubit.js~Qubit#copy",
     "access": "public",
     "description": "Non-copyable (returns reference to self).\nNote:\nTo prevent problems with automatic deallocation, qubits are not copyable!",
-    "lineNumber": 144,
+    "lineNumber": 147,
     "params": [],
     "return": {
       "types": [
@@ -24307,11 +24311,9 @@
   },
   {
     "__docId__": 1077,
-    "kind": "function",
+    "kind": "class",
     "name": "Qureg",
     "memberof": "src/types/qubit.js",
-    "generator": false,
-    "async": false,
     "static": true,
     "longname": "src/types/qubit.js~Qureg",
     "access": "public",
@@ -24319,47 +24321,80 @@
     "importPath": "projectq/src/types/qubit.js",
     "importStyle": "{Qureg}",
     "description": "Quantum register class.\nSimplifies accessing measured values for single-qubit registers (no []-access necessary)\nand enables pretty-printing of general quantum registers).",
-    "lineNumber": 156,
+    "lineNumber": 158,
     "unknown": [
-      {
-        "tagName": "@interface",
-        "tagValue": ""
-      },
       {
         "tagName": "@class",
         "tagValue": "Qureg"
       }
     ],
-    "params": [
+    "interface": false,
+    "extends": [
+      "Array"
+    ]
+  },
+  {
+    "__docId__": 1078,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "src/types/qubit.js~Qureg",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/types/qubit.js~Qureg#constructor",
+    "access": "public",
+    "description": "a little different with `Array`: when pass an array as argument, will copy the passed array",
+    "lineNumber": 164,
+    "unknown": [
       {
-        "name": "args",
-        "types": [
-          "...*"
-        ],
-        "spread": true
+        "tagName": "@constructor",
+        "tagValue": ""
       }
     ],
-    "return": {
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "...any",
+          "number",
+          "Array"
+        ],
+        "spread": true,
+        "optional": false,
+        "name": "args",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 1079,
+    "kind": "member",
+    "name": "__proto__",
+    "memberof": "src/types/qubit.js~Qureg",
+    "static": false,
+    "longname": "src/types/qubit.js~Qureg#__proto__",
+    "access": "private",
+    "description": "",
+    "lineNumber": 175,
+    "ignore": true,
+    "type": {
       "types": [
         "*"
       ]
     }
   },
   {
-    "__docId__": 1078,
-    "kind": "function",
+    "__docId__": 1080,
+    "kind": "method",
     "name": "equal",
-    "memberof": "src/types/qubit.js",
+    "memberof": "src/types/qubit.js~Qureg",
     "generator": false,
     "async": false,
-    "static": true,
-    "longname": "src/types/qubit.js~equal",
+    "static": false,
+    "longname": "src/types/qubit.js~Qureg#equal",
     "access": "public",
-    "export": false,
-    "importPath": "projectq/src/types/qubit.js",
-    "importStyle": null,
-    "description": "",
-    "lineNumber": 174,
+    "description": "test if two Quregs are equal",
+    "lineNumber": 183,
     "params": [
       {
         "nullable": null,
@@ -24380,24 +24415,20 @@
       ],
       "spread": false,
       "description": ""
-    },
-    "ignore": true
+    }
   },
   {
-    "__docId__": 1079,
-    "kind": "function",
+    "__docId__": 1081,
+    "kind": "method",
     "name": "toBoolean",
-    "memberof": "src/types/qubit.js",
+    "memberof": "src/types/qubit.js~Qureg",
     "generator": false,
     "async": false,
-    "static": true,
-    "longname": "src/types/qubit.js~toBoolean",
+    "static": false,
+    "longname": "src/types/qubit.js~Qureg#toBoolean",
     "access": "public",
-    "export": false,
-    "importPath": "projectq/src/types/qubit.js",
-    "importStyle": null,
-    "description": "Return measured value if Qureg consists of 1 qubit only.",
-    "lineNumber": 188,
+    "description": "only supported when `length === 1`, use the qubit value as qureg value",
+    "lineNumber": 195,
     "return": {
       "nullable": null,
       "types": [
@@ -24411,27 +24442,23 @@
         "types": [
           "Error"
         ],
-        "description": "if more than 1 qubit resides in this register (then you\nneed to specify which value to get using qureg[???])"
+        "description": "will throw when `length !== 1`"
       }
     ],
-    "params": [],
-    "ignore": true
+    "params": []
   },
   {
-    "__docId__": 1080,
-    "kind": "function",
+    "__docId__": 1082,
+    "kind": "method",
     "name": "toNumber",
-    "memberof": "src/types/qubit.js",
+    "memberof": "src/types/qubit.js~Qureg",
     "generator": false,
     "async": false,
-    "static": true,
-    "longname": "src/types/qubit.js~toNumber",
+    "static": false,
+    "longname": "src/types/qubit.js~Qureg#toNumber",
     "access": "public",
-    "export": false,
-    "importPath": "projectq/src/types/qubit.js",
-    "importStyle": null,
-    "description": "",
-    "lineNumber": 199,
+    "description": "number representation",
+    "lineNumber": 207,
     "return": {
       "nullable": null,
       "types": [
@@ -24440,56 +24467,26 @@
       "spread": false,
       "description": ""
     },
-    "params": [],
-    "ignore": true
+    "params": []
   },
   {
-    "__docId__": 1081,
-    "kind": "function",
-    "name": "toString",
-    "memberof": "src/types/qubit.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/types/qubit.js~toString",
-    "access": "public",
-    "export": false,
-    "importPath": "projectq/src/types/qubit.js",
-    "importStyle": null,
-    "description": "",
-    "lineNumber": 206,
-    "return": {
-      "nullable": null,
-      "types": [
-        "string"
-      ],
-      "spread": false,
-      "description": ""
-    },
-    "params": [],
-    "ignore": true
-  },
-  {
-    "__docId__": 1082,
-    "kind": "function",
+    "__docId__": 1083,
+    "kind": "method",
     "name": "add",
-    "memberof": "src/types/qubit.js",
+    "memberof": "src/types/qubit.js~Qureg",
     "generator": false,
     "async": false,
-    "static": true,
-    "longname": "src/types/qubit.js~add",
+    "static": false,
+    "longname": "src/types/qubit.js~Qureg#add",
     "access": "public",
-    "export": false,
-    "importPath": "projectq/src/types/qubit.js",
-    "importStyle": null,
-    "description": "",
-    "lineNumber": 236,
+    "description": "add qubits from `other`, return a new Qureg instance",
+    "lineNumber": 216,
     "params": [
       {
         "nullable": null,
         "types": [
-          "Qureg",
-          "Array.<Qubit>"
+          "Array<Qubit>",
+          "Qureg"
         ],
         "spread": false,
         "optional": false,
@@ -24504,34 +24501,118 @@
       ],
       "spread": false,
       "description": ""
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 1083,
-    "kind": "function",
-    "name": "deallocate",
-    "memberof": "src/types/qubit.js",
-    "generator": false,
-    "async": false,
-    "static": true,
-    "longname": "src/types/qubit.js~deallocate",
-    "access": "public",
-    "export": false,
-    "importPath": "projectq/src/types/qubit.js",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 241,
-    "undocument": true,
-    "params": [],
-    "return": null,
-    "ignore": true
+    }
   },
   {
     "__docId__": 1084,
+    "kind": "method",
+    "name": "toString",
+    "memberof": "src/types/qubit.js~Qureg",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/types/qubit.js~Qureg#toString",
+    "access": "public",
+    "description": "string description",
+    "lineNumber": 225,
+    "return": {
+      "nullable": null,
+      "types": [
+        "string"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "params": []
+  },
+  {
+    "__docId__": 1085,
+    "kind": "method",
+    "name": "deallocate",
+    "memberof": "src/types/qubit.js~Qureg",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/types/qubit.js~Qureg#deallocate",
+    "access": "public",
+    "description": "deallocate all qubit, then clear the qureg",
+    "lineNumber": 254,
+    "params": [],
+    "return": null
+  },
+  {
+    "__docId__": 1086,
+    "kind": "member",
+    "name": "length",
+    "memberof": "src/types/qubit.js~Qureg",
+    "static": false,
+    "longname": "src/types/qubit.js~Qureg#length",
+    "access": "public",
+    "description": null,
+    "lineNumber": 256,
+    "undocument": true,
+    "type": {
+      "types": [
+        "number"
+      ]
+    }
+  },
+  {
+    "__docId__": 1087,
+    "kind": "get",
+    "name": "engine",
+    "memberof": "src/types/qubit.js~Qureg",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/types/qubit.js~Qureg#engine",
+    "access": "public",
+    "description": "",
+    "lineNumber": 262,
+    "return": {
+      "nullable": null,
+      "types": [
+        "BasicEngine"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 1088,
+    "kind": "set",
+    "name": "engine",
+    "memberof": "src/types/qubit.js~Qureg",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/types/qubit.js~Qureg#engine",
+    "access": "public",
+    "description": "",
+    "lineNumber": 269,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "BasicEngine"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "newEngine",
+        "description": ""
+      }
+    ]
+  },
+  {
+    "__docId__": 1089,
     "kind": "file",
     "name": "src/types/qubit.spec.js",
-    "content": "/*\r\n * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).\r\n *\r\n * Licensed under the Apache License, Version 2.0 (the \"License\");\r\n * you may not use this file except in compliance with the License.\r\n * You may obtain a copy of the License at\r\n *\r\n * http://www.apache.org/licenses/LICENSE-2.0\r\n *\r\n * Unless required by applicable law or agreed to in writing, software\r\n * distributed under the License is distributed on an \"AS IS\" BASIS,\r\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\r\n * See the License for the specific language governing permissions and\r\n * limitations under the License.\r\n */\r\n\r\nimport {assert, expect} from 'chai'\r\nimport math from 'mathjs'\r\nimport {BasicQubit, Qubit, Qureg} from './qubit'\r\nimport {BasicEngine} from '../cengines/basics'\r\nimport MainEngine from '../cengines/main'\r\nimport {DummyEngine} from '../cengines/testengine'\r\nimport {Deallocate} from '../ops/gates';\r\n\r\nconst mc = math.complex\r\nconst mm = math.matrix\r\n\r\ndescribe('Qubit test', () => {\r\n  it('should test math complex type', () => {\r\n    const c = mc(1, -1)\r\n    console.log(c.re, c.im)\r\n    const a = mm([[1, 0], [0, 1]])\r\n    console.log(a._data)\r\n  });\r\n\r\n  it('should test basic qubit', () => {\r\n    const qubitID = [0, 1]\r\n    const fakeEngine = 'Fake'\r\n    const qubit = new BasicQubit(fakeEngine, qubitID)\r\n    expect(qubit.toString()).to.equal(qubitID.toString())\r\n    expect(qubit.toString()).to.equal(qubit.inspect())\r\n  });\r\n\r\n  it('should test basic qubit measurement', () => {\r\n    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])\r\n    const qubit0 = eng.allocateQubit()[0]\r\n    const qubit1 = eng.allocateQubit()[0]\r\n    eng.setMeasurementResult(qubit0, false)\r\n    eng.setMeasurementResult(qubit1, true)\r\n\r\n    expect(qubit0.toBoolean()).to.equal(false)\r\n    expect(qubit1.toBoolean()).to.equal(true)\r\n    expect(qubit0.toNumber()).to.equal(0)\r\n    expect(qubit1.toNumber()).to.equal(1)\r\n  });\r\n\r\n  it('should test basic qubit comparison', () => {\r\n    const data = [\r\n      [0, 0, true],\r\n      [0, 1, false]\r\n    ]\r\n\r\n    const fakeEngine = 'Fake'\r\n    const fakeEngine2 = 'Fake 2'\r\n\r\n    data.forEach((item) => {\r\n      const [id0, id1, expected] = item\r\n\r\n      const qubit0 = new BasicQubit(fakeEngine, id0)\r\n      const qubit1 = new BasicQubit(fakeEngine, id1)\r\n      const qubit2 = new BasicQubit(fakeEngine2, id0)\r\n\r\n      expect(qubit2.equal(qubit0)).to.equal(false)\r\n      expect(qubit2.equal(qubit1)).to.equal(false)\r\n      expect(qubit0.equal(qubit1)).to.equal(expected)\r\n    })\r\n  });\r\n\r\n  it('should test basic qubit equal', () => {\r\n    const fakeEngine = 'Engine'\r\n    const q1 = new BasicQubit(fakeEngine, 1)\r\n    const q2 = new BasicQubit(fakeEngine, 2)\r\n    const q3 = new BasicQubit(null, 3)\r\n    const q4 = new BasicQubit(fakeEngine, 1)\r\n\r\n    expect(q1.equal(q2)).to.equal(false)\r\n    expect(q1.equal(q3)).to.equal(false)\r\n    expect(q2.equal(q3)).to.equal(false)\r\n    expect(q4.equal(q1)).to.equal(true)\r\n  });\r\n\r\n  class MockMainEngine {\r\n    constructor() {\r\n      this.numCalls = 0\r\n      this.activeQubits = new Set()\r\n      this.main = this\r\n    }\r\n\r\n    deallocateQubit(qubit) {\r\n      this.numCalls += 1\r\n      this.qubitID = qubit.id\r\n    }\r\n  }\r\n\r\n  it('should test qubit del', () => {\r\n    const engine = new MockMainEngine()\r\n    const qubit = new Qubit(engine, 10)\r\n    assert(qubit.id === 10)\r\n    qubit.deallocate()\r\n    assert(qubit.id === -1)\r\n    assert(engine.numCalls === 1)\r\n    assert(engine.qubitID === 10)\r\n  });\r\n\r\n  it('should qubit not copyable', () => {\r\n    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])\r\n    const qubit = new Qubit(eng, 10)\r\n    const qubit_copy = qubit.copy()\r\n    assert(qubit === qubit_copy)\r\n  })\r\n\r\n  it('should test qureg str', () => {\r\n    const eng = new MainEngine(new DummyEngine(), [])\r\n    const reg = new Qureg()\r\n    expect(reg.toString()).to.equal('Qureg[]')\r\n\r\n    const a = eng.allocateQureg(10)\r\n    const b = eng.allocateQureg(50)\r\n    const c = eng.allocateQubit()\r\n    const d = eng.allocateQubit()\r\n    const e = eng.allocateQubit()\r\n\r\n    expect(a.toString()).to.equal('Qureg[0-9]')\r\n    assert(b.toString() === 'Qureg[10-59]')\r\n    assert(c.toString() === 'Qureg[60]')\r\n    assert(d.toString() === 'Qureg[61]')\r\n    assert(e.toString() === 'Qureg[62]')\r\n\r\n    expect(c.add(e).toString()).to.equal('Qureg[60, 62]')\r\n    expect(a.add(b).toString()).to.equal('Qureg[0-59]')\r\n    expect(a.add(b).add(c).toString()).to.equal('Qureg[0-60]')\r\n    expect(a.add(b).add(d).toString()).to.equal('Qureg[0-59, 61]')\r\n    expect(a.add(b).add(e).toString()).to.equal('Qureg[0-59, 62]')\r\n    expect(b.add(a).toString()).to.equal('Qureg[10-59, 0-9]')\r\n    expect(e.add(b).add(a).toString()).to.equal('Qureg[62, 10-59, 0-9]')\r\n  });\r\n\r\n  it('should test qureg measure if qubit', () => {\r\n    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])\r\n    const qureg0 = new Qureg(eng.allocateQubit())\r\n    const qureg1 = new Qureg(eng.allocateQubit())\r\n    eng.setMeasurementResult(qureg0[0], false)\r\n    eng.setMeasurementResult(qureg1[0], true)\r\n\r\n    expect(qureg0.toBoolean()).to.equal(false)\r\n    expect(qureg1.toBoolean()).to.equal(true)\r\n    expect(qureg0.toNumber()).to.equal(0)\r\n    expect(qureg1.toNumber()).to.equal(1)\r\n  });\r\n\r\n  it('should qureg measure exception', () => {\r\n    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])\r\n    const qureg = new Qureg()\r\n    const ids = [0, 1]\r\n    ids.forEach((id) => {\r\n      const qubit = new Qubit(eng, id)\r\n      qureg.push(qubit)\r\n    })\r\n    expect(qureg.toBoolean).to.throw()\r\n  });\r\n\r\n  it('should qureg engine', () => {\r\n    const eng1 = new MainEngine(new DummyEngine(), [new DummyEngine()])\r\n    const eng2 = new MainEngine(new DummyEngine(), [new DummyEngine()])\r\n    const qureg = new Qureg([new Qubit(eng1, 0), new Qubit(eng1, 1)])\r\n    expect(eng1).to.equal(qureg.engine)\r\n    qureg.engine = eng2\r\n    expect(qureg[0].engine === eng2 && qureg[1].engine === eng2).to.equal(true)\r\n  });\r\n\r\n  it('should idempotent del', () => {\r\n    const rec = new DummyEngine(true)\r\n    const eng = new MainEngine(rec, [])\r\n    const q = eng.allocateQubit()[0]\r\n    rec.receivedCommands = []\r\n    assert(rec.receivedCommands.length === 0)\r\n    q.deallocate()\r\n    assert(rec.receivedCommands.length === 1)\r\n    q.deallocate()\r\n    assert(rec.receivedCommands.length === 1)\r\n  });\r\n\r\n  it('should test qureg deallocate', () => {\r\n    const rec = new DummyEngine(true)\r\n    const eng = new MainEngine(rec, [])\r\n    const q = eng.allocateQureg(1)\r\n    rec.receivedCommands = []\r\n    assert(rec.receivedCommands.length === 0)\r\n    q.deallocate()\r\n    assert(rec.receivedCommands.length === 1)\r\n    q.deallocate()\r\n    assert(rec.receivedCommands.length === 1)\r\n  });\r\n\r\n  it('should test qureg to Number', function () {\r\n    const rec = new DummyEngine(true)\r\n    const eng = new MainEngine(rec, [])\r\n    const q = eng.allocateQureg(2)\r\n    expect(() => q.toNumber()).to.throw()\r\n    expect(() => q.toBoolean()).to.throw()\r\n\r\n    const q2 = eng.allocateQureg(1)\r\n    expect(() => q2.toNumber()).to.throw()\r\n  });\r\n\r\n  it('should test qureg equal', function () {\r\n    const rec = new DummyEngine(true)\r\n    const eng = new MainEngine(rec, [])\r\n    const q = eng.allocateQureg(2)\r\n    const q2 = eng.allocateQureg(2)\r\n    const q3 = new Qureg(...q)\r\n    expect(q.equal(q2)).to.equal(false)\r\n    expect(q.equal(q3)).to.equal(true)\r\n    expect(q.equal(new Array(...q))).to.equal(false)\r\n  });\r\n\r\n  it('should test basic qubit array copy', function () {\r\n    const q = new BasicQubit(null, 0)\r\n    const array = [q]\r\n    const copy = BasicQubit.copyArray(array)\r\n    expect(array).to.deep.equal(copy)\r\n  });\r\n\r\n  it('should idempotent del on failure', () => {\r\n    class InjectedBugEngine extends BasicEngine {\r\n      receive(cmds) {\r\n        cmds.forEach((cmd) => {\r\n          if (cmd.gate === Deallocate) {\r\n            throw new Error('Value error')\r\n          }\r\n        })\r\n      }\r\n    }\r\n\r\n    const eng = new MainEngine(new InjectedBugEngine(), [])\r\n    const q = eng.allocateQubit()[0]\r\n\r\n    // First call to __del__ triggers the bug.\r\n    try {\r\n      q.deallocate()\r\n      assert(false)\r\n    } catch (e) {\r\n\r\n    } finally {\r\n      // Later calls to __del__ do nothing.\r\n      expect(q.id).to.equal(-1)\r\n      q.deallocate()\r\n    }\r\n  });\r\n})\r\n",
+    "content": "/*\r\n * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).\r\n *\r\n * Licensed under the Apache License, Version 2.0 (the \"License\");\r\n * you may not use this file except in compliance with the License.\r\n * You may obtain a copy of the License at\r\n *\r\n * http://www.apache.org/licenses/LICENSE-2.0\r\n *\r\n * Unless required by applicable law or agreed to in writing, software\r\n * distributed under the License is distributed on an \"AS IS\" BASIS,\r\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\r\n * See the License for the specific language governing permissions and\r\n * limitations under the License.\r\n */\r\n\r\nimport {assert, expect} from 'chai'\r\nimport math from 'mathjs'\r\nimport {BasicQubit, Qubit, Qureg} from './qubit'\r\nimport {BasicEngine} from '../cengines/basics'\r\nimport MainEngine from '../cengines/main'\r\nimport {DummyEngine} from '../cengines/testengine'\r\nimport {Deallocate} from '../ops/gates';\r\nimport {arrayEqual} from '../libs/polyfill';\r\n\r\nconst mc = math.complex\r\nconst mm = math.matrix\r\n\r\ndescribe('Qubit test', () => {\r\n  it('should test subclass array', () => {\r\n\r\n  });\r\n  it('should test math complex type', () => {\r\n    const c = mc(1, -1)\r\n    console.log(c.re, c.im)\r\n    const a = mm([[1, 0], [0, 1]])\r\n    console.log(a._data)\r\n  });\r\n\r\n  it('should test basic qubit', () => {\r\n    const qubitID = [0, 1]\r\n    const fakeEngine = 'Fake'\r\n    const qubit = new BasicQubit(fakeEngine, qubitID)\r\n    expect(qubit.toString()).to.equal(qubitID.toString())\r\n    expect(qubit.toString()).to.equal(qubit.inspect())\r\n  });\r\n\r\n  it('should test basic qubit measurement', () => {\r\n    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])\r\n    const qubit0 = eng.allocateQubit()[0]\r\n    const qubit1 = eng.allocateQubit()[0]\r\n    eng.setMeasurementResult(qubit0, false)\r\n    eng.setMeasurementResult(qubit1, true)\r\n\r\n    expect(qubit0.toBoolean()).to.equal(false)\r\n    expect(qubit1.toBoolean()).to.equal(true)\r\n    expect(qubit0.toNumber()).to.equal(0)\r\n    expect(qubit1.toNumber()).to.equal(1)\r\n  });\r\n\r\n  it('should test basic qubit comparison', () => {\r\n    const data = [\r\n      [0, 0, true],\r\n      [0, 1, false]\r\n    ]\r\n\r\n    const fakeEngine = 'Fake'\r\n    const fakeEngine2 = 'Fake 2'\r\n\r\n    data.forEach((item) => {\r\n      const [id0, id1, expected] = item\r\n\r\n      const qubit0 = new BasicQubit(fakeEngine, id0)\r\n      const qubit1 = new BasicQubit(fakeEngine, id1)\r\n      const qubit2 = new BasicQubit(fakeEngine2, id0)\r\n\r\n      expect(qubit2.equal(qubit0)).to.equal(false)\r\n      expect(qubit2.equal(qubit1)).to.equal(false)\r\n      expect(qubit0.equal(qubit1)).to.equal(expected)\r\n    })\r\n  });\r\n\r\n  it('should test basic qubit equal', () => {\r\n    const fakeEngine = 'Engine'\r\n    const q1 = new BasicQubit(fakeEngine, 1)\r\n    const q2 = new BasicQubit(fakeEngine, 2)\r\n    const q3 = new BasicQubit(null, 3)\r\n    const q4 = new BasicQubit(fakeEngine, 1)\r\n\r\n    expect(q1.equal(q2)).to.equal(false)\r\n    expect(q1.equal(q3)).to.equal(false)\r\n    expect(q2.equal(q3)).to.equal(false)\r\n    expect(q4.equal(q1)).to.equal(true)\r\n  });\r\n\r\n  class MockMainEngine {\r\n    constructor() {\r\n      this.numCalls = 0\r\n      this.activeQubits = new Set()\r\n      this.main = this\r\n    }\r\n\r\n    deallocateQubit(qubit) {\r\n      this.numCalls += 1\r\n      this.qubitID = qubit.id\r\n    }\r\n  }\r\n\r\n  it('should test qubit del', () => {\r\n    const engine = new MockMainEngine()\r\n    const qubit = new Qubit(engine, 10)\r\n    assert(qubit.id === 10)\r\n    qubit.deallocate()\r\n    assert(qubit.id === -1)\r\n    assert(engine.numCalls === 1)\r\n    assert(engine.qubitID === 10)\r\n  });\r\n\r\n  it('should qubit not copyable', () => {\r\n    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])\r\n    const qubit = new Qubit(eng, 10)\r\n    const qubit_copy = qubit.copy()\r\n    assert(qubit === qubit_copy)\r\n  })\r\n\r\n  it('should test qureg str', () => {\r\n    const eng = new MainEngine(new DummyEngine(), [])\r\n    const reg = new Qureg()\r\n    expect(reg.toString()).to.equal('Qureg[]')\r\n\r\n    const a = eng.allocateQureg(10)\r\n    const b = eng.allocateQureg(50)\r\n    const c = eng.allocateQubit()\r\n    const d = eng.allocateQubit()\r\n    const e = eng.allocateQubit()\r\n\r\n    expect(a.toString()).to.equal('Qureg[0-9]')\r\n    assert(b.toString() === 'Qureg[10-59]')\r\n    assert(c.toString() === 'Qureg[60]')\r\n    assert(d.toString() === 'Qureg[61]')\r\n    assert(e.toString() === 'Qureg[62]')\r\n\r\n    expect(c.add(e).toString()).to.equal('Qureg[60, 62]')\r\n    expect(a.add(b).toString()).to.equal('Qureg[0-59]')\r\n    expect(a.add(b).add(c).toString()).to.equal('Qureg[0-60]')\r\n    expect(a.add(b).add(d).toString()).to.equal('Qureg[0-59, 61]')\r\n    expect(a.add(b).add(e).toString()).to.equal('Qureg[0-59, 62]')\r\n    expect(b.add(a).toString()).to.equal('Qureg[10-59, 0-9]')\r\n    expect(e.add(b).add(a).toString()).to.equal('Qureg[62, 10-59, 0-9]')\r\n  });\r\n\r\n  it('should test qureg measure if qubit', () => {\r\n    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])\r\n    const qureg0 = new Qureg(eng.allocateQubit())\r\n    const qureg1 = new Qureg(eng.allocateQubit())\r\n    eng.setMeasurementResult(qureg0[0], false)\r\n    eng.setMeasurementResult(qureg1[0], true)\r\n\r\n    expect(qureg0.toBoolean()).to.equal(false)\r\n    expect(qureg1.toBoolean()).to.equal(true)\r\n    expect(qureg0.toNumber()).to.equal(0)\r\n    expect(qureg1.toNumber()).to.equal(1)\r\n  });\r\n\r\n  it('should qureg measure exception', () => {\r\n    const eng = new MainEngine(new DummyEngine(), [new DummyEngine()])\r\n    const qureg = new Qureg()\r\n    const ids = [0, 1]\r\n    ids.forEach((id) => {\r\n      const qubit = new Qubit(eng, id)\r\n      qureg.push(qubit)\r\n    })\r\n    expect(qureg.toBoolean).to.throw()\r\n  });\r\n\r\n  it('should qureg engine', () => {\r\n    const eng1 = new MainEngine(new DummyEngine(), [new DummyEngine()])\r\n    const eng2 = new MainEngine(new DummyEngine(), [new DummyEngine()])\r\n    const qureg = new Qureg([new Qubit(eng1, 0), new Qubit(eng1, 1)])\r\n    expect(eng1).to.equal(qureg.engine)\r\n    qureg.engine = eng2\r\n    expect(qureg[0].engine === eng2 && qureg[1].engine === eng2).to.equal(true)\r\n  });\r\n\r\n  it('should idempotent del', () => {\r\n    const rec = new DummyEngine(true)\r\n    const eng = new MainEngine(rec, [])\r\n    const q = eng.allocateQubit()[0]\r\n    rec.receivedCommands = []\r\n    assert(rec.receivedCommands.length === 0)\r\n    q.deallocate()\r\n    assert(rec.receivedCommands.length === 1)\r\n    q.deallocate()\r\n    assert(rec.receivedCommands.length === 1)\r\n  });\r\n\r\n  it('should test qureg deallocate', () => {\r\n    const rec = new DummyEngine(true)\r\n    const eng = new MainEngine(rec, [])\r\n    const q = eng.allocateQureg(1)\r\n    rec.receivedCommands = []\r\n    assert(rec.receivedCommands.length === 0)\r\n    q.deallocate()\r\n    assert(rec.receivedCommands.length === 1)\r\n    q.deallocate()\r\n    assert(rec.receivedCommands.length === 1)\r\n  });\r\n\r\n  it('should test qureg to Number', () => {\r\n    const rec = new DummyEngine(true)\r\n    const eng = new MainEngine(rec, [])\r\n    const q = eng.allocateQureg(2)\r\n    expect(() => q.toNumber()).to.throw()\r\n    expect(() => q.toBoolean()).to.throw()\r\n\r\n    const q2 = eng.allocateQureg(1)\r\n    expect(() => q2.toNumber()).to.throw()\r\n  });\r\n\r\n  it('should test qureg equal', () => {\r\n    const rec = new DummyEngine(true)\r\n    const eng = new MainEngine(rec, [])\r\n    const q = eng.allocateQureg(2)\r\n    const q2 = eng.allocateQureg(2)\r\n    const q3 = new Qureg(...q)\r\n    expect(q.equal(q2)).to.equal(false)\r\n    expect(q.equal(q3)).to.equal(true)\r\n    expect(q.equal(new Array(...q))).to.equal(false)\r\n  });\r\n\r\n  it('should test basic qubit array copy', () => {\r\n    const q = new BasicQubit(null, 0)\r\n    const array = [q]\r\n    const copy = BasicQubit.copyArray(array)\r\n    expect(array).to.deep.equal(copy)\r\n  });\r\n\r\n  it('should idempotent del on failure', () => {\r\n    class InjectedBugEngine extends BasicEngine {\r\n      receive(cmds) {\r\n        cmds.forEach((cmd) => {\r\n          if (cmd.gate === Deallocate) {\r\n            throw new Error('Value error')\r\n          }\r\n        })\r\n      }\r\n    }\r\n\r\n    const eng = new MainEngine(new InjectedBugEngine(), [])\r\n    const q = eng.allocateQubit()[0]\r\n\r\n    // First call to __del__ triggers the bug.\r\n    try {\r\n      q.deallocate()\r\n      assert(false)\r\n    } catch (e) {\r\n\r\n    } finally {\r\n      // Later calls to __del__ do nothing.\r\n      expect(q.id).to.equal(-1)\r\n      q.deallocate()\r\n    }\r\n  });\r\n})\r\n",
     "static": true,
     "longname": "E:/workpace/Q/src/types/qubit.spec.js",
     "access": "public",
@@ -24539,7 +24620,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 1085,
+    "__docId__": 1090,
     "kind": "variable",
     "name": "mc",
     "memberof": "src/types/qubit.spec.js",
@@ -24550,7 +24631,7 @@
     "importPath": "projectq/src/types/qubit.spec.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 25,
+    "lineNumber": 26,
     "undocument": true,
     "type": {
       "types": [
@@ -24560,7 +24641,7 @@
     "ignore": true
   },
   {
-    "__docId__": 1086,
+    "__docId__": 1091,
     "kind": "variable",
     "name": "mm",
     "memberof": "src/types/qubit.spec.js",
@@ -24571,7 +24652,7 @@
     "importPath": "projectq/src/types/qubit.spec.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 26,
+    "lineNumber": 27,
     "undocument": true,
     "type": {
       "types": [
