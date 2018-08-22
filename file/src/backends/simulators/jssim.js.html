@@ -38,7 +38,6 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/ibm/ibmhttpclient.js~IBMHTTPClient.html">IBMHTTPClient</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#backends-simulators">backends/simulators</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/simulators/classicalsimulator.js~ClassicalSimulator.html">ClassicalSimulator</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/simulators/jssim.js~Simulator.html">Simulator</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/simulators/shared.spec.js~TrivialMapper.html">TrivialMapper</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html">Simulator</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#cengines">cengines</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/basicmapper.js~BasicMapperEngine.html">BasicMapperEngine</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span></span></li>
@@ -515,10 +514,22 @@ the qubits given by the list of ids.
     return probability
   }
 
+  /**
+   * @ignore
+   * @param i
+   * @return {*}
+   * @private
+   */
   _getState(i) {
     return this._state.subset(math.index(i))
   }
 
+  /**
+   * @ignore
+   * @param i
+   * @param value
+   * @private
+   */
   _setState(i, value) {
     this._state.subset(math.index(i), value)
   }
@@ -607,19 +618,25 @@ TODO: Implement better estimates for s.
         })
         update = math.multiply(update, coeff)
         this._state = update
-        for (let i = 0; i &lt; update.length; ++i) {
-          if ((i &amp; mask) === mask) {
-            output_state[i] = math.add(output_state[i], update[i])
+
+        update.forEach((value, [m]) =&gt; {
+          if ((m &amp; mask) === mask) {
+            const idx = math.index(m)
+            const v = math.add(output_state.subset(idx), value)
+            output_state.subset(idx, v)
           }
-        }
+        })
         nrm_change = math.norm(update)
         j += 1
       }
-      for (let i = 0; i &lt; update.length; ++i) {
-        if ((i &amp; mask) === mask) {
-          output_state[i] *= correction
+
+      update.forEach((value, [k]) =&gt; {
+        if ((k &amp; mask) === mask) {
+          const idx = math.index(k)
+          const v = math.multiply(output_state.subset(idx), correction)
+          output_state.subset(idx, v)
         }
-      }
+      })
       this._state = math.clone(output_state)
     }
   }

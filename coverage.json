@@ -1,6 +1,6 @@
 {
-  "coverage": "51%",
-  "expectCount": 845,
+  "coverage": "54.28%",
+  "expectCount": 794,
   "actualCount": 431,
   "files": {
     "src/backends/circuits/drawer.js": {
@@ -53,17 +53,6 @@
         394
       ]
     },
-    "src/backends/ibm/ibm.spec.js": {
-      "expectCount": 5,
-      "actualCount": 0,
-      "undocumentLines": [
-        38,
-        40,
-        44,
-        48,
-        49
-      ]
-    },
     "src/backends/ibm/ibmhttpclient.js": {
       "expectCount": 9,
       "actualCount": 3,
@@ -74,14 +63,6 @@
         92,
         98,
         117
-      ]
-    },
-    "src/backends/ibm/ibmhttpclient.spec.js": {
-      "expectCount": 2,
-      "actualCount": 0,
-      "undocumentLines": [
-        19,
-        20
       ]
     },
     "src/backends/printer.js": {
@@ -104,14 +85,6 @@
         59,
         61,
         62
-      ]
-    },
-    "src/backends/resource.spec.js": {
-      "expectCount": 2,
-      "actualCount": 0,
-      "undocumentLines": [
-        33,
-        34
       ]
     },
     "src/backends/simulators/classicalsimulator.js": {
@@ -138,23 +111,11 @@
     },
     "src/backends/simulators/jssim.js": {
       "expectCount": 26,
-      "actualCount": 21,
+      "actualCount": 23,
       "undocumentLines": [
         50,
         51,
-        52,
-        348,
-        352
-      ]
-    },
-    "src/backends/simulators/shared.spec.js": {
-      "expectCount": 4,
-      "actualCount": 0,
-      "undocumentLines": [
-        19,
-        20,
-        22,
-        25
+        52
       ]
     },
     "src/backends/simulators/simulator.js": {
@@ -163,28 +124,6 @@
       "undocumentLines": [
         85,
         89
-      ]
-    },
-    "src/backends/simulators/simulator.spec.js": {
-      "expectCount": 17,
-      "actualCount": 1,
-      "undocumentLines": [
-        61,
-        62,
-        64,
-        67,
-        73,
-        74,
-        76,
-        79,
-        85,
-        86,
-        88,
-        91,
-        97,
-        98,
-        105,
-        113
       ]
     },
     "src/cengines/basicmapper.js": {
@@ -368,15 +307,6 @@
         93
       ]
     },
-    "src/libs/math/constantmath.spec.js": {
-      "expectCount": 3,
-      "actualCount": 0,
-      "undocumentLines": [
-        32,
-        40,
-        55
-      ]
-    },
     "src/libs/math/defaultrules.js": {
       "expectCount": 3,
       "actualCount": 0,
@@ -519,13 +449,6 @@
         482
       ]
     },
-    "src/ops/basics.spec.js": {
-      "expectCount": 1,
-      "actualCount": 0,
-      "undocumentLines": [
-        28
-      ]
-    },
     "src/ops/command.js": {
       "expectCount": 25,
       "actualCount": 14,
@@ -541,13 +464,6 @@
         229,
         238,
         247
-      ]
-    },
-    "src/ops/command.spec.js": {
-      "expectCount": 1,
-      "actualCount": 0,
-      "undocumentLines": [
-        32
       ]
     },
     "src/ops/gates.js": {
@@ -616,17 +532,6 @@
         457
       ]
     },
-    "src/ops/gates.spec.js": {
-      "expectCount": 5,
-      "actualCount": 0,
-      "undocumentLines": [
-        57,
-        58,
-        59,
-        60,
-        62
-      ]
-    },
     "src/ops/metagates.js": {
       "expectCount": 25,
       "actualCount": 9,
@@ -649,15 +554,6 @@
         271
       ]
     },
-    "src/ops/metagates.spec.js": {
-      "expectCount": 3,
-      "actualCount": 0,
-      "undocumentLines": [
-        35,
-        36,
-        37
-      ]
-    },
     "src/ops/qftgate.js": {
       "expectCount": 3,
       "actualCount": 1,
@@ -677,13 +573,6 @@
         167,
         397,
         444
-      ]
-    },
-    "src/ops/qubitoperator.spec.js": {
-      "expectCount": 1,
-      "actualCount": 0,
-      "undocumentLines": [
-        22
       ]
     },
     "src/ops/shortcuts.js": {
@@ -708,13 +597,6 @@
         246
       ]
     },
-    "src/ops/timeevolution.spec.js": {
-      "expectCount": 1,
-      "actualCount": 0,
-      "undocumentLines": [
-        27
-      ]
-    },
     "src/ops/_cycle.js": {
       "expectCount": 4,
       "actualCount": 3,
@@ -727,13 +609,6 @@
       "actualCount": 5,
       "undocumentLines": [
         9
-      ]
-    },
-    "src/setups/decompositions/arb1qubit2rzandry.spec.js": {
-      "expectCount": 2,
-      "actualCount": 1,
-      "undocumentLines": [
-        30
       ]
     },
     "src/setups/decompositions/barrier.js": {
@@ -775,13 +650,6 @@
       "actualCount": 0,
       "undocumentLines": [
         10
-      ]
-    },
-    "src/setups/decompositions/gates.spec.js": {
-      "expectCount": 1,
-      "actualCount": 0,
-      "undocumentLines": [
-        24
       ]
     },
     "src/setups/decompositions/globalphase.js": {
@@ -840,13 +708,6 @@
         22,
         47,
         61
-      ]
-    },
-    "src/setups/decompositions/time_evolution.spec.js": {
-      "expectCount": 1,
-      "actualCount": 0,
-      "undocumentLines": [
-        16
       ]
     },
     "src/setups/decompositions/toffoli2cnotandtgate.js": {
@@ -910,14 +771,6 @@
         120,
         138,
         256
-      ]
-    },
-    "src/types/qubit.spec.js": {
-      "expectCount": 2,
-      "actualCount": 0,
-      "undocumentLines": [
-        26,
-        27
       ]
     }
   }

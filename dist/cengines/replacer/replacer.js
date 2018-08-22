@@ -1,0 +1,281 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.AutoReplacer = exports.InstructionFilter = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _basics = require('../basics');
+
+var _gates = require('../../ops/gates');
+
+var _cmdmodifier = require('../cmdmodifier');
+
+var _cmdmodifier2 = _interopRequireDefault(_cmdmodifier);
+
+var _util = require('../../libs/util');
+
+var _cycle = require('../../ops/_cycle');
+
+var _error = require('../../meta/error');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Licensed under the Apache License, Version 2.0 (the "License");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * you may not use this file except in compliance with the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * You may obtain a copy of the License at
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * http://www.apache.org/licenses/LICENSE-2.0
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                *
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * Unless required by applicable law or agreed to in writing, software
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * distributed under the License is distributed on an "AS IS" BASIS,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * See the License for the specific language governing permissions and
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                * limitations under the License.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                */
+
+/**
+ * @class InstructionFilter
+ * @desc
+The InstructionFilter is a compiler engine which changes the behavior of
+isAvailable according to a filter function. All commands are passed to
+this function, which then returns whether this command can be executed
+(true) or needs replacement (false).
+ */
+var InstructionFilter = exports.InstructionFilter = function (_BasicEngine) {
+  _inherits(InstructionFilter, _BasicEngine);
+
+  /**
+   * @constructor
+  Initializer: The provided filterfun returns true for all commands
+  which do not need replacement and false for commands that do.
+      @param {function} filterFunc Filter function which returns true for
+    available commands, and false otherwise. filterfun will be
+    called as filterfun(self, cmd).
+  */
+  function InstructionFilter(filterFunc) {
+    _classCallCheck(this, InstructionFilter);
+
+    var _this = _possibleConstructorReturn(this, (InstructionFilter.__proto__ || Object.getPrototypeOf(InstructionFilter)).call(this));
+
+    _this._filterFunc = filterFunc;
+    return _this;
+  }
+
+  /**
+  Specialized implementation of BasicBackend.isAvailable: Forwards this
+  call to the filter function given to the constructor.
+      @param {Command} cmd Command for which to check availability.
+   */
+
+
+  _createClass(InstructionFilter, [{
+    key: 'isAvailable',
+    value: function isAvailable(cmd) {
+      return this._filterFunc(this, cmd);
+    }
+
+    /**
+    Forward all commands to the next engine.
+        @param {Command[]} commandList List of commands to receive.
+     */
+
+  }, {
+    key: 'receive',
+    value: function receive(commandList) {
+      this.next.receive(commandList);
+    }
+  }]);
+
+  return InstructionFilter;
+}(_basics.BasicEngine);
+
+/**
+ * @class AutoReplacer
+ * @desc
+The AutoReplacer is a compiler engine which uses engine.isAvailable in
+order to determine which commands need to be replaced/decomposed/compiled
+further. The loaded setup is used to find decomposition rules appropriate
+for each command (e.g., setups.default).
+ */
+
+
+var AutoReplacer = exports.AutoReplacer = function (_BasicEngine2) {
+  _inherits(AutoReplacer, _BasicEngine2);
+
+  /**
+   * @constructor
+    @param {DecompositionRuleSet} decompositionRuleSet
+    @param {?function} decomposition_chooser A function which, given the
+  Command to decompose and a list of potential Decomposition
+  objects, determines (and then returns) the 'best'
+  decomposition.
+      The default decomposition chooser simply returns the first list
+  element, i.e., calling
+     @example
+  repl = new AutoReplacer()
+  Amounts to
+     @example
+    function decomposition_chooser(cmd, decomp_list) {
+    return decomp_list[0]
+  }
+  const repl = new AutoReplacer(decomposition_chooser)
+  */
+  function AutoReplacer(decompositionRuleSet, decomposition_chooser) {
+    _classCallCheck(this, AutoReplacer);
+
+    if (!decomposition_chooser) {
+      decomposition_chooser = function decomposition_chooser(cmd, decomposition_list) {
+        return decomposition_list[0];
+      };
+    }
+
+    var _this2 = _possibleConstructorReturn(this, (AutoReplacer.__proto__ || Object.getPrototypeOf(AutoReplacer)).call(this));
+
+    _this2._decomp_chooser = decomposition_chooser;
+    _this2.decompositionRuleSet = decompositionRuleSet;
+    return _this2;
+  }
+
+  /**
+  Check whether a command cmd can be handled by further engines and,
+  if not, replace it using the decomposition rules loaded with the setup
+  (e.g., setups.default).
+      @param {Command} cmd Command to process.
+      @throws Exception if no replacement is available in the loaded setup.
+   */
+
+
+  _createClass(AutoReplacer, [{
+    key: '_processCommand',
+    value: function _processCommand(cmd) {
+      var _this3 = this;
+
+      if (this.isAvailable(cmd)) {
+        this.send([cmd]);
+      } else {
+        (function () {
+          // check for decomposition rules
+          var decomp_list = [];
+          var potential_decomps = [];
+
+          // First check for a decomposition rules of the gate class, then
+          // the gate class of the inverse gate. If nothing is found, do the
+          // same for the first parent class, etc.
+          var gate_mro = (0, _util.classHierachy)(cmd.gate.constructor);
+          // If gate does not have an inverse it's parent classes are
+          // DaggeredGate, BasicGate, object. Hence don't check the last two
+          var inverse_mro = (0, _util.classHierachy)((0, _cycle.getInverse)(cmd.gate).constructor);
+          var rules = _this3.decompositionRuleSet.decompositions;
+          var total = Math.max(gate_mro.length, inverse_mro.length);
+          for (var level = 0; level < total; ++level) {
+            // Check for forward rules
+            if (level < gate_mro.length) {
+              var class_name = gate_mro[level].name;
+              try {
+                potential_decomps = rules[class_name] || [];
+              } catch (e) {
+                console.log(e);
+              }
+
+              potential_decomps.forEach(function (d) {
+                return d.check(cmd) && decomp_list.push(d);
+              });
+              if (decomp_list.length > 0) {
+                break;
+              }
+            }
+            // Check for rules implementing the inverse gate
+            // and run them in reverse
+
+            if (level < inverse_mro.length) {
+              var inv_class_name = inverse_mro[level].name;
+              try {
+                var list = rules[inv_class_name] || [];
+                list = list.map(function (d) {
+                  return d.getInverseDecomposition();
+                });
+                potential_decomps = potential_decomps.concat(list);
+              } catch (e) {
+                console.log(e);
+              }
+
+              // throw out the ones which don't recognize the command
+              potential_decomps.forEach(function (d) {
+                return d.check(cmd) && decomp_list.push(d);
+              });
+              if (decomp_list.length > 0) {
+                break;
+              }
+            }
+          }
+
+          if (decomp_list.length === 0) {
+            throw new _error.NoGateDecompositionError('\nNo replacement found for ' + cmd.toString() + '!');
+          }
+
+          // use decomposition chooser to determine the best decomposition
+          var chosen_decomp = _this3._decomp_chooser(cmd, decomp_list);
+
+          // the decomposed command must have the same tags
+          // (plus the ones it gets from meta-statements inside the
+          // decomposition rule).
+          // --> use a CommandModifier with a ForwarderEngine to achieve this.
+          var old_tags = cmd.tags.slice(0);
+
+          /*
+          Receive a list of commands from the previous compiler engine and, if
+                necessary, replace/decompose the gates according to the decomposition
+            rules in the loaded setup.
+                  @param {Command} command List of commands to handle.
+           */
+          var cmd_mod_fun = function cmd_mod_fun(command) {
+            // Adds the tags
+            command.tags = [].concat(_toConsumableArray(old_tags), _toConsumableArray(command.tags));
+            command.engine = _this3.main;
+            return command;
+          };
+          // the CommandModifier calls cmd_mod_fun for each command
+          // --> commands get the right tags.
+          var cmod_eng = new _cmdmodifier2.default(cmd_mod_fun);
+          cmod_eng.next = _this3; // send modified commands back here
+          cmod_eng.main = _this3.main;
+          // forward everything to cmod_eng using the ForwarderEngine
+          // which behaves just like MainEngine
+          // (--> meta functions still work)
+          var forwarder_eng = new _basics.ForwarderEngine(cmod_eng);
+          cmd.engine = forwarder_eng; // send gates directly to forwarder
+          // (and not to main engine, which would screw up the ordering).
+
+          chosen_decomp.decompose(cmd); // run the decomposition
+        })();
+      }
+    }
+  }, {
+    key: 'receive',
+    value: function receive(commandList) {
+      var _this4 = this;
+
+      commandList.forEach(function (cmd) {
+        if (!(cmd.gate instanceof _gates.FlushGate)) {
+          _this4._processCommand(cmd);
+        } else {
+          _this4.send([cmd]);
+        }
+      });
+    }
+  }]);
+
+  return AutoReplacer;
+}(_basics.BasicEngine);

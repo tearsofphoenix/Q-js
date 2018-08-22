@@ -630,12 +630,6 @@ window.esdocSearchIndex = [
     "variable"
   ],
   [
-    "projectq/src/backends/simulators/shared.spec.js~trivialmapper",
-    "class/src/backends/simulators/shared.spec.js~TrivialMapper.html",
-    "<span>TrivialMapper</span> <span class=\"search-result-import-path\">projectq/src/backends/simulators/shared.spec.js</span>",
-    "class"
-  ],
-  [
     "projectq/src/meta/compute.js~uncompute",
     "function/index.html#static-function-Uncompute",
     "<span>Uncompute</span> <span class=\"search-result-import-path\">projectq/src/meta/compute.js</span>",
@@ -1200,12 +1194,6 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "src/backends/circuits/drawer.spec.js",
-    "file/src/backends/circuits/drawer.spec.js.html",
-    "src/backends/circuits/drawer.spec.js",
-    "file"
-  ],
-  [
     "src/backends/circuits/tolatex.js",
     "file/src/backends/circuits/tolatex.js.html",
     "src/backends/circuits/tolatex.js",
@@ -1326,12 +1314,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/backends/circuits/tolatex.spec.js",
-    "file/src/backends/circuits/tolatex.spec.js.html",
-    "src/backends/circuits/tolatex.spec.js",
-    "file"
-  ],
-  [
     "src/backends/ibm/ibm.js",
     "file/src/backends/ibm/ibm.js.html",
     "src/backends/ibm/ibm.js",
@@ -1441,13 +1423,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/backends/ibm/ibm.js~ibmbackend#didruncallback",
-    "class/src/backends/ibm/ibm.js~IBMBackend.html#instance-set-didRunCallback",
+    "class/src/backends/ibm/ibm.js~IBMBackend.html#instance-get-didRunCallback",
     "src/backends/ibm/ibm.js~IBMBackend#didRunCallback",
     "member"
   ],
   [
     "src/backends/ibm/ibm.js~ibmbackend#didruncallback",
-    "class/src/backends/ibm/ibm.js~IBMBackend.html#instance-get-didRunCallback",
+    "class/src/backends/ibm/ibm.js~IBMBackend.html#instance-set-didRunCallback",
     "src/backends/ibm/ibm.js~IBMBackend#didRunCallback",
     "member"
   ],
@@ -1486,12 +1468,6 @@ window.esdocSearchIndex = [
     "class/src/backends/ibm/ibm.js~IBMBackend.html#instance-method-run",
     "src/backends/ibm/ibm.js~IBMBackend#run",
     "method"
-  ],
-  [
-    "src/backends/ibm/ibm.spec.js",
-    "file/src/backends/ibm/ibm.spec.js.html",
-    "src/backends/ibm/ibm.spec.js",
-    "file"
   ],
   [
     "src/backends/ibm/ibmhttpclient.js",
@@ -1542,12 +1518,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/backends/ibm/ibmhttpclient.spec.js",
-    "file/src/backends/ibm/ibmhttpclient.spec.js.html",
-    "src/backends/ibm/ibmhttpclient.spec.js",
-    "file"
-  ],
-  [
     "src/backends/printer.js",
     "file/src/backends/printer.js.html",
     "src/backends/printer.js",
@@ -1594,12 +1564,6 @@ window.esdocSearchIndex = [
     "class/src/backends/printer.js~CommandPrinter.html#instance-method-receive",
     "src/backends/printer.js~CommandPrinter#receive",
     "method"
-  ],
-  [
-    "src/backends/printer.spec.js",
-    "file/src/backends/printer.spec.js.html",
-    "src/backends/printer.spec.js",
-    "file"
   ],
   [
     "src/backends/resource.js",
@@ -1678,12 +1642,6 @@ window.esdocSearchIndex = [
     "class/src/backends/resource.js~ResourceCounter.html#instance-method-toString",
     "src/backends/resource.js~ResourceCounter#toString",
     "method"
-  ],
-  [
-    "src/backends/resource.spec.js",
-    "file/src/backends/resource.spec.js.html",
-    "src/backends/resource.spec.js",
-    "file"
   ],
   [
     "src/backends/simulators/classicalsimulator.js",
@@ -1788,12 +1746,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/backends/simulators/classicalsimulator.spec.js",
-    "file/src/backends/simulators/classicalsimulator.spec.js.html",
-    "src/backends/simulators/classicalsimulator.spec.js",
-    "file"
-  ],
-  [
     "src/backends/simulators/cppsim.js",
     "file/src/backends/simulators/cppsim.js.html",
     "src/backends/simulators/cppsim.js",
@@ -1804,12 +1756,6 @@ window.esdocSearchIndex = [
     "file/src/backends/simulators/jssim.js.html",
     "src/backends/simulators/jssim.js",
     "file"
-  ],
-  [
-    "src/backends/simulators/jssim.js~simulator#_getstate",
-    "class/src/backends/simulators/jssim.js~Simulator.html#instance-method-_getState",
-    "src/backends/simulators/jssim.js~Simulator#_getState",
-    "method"
   ],
   [
     "src/backends/simulators/jssim.js~simulator#_map",
@@ -1828,12 +1774,6 @@ window.esdocSearchIndex = [
     "class/src/backends/simulators/jssim.js~Simulator.html#instance-member-_numQubits",
     "src/backends/simulators/jssim.js~Simulator#_numQubits",
     "member"
-  ],
-  [
-    "src/backends/simulators/jssim.js~simulator#_setstate",
-    "class/src/backends/simulators/jssim.js~Simulator.html#instance-method-_setState",
-    "src/backends/simulators/jssim.js~Simulator#_setState",
-    "method"
   ],
   [
     "src/backends/simulators/jssim.js~simulator#_singlequbitgate",
@@ -1956,30 +1896,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/backends/simulators/shared.spec.js",
-    "file/src/backends/simulators/shared.spec.js.html",
-    "src/backends/simulators/shared.spec.js",
-    "file"
-  ],
-  [
-    "src/backends/simulators/shared.spec.js~trivialmapper#constructor",
-    "class/src/backends/simulators/shared.spec.js~TrivialMapper.html#instance-constructor-constructor",
-    "src/backends/simulators/shared.spec.js~TrivialMapper#constructor",
-    "method"
-  ],
-  [
-    "src/backends/simulators/shared.spec.js~trivialmapper#currentmapping",
-    "class/src/backends/simulators/shared.spec.js~TrivialMapper.html#instance-member-currentMapping",
-    "src/backends/simulators/shared.spec.js~TrivialMapper#currentMapping",
-    "member"
-  ],
-  [
-    "src/backends/simulators/shared.spec.js~trivialmapper#receive",
-    "class/src/backends/simulators/shared.spec.js~TrivialMapper.html#instance-method-receive",
-    "src/backends/simulators/shared.spec.js~TrivialMapper#receive",
-    "method"
-  ],
-  [
     "src/backends/simulators/simulator.js",
     "file/src/backends/simulators/simulator.js.html",
     "src/backends/simulators/simulator.js",
@@ -2070,12 +1986,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/backends/simulators/simulator.spec.js",
-    "file/src/backends/simulators/simulator.spec.js.html",
-    "src/backends/simulators/simulator.spec.js",
-    "file"
-  ],
-  [
     "src/cengines/basicmapper.js",
     "file/src/cengines/basicmapper.js.html",
     "src/cengines/basicmapper.js",
@@ -2095,13 +2005,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/cengines/basicmapper.js~basicmapperengine#currentmapping",
-    "class/src/cengines/basicmapper.js~BasicMapperEngine.html#instance-get-currentMapping",
+    "class/src/cengines/basicmapper.js~BasicMapperEngine.html#instance-set-currentMapping",
     "src/cengines/basicmapper.js~BasicMapperEngine#currentMapping",
     "member"
   ],
   [
     "src/cengines/basicmapper.js~basicmapperengine#currentmapping",
-    "class/src/cengines/basicmapper.js~BasicMapperEngine.html#instance-set-currentMapping",
+    "class/src/cengines/basicmapper.js~BasicMapperEngine.html#instance-get-currentMapping",
     "src/cengines/basicmapper.js~BasicMapperEngine#currentMapping",
     "member"
   ],
@@ -2110,12 +2020,6 @@ window.esdocSearchIndex = [
     "class/src/cengines/basicmapper.js~BasicMapperEngine.html#instance-method-sendCMDWithMappedIDs",
     "src/cengines/basicmapper.js~BasicMapperEngine#sendCMDWithMappedIDs",
     "method"
-  ],
-  [
-    "src/cengines/basicmapper.spec.js",
-    "file/src/cengines/basicmapper.spec.js.html",
-    "src/cengines/basicmapper.spec.js",
-    "file"
   ],
   [
     "src/cengines/basics.js",
@@ -2214,12 +2118,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/cengines/basics.spec.js",
-    "file/src/cengines/basics.spec.js.html",
-    "src/cengines/basics.spec.js",
-    "file"
-  ],
-  [
     "src/cengines/cmdmodifier.js",
     "file/src/cengines/cmdmodifier.js.html",
     "src/cengines/cmdmodifier.js",
@@ -2242,12 +2140,6 @@ window.esdocSearchIndex = [
     "class/src/cengines/cmdmodifier.js~CommandModifier.html#instance-method-receive",
     "src/cengines/cmdmodifier.js~CommandModifier#receive",
     "method"
-  ],
-  [
-    "src/cengines/cmdmodifier.spec.js",
-    "file/src/cengines/cmdmodifier.spec.js.html",
-    "src/cengines/cmdmodifier.spec.js",
-    "file"
   ],
   [
     "src/cengines/ibm5qubitmapper.js",
@@ -2320,12 +2212,6 @@ window.esdocSearchIndex = [
     "class/src/cengines/ibm5qubitmapper.js~IBM5QubitMapper.html#instance-method-run",
     "src/cengines/ibm5qubitmapper.js~IBM5QubitMapper#run",
     "method"
-  ],
-  [
-    "src/cengines/ibm5qubitmapper.spec.js",
-    "file/src/cengines/ibm5qubitmapper.spec.js.html",
-    "src/cengines/ibm5qubitmapper.spec.js",
-    "file"
   ],
   [
     "src/cengines/linearmapper.js",
@@ -2442,12 +2328,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/cengines/linearmapper.spec.js",
-    "file/src/cengines/linearmapper.spec.js.html",
-    "src/cengines/linearmapper.spec.js",
-    "file"
-  ],
-  [
     "src/cengines/main.js",
     "file/src/cengines/main.js.html",
     "src/cengines/main.js",
@@ -2556,12 +2436,6 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "src/cengines/main.spec.js",
-    "file/src/cengines/main.spec.js.html",
-    "src/cengines/main.spec.js",
-    "file"
-  ],
-  [
     "src/cengines/manualmapper.js",
     "file/src/cengines/manualmapper.js.html",
     "src/cengines/manualmapper.js",
@@ -2590,12 +2464,6 @@ window.esdocSearchIndex = [
     "class/src/cengines/manualmapper.js~ManualMapper.html#instance-method-receive",
     "src/cengines/manualmapper.js~ManualMapper#receive",
     "method"
-  ],
-  [
-    "src/cengines/manualmapper.spec.js",
-    "file/src/cengines/manualmapper.spec.js.html",
-    "src/cengines/manualmapper.spec.js",
-    "file"
   ],
   [
     "src/cengines/optimize.js",
@@ -2658,12 +2526,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/cengines/optimize.spec.js",
-    "file/src/cengines/optimize.spec.js.html",
-    "src/cengines/optimize.spec.js",
-    "file"
-  ],
-  [
     "src/cengines/replacer/decompositionrule.js",
     "file/src/cengines/replacer/decompositionrule.js.html",
     "src/cengines/replacer/decompositionrule.js",
@@ -2722,12 +2584,6 @@ window.esdocSearchIndex = [
     "class/src/cengines/replacer/decompositionruleset.js~DecompositionRuleSet.html#instance-member-decompositions",
     "src/cengines/replacer/decompositionruleset.js~DecompositionRuleSet#decompositions",
     "member"
-  ],
-  [
-    "src/cengines/replacer/decompositionruleset.spec.js",
-    "file/src/cengines/replacer/decompositionruleset.spec.js.html",
-    "src/cengines/replacer/decompositionruleset.spec.js",
-    "file"
   ],
   [
     "src/cengines/replacer/replacer.js",
@@ -2790,12 +2646,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/cengines/replacer/replacer.spec.js",
-    "file/src/cengines/replacer/replacer.spec.js.html",
-    "src/cengines/replacer/replacer.spec.js",
-    "file"
-  ],
-  [
     "src/cengines/swapandcnotflipper.js",
     "file/src/cengines/swapandcnotflipper.js.html",
     "src/cengines/swapandcnotflipper.js",
@@ -2850,12 +2700,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/cengines/swapandcnotflipper.spec.js",
-    "file/src/cengines/swapandcnotflipper.spec.js.html",
-    "src/cengines/swapandcnotflipper.spec.js",
-    "file"
-  ],
-  [
     "src/cengines/tagremover.js",
     "file/src/cengines/tagremover.js.html",
     "src/cengines/tagremover.js",
@@ -2884,12 +2728,6 @@ window.esdocSearchIndex = [
     "class/src/cengines/tagremover.js~TagRemover.html#instance-method-receive",
     "src/cengines/tagremover.js~TagRemover#receive",
     "method"
-  ],
-  [
-    "src/cengines/tagremover.spec.js",
-    "file/src/cengines/tagremover.spec.js.html",
-    "src/cengines/tagremover.spec.js",
-    "file"
   ],
   [
     "src/cengines/testengine.js",
@@ -2974,12 +2812,6 @@ window.esdocSearchIndex = [
     "class/src/cengines/testengine.js~DummyEngine.html#instance-member-saveCommands",
     "src/cengines/testengine.js~DummyEngine#saveCommands",
     "member"
-  ],
-  [
-    "src/cengines/testengine.spec.js",
-    "file/src/cengines/testengine.spec.js.html",
-    "src/cengines/testengine.spec.js",
-    "file"
   ],
   [
     "src/cengines/twodmapper.js",
@@ -3198,21 +3030,9 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "src/cengines/twodmapper.spec.js",
-    "file/src/cengines/twodmapper.spec.js.html",
-    "src/cengines/twodmapper.spec.js",
-    "file"
-  ],
-  [
     "src/libs/math/constantmath.js",
     "file/src/libs/math/constantmath.js.html",
     "src/libs/math/constantmath.js",
-    "file"
-  ],
-  [
-    "src/libs/math/constantmath.spec.js",
-    "file/src/libs/math/constantmath.spec.js.html",
-    "src/libs/math/constantmath.spec.js",
     "file"
   ],
   [
@@ -3324,12 +3144,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/libs/math/gates.spec.js",
-    "file/src/libs/math/gates.spec.js.html",
-    "src/libs/math/gates.spec.js",
-    "file"
-  ],
-  [
     "src/libs/polyfill.js",
     "file/src/libs/polyfill.js.html",
     "src/libs/polyfill.js",
@@ -3339,12 +3153,6 @@ window.esdocSearchIndex = [
     "src/libs/util.js",
     "file/src/libs/util.js.html",
     "src/libs/util.js",
-    "file"
-  ],
-  [
-    "src/libs/util.spec.js",
-    "file/src/libs/util.spec.js.html",
-    "src/libs/util.spec.js",
     "file"
   ],
   [
@@ -3432,12 +3240,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/meta/compute.spec.js",
-    "file/src/meta/compute.spec.js.html",
-    "src/meta/compute.spec.js",
-    "file"
-  ],
-  [
     "src/meta/control.js",
     "file/src/meta/control.js.html",
     "src/meta/control.js",
@@ -3472,12 +3274,6 @@ window.esdocSearchIndex = [
     "class/src/meta/control.js~ControlEngine.html#instance-method-receive",
     "src/meta/control.js~ControlEngine#receive",
     "method"
-  ],
-  [
-    "src/meta/control.spec.js",
-    "file/src/meta/control.spec.js.html",
-    "src/meta/control.spec.js",
-    "file"
   ],
   [
     "src/meta/dagger.js",
@@ -3520,12 +3316,6 @@ window.esdocSearchIndex = [
     "class/src/meta/dagger.js~DaggerEngine.html#instance-method-run",
     "src/meta/dagger.js~DaggerEngine#run",
     "method"
-  ],
-  [
-    "src/meta/dagger.spec.js",
-    "file/src/meta/dagger.spec.js.html",
-    "src/meta/dagger.spec.js",
-    "file"
   ],
   [
     "src/meta/error.js",
@@ -3684,12 +3474,6 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "src/meta/loop.spec.js",
-    "file/src/meta/loop.spec.js.html",
-    "src/meta/loop.spec.js",
-    "file"
-  ],
-  [
     "src/meta/tag.js",
     "file/src/meta/tag.js.html",
     "src/meta/tag.js",
@@ -3741,12 +3525,6 @@ window.esdocSearchIndex = [
     "src/meta/util.js",
     "file/src/meta/util.js.html",
     "src/meta/util.js",
-    "file"
-  ],
-  [
-    "src/meta/util.spec.js",
-    "file/src/meta/util.spec.js.html",
-    "src/meta/util.spec.js",
     "file"
   ],
   [
@@ -3942,12 +3720,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/ops/basics.spec.js",
-    "file/src/ops/basics.spec.js.html",
-    "src/ops/basics.spec.js",
-    "file"
-  ],
-  [
     "src/ops/command.js",
     "file/src/ops/command.js.html",
     "src/ops/command.js",
@@ -4003,13 +3775,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/ops/command.js~command#controlqubits",
-    "class/src/ops/command.js~Command.html#instance-set-controlQubits",
+    "class/src/ops/command.js~Command.html#instance-get-controlQubits",
     "src/ops/command.js~Command#controlQubits",
     "member"
   ],
   [
     "src/ops/command.js~command#controlqubits",
-    "class/src/ops/command.js~Command.html#instance-get-controlQubits",
+    "class/src/ops/command.js~Command.html#instance-set-controlQubits",
     "src/ops/command.js~Command#controlQubits",
     "member"
   ],
@@ -4075,13 +3847,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/ops/command.js~command#qubits",
-    "class/src/ops/command.js~Command.html#instance-get-qubits",
+    "class/src/ops/command.js~Command.html#instance-set-qubits",
     "src/ops/command.js~Command#qubits",
     "member"
   ],
   [
     "src/ops/command.js~command#qubits",
-    "class/src/ops/command.js~Command.html#instance-set-qubits",
+    "class/src/ops/command.js~Command.html#instance-get-qubits",
     "src/ops/command.js~Command#qubits",
     "member"
   ],
@@ -4096,12 +3868,6 @@ window.esdocSearchIndex = [
     "class/src/ops/command.js~Command.html#instance-method-toString",
     "src/ops/command.js~Command#toString",
     "method"
-  ],
-  [
-    "src/ops/command.spec.js",
-    "file/src/ops/command.spec.js.html",
-    "src/ops/command.spec.js",
-    "file"
   ],
   [
     "src/ops/gates.js",
@@ -4362,12 +4128,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/ops/gates.spec.js",
-    "file/src/ops/gates.spec.js.html",
-    "src/ops/gates.spec.js",
-    "file"
-  ],
-  [
     "src/ops/metagates.js",
     "file/src/ops/metagates.js.html",
     "src/ops/metagates.js",
@@ -4494,12 +4254,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/ops/metagates.spec.js",
-    "file/src/ops/metagates.spec.js.html",
-    "src/ops/metagates.spec.js",
-    "file"
-  ],
-  [
     "src/ops/qftgate.js",
     "file/src/ops/qftgate.js.html",
     "src/ops/qftgate.js",
@@ -4510,12 +4264,6 @@ window.esdocSearchIndex = [
     "class/src/ops/qftgate.js~QFTGate.html#instance-method-toString",
     "src/ops/qftgate.js~QFTGate#toString",
     "method"
-  ],
-  [
-    "src/ops/qftgate.spec.js",
-    "file/src/ops/qftgate.spec.js.html",
-    "src/ops/qftgate.spec.js",
-    "file"
   ],
   [
     "src/ops/qubitoperator.js",
@@ -4614,21 +4362,9 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/ops/qubitoperator.spec.js",
-    "file/src/ops/qubitoperator.spec.js.html",
-    "src/ops/qubitoperator.spec.js",
-    "file"
-  ],
-  [
     "src/ops/shortcuts.js",
     "file/src/ops/shortcuts.js.html",
     "src/ops/shortcuts.js",
-    "file"
-  ],
-  [
-    "src/ops/shortcuts.spec.js",
-    "file/src/ops/shortcuts.spec.js.html",
-    "src/ops/shortcuts.spec.js",
     "file"
   ],
   [
@@ -4686,21 +4422,9 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/ops/timeevolution.spec.js",
-    "file/src/ops/timeevolution.spec.js.html",
-    "src/ops/timeevolution.spec.js",
-    "file"
-  ],
-  [
     "src/setups/decompositions/arb1qubit2rzandry.js",
     "file/src/setups/decompositions/arb1qubit2rzandry.js.html",
     "src/setups/decompositions/arb1qubit2rzandry.js",
-    "file"
-  ],
-  [
-    "src/setups/decompositions/arb1qubit2rzandry.spec.js",
-    "file/src/setups/decompositions/arb1qubit2rzandry.spec.js.html",
-    "src/setups/decompositions/arb1qubit2rzandry.spec.js",
     "file"
   ],
   [
@@ -4710,21 +4434,9 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
-    "src/setups/decompositions/barrier.spec.js",
-    "file/src/setups/decompositions/barrier.spec.js.html",
-    "src/setups/decompositions/barrier.spec.js",
-    "file"
-  ],
-  [
     "src/setups/decompositions/carb1qubit2cnotrzandry.js",
     "file/src/setups/decompositions/carb1qubit2cnotrzandry.js.html",
     "src/setups/decompositions/carb1qubit2cnotrzandry.js",
-    "file"
-  ],
-  [
-    "src/setups/decompositions/carb1qubit2cnotrzandry.spec.js",
-    "file/src/setups/decompositions/carb1qubit2cnotrzandry.spec.js.html",
-    "src/setups/decompositions/carb1qubit2cnotrzandry.spec.js",
     "file"
   ],
   [
@@ -4734,21 +4446,9 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
-    "src/setups/decompositions/cnot2cz.spec.js",
-    "file/src/setups/decompositions/cnot2cz.spec.js.html",
-    "src/setups/decompositions/cnot2cz.spec.js",
-    "file"
-  ],
-  [
     "src/setups/decompositions/cnu2toffoliandcu.js",
     "file/src/setups/decompositions/cnu2toffoliandcu.js.html",
     "src/setups/decompositions/cnu2toffoliandcu.js",
-    "file"
-  ],
-  [
-    "src/setups/decompositions/cnu2toffoliandcu.spec.js",
-    "file/src/setups/decompositions/cnu2toffoliandcu.spec.js.html",
-    "src/setups/decompositions/cnu2toffoliandcu.spec.js",
     "file"
   ],
   [
@@ -4761,12 +4461,6 @@ window.esdocSearchIndex = [
     "src/setups/decompositions/entangle.js",
     "file/src/setups/decompositions/entangle.js.html",
     "src/setups/decompositions/entangle.js",
-    "file"
-  ],
-  [
-    "src/setups/decompositions/gates.spec.js",
-    "file/src/setups/decompositions/gates.spec.js.html",
-    "src/setups/decompositions/gates.spec.js",
     "file"
   ],
   [
@@ -4806,21 +4500,9 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
-    "src/setups/decompositions/rx2rz.spec.js",
-    "file/src/setups/decompositions/rx2rz.spec.js.html",
-    "src/setups/decompositions/rx2rz.spec.js",
-    "file"
-  ],
-  [
     "src/setups/decompositions/ry2rz.js",
     "file/src/setups/decompositions/ry2rz.js.html",
     "src/setups/decompositions/ry2rz.js",
-    "file"
-  ],
-  [
-    "src/setups/decompositions/ry2rz.spec.js",
-    "file/src/setups/decompositions/ry2rz.spec.js.html",
-    "src/setups/decompositions/ry2rz.spec.js",
     "file"
   ],
   [
@@ -4836,12 +4518,6 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
-    "src/setups/decompositions/time_evolution.spec.js",
-    "file/src/setups/decompositions/time_evolution.spec.js.html",
-    "src/setups/decompositions/time_evolution.spec.js",
-    "file"
-  ],
-  [
     "src/setups/decompositions/toffoli2cnotandtgate.js",
     "file/src/setups/decompositions/toffoli2cnotandtgate.js.html",
     "src/setups/decompositions/toffoli2cnotandtgate.js",
@@ -4854,33 +4530,15 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
-    "src/setups/grid.spec.js",
-    "file/src/setups/grid.spec.js.html",
-    "src/setups/grid.spec.js",
-    "file"
-  ],
-  [
     "src/setups/ibm.js",
     "file/src/setups/ibm.js.html",
     "src/setups/ibm.js",
     "file"
   ],
   [
-    "src/setups/ibm.spec.js",
-    "file/src/setups/ibm.spec.js.html",
-    "src/setups/ibm.spec.js",
-    "file"
-  ],
-  [
     "src/setups/ibm16.js",
     "file/src/setups/ibm16.js.html",
     "src/setups/ibm16.js",
-    "file"
-  ],
-  [
-    "src/setups/ibm16.spec.js",
-    "file/src/setups/ibm16.spec.js.html",
-    "src/setups/ibm16.spec.js",
     "file"
   ],
   [
@@ -4896,21 +4554,9 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
-    "src/setups/linear.spec.js",
-    "file/src/setups/linear.spec.js.html",
-    "src/setups/linear.spec.js",
-    "file"
-  ],
-  [
     "src/setups/restrictedgateset.js",
     "file/src/setups/restrictedgateset.js.html",
     "src/setups/restrictedgateset.js",
-    "file"
-  ],
-  [
-    "src/setups/restrictedgateset.spec.js",
-    "file/src/setups/restrictedgateset.spec.js.html",
-    "src/setups/restrictedgateset.spec.js",
     "file"
   ],
   [
@@ -5017,13 +4663,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/types/qubit.js~qureg#engine",
-    "class/src/types/qubit.js~Qureg.html#instance-get-engine",
+    "class/src/types/qubit.js~Qureg.html#instance-set-engine",
     "src/types/qubit.js~Qureg#engine",
     "member"
   ],
   [
     "src/types/qubit.js~qureg#engine",
-    "class/src/types/qubit.js~Qureg.html#instance-set-engine",
+    "class/src/types/qubit.js~Qureg.html#instance-get-engine",
     "src/types/qubit.js~Qureg#engine",
     "member"
   ],
@@ -5056,11 +4702,5 @@ window.esdocSearchIndex = [
     "class/src/types/qubit.js~Qureg.html#instance-method-toString",
     "src/types/qubit.js~Qureg#toString",
     "method"
-  ],
-  [
-    "src/types/qubit.spec.js",
-    "file/src/types/qubit.spec.js.html",
-    "src/types/qubit.spec.js",
-    "file"
   ]
 ]
