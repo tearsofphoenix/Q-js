@@ -23,6 +23,7 @@ import { LastEngineError } from '../meta/error'
 
 /**
  * @class BasicEngine
+ * @desc
 Basic compiler engine: All compiler engines are derived from this class.
 It provides basic functionality such as qubit allocation/deallocation and
 functions that provide information about the engine's position (e.g., next
@@ -174,7 +175,7 @@ returns true.
 
 /**
  * @class ForwarderEngine
- * @classdesc
+ * @desc
     A ForwarderEngine is a trivial engine which forwards all commands to the next engine.
 
     It is mainly used as a substitute for the MainEngine at lower levels such
@@ -183,7 +184,6 @@ that meta operations still work (e.g., with Compute).
 export class ForwarderEngine extends BasicEngine {
   /**
    * @constructor
-    Initialize a ForwarderEngine.
 
     @param {BasicEngine} engine Engine to forward all commands to.
     @param {function} cmdModFunc Function which is called before sending a

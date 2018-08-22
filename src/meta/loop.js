@@ -43,6 +43,7 @@ LoopTag.loop_tag_id = 0
 
 /**
  * @class LoopEngine
+ * @desc
 Stores all commands and, when done, executes them num times if no loop tag
 handler engine is available.
     If there is one, it adds a loop_tag to the commands and sends them on.
@@ -50,7 +51,7 @@ handler engine is available.
 export class LoopEngine extends BasicEngine {
   /**
    * @constructor
-    @param {number}num: Number of loop iterations.
+    @param {number} num Number of loop iterations.
    */
   constructor(num) {
     super()
@@ -70,21 +71,21 @@ export class LoopEngine extends BasicEngine {
   Apply the loop statements to all stored commands.
    Unrolls the loop if LoopTag is not supported by any of the following engines, i.e., if
 
-   @code
+   @example
     is_meta_tag_supported(next_engine, LoopTag) == false
    */
   run() {
     const error_message = ('\n Error. Qubits have been allocated in with '
     + 'Loop(eng, num) context,\n which have not '
     + 'explicitely been deallocated in the Loop context.\n'
-    + 'Correct usage:\nwith Loop(eng, 5):\n'
+    + 'Correct usage:\nLoop(eng, 5):\n'
     + '    qubit = eng.allocateQubit()\n'
     + '    ...\n'
-    + '    del qubit[0]\n')
+    + '    qubit[0].deallocate()\n')
 
     if (!this._nextEnginesSupportLoopTag) {
       // Unroll the loop
-      // Check that local qubits have been deallocated:
+      // Check that local qubits have been deallocated
       if (!setEqual(this._deallocatedQubitIDs, this._allocatedQubitIDs)) {
         throw new QubitManagementError(error_message)
       }
@@ -182,31 +183,31 @@ unroll or, if there is a LoopTag-handling engine, add the LoopTag.
 Loop n times over an entire code block.
 
     @example
-@code
-
-with Loop(eng, 4):
-# [quantum gates to be executed 4 times]
+    Loop(eng, 4, () => { })
+    // [quantum gates to be executed 4 times]
 
 Warning:
     If the code in the loop contains allocation of qubits, those qubits
-have to be deleted prior to exiting the 'with Loop()' context.
+have to be deleted prior to exiting the 'Loop()' context.
 
     This code is **NOT VALID**:
 
-@code
+ @example
 
-with Loop(eng, 4):
-qb = eng.allocateQubit()
-H | qb # qb is still available!!!
+  Loop(eng, 4, () => {
+    qb = eng.allocateQubit()
+  })
+
+  H.or(qb) // qb is still available!!!
 
 The **correct way** of handling qubit (de-)allocation is as follows:
 
-@code
-
-with Loop(eng, 4):
-qb = eng.allocateQubit()
+ @example
+  Loop(eng, 4, () => {
+    qb = eng.allocateQubit()
+  })
 ...
-del qb # sends deallocate gate
+  qb.deallocate() // sends deallocate gate
  */
 export function Loop(engine, num, func) {
   if (typeof num === 'number' && num >= 0 && num % 1 === 0) {

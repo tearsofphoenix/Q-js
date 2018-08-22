@@ -22,7 +22,7 @@
     MainEngine. Qubit objects are automatically deallocated if they go out of
     scope and intented to be used within Qureg objects in user code.
 
-    @code
+ @example
       import MainEngine
       const eng = new MainEngine()
       const qubit = eng.allocateQubit()
@@ -36,6 +36,7 @@ import {arrayEqual} from '../libs/polyfill'
 
 /**
  * @class BasicQubit
+ * @desc
  * objects represent qubits. They have an id and a reference to the owning engine.
  */
 export class BasicQubit {
@@ -105,7 +106,7 @@ export class BasicQubit {
 
 /**
  * @class Qubit
- * @classdesc
+ * @desc
     Represents a (logical-level) qubit with a unique index provided by the
     MainEngine. Once the qubit goes out of scope (and is garbage-collected),
     it deallocates itself automatically, allowing automatic resource management.
@@ -146,11 +147,11 @@ export class Qubit extends BasicQubit {
 }
 
 /**
+ * @interface
  * @class Qureg
- * @classdesc Quantum register class.
-
-Simplifies accessing measured values for single-qubit registers (no []-
-    access necessary) and enables pretty-printing of general quantum registers).
+ * @desc Quantum register class.
+Simplifies accessing measured values for single-qubit registers (no []-access necessary)
+ and enables pretty-printing of general quantum registers).
  */
 export function Qureg(...args) {
   const arg0 = args[0]
@@ -188,8 +189,8 @@ Qureg.prototype.toBoolean = function () {
   if (this.length === 1) {
     return this[0].toBoolean()
   }
-  throw new Error('__bool__(qureg): Quantum register contains more "\n'
-    + '"than 1 qubit. Use __bool__(qureg[idx]) instead.')
+  throw new Error('qureg.toBoolean(): Quantum register contains more "\n'
+    + '"than 1 qubit. Use qureg[idx].toBoolean() instead.')
 }
 
 /**

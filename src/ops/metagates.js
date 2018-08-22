@@ -20,7 +20,6 @@
 * ControlledGate (Represents a controlled version of an arbitrary gate)
 * Tensor/All (Applies a single qubit gate to all supplied qubits), e.g.,
     @example
-@code
 
 Tensor(H) | (qubit1, qubit2) # apply H to qubit #1 and #2
 
@@ -37,6 +36,7 @@ import { arrayIsTuple } from '../libs/util'
 
 /**
  * @class DaggeredGate
+ * @desc
 Wrapper class allowing to execute the inverse of a gate, even when it does
 not define one.
 
@@ -48,7 +48,6 @@ not define one.
 function on a gate which does not provide a getInverse() member function.
 
 @example
-    @code
 
 with Dagger(eng)
 MySpecialGate | qubits
@@ -111,6 +110,7 @@ Cycle.add('DaggeredGate', DaggeredGate)
 
 /**
  * @class ControlledGate
+ * @desc
 Controlled version of a gate.
 
     Note:
@@ -122,7 +122,6 @@ the __or__-operator, using the first qubits provided as control qubits.
 separate quregs.
 
     @example
-@code
 
 ControlledGate(gate, 2) | (qb0, qb2, qb3) # qb0 & qb2 are controls
 C(gate, 2) | (qb0, qb2, qb3) # This is much nicer.
@@ -131,7 +130,7 @@ C(gate, 2) | ([qb0,qb2], qb3) # Is equivalent
 Note:
     Use :func:`C` rather than ControlledGate, i.e.,
 
-@code
+ @example
 
 C(X, 2) == Toffoli
  */
@@ -214,7 +213,6 @@ Return n-controlled version of the provided gate.
     @param {number} n Number of controls (default: 1)
 
 @example
-    @code
 
 C(NOT) | (c, q) # equivalent to CNOT | (c, q)
  */
@@ -224,12 +222,12 @@ export function C(gate, n = 1) {
 
 /**
  * @class Tensor
+ * @desc
 Wrapper class allowing to apply a (single-qubit) gate to every qubit in a
 quantum register. Allowed syntax is to supply either a qureg or a tuple
 which contains only one qureg.
 
     @example
-@code
 
 Tensor(H) | x # applies H to every qubit in the list of qubits x
 Tensor(H) | (x,) # alternative to be consistent with other syntax

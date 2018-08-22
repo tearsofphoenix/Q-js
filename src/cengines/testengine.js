@@ -19,7 +19,7 @@ import {FlushGate} from '../ops/gates'
 
 /**
  * @class CompareEngine
- * @classdesc CompareEngine is an engine which saves all commands. It is only intended
+ * @desc CompareEngine is an engine which saves all commands. It is only intended
  * for testing purposes. Two CompareEngine backends can be compared and
  * return true if they contain the same commmands.
  */
@@ -128,7 +128,7 @@ export class CompareEngine extends BasicEngine {
 
 /**
  * @class DummyEngine
-   @classdesc DummyEngine used for testing.
+   @desc DummyEngine used for testing.
     The DummyEngine forwards all commands directly to next engine.
     If this.is_last_engine == true it just discards all gates.
     By setting save_commands == true all commands get saved as a

@@ -15,15 +15,6 @@
  * limitations under the License.
  */
 
-// Draper's addition by constant https://arxiv.org/abs/quant-ph/0008033
-
-/**
-Adds a classical constant c to the quantum integer (qureg) quint using
-Draper addition.
-
-    Note: Uses the Fourier-transform adder from
-https://arxiv.org/abs/quant-ph/0008033.
- */
 import assert from 'assert'
 import math from 'mathjs'
 import {Compute, CustomUncompute, Uncompute} from '../../meta/compute'
@@ -39,7 +30,8 @@ import {len} from '../polyfill';
 
 /**
  * Adds a classical constant c to the quantum integer (qureg) quint using Draper addition.
- * Note: Uses the Fourier-transform adder from `https://arxiv.org/abs/quant-ph/0008033`.
+ * Note: Uses the Fourier-transform adder
+ * see https://arxiv.org/abs/quant-ph/0008033
  */
 export function add_constant(eng, c, quint) {
   Compute(eng, () => QFT.or(quint))
@@ -55,10 +47,11 @@ export function add_constant(eng, c, quint) {
   Uncompute(eng)
 }
 
-// Modular adder by Beauregard https://arxiv.org/abs/quant-ph/0205095
 /**
+ * Modular adder by Beauregard
+ * see https://arxiv.org/abs/quant-ph/0205095
 Adds a classical constant c to a quantum integer (qureg) quint modulo N
-using Draper addition and the construction from `https://arxiv.org/abs/quant-ph/0205095`.
+using Draper addition and the construction
  */
 export function add_constant_modN(eng, c, N, quint) {
   assert(c < N && c >= 0)
@@ -105,10 +98,9 @@ function inv_mod_N(a, N) {
   return (old_s + N) % N
 }
 
-// Modular multiplication by modular addition & shift, followed by uncompute
-// from https://arxiv.org/abs/quant-ph/0205095
-
 /**
+ * Modular multiplication by modular addition & shift, followed by uncompute
+ https://arxiv.org/abs/quant-ph/0205095
 Multiplies a quantum integer by a classical number a modulo N, i.e.,
 
 |x> -> |a*x mod N>

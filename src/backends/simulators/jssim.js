@@ -34,6 +34,7 @@ import { stringToArray } from '../../ops/qubitoperator'
 
 /**
  * @class JSSimulator
+ * @desc
 NodeJS implementation of a quantum computer simulator.
 
     This Simulator can be used as a backup if compiling the c++ simulator is
@@ -43,7 +44,6 @@ slower, so please consider building the c++ version for larger experiments.
 export default class Simulator {
   /**
    * @constructor
-  Initialize the simulator.
    */
   constructor() {
     // ignore seed
@@ -56,8 +56,7 @@ export default class Simulator {
   Return the qubit index to bit location map and the corresponding state
 vector.
 
-    This function can be used to measure expectation values more
-efficiently (emulation).
+    This function can be used to measure expectation values more efficiently (emulation).
 
     @return {Array}
 A tuple where the first entry is a dictionary mapping qubit indices
@@ -97,9 +96,9 @@ outcomes (true/false).
     val = 0
 
     pos.forEach((looper, i) => {
-      res[i] = (((i_picked >> looper) & 1) == 1)
+      res[i] = ((i_picked >> looper) & 1) === 1
       mask |= (1 << looper)
-      val |= ((res[i] & 1) ** looper)
+      val |= ((res[i] & 1) << looper)
     })
 
     let nrm = 0.0
@@ -540,9 +539,9 @@ using `mask` to identify control qubits.
    @param {Array.<number[]>} m 2^k x 2^k complex matrix describing the k-qubit gate.
    @param {number[]} pos List of bit-positions of the qubits.
    @param {number} mask Bit-mask where set bits indicate control qubits.
+   see follows the description in https://arxiv.org/abs/1704.01127
    */
   _multiQubitGate(m, pos, mask) {
-    // follows the description in https://arxiv.org/abs/1704.01127
     const inactive = Object.keys(this._map).map(k => parseInt(k, 10)).filter(p => !pos.includes(p))
 
     const matrix = math.matrix(m)

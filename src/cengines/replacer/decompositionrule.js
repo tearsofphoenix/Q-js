@@ -19,7 +19,7 @@ import { isKindclassOf } from '../../libs/util'
 
 /**
  * @class DecompositionRule
- * @classdesc A rule for breaking down specific gates into sequences of simpler gates.
+ * @desc A rule for breaking down specific gates into sequences of simpler gates.
  */
 export default class DecompositionRule {
   /**

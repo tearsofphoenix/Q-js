@@ -24,7 +24,7 @@ import {NotMergeable} from '../meta/error';
 
 /**
  * @class LocalOptimizer
- * @classdesc is a compiler engine which optimizes locally (merging
+ * @desc is a compiler engine which optimizes locally (merging
 rotations, cancelling gates with their inverse) in a local window of user-
 defined size.
 

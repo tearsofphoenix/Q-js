@@ -24,7 +24,7 @@ import CommandModifier from './cmdmodifier'
 
 /**
  * @class SwapAndCNOTFlipper
- * @classdesc
+ * @desc
 Flips CNOTs and translates Swaps to CNOTs where necessary.
 
     Warning:

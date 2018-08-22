@@ -30,7 +30,7 @@ function parseStringKey(key) {
 
 /**
  * @class ResourceCounter
- * @classdesc
+ * @desc
 ResourceCounter is a compiler engine which counts the number of gates and
 max. number of active qubits.
 
@@ -46,7 +46,6 @@ given point).
 Properties:
   depth_of_dag (int): It is the longest path in the directed
 acyclic graph (DAG) of the program.
- @class ResourceCounter
  */
 export default class ResourceCounter extends BasicEngine {
   /**

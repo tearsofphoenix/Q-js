@@ -23,6 +23,7 @@ import {NoGateDecompositionError} from '../../meta/error';
 
 /**
  * @class InstructionFilter
+ * @desc
 The InstructionFilter is a compiler engine which changes the behavior of
 isAvailable according to a filter function. All commands are passed to
 this function, which then returns whether this command can be executed
@@ -34,7 +35,7 @@ export class InstructionFilter extends BasicEngine {
   Initializer: The provided filterfun returns true for all commands
 which do not need replacement and false for commands that do.
 
-    @param {function} filterFunc: Filter function which returns true for
+    @param {function} filterFunc Filter function which returns true for
     available commands, and false otherwise. filterfun will be
     called as filterfun(self, cmd).
   */
@@ -66,6 +67,7 @@ call to the filter function given to the constructor.
 
 /**
  * @class AutoReplacer
+ * @desc
 The AutoReplacer is a compiler engine which uses engine.isAvailable in
 order to determine which commands need to be replaced/decomposed/compiled
 further. The loaded setup is used to find decomposition rules appropriate
@@ -75,7 +77,7 @@ export class AutoReplacer extends BasicEngine {
   /**
    * @constructor
     @param {DecompositionRuleSet} decompositionRuleSet
-    @param {function} decomposition_chooser: A function which, given the
+    @param {function} decomposition_chooser A function which, given the
 Command to decompose and a list of potential Decomposition
 objects, determines (and then returns) the 'best'
 decomposition.
@@ -83,13 +85,13 @@ decomposition.
     The default decomposition chooser simply returns the first list
 element, i.e., calling
 
-    @code
+   @example
 
-repl = AutoReplacer()
+repl = new AutoReplacer()
 
 Amounts to
 
-    @code
+   @example
 
   function decomposition_chooser(cmd, decomp_list) {
     return decomp_list[0]
@@ -186,8 +188,7 @@ if not, replace it using the decomposition rules loaded with the setup
             necessary, replace/decompose the gates according to the decomposition
         rules in the loaded setup.
 
-            @param
-        command_list (list<Command>): List of commands to handle.
+            @param {Command} command List of commands to handle.
        */
       const cmd_mod_fun = (command) => { // Adds the tags
         command.tags = [...old_tags, ...command.tags]

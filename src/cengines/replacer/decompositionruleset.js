@@ -22,8 +22,8 @@ import {Dagger} from '../../meta/dagger'
  */
 export default class DecompositionRuleSet {
   /**
-    @param {Array.<DecompositionRule>} rules : Initial decomposition rules.
-    @param {Array} modules: A list of
+    @param {Array.<DecompositionRule>} rules Initial decomposition rules.
+    @param {Array} modules A list of
 things with an "all_defined_decomposition_rules" property
 containing decomposition rules to add to the rule set.
      */
@@ -60,6 +60,7 @@ containing decomposition rules to add to the rule set.
 
 /**
  * @class ModuleWithDecompositionRuleSet
+ * @desc
 Interface type for explaining one of the parameters that can be given to
 DecompositionRuleSet.
  */
@@ -70,7 +71,9 @@ class ModuleWithDecompositionRuleSet {
 }
 
 /**
+ * @private
  * @class _Decomposition
+ * @desc
 The Decomposition class can be used to register a decomposition rule (by
 calling register_decomposition)
  */
@@ -79,8 +82,8 @@ class _Decomposition {
    * @constructor
     Construct the Decomposition object.
 
-    @param {function} replacementFunc: Function that, when called with a `Command` object, decomposes this command.
-    @param {function} recognizerFunc: Function that, when called with a `Command` object,
+    @param {function} replacementFunc Function that, when called with a `Command` object, decomposes this command.
+    @param {function} recognizerFunc Function that, when called with a `Command` object,
     returns true if and only if the replacement rule can handle this command.
 
     Every Decomposition is registered with the gate class. The
@@ -94,16 +97,16 @@ decomposition rule can indeed be applied to replace the given Command.
 Pauli-X gate with 2 control qubits. The recognizer function would then
 be:
 
-    @code
+    @example
 
-function recogn_toffoli(cmd):
-// can be applied if the gate is an X-gate with 2 controls:
+function recogn_toffoli(cmd)
+// can be applied if the gate is an X-gate with 2 controls
     return len(cmd.control_qubits) == 2
 
 and, given a replacement function `replace_toffoli`, the decomposition
 rule can be registered as
 
-@code
+   @example
 
 register_decomposition(X.constructor, decompose_toffoli,
     recogn_toffoli)
@@ -123,7 +126,7 @@ original command.
     This simulates the user having added a decomposition rule for the
     inverse as well. Since decomposing the inverse of a command can be
 achieved by running the original decomposition inside a
-    `with Dagger(engine):` statement, this is not necessary
+    `with Dagger(engine)` statement, this is not necessary
 (and will be done automatically by the framework).
 
   @return {_Decomposition} Decomposition handling the inverse of the original command.

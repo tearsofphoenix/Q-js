@@ -34,8 +34,7 @@ import {QubitManagementError} from './error'
 
 /**
  * @class ComputeEngine
-Adds Compute-tags to all commands and stores them (to later uncompute them
-automatically)
+ * @desc Adds Compute-tags to all commands and stores them (to later uncompute them automatically)
  */
 export class ComputeEngine extends BasicEngine {
   /**
@@ -189,7 +188,7 @@ uncompute.
   }
 
   /**
-End the compute step (exit the with Compute() - statement).
+End the compute step (exit the Compute() - statement).
 
 Will tell the Compute-engine to stop caching. It then waits for the
     uncompute instruction, which is when it sends all cached commands
@@ -267,12 +266,12 @@ export class UncomputeEngine extends BasicEngine {
 Start a compute-section.
 
     @example
-@code
 
-with Compute(eng):
-do_something(qubits)
-action(qubits)
-Uncompute(eng) # runs inverse of the compute section
+Compute(eng, () => {
+  do_something(qubits)
+  action(qubits)
+})
+Uncompute(eng) // runs inverse of the compute section
 
 Warning:
     If qubits are allocated within the compute section, they must either be
@@ -281,37 +280,37 @@ uncomputed and deallocated within that section or, alternatively,
 
     This means that the following examples are valid:
 
-    @code
+ @example
 
-with Compute(eng):
-anc = eng.allocateQubit()
-do_something_with_ancilla(anc)
-...
+Compute(eng, () => {
+  anc = eng.allocateQubit()
+  do_something_with_ancilla(anc)
+})
+ ...
 uncompute_ancilla(anc)
-del anc
+anc.deallocate()
 
 do_something_else(qubits)
 
-Uncompute(eng)  # will allocate a new ancilla (with a different id)
-# and then deallocate it again
+Uncompute(eng)  // will allocate a new ancilla (with a different id)
+// and then deallocate it again
 
-    @code
+ @example
 
-with Compute(eng):
+Compute(eng, () => {
 anc = eng.allocateQubit()
 do_something_with_ancilla(anc)
 ...
-
+})
 do_something_else(qubits)
 
-Uncompute(eng)  # will deallocate the ancilla!
+Uncompute(eng)  // will deallocate the ancilla!
 
     After the uncompute section, ancilla qubits allocated within the
 compute section will be invalid (and deallocated). The same holds when
 using CustomUncompute.
 
-    Failure to comply with these rules results in an exception being
-thrown.
+    Failure to comply with these rules results in an exception being thrown.
  */
 export function Compute(engine, func) {
   let computeEngine = null
@@ -341,13 +340,16 @@ export function Compute(engine, func) {
 Start a custom uncompute-section.
 
     @example
-@code
 
-with Compute(eng):
-do_something(qubits)
-action(qubits)
-with CustomUncompute(eng):
-do_something_inverse(qubits)
+Compute(eng, () => {
+  do_something(qubits)
+})
+
+ action(qubits)
+
+ CustomUncompute(eng, () => {
+  do_something_inverse(qubits)
+})
 
 @throws {QubitManagementError} If qubits are allocated within Compute or within
 CustomUncompute context but are not deallocated.
@@ -361,10 +363,7 @@ export function CustomUncompute(engine, func) {
     // first, remove the compute engine
     const compute_eng = engine.next
     if (!(compute_eng instanceof ComputeEngine)) {
-      throw new QubitManagementError(
-        'Invalid call to CustomUncompute: No corresponding'
-        + "'with Compute' statement found."
-      )
+      throw new QubitManagementError('Invalid call to CustomUncompute: No corresponding "Compute" statement found.')
     }
     // Make copy so there is not reference to compute_eng anymore
     // after __enter__
@@ -387,7 +386,7 @@ export function CustomUncompute(engine, func) {
     const all_deallocated_qubits = unionSet(deallocatedQubitIDs, uncomputeEngine.deallocatedQubitIDs)
     if (!setEqual(all_allocated_qubits, all_deallocated_qubits)) {
       throw new QubitManagementError('\nError. Not all qubits have been deallocated which have \n'
-               + 'been allocated in the with Compute(eng) or with '
+               + 'been allocated in the Compute(eng) or with '
                + 'CustomUncompute(eng) context.')
     }
     // remove uncompute engine
@@ -410,19 +409,16 @@ export function CustomUncompute(engine, func) {
 Uncompute automatically.
 
     @example
-@code
-
-with Compute(eng):
-do_something(qubits)
-action(qubits)
-Uncompute(eng) # runs inverse of the compute section
+ Compute(eng, () => {
+  do_something(qubits)
+})
+  action(qubits)
+  Uncompute(eng) // runs inverse of the compute section
  */
 export function Uncompute(engine) {
   const compute_eng = engine.next
   if (!(compute_eng instanceof ComputeEngine)) {
-    throw new Error('Invalid call to Uncompute: No '
-    + "corresponding 'with Compute' statement "
-    + 'found.')
+    throw new Error('Invalid call to Uncompute: No corresponding "Compute" statement found.')
   }
   compute_eng.runUnCompute()
   dropEngineAfter(engine)

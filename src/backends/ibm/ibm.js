@@ -27,14 +27,13 @@ import '../../ops/metagates'
 const {Tdag, Sdag} = Gates
 /**
  * @class IBMBackend
- * @classdesc
+ * @desc
 The IBM Backend class, which stores the circuit, transforms it to JSON
 QASM, and sends the circuit through the IBM API.
  */
 export default class IBMBackend extends BasicEngine {
   /**
    * @constructor
-  Initialize the Backend object.
   @param {{use_hardware: boolean, num_runs: number, verbose: boolean, user: string, password: string, device: string, retrieve_execution: ?string}} args
     use_hardware: If true, the code is run on the IBM quantum chip (instead of using the IBM simulator)
     num_runs: Number of runs to collect statistics. (default is 1024)

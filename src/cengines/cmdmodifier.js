@@ -23,9 +23,9 @@ import {BasicEngine} from './basics'
 
 /**
  * @class CommandModifier
+ * @desc
 CommandModifier is a compiler engine which applies a function to all
-incoming commands, sending on the resulting command instead of the
-original one.
+incoming commands, sending on the resulting command instead of the original one.
  */
 export default class CommandModifier extends BasicEngine {
   /**
@@ -36,7 +36,6 @@ export default class CommandModifier extends BasicEngine {
     returns the command it should send instead.
 
     @example
-@code
 
 function cmd_mod_fun(cmd)
 cmd.tags += [new MyOwnTag()]

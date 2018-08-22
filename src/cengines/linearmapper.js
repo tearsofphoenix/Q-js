@@ -68,7 +68,7 @@ export function return_swap_depth(swaps) {
 
 /**
  * @class LinearMapper
- * @classdesc
+ * @desc
 Maps a quantum circuit to a linear chain of nearest neighbour interactions.
 
     Maps a quantum circuit to a linear chain of qubits with nearest neighbour
@@ -343,7 +343,7 @@ possible or updates the segements such that the gate is possible.
   /**
   Returns the swap operation for an odd-even transposition sort.
 
-  See https://en.wikipedia.org/wiki/Odd-even_sort for more info.
+  @see https://en.wikipedia.org/wiki/Odd-even_sort
 
   @param {Object} old_mapping keys are logical ids and values are mapped qubit ids
   @param {Object} new_mapping dict: keys are logical ids and values are mapped qubit ids

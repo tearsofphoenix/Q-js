@@ -35,7 +35,6 @@ instead.
     @param {BasicGate} gate Gate of which to get the inverse
 
 @example
-    @code
 
 getInverse(H) // returns a Hadamard gate (HGate object)
  */

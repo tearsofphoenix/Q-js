@@ -27,20 +27,18 @@ import { LastEngineError } from '../meta/error'
 
 /**
  * @class CommandPrinter
- * @classdesc
+ * @desc
  * CommandPrinter is a compiler engine which prints commands to stdout prior
  * to sending them on to the next compiler engine.
  */
 export default class CommandPrinter extends BasicEngine {
   /**
    * @constructor
-   *Initialize a CommandPrinter.
-
-  @param {boolean} acceptInput: If accept_input is true, the printer queries
+  @param {boolean} acceptInput If accept_input is true, the printer queries
   the user to input measurement results if the CommandPrinter is
   the last engine. Otherwise, all measurements yield
-  @param {boolean} defaultMeasure. Default measurement result (if accept_input is false).
-  @param {boolean} inPlace: If in_place is true, all output is written on the same line of the terminal.
+  @param {boolean} defaultMeasure Default measurement result (if accept_input is false).
+  @param {boolean} inPlace If in_place is true, all output is written on the same line of the terminal.
   */
   constructor(acceptInput = true, defaultMeasure = false, inPlace = false) {
     super()

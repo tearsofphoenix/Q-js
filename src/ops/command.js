@@ -19,7 +19,7 @@ This file defines the apply_command function and the Command class.
 
 When a gate is applied to qubits, e.g.,
 
-@code
+ @example
 
 CNOT | (qubit1, qubit2)
 
@@ -32,7 +32,7 @@ to generate a Command object which stores the qubits in a canonical order
 using interchangeable qubit indices defined by the gate to allow the
 optimizer to cancel the following two gates
 
-    @code
+ @example
 Swap | (qubit1, qubit2)
 Swap | (qubit2, qubit1)
 
@@ -48,7 +48,7 @@ import {NotMergeable} from '../meta/error'
 
 /**
  * @class Command
- * @classdesc
+ * @desc
 Class used as a container to store commands. If a gate is applied to
 qubits, then the gate and qubits are saved in a command object. Qubits
 are copied into WeakQubitRefs in order to allow early deallocation (would
