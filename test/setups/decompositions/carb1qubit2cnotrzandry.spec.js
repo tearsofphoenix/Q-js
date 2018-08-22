@@ -9,7 +9,7 @@ import {
 } from '../../../src/ops';
 import carb1q, {_recognize_carb1qubit, _recognize_v} from '../../../src/setups/decompositions/carb1qubit2cnotrzandry';
 import {instanceOf} from '../../../src/libs/util';
-import {create_test_matrices} from '../../../src/setups/decompositions/arb1qubit2rzandry.spec';
+import {create_test_matrices} from './arb1qubit2rzandry.spec';
 import Simulator from '../../../src/backends/simulators/simulator';
 import DecompositionRuleSet from '../../../src/cengines/replacer/decompositionruleset'
 
