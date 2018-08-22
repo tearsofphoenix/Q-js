@@ -27,19 +27,40 @@ import {BasicQubit} from '../types/qubit';
 import {LogicalQubitIDTag} from '../meta';
 
 /**
+ * @class Position
+ */
+class Position {
+  /**
+   * @constructor
+   * @param {number} current_row
+   * @param {number} current_column
+   * @param {number} final_row
+   * @param {number} final_column
+   * @param {number} row_after_step_1
+   */
+  constructor(current_row, current_column, final_row, final_column, row_after_step_1) {
+    this.current_row = current_row
+    this.current_column = current_column
+    this.final_row = final_row
+    this.final_column = final_column
+    this.row_after_step_1 = row_after_step_1
+  }
+}
+
+/**
  * @class GridMapper
  * @desc
 Mapper to a 2-D grid graph.
 
     Mapped qubits on the grid are numbered in row-major order. E.g. for
 3 rows and 2 columns:
-
+  ```js
     0 - 1
     |   |
     2 - 3
     |   |
     4 - 5
-
+  ```
 The numbers are the mapped qubit ids. The backend might number
 the qubits on the grid differently (e.g. not row-major), we call these
 backend qubit ids. If the backend qubit ids are not row-major, one can
@@ -49,9 +70,7 @@ backend ids.
     Note: The algorithm sorts twice inside each column and once inside each
 row.
 
-    Attributes:
-current_mapping:  Stores the mapping: key is logical qubit id, value
-is backend qubit id.
+ @property current_mapping Stores the mapping: key is logical qubit id, value is backend qubit id.
 storage(int): Number of gate it caches before mapping.
 num_rows(int): Number of rows in the grid
 num_columns(int): Number of columns in the grid
@@ -69,21 +88,15 @@ export default class GridMapper extends BasicMapperEngine {
    * @constructor
   Initialize a GridMapper compiler engine.
 
-    @param {{num_rows: number, num_columns: number, mapped_ids_to_backend_ids: Object, storage: number, optimization_function: function, num_optimization_steps: number}} args
-      num_rows(int): Number of rows in the grid
-      num_columns(int): Number of columns in the grid.
-      mapped_ids_to_backend_ids(dict): Stores a mapping from mapped ids which are 0,...,this.num_qubits-1
-      in row-major order on the grid to the corresponding qubit ids of the backend.
-      Key: mapped id. Value: corresponding backend id. Default is None
-      which means backend ids are identical to mapped ids.
-      storage: Number of gates to temporarily store
-      optimization_function: Function which takes a list of swaps and returns a cost value. Mapper chooses a
-        permutation which minimizes this cost. Default optimizes for circuit depth.
-      num_optimization_steps(int): Number of different permutations to of the matching to try and minimize the cost.
+    @param {{num_rows: number, num_columns: number, mapped_ids_to_backend_ids: ?Object, storage: ?number, optimization_function: ?function, num_optimization_steps: ?number}} args
     @throws {Error} if incorrect `mapped_ids_to_backend_ids` parameter
    */
   constructor(args) {
     super()
+    /**
+     * @type {Object}
+     * @property {number} args.num_rows
+     */
     const {
       num_rows, num_columns, mapped_ids_to_backend_ids,
       storage = 1000,
@@ -91,7 +104,26 @@ export default class GridMapper extends BasicMapperEngine {
       num_optimization_steps = 50
     } = args
 
-
+    /**
+     * @property {number} this.num_rows Number of rows in the grid
+     * @property {number} this.num_columns Number of columns in the grid.
+     * @property {number} this.num_qubits
+     * @property {Object<number, number>} this._mapped_ids_to_backend_ids
+     * @property {Object<number, number>} this._backend_ids_to_mapped_ids
+     *      Stores a mapping from mapped ids which are 0,...,this.num_qubits-1 in row-major order
+     *      on the grid to the corresponding qubit ids of the backend. Key: mapped id. Value: corresponding backend id.
+     *      Default is None which means backend ids are identical to mapped ids.
+     * @property {Object<number, number>} this._current_row_major_mapping
+     * @property {number} this.storage Number of gates to temporarily store
+     * @property {function} this.optimization_function
+     *      Function which takes a list of swaps and returns a cost value. Mapper chooses a permutation
+     *      which minimizes this cost. Default optimizes for circuit depth.
+     * @property {number} this.num_optimization_steps
+     *      Number of different permutations to of the matching to try and minimize the cost.
+     * @property {number} this.num_mappings
+     * @property {Object<number, number>} this.depth_of_swaps
+     * @property {Object<number, number>} this.num_of_swaps_per_mapping
+     */
     this.num_rows = num_rows
     this.num_columns = num_columns
     this.num_qubits = num_rows * num_columns
@@ -129,15 +161,23 @@ export default class GridMapper extends BasicMapperEngine {
     // places.
     // TODO
     // this._rng = random.Random(11)
-    // Storing commands
+    /**
+     * Storing commands
+     * @property {Command[]} this._stored_commands
+     */
     this._stored_commands = []
-    // Logical qubit ids for which the Allocate gate has already been
-    // processed and sent to the next engine but which are not yet
-    // deallocated:
+    /** Logical qubit ids for which the Allocate gate has already been
+      processed and sent to the next engine but which are not yet deallocated:
+      @property {Set<number>} this._currently_allocated_ids
+     */
     this._currently_allocated_ids = new Set()
-    // Change between 2D and 1D mappings (2D is a snake like 1D chain)
-    // Note it translates to our mapped ids in row major order and not
-    // backend ids which might be different.
+    /**
+     * Change between 2D and 1D mappings (2D is a snake like 1D chain)
+        Note it translates to our mapped ids in row major order and not
+        backend ids which might be different.
+     * @property {Object<number, number>} this._map_2d_to_1d
+     * @property {Object<number, number>} this._map_1d_to_2d
+    */
     this._map_2d_to_1d = {}
     this._map_1d_to_2d = {}
     for (let row_index = 0; row_index < this.num_rows; ++row_index) {
@@ -155,7 +195,9 @@ export default class GridMapper extends BasicMapperEngine {
       }
     }
 
-    // Statistics:
+    /**
+     * Statistics
+      */
     this.num_mappings = 0
     this.depth_of_swaps = {}
     this.num_of_swaps_per_mapping = {}
@@ -230,8 +272,13 @@ mapping to apply these gates on a first come first served basis.
     return new_mapping_2d
   }
 
-  // If swapped (inplace), then return swap operation
-  // so that key(element0) < key(element1)
+  /**
+   * If swapped (inplace), then return swap operation so that `key(element0) < key(element1)`
+   @param {Position} element0
+   @param {Position} element1
+   @param {function(arg: Position): number} key
+   @return {Array<number>|undefined}
+   */
   _compareAndSwap(element0, element1, key) {
     if (key(element0) > key(element1)) {
       const mapped_id0 = (element0.current_column + element0.current_row * this.num_columns)
@@ -252,6 +299,12 @@ mapping to apply these gates on a first come first served basis.
     return undefined
   }
 
+  /**
+   * @param {Array<Position[]>} final_positions
+   * @param {function(arg: Position): number} key
+   * @return {Array<number[]>}
+   * @private
+   */
   _sortWithinRows(final_positions, key) {
     const swap_operations = []
     for (let row = 0; row < this.num_rows; ++row) {
@@ -282,6 +335,12 @@ mapping to apply these gates on a first come first served basis.
     return swap_operations
   }
 
+  /**
+   * @param {Array<Position[]>} final_positions
+   * @param {function(arg: Position): number} key
+   * @return {Array<number[]>}
+   * @private
+   */
   _sortWithinColumns(final_positions, key) {
     const swap_operations = []
     for (let column = 0; column < this.num_columns; ++column) {
@@ -433,7 +492,6 @@ which don't store any information.
 
   /**
   Sends the stored commands possible without changing the mapping.
-
     Note: this._current_row_major_mapping (hence also this.currentMapping) must exist already
    */
   _sendPossibleCommands() {
@@ -553,15 +611,6 @@ which don't store any information.
     }
     let swap_operations = []
 
-    class Position {
-      constructor(current_row, current_column, final_row, final_column, row_after_step_1) {
-        this.current_row = current_row
-        this.current_column = current_column
-        this.final_row = final_row
-        this.final_column = final_column
-        this.row_after_step_1 = row_after_step_1
-      }
-    }
     // final_positions contains info containers
     // final_position[i][j] contains info container with
     // current_row == i and current_column == j

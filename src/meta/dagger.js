@@ -18,10 +18,10 @@
 Tools to easily invert a sequence of gates.
 
  @example
-
-with Dagger(eng)
-H | qubit1
-Rz(0.5) | qubit2
+ Dagger(eng, () => {
+  H.or(qubit1)
+  new Rz(0.5).or(qubit2)
+})
 */
 
 import {BasicEngine} from '../cengines/basics'
@@ -98,19 +98,18 @@ to be deleted prior to exiting the 'with Dagger()' context.
     This code is **NOT VALID**:
 
  @example
-
-with Dagger(eng):
-qb = eng.allocateQubit()
-H | qb // qb is still available!!!
-
+  Dagger(eng, () => {
+    qb = eng.allocateQubit()
+    H.or(qb) // qb is still available!!!
+  })
 The **correct way** of handling qubit (de-)allocation is as follows:
 
  @example
-
-with Dagger(eng):
-qb = eng.allocateQubit()
-...
-del qb // sends deallocate gate (which becomes an allocate)
+  Dagger(eng, () => {
+    qb = eng.allocateQubit()
+    ...
+    qb.deallocate() // sends deallocate gate (which becomes an allocate)
+  })
 
  @param {BasicEngine} engine Engine which handles the commands (usually MainEngine)
  @param {function} func

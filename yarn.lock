@@ -1755,7 +1755,7 @@ esdoc-brand-plugin@^1.0.0:
   dependencies:
     cheerio "0.22.0"
 
-esdoc-coverage-plugin@^1.0.0, esdoc-coverage-plugin@^1.1.0:
+esdoc-coverage-plugin@^1.0.0:
   version "1.1.0"
   resolved "http://registry.npm.taobao.org/esdoc-coverage-plugin/download/esdoc-coverage-plugin-1.1.0.tgz#3869869cd7f87891f972625787695a299aece45c"
 

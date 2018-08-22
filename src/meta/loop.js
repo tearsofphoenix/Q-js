@@ -180,6 +180,9 @@ unroll or, if there is a LoopTag-handling engine, add the LoopTag.
 
 
 /**
+ * @param {BasicEngine} engine
+ * @param {number} num
+ * @param {function} func
 Loop n times over an entire code block.
 
     @example
@@ -196,18 +199,17 @@ have to be deleted prior to exiting the 'Loop()' context.
 
   Loop(eng, 4, () => {
     qb = eng.allocateQubit()
+    H.or(qb) // qb is still available!!!
   })
-
-  H.or(qb) // qb is still available!!!
 
 The **correct way** of handling qubit (de-)allocation is as follows:
 
  @example
   Loop(eng, 4, () => {
     qb = eng.allocateQubit()
+    ...
+    qb.deallocate() // sends deallocate gate
   })
-...
-  qb.deallocate() // sends deallocate gate
  */
 export function Loop(engine, num, func) {
   if (typeof num === 'number' && num >= 0 && num % 1 === 0) {

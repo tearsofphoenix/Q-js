@@ -3,6 +3,8 @@ NodeJS version of [ProjectQ](https://github.com/ProjectQ-Framework/ProjectQ)
 
 CircleCI build status: [![CircleCI](https://circleci.com/gh/tearsofphoenix/Q-js/tree/master.svg?style=svg)](https://circleci.com/gh/tearsofphoenix/Q-js/tree/master)
 
+[![NPM](https://nodei.co/npm/projectq.png)](https://nodei.co/npm/projectq/)
+
 ### install
  1. use `git` to clone the repository 
  2. run `yarn install` 
