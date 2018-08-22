@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/cengines/linearmapper.js | projectq</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#backends">backends</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/printer.js~CommandPrinter.html">CommandPrinter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/resource.js~ResourceCounter.html">ResourceCounter</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#backends-circuits">backends/circuits</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/circuits/drawer.js~CircuitDrawer.html">CircuitDrawer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/circuits/drawer.js~CircuitItem.html">CircuitItem</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/circuits/tolatex.js~_Circ2Tikz.html">_Circ2Tikz</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-_exports">_exports</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#backends-ibm">backends/ibm</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/ibm/ibm.js~IBMBackend.html">IBMBackend</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/ibm/ibmhttpclient.js~IBMHTTPClient.html">IBMHTTPClient</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#backends-simulators">backends/simulators</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/simulators/classicalsimulator.js~ClassicalSimulator.html">ClassicalSimulator</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/simulators/jssim.js~Simulator.html">Simulator</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/simulators/shared.spec.js~TrivialMapper.html">TrivialMapper</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/backends/simulators/simulator.js~Simulator.html">Simulator</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-All">All</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#cengines">cengines</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/basicmapper.js~BasicMapperEngine.html">BasicMapperEngine</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/basics.js~BasicEngine.html">BasicEngine</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/basics.js~ForwarderEngine.html">ForwarderEngine</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/cmdmodifier.js~CommandModifier.html">CommandModifier</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/ibm5qubitmapper.js~IBM5QubitMapper.html">IBM5QubitMapper</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/linearmapper.js~LinearMapper.html">LinearMapper</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/main.js~MainEngine.html">MainEngine</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/manualmapper.js~ManualMapper.html">ManualMapper</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/optimize.js~LocalOptimizer.html">LocalOptimizer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/swapandcnotflipper.js~SwapAndCNOTFlipper.html">SwapAndCNOTFlipper</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/tagremover.js~TagRemover.html">TagRemover</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/testengine.js~CompareEngine.html">CompareEngine</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/testengine.js~DummyEngine.html">DummyEngine</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/twodmapper.js~GridMapper.html">GridMapper</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-return_swap_depth">return_swap_depth</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ibmqx4_connections">ibmqx4_connections</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#cengines-replacer">cengines/replacer</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/replacer/decompositionrule.js~DecompositionRule.html">DecompositionRule</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/replacer/decompositionruleset.js~DecompositionRuleSet.html">DecompositionRuleSet</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/replacer/replacer.js~AutoReplacer.html">AutoReplacer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/cengines/replacer/replacer.js~InstructionFilter.html">InstructionFilter</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#libs">libs</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-arrayEqual">arrayEqual</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-arrayFromRange">arrayFromRange</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-complexVectorDot">complexVectorDot</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-expmod">expmod</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-intersection">intersection</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isComplex">isComplex</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isNumeric">isNumeric</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-len">len</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-narray">narray</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-productLoop">productLoop</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-productLoop3">productLoop3</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-randomSample">randomSample</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setDifference">setDifference</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setEqual">setEqual</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setFromRange">setFromRange</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-setIsSuperSet">setIsSuperSet</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stringToBitArray">stringToBitArray</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-symmetricDifference">symmetricDifference</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unionSet">unionSet</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ObjectCopy">ObjectCopy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-arrayIsTuple">arrayIsTuple</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-classHierachy">classHierachy</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genString">genString</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-instanceOf">instanceOf</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isKindclassOf">isKindclassOf</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isSubclassOf">isSubclassOf</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-markTuple">markTuple</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-matrixDot">matrixDot</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-matrixGetRow">matrixGetRow</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-matrixRangeAssign">matrixRangeAssign</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-matrixRangeIndicesAssign">matrixRangeIndicesAssign</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-tuple">tuple</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-zeros">zeros</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#libs-math">libs/math</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/libs/math/gates.js~AddConstant.html">AddConstant</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/libs/math/gates.js~AddConstantModN.html">AddConstantModN</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/libs/math/gates.js~MultiplyByConstantModN.html">MultiplyByConstantModN</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-add_constant">add_constant</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-add_constant_modN">add_constant_modN</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mul_by_constant_modN">mul_by_constant_modN</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-SubConstant">SubConstant</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-SubConstantModN">SubConstantModN</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#meta">meta</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/compute.js~ComputeEngine.html">ComputeEngine</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/compute.js~UncomputeEngine.html">UncomputeEngine</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/control.js~ControlEngine.html">ControlEngine</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/dagger.js~DaggerEngine.html">DaggerEngine</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/error.js~LastEngineError.html">LastEngineError</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/error.js~NoGateDecompositionError.html">NoGateDecompositionError</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/error.js~NotMergeable.html">NotMergeable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/error.js~NotYetMeasuredError.html">NotYetMeasuredError</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/error.js~QubitManagementError.html">QubitManagementError</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/loop.js~LoopEngine.html">LoopEngine</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/loop.js~LoopTag.html">LoopTag</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/tag.js~ComputeTag.html">ComputeTag</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/tag.js~DirtyQubitTag.html">DirtyQubitTag</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/tag.js~LogicalQubitIDTag.html">LogicalQubitIDTag</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/meta/tag.js~UncomputeTag.html">UncomputeTag</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Compute">Compute</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-CustomUncompute">CustomUncompute</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Uncompute">Uncompute</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Control">Control</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Dagger">Dagger</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Loop">Loop</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-dropEngineAfter">dropEngineAfter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-insertEngine">insertEngine</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#ops">ops</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/basics.js~BasicGate.html">BasicGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/basics.js~BasicMathGate.html">BasicMathGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/basics.js~BasicPhaseGate.html">BasicPhaseGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/basics.js~BasicRotationGate.html">BasicRotationGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/basics.js~ClassicalInstructionGate.html">ClassicalInstructionGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/basics.js~FastForwardingGate.html">FastForwardingGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/basics.js~SelfInverseGate.html">SelfInverseGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/command.js~Command.html">Command</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~AllocateDirtyQubitGate.html">AllocateDirtyQubitGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~AllocateQubitGate.html">AllocateQubitGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~BarrierGate.html">BarrierGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~DeallocateQubitGate.html">DeallocateQubitGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~EntangleGate.html">EntangleGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~FlushGate.html">FlushGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~HGate.html">HGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~MeasureGate.html">MeasureGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~Ph.html">Ph</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~R.html">R</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~Rx.html">Rx</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~Ry.html">Ry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~Rz.html">Rz</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~SGate.html">SGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~SqrtSwapGate.html">SqrtSwapGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~SqrtXGate.html">SqrtXGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~SwapGate.html">SwapGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~TGate.html">TGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~XGate.html">XGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~YGate.html">YGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/gates.js~ZGate.html">ZGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/metagates.js~ControlledGate.html">ControlledGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/metagates.js~DaggeredGate.html">DaggeredGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/metagates.js~Tensor.html">Tensor</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/qftgate.js~QFTGate.html">QFTGate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/qubitoperator.js~QubitOperator.html">QubitOperator</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/ops/timeevolution.js~TimeEvolution.html">TimeEvolution</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-add">add</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-get">get</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getInverse">getInverse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-C">C</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-stringToArray">stringToArray</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-CRz">CRz</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Allocate">Allocate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-AllocateDirty">AllocateDirty</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Entangle">Entangle</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-H">H</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Measure">Measure</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-NOT">NOT</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-S">S</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-SqrtSwap">SqrtSwap</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-SqrtX">SqrtX</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Swap">Swap</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-T">T</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-X">X</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Y">Y</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Z">Z</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-obj">obj</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-All">All</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-QFT">QFT</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-PAULI_OPERATOR_PRODUCTS">PAULI_OPERATOR_PRODUCTS</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CNOT">CNOT</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CX">CX</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-CZ">CZ</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Toffoli">Toffoli</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#setups">setups</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getEngineList">getEngineList</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-high_level_gates">high_level_gates</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getEngineList">getEngineList</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getEngineList">getEngineList</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getEngineList">getEngineList</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getEngineList">getEngineList</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getEngineList">getEngineList</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ibmqx5_connections">ibmqx5_connections</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#setups-decompositions">setups/decompositions</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-_find_parameters">_find_parameters</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-_recognize_arb1qubit">_recognize_arb1qubit</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-phase">phase</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-create_test_matrices">create_test_matrices</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-_decompose_barrier">_decompose_barrier</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-_recognize_barrier">_recognize_barrier</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-_recognize_carb1qubit">_recognize_carb1qubit</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-_recognize_v">_recognize_v</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-_recognize_cnot">_recognize_cnot</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-_decompose_CnU">_decompose_CnU</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-_recognize_CnU">_recognize_CnU</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-_recognize_RxNoCtrl">_recognize_RxNoCtrl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-_decompose_ry">_decompose_ry</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-_recognize_RyNoCtrl">_recognize_RyNoCtrl</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rule_commuting_terms">rule_commuting_terms</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rule_individual_terms">rule_individual_terms</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#types">types</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/types/qubit.js~BasicQubit.html">BasicQubit</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/types/qubit.js~Qubit.html">Qubit</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Qureg">Qureg</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/cengines/linearmapper.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">
+/*
+ * Copyright (c) 2018 Isaac Phoenix (tearsofphoenix@icloud.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+Mapper for a quantum circuit to a linear chain of qubits.
+
+    Input: Quantum circuit with 1 and 2 qubit gates on n qubits. Gates are assumed
+to be applied in parallel if they act on disjoint qubit(s) and any pair
+of qubits can perform a 2 qubit gate (all-to-all connectivity)
+Output: Quantum circuit in which qubits are placed in 1-D chain in which only
+nearest neighbour qubits can perform a 2 qubit gate. The mapper uses
+Swap gates in order to move qubits next to each other.
+*/
+
+
+import assert from &apos;assert&apos;
+import BasicMapperEngine from &apos;./basicmapper&apos;
+import {
+  intersection, len, setDifference, setFromRange
+} from &apos;../libs/polyfill&apos;
+import {
+  Allocate,
+  AllocateQubitGate, Deallocate, DeallocateQubitGate, FlushGate, Swap
+} from &apos;../ops/gates&apos;
+import {BasicQubit} from &apos;../types/qubit&apos;
+import {tuple} from &apos;../libs/util&apos;
+import Command from &apos;../ops/command&apos;
+import {LogicalQubitIDTag} from &apos;../meta&apos;
+
+/**
+ Returns the circuit depth to execute these swaps.
+
+ @param {Array.&lt;Array&gt;} swaps Each tuple contains two integers representing the two IDs of the qubits involved in the
+    Swap operation
+ @returns {number} Circuit depth to execute these swaps.
+ */
+export function return_swap_depth(swaps) {
+  const depth_of_qubits = {}
+  swaps.forEach(([qb0_id, qb1_id]) =&gt; {
+    if (!(qb0_id in depth_of_qubits)) {
+      depth_of_qubits[qb0_id] = 0
+    }
+    if (!(qb1_id in depth_of_qubits)) {
+      depth_of_qubits[qb1_id] = 0
+    }
+    const max_depth = Math.max(depth_of_qubits[qb0_id], depth_of_qubits[qb1_id])
+    depth_of_qubits[qb0_id] = max_depth + 1
+    depth_of_qubits[qb1_id] = max_depth + 1
+  })
+  const values = Object.values(depth_of_qubits)
+  values.push(0)
+  return Math.max(...values)
+}
+
+/**
+ * @class LinearMapper
+ * @desc
+Maps a quantum circuit to a linear chain of nearest neighbour interactions.
+
+    Maps a quantum circuit to a linear chain of qubits with nearest neighbour
+interactions using Swap gates. It supports open or cyclic boundary
+conditions.
+
+    Attributes:
+current_mapping:  Stores the mapping: key is logical qubit id, value
+is mapped qubit id from 0,...,this.num_qubits
+cyclic (Bool): If chain is cyclic or not
+storage (int): Number of gate it caches before mapping.
+num_mappings (int): Number of times the mapper changed the mapping
+depth_of_swaps (dict): Key are circuit depth of swaps, value is the
+number of such mappings which have been
+applied
+num_of_swaps_per_mapping (dict): Key are the number of swaps per
+mapping, value is the number of such
+mappings which have been applied
+
+Note:
+    1) Gates are cached and only mapped from time to time. A
+FastForwarding gate doesn&apos;t empty the cache, only a FlushGate does.
+2) Only 1 and two qubit gates allowed.
+3) Does not optimize for dirty qubits.
+ */
+export default class LinearMapper extends BasicMapperEngine {
+  /**
+   * @constructor
+  Initialize a LinearMapper compiler engine.
+
+    @param {number} num_qubits Number of physical qubits in the linear chain
+    @param {boolean} cyclic If 1D chain is a cycle. Default is false.
+    @param {number} storage Number of gates to temporarily store, default is 1000
+  */
+  constructor(num_qubits, cyclic = false, storage = 1000) {
+    super()
+
+    this.num_qubits = num_qubits
+    this.cyclic = cyclic
+    this.storage = storage
+    // Storing commands
+    this._stored_commands = []
+    // Logical qubit ids for which the Allocate gate has already been
+    // processed and sent to the next engine but which are not yet
+    // deallocated:
+    this._currently_allocated_ids = new Set()
+    // Statistics:
+    this.num_mappings = 0
+    this.depth_of_swaps = {}
+    this.num_of_swaps_per_mapping = {}
+  }
+
+  // Only allows 1 or two qubit gates.
+  isAvailable(cmd) {
+    let num_qubits = 0
+    cmd.allQubits.forEach(qureg =&gt; num_qubits += len(qureg))
+    return num_qubits &lt;= 2
+  }
+
+  /**
+   * @static
+  Builds a mapping of qubits to a linear chain.
+
+    It goes through stored_commands and tries to find a mapping to apply these gates
+    on a first come first served basis. More compilicated scheme could try to optimize to apply
+   as many gates as possible between the Swaps.
+
+    @param {number} num_qubits Total number of qubits in the linear chain
+    @param {boolean} cyclic If linear chain is a cycle.
+    @param {Set&lt;Number&gt;} currently_allocated_ids Logical qubit ids for which
+      the Allocate gate has already been processed and sent to the next engine but which are
+      not yet deallocated and hence need to be included in the new mapping.
+    @param {Command[]} stored_commands Future commands which should be applied next.
+    @param {Object} current_mapping A current mapping as a dict. key is logical qubit id, value is placement id.
+      If there are different possible maps, this current mapping is used to minimize the swaps
+      to go to the new mapping by a heuristic.
+
+    @return {Object} A new mapping as a dict. key is logical qubit id, value is placement id
+   */
+  static returnNewMapping(num_qubits, cyclic, currently_allocated_ids, stored_commands, current_mapping) {
+    // allocated_qubits is used as this mapper currently does not reassign
+    // a qubit placement to a new qubit if the previous qubit at that
+    // location has been deallocated. This is done after the next swaps.
+    const allocated_qubits = new Set(currently_allocated_ids)
+    const active_qubits = new Set(currently_allocated_ids)
+    // Segments contains a list of segments. A segment is a list of
+    // neighouring qubit ids
+    const segments = []
+    // neighbour_ids only used to speedup the lookup process if qubits
+    // are already connected. key: qubit_id, value: set of neighbour ids
+    const neighbour_ids = {}
+    active_qubits.forEach(qubit_id =&gt; neighbour_ids[qubit_id] = new Set())
+
+    for (let i = 0; i &lt; stored_commands.length; ++i) {
+      const cmd = stored_commands[i]
+      if (len(allocated_qubits) === num_qubits &amp;&amp; len(active_qubits) === 0) {
+        break
+      }
+
+      const qubit_ids = []
+      cmd.allQubits.forEach(qureg =&gt; qureg.forEach(qubit =&gt; qubit_ids.push(qubit.id)))
+
+      if (len(qubit_ids) &gt; 2 || len(qubit_ids) === 0) {
+        throw new Error(`Invalid command (number of qubits): ${cmd.toString()}`)
+      } else if (cmd.gate instanceof AllocateQubitGate) {
+        const qubit_id = cmd.qubits[0][0].id
+        if (len(allocated_qubits) &lt; num_qubits) {
+          allocated_qubits.add(qubit_id)
+          active_qubits.add(qubit_id)
+          neighbour_ids[qubit_id] = new Set()
+        }
+      } else if (cmd.gate instanceof DeallocateQubitGate) {
+        const qubit_id = cmd.qubits[0][0].id
+        if (active_qubits.has(qubit_id)) {
+          active_qubits.delete(qubit_id)
+        }
+        // Do not remove from allocated_qubits as this would
+        // allow the mapper to add a new qubit to this location
+        // before the next swaps which is currently not supported
+      } else if (len(qubit_ids) === 1) {
+        continue
+      } else {
+        // Process a two qubit gate:
+
+        LinearMapper._processTwoQubitGate(
+          num_qubits,
+          cyclic,
+          qubit_ids[0],
+          qubit_ids[1],
+          active_qubits,
+          segments,
+          neighbour_ids
+        )
+      }
+    }
+
+    return LinearMapper._returnNewMappingFromSegments(
+      num_qubits,
+      segments,
+      allocated_qubits,
+      current_mapping
+    )
+  }
+
+  /**
+  Processes a two qubit gate.
+
+    It either removes the two qubits from active_qubits if the gate is not
+possible or updates the segements such that the gate is possible.
+
+   @param {number} num_qubits Total number of qubits in the chain
+   @param {boolean} cyclic If linear chain is a cycle
+   @param {number} qubit0 qubit.id of one of the qubits
+   @param {number} qubit1 qubit.id of the other qubit
+   @param {Set&lt;Number&gt;} active_qubits contains all qubit ids which for which gates can be applied in this cycle before the swaps
+   @param {Array} segments List of segments. A segment is a list of neighbouring qubits.
+   @param {Object} neighbour_ids Key: qubit.id Value: qubit.id of neighbours
+   */
+  static _processTwoQubitGate(num_qubits, cyclic, qubit0, qubit1, active_qubits, segments, neighbour_ids) {
+    // already connected
+    if (qubit1 in neighbour_ids &amp;&amp; neighbour_ids[qubit1].has(qubit0)) {
+      // do nothing
+
+    }
+    // at least one qubit is not an active qubit:
+    else if (!active_qubits.has(qubit0) || !active_qubits.has(qubit1)) {
+      active_qubits.delete(qubit0)
+      active_qubits.delete(qubit1)
+    }
+    // at least one qubit is in the inside of a segment:
+    else if (len(neighbour_ids[qubit0]) &gt; 1 || len(neighbour_ids[qubit1]) &gt; 1) {
+      active_qubits.delete(qubit0)
+      active_qubits.delete(qubit1)
+    }
+    // qubits are both active and either not yet in a segment or at
+    // the end of segement:
+    else {
+      let segment_index_qb0
+      let qb0_is_left_end
+      let segment_index_qb1
+      let qb1_is_left_end
+
+      segments.forEach((segment, index) =&gt; {
+        if (qubit0 === segment[0]) {
+          segment_index_qb0 = index
+          qb0_is_left_end = true
+        } else if (qubit0 === segment[segment.length - 1]) {
+          segment_index_qb0 = index
+          qb0_is_left_end = false
+        }
+        if (qubit1 === segment[0]) {
+          segment_index_qb1 = index
+          qb1_is_left_end = true
+        } else if (qubit1 === segment[segment.length - 1]) {
+          segment_index_qb1 = index
+          qb1_is_left_end = false
+        }
+      })
+      // Both qubits are not yet assigned to a segment:
+      if (typeof segment_index_qb0 === &apos;undefined&apos; &amp;&amp; typeof segment_index_qb1 === &apos;undefined&apos;) {
+        segments.push([qubit0, qubit1])
+        neighbour_ids[qubit0].add(qubit1)
+        neighbour_ids[qubit1].add(qubit0)
+      }
+      // if qubits are in the same segment, then the gate is not
+      // possible. Note that if this.cyclic==true, we have
+      // added that connection already to neighbour_ids and wouldn&apos;t be
+      // in this branch.
+      else if (segment_index_qb0 === segment_index_qb1) {
+        active_qubits.delete(qubit0)
+        active_qubits.delete(qubit1)
+        // qubit0 not yet assigned to a segment:
+      } else if (typeof segment_index_qb0 === &apos;undefined&apos;) {
+        if (qb1_is_left_end) {
+          segments[segment_index_qb1].splice(0, 0, qubit0)
+        } else {
+          segments[segment_index_qb1].push(qubit0)
+        }
+        neighbour_ids[qubit0].add(qubit1)
+        neighbour_ids[qubit1].add(qubit0)
+        if (cyclic &amp;&amp; len(segments[0]) === num_qubits) {
+          const tmp = segments[0]
+          neighbour_ids[tmp[0]].add(tmp[tmp.length - 1])
+          neighbour_ids[tmp[tmp.length - 1]].add(tmp[0])
+        }
+      }
+      // qubit1 not yet assigned to a segment:
+      else if (typeof segment_index_qb1 === &apos;undefined&apos;) {
+        if (qb0_is_left_end) {
+          segments[segment_index_qb0].splice(0, 0, qubit1)
+        } else {
+          segments[segment_index_qb0].push(qubit1)
+        }
+        neighbour_ids[qubit0].add(qubit1)
+        neighbour_ids[qubit1].add(qubit0)
+        if (cyclic &amp;&amp; len(segments[0]) === num_qubits) {
+          const tmp = segments[0]
+          neighbour_ids[tmp[0]].add(tmp[tmp.length - 1])
+          neighbour_ids[tmp[tmp.length - 1]].add(tmp[0])
+        }
+      }
+      // both qubits are at the end of different segments -&gt; combine them
+      else {
+        if (!qb0_is_left_end &amp;&amp; qb1_is_left_end) {
+          segments[segment_index_qb0] = segments[segment_index_qb0].concat(segments[segment_index_qb1])
+          segments.splice(segment_index_qb1, 1)
+        } else if (!qb0_is_left_end &amp;&amp; !qb1_is_left_end) {
+          const rev = segments[segment_index_qb1].slice(0).reverse()
+          segments[segment_index_qb0] = segments[segment_index_qb0].concat(rev)
+          segments.splice(segment_index_qb1, 1)
+        } else if (qb0_is_left_end &amp;&amp; qb1_is_left_end) {
+          segments[segment_index_qb0].reverse()
+          segments[segment_index_qb0] = segments[segment_index_qb0].concat(segments[segment_index_qb1])
+          segments.splice(segment_index_qb1, 1)
+        } else {
+          segments[segment_index_qb1] = segments[segment_index_qb1].concat(segments[segment_index_qb0])
+          segments.splice(segment_index_qb0, 1)
+        }
+
+        // Add new neighbour ids &amp;&amp; make sure to check cyclic
+        neighbour_ids[qubit0].add(qubit1)
+        neighbour_ids[qubit1].add(qubit0)
+        if (cyclic &amp;&amp; len(segments[0]) === num_qubits) {
+          const tmp = segments[0]
+          neighbour_ids[tmp[0]].add(tmp[tmp.length - 1])
+          neighbour_ids[tmp[tmp.length - 1]].add(tmp[0])
+        }
+      }
+    }
+  }
+
+  /**
+  Returns the swap operation for an odd-even transposition sort.
+
+  @see https://en.wikipedia.org/wiki/Odd-even_sort
+
+  @param {Object} old_mapping keys are logical ids and values are mapped qubit ids
+  @param {Object} new_mapping dict: keys are logical ids and values are mapped qubit ids
+  @return {Array} List of tuples. Each tuple is a swap operation which needs to be
+  applied. Tuple contains the two MappedQubit ids for the Swap.
+  */
+  _oddEvenTranspositionSortSwaps(old_mapping, new_mapping) {
+    const final_positions = new Array(this.num_qubits)
+    // move qubits which are in both mappings
+    Object.keys(old_mapping).forEach((logical_id) =&gt; {
+      if (logical_id in new_mapping) {
+        final_positions[old_mapping[logical_id]] = new_mapping[logical_id]
+      }
+    })
+    // exchange all remaining None with the not yet used mapped ids
+    const used_mapped_ids = new Set(final_positions)
+    used_mapped_ids.delete(undefined)
+    const all_ids = setFromRange(this.num_qubits)
+    let not_used_mapped_ids = Array.from(setDifference(all_ids, used_mapped_ids))
+    not_used_mapped_ids = not_used_mapped_ids.sort().reverse()
+    for (let i = 0; i &lt; final_positions.length; ++i) {
+      const looper = final_positions[i]
+      if (typeof looper === &apos;undefined&apos;) {
+        final_positions[i] = not_used_mapped_ids.pop()
+      }
+    }
+    assert(len(not_used_mapped_ids) === 0)
+    // Start sorting:
+    const swap_operations = []
+    let finished_sorting = false
+    while (!finished_sorting) {
+      finished_sorting = true
+      for (let i = 1; i &lt; len(final_positions); i += 2) {
+        if (final_positions[i] &gt; final_positions[i + 1]) {
+          swap_operations.push(tuple(i, i + 1))
+          const tmp = final_positions[i]
+          final_positions[i] = final_positions[i + 1]
+          final_positions[i + 1] = tmp
+          finished_sorting = false
+        }
+      }
+      for (let i = 0; i &lt; len(final_positions) - 1; i += 2) {
+        if (final_positions[i] &gt; final_positions[i + 1]) {
+          swap_operations.push(tuple(i, i + 1))
+          const tmp = final_positions[i]
+          final_positions[i] = final_positions[i + 1]
+          final_positions[i + 1] = tmp
+          finished_sorting = false
+        }
+      }
+    }
+    return swap_operations
+  }
+
+
+  /**
+  Sends the stored commands possible without changing the mapping.
+
+  Note: this.currentMapping must exist already
+   */
+  _sendPossibleCommands() {
+    const active_ids = new Set(this._currently_allocated_ids)
+    Object.keys(this._currentMapping).forEach(logical_id =&gt; active_ids.add(parseInt(logical_id, 10)))
+
+    let new_stored_commands = []
+    for (let i = 0; i &lt; this._stored_commands.length; ++i) {
+      const cmd = this._stored_commands[i]
+      if (len(active_ids) === 0) {
+        new_stored_commands = new_stored_commands.concat(this._stored_commands.slice(i))
+        break
+      }
+      if (cmd.gate instanceof AllocateQubitGate) {
+        const qid = cmd.qubits[0][0].id
+        if (qid in this._currentMapping) {
+          this._currently_allocated_ids.add(qid)
+          const qb = new BasicQubit(this, this._currentMapping[qid])
+          const new_cmd = new Command(this, new AllocateQubitGate(), tuple([qb]), [], [new LogicalQubitIDTag(qid)])
+          this.send([new_cmd])
+        } else {
+          new_stored_commands.push(cmd)
+        }
+      } else if (cmd.gate instanceof DeallocateQubitGate) {
+        const qid = cmd.qubits[0][0].id
+        if (active_ids.has(qid)) {
+          const qb = new BasicQubit(this, this._currentMapping[qid])
+          const new_cmd = new Command(this, new DeallocateQubitGate(), tuple([qb]), [], [new LogicalQubitIDTag(qid)])
+          this._currently_allocated_ids.delete(qid)
+          active_ids.delete(qid)
+          delete this._currentMapping[qid]
+          this.send([new_cmd])
+        } else {
+          new_stored_commands.push(cmd)
+        }
+      } else {
+        let send_gate = true
+        let mapped_ids = new Set()
+        for (let i = 0; i &lt; cmd.allQubits.length; ++i) {
+          const qureg = cmd.allQubits[i]
+          for (let j = 0; j &lt; qureg.length; ++j) {
+            const qubit = qureg[j]
+            if (!(active_ids.has(qubit.id))) {
+              send_gate = false
+              break
+            }
+            mapped_ids.add(this._currentMapping[qubit.id])
+          }
+        }
+
+        // Check that mapped ids are nearest neighbour
+        if (len(mapped_ids) === 2) {
+          mapped_ids = Array.from(mapped_ids)
+          const diff = Math.abs(mapped_ids[0] - mapped_ids[1])
+          if (this.cyclic) {
+            if (diff !== 1 &amp;&amp; diff !== this.num_qubits - 1) {
+              send_gate = false
+            }
+          } else if (diff !== 1) {
+            send_gate = false
+          }
+        }
+        if (send_gate) {
+          this.sendCMDWithMappedIDs(cmd)
+        } else {
+          cmd.allQubits.forEach(qureg =&gt; qureg.forEach(qubit =&gt; active_ids.delete(qubit.id)))
+          new_stored_commands.push(cmd)
+        }
+      }
+    }
+    this._stored_commands = new_stored_commands
+  }
+
+  /**
+    Creates a new mapping and executes possible gates.
+
+  It first allocates all 0, ..., this.num_qubits-1 mapped qubit ids, if
+  they are not already used because we might need them all for the
+  swaps. Then it creates a new map, swaps all the qubits to the new map,
+  executes all possible gates, and finally deallocates mapped qubit ids
+  which don&apos;t store any information.
+   */
+  _run() {
+    const num_of_stored_commands_before = len(this._stored_commands)
+    if (!this._currentMapping) {
+      this.currentMapping = {}
+    } else {
+      this._sendPossibleCommands()
+      if (len(this._stored_commands) === 0) {
+        return
+      }
+    }
+    const new_mapping = LinearMapper.returnNewMapping(this.num_qubits,
+      this.cyclic,
+      this._currently_allocated_ids,
+      this._stored_commands,
+      this.currentMapping)
+    const swaps = this._oddEvenTranspositionSortSwaps(this._currentMapping, new_mapping)
+    if (swaps.length &gt; 0) { // first mapping requires no swaps
+      // Allocate all mapped qubit ids (which are not already allocated,
+      // i.e., contained in this._currently_allocated_ids)
+      let mapped_ids_used = new Set()
+      for (const logical_id of this._currently_allocated_ids) {
+        mapped_ids_used.add(this._currentMapping[logical_id])
+      }
+      const tmpSet = setFromRange(this.num_qubits)
+      const not_allocated_ids = setDifference(tmpSet, mapped_ids_used)
+      for (const mapped_id of not_allocated_ids) {
+        const qb = new BasicQubit(this, mapped_id)
+        const cmd = new Command(this, Allocate, tuple([qb]))
+        this.send([cmd])
+      }
+      // Send swap operations to arrive at new_mapping:
+      swaps.forEach(([qubit_id0, qubit_id1]) =&gt; {
+        const q0 = new BasicQubit(this, qubit_id0)
+        const q1 = new BasicQubit(this, qubit_id1)
+        const cmd = new Command(this, Swap, tuple([q0], [q1]))
+        this.send([cmd])
+      })
+      // Register statistics:
+      this.num_mappings += 1
+      const depth = return_swap_depth(swaps)
+      if (!(depth in this.depth_of_swaps)) {
+        this.depth_of_swaps[depth] = 1
+      } else {
+        this.depth_of_swaps[depth] += 1
+      }
+      if (!(len(swaps) in this.num_of_swaps_per_mapping)) {
+        this.num_of_swaps_per_mapping[len(swaps)] = 1
+      } else {
+        this.num_of_swaps_per_mapping[len(swaps)] += 1
+      }
+      // Deallocate all previously mapped ids which we only needed for the
+      // swaps:
+      mapped_ids_used = new Set()
+      for (const logical_id of this._currently_allocated_ids) {
+        mapped_ids_used.add(new_mapping[logical_id])
+      }
+      const not_needed_anymore = setDifference(setFromRange(this.num_qubits), mapped_ids_used)
+      for (const mapped_id of not_needed_anymore) {
+        const qb = new BasicQubit(this, mapped_id)
+        const cmd = new Command(this, Deallocate, tuple([qb]))
+        this.send([cmd])
+      }
+    }
+
+    // Change to new map:
+    this.currentMapping = new_mapping
+    // Send possible gates:
+    this._sendPossibleCommands()
+    // Check that mapper actually made progress
+    if (len(this._stored_commands) === num_of_stored_commands_before) {
+      throw new Error(&apos;Mapper is potentially in an infinite loop. &apos;
+      + &apos;It is likely that the algorithm requires &apos;
+      + &apos;too many qubits. Increase the number of &apos;
+      + &apos;qubits for this mapper.&apos;)
+    }
+  }
+
+  /**
+  Receives a command list and, for each command, stores it until
+  we do a mapping (FlushGate or Cache of stored commands is full).
+
+  @param {Command[]} command_list list of commands to receive.
+  */
+  receive(command_list) {
+    command_list.forEach((cmd) =&gt; {
+      if (cmd.gate instanceof FlushGate) {
+        while (this._stored_commands.length &gt; 0) {
+          this._run()
+        }
+        this.send([cmd])
+      } else {
+        this._stored_commands.push(cmd)
+      }
+    })
+
+    // Storage is full: Create new map and send some gates away:
+    if (this._stored_commands.length &gt;= this.storage) {
+      this._run()
+    }
+  }
+
+  /**
+   * @static
+  Combines the individual segments into a new mapping.
+
+  It tries to minimize the number of swaps to go from the old mapping
+  in this.currentMapping to the new mapping which it returns. The
+  strategy is to map a segment to the same region where most of the
+  qubits are already. Note that this is not a global optimal strategy
+  but helps if currently the qubits can be divided into independent
+  groups without interactions between the groups.
+
+   @param {number} num_qubits Total number of qubits in the linear chain
+   @param {Array} segments List of segments. A segment is a list of qubit ids which
+    should be nearest neighbour in the new map. Individual qubits are in allocated_qubits
+    but not in any segment
+   @param {Object} allocated_qubits A set of all qubit ids which need to be present in the new map
+   @param {Object} current_mapping A current mapping as a dict. key is logical qubit
+  id, value is placement id. If there are different possible maps, this current mapping is used to
+  minimize the swaps to go to the new mapping by a heuristic.
+  @returns
+      A new mapping as a dict. key is logical qubit id, value is placement id
+   */
+  static _returnNewMappingFromSegments(num_qubits, segments, allocated_qubits, current_mapping) {
+    const remaining_segments = segments.slice(0)
+    const individual_qubits = new Set(allocated_qubits)
+    let num_unused_qubits = num_qubits - len(allocated_qubits)
+    // Create a segment out of individual qubits and add to segments
+    segments.forEach((segment) =&gt; {
+      segment.forEach((qubit_id) =&gt; {
+        individual_qubits.delete(qubit_id)
+      })
+    })
+
+    for (const individual_qubit_id of individual_qubits) {
+      remaining_segments.push([individual_qubit_id])
+    }
+
+    const previous_chain = new Array(num_qubits)
+    if (current_mapping) {
+      Object.keys(current_mapping).forEach(key =&gt; previous_chain[current_mapping[key]] = parseInt(key, 10))
+    }
+
+    // Note: previous_chain potentially has some None elements
+    const new_chain = new Array(num_qubits)
+
+    let current_position_to_fill = 0
+    while (len(remaining_segments)) {
+      let best_segment = []
+      let best_padding = num_qubits
+      let highest_overlap_fraction = 0
+      remaining_segments.forEach((segment) =&gt; {
+        for (let padding = 0; padding &lt; num_unused_qubits + 1; ++padding) {
+          const idx0 = current_position_to_fill + padding
+          const idx1 = idx0 + len(segment)
+
+          const previous_chain_ids = new Set(previous_chain.slice(idx0, idx1))
+          previous_chain_ids.delete(undefined)
+          const segment_ids = new Set(segment)
+          segment_ids.delete(undefined)
+
+          const overlap = len(intersection(previous_chain_ids, segment_ids)) + previous_chain.slice(idx0, idx1).count(undefined)
+          let overlap_fraction
+          if (overlap === 0) {
+            overlap_fraction = 0
+          } else if (overlap === len(segment)) {
+            overlap_fraction = 1
+          } else {
+            overlap_fraction = overlap / (len(segment) * 1.0)
+          }
+          if ((overlap_fraction === 1 &amp;&amp; padding &lt; best_padding)
+          || overlap_fraction &gt; highest_overlap_fraction
+          || highest_overlap_fraction === 0) {
+            best_segment = segment
+            best_padding = padding
+            highest_overlap_fraction = overlap_fraction
+          }
+        }
+      })
+
+      // Add best segment and padding to new_chain
+      const start = current_position_to_fill + best_padding
+      for (let i = 0; i &lt; len(best_segment); ++i) {
+        new_chain[start + i] = best_segment[i]
+      }
+
+      remaining_segments.remove(best_segment)
+      current_position_to_fill += best_padding + len(best_segment)
+      num_unused_qubits -= best_padding
+    }
+    // Create mapping
+    const new_mapping = {}
+    Object.keys(new_chain).forEach((pos) =&gt; {
+      const logical_id = new_chain[pos]
+      if (typeof logical_id !== &apos;undefined&apos;) {
+        new_mapping[logical_id] = parseInt(pos, 10)
+      }
+    })
+    return new_mapping
+  }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
