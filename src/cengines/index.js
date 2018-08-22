@@ -26,7 +26,7 @@ export MainEngine from './main'
 
 export ManualMapper from './manualmapper'
 
-export Optimize from './optimize'
+export LocalOptimizer from './optimize'
 
 export SwapAndCNOTFlipper from './swapandcnotflipper'
 

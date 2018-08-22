@@ -16,21 +16,21 @@
 
 import {expect} from 'chai'
 import math from 'mathjs'
-import DecompositionRuleSet from '../cengines/replacer/decompositionruleset';
-import {getInverse} from '../ops/_cycle';
+
+import {getInverse} from '../src/ops/_cycle';
 import {
   BasicMathGate, QFT, Swap, Measure, All, H, X
-} from '../ops';
-import {AutoReplacer, DummyEngine, InstructionFilter} from '../cengines';
-import TagRemover from '../cengines/tagremover';
-import LocalOptimizer from '../cengines/optimize';
-import MainEngine from '../cengines/main';
-import {MultiplyByConstantModN} from '../libs/math/gates';
-import {Control} from '../meta'
-import Simulator from '../backends/simulators/simulator';
-import decompositions from '../setups/decompositions'
-import mathrules from '../libs/math/defaultrules'
-import {expmod} from "../libs/polyfill";
+} from '../src/ops';
+import {
+  DecompositionRuleSet, MainEngine, AutoReplacer,
+  DummyEngine, InstructionFilter, TagRemover, LocalOptimizer
+} from '../src/cengines'
+import {MultiplyByConstantModN} from '../src/libs/math/gates'
+import {Control} from '../src/meta'
+import Simulator from '../src/backends/simulators/simulator'
+import decompositions from '../src/setups/decompositions'
+import mathrules from '../src/libs/math/defaultrules'
+import {expmod} from '../src/libs/polyfill'
 
 describe('test', () => {
   const rule_set = new DecompositionRuleSet([...mathrules, ...decompositions])
