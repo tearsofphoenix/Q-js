@@ -112,113 +112,113 @@ describe('ibm test', () => {
     dummy.isLastEngine = true
     eng.next = dummy
   });
-
-  it('should test_ibm_retrieve', () => {
-    IBMHTTPClient.retrieve = async () => {
-      return {
-        'date': '2017-01-19T14:28:47.622Z',
-        'data': {
-          'time': 14.429004907608032,
-          'counts': {
-            '00111': 396,
-            '00101': 27,
-            '00000': 601
-          },
-          'qasm': ('...')
-        }
-      }
-    }
-    const backend = new IBMBackend({retrieve_execution: 'ab1s2'})
-    const rule_set = new DecompositionRuleSet([...decompositions])
-    const connectivity = new Set([[1, 2], [2, 4], [0, 2], [3, 2], [4, 3], [0, 1]])
-    const engine_list = [new TagRemover(),
-      new LocalOptimizer(10),
-      new AutoReplacer(rule_set),
-      new TagRemover(),
-      new IBM5QubitMapper(),
-      new SwapAndCNOTFlipper(connectivity),
-      new LocalOptimizer(10)]
-    const eng = new MainEngine(backend, engine_list)
-    const unused_qubit = eng.allocateQubit()
-    const qureg = eng.allocateQureg(3)
-    // entangle the qureg
-    Entangle.or(qureg)
-    Tdag.or(qureg[0])
-    Sdag.or(qureg[0])
-    Barrier.or(qureg)
-    new Rx(0.2).or(qureg[0])
-
-    unused_qubit.deallocate()
-    // measure; should be all-0 or all-1
-    new All(Measure).or(qureg)
-    // run the circuit
-    eng.flush()
-    const prob_dict = eng.backend.getProbability([qureg[0], qureg[2], qureg[1]])
-    console.log(prob_dict)
-
-    expect(prob_dict['111']).to.be.closeTo(0.38671875, 1e-12)
-    expect(prob_dict['101']).to.be.closeTo(0.0263671875, 1e-12)
-  });
-
-  it('should test_ibm_backend_functional_test', () => {
-    const correct_info = ('{"qasms": [{"qasm": "\\ninclude \\"qelib1.inc\\";'
-+ '\\nqreg q[3];\\ncreg c[3];\\nh q[2];\\ncx q[2], q[0];'
-        + '\\ncx q[2], q[1];\\ntdg q[2];\\nsdg q[2];'
-        + '\\nbarrier q[2], q[0], q[1];'
-        + '\\nu3(0.2, -pi/2, pi/2) q[2];\\nmeasure q[2] -> '
-        + 'c[2];\\nmeasure q[0] -> c[0];\\nmeasure q[1] -> c[1];"}]'
-        + ', "shots": 1024, "maxCredits": 5, "backend": {"name": '
-        + '"simulator"}}')
-
-    const mock_send = async (args) => {
-      return {
-        'date': '2017-01-19T14:28:47.622Z',
-        'data': {
-          'time': 14.429004907608032,
-          'counts': {
-            '00111': 396,
-            '00101': 27,
-            '00000': 601
-          },
-          'qasm': ('...')
-        }
-      }
-    }
-
-    IBMHTTPClient.send = mock_send
-
-    const backend = new IBMBackend({verbose: true})
-    // no circuit has been executed -> raises exception
-    expect(() => backend.getProbabilities([])).to.throw()
-
-    const rule_set = new DecompositionRuleSet(decompositions)
-
-    const engine_list = [new TagRemover(),
-      new LocalOptimizer(10),
-      new AutoReplacer(rule_set),
-      new TagRemover(),
-      new IBM5QubitMapper(),
-      new SwapAndCNOTFlipper(ibmqx4_connections),
-      new LocalOptimizer(10)]
-    const eng = new MainEngine(backend, engine_list)
-    const unused_qubit = eng.allocateQubit()
-    const qureg = eng.allocateQureg(3)
-    // entangle the qureg
-    Entangle.or(qureg)
-    Tdag.or(qureg[0])
-    Sdag.or(qureg[0])
-    Barrier.or(qureg)
-    new Rx(0.2).or(qureg[0])
-
-    unused_qubit.deallocate()
-    // measure; should be all-0 or all-1
-    new All(Measure).or(qureg)
-    // run the circuit
-    eng.flush()
-    const prob_dict = eng.backend.getProbabilities([qureg[0], qureg[2], qureg[1]])
-    expect(prob_dict['111']).to.be.closeTo(0.38671875, 1e-12)
-    expect(prob_dict['101']).to.be.closeTo(0.0263671875, 1e-12)
-
-    expect(() => eng.backend.getProbabilities(eng.allocateQubit())).to.throw()
-  });
+//
+//   it('should test_ibm_retrieve', () => {
+//     IBMHTTPClient.retrieve = async () => {
+//       return {
+//         'date': '2017-01-19T14:28:47.622Z',
+//         'data': {
+//           'time': 14.429004907608032,
+//           'counts': {
+//             '00111': 396,
+//             '00101': 27,
+//             '00000': 601
+//           },
+//           'qasm': ('...')
+//         }
+//       }
+//     }
+//     const backend = new IBMBackend({retrieve_execution: 'ab1s2'})
+//     const rule_set = new DecompositionRuleSet([...decompositions])
+//     const connectivity = new Set([[1, 2], [2, 4], [0, 2], [3, 2], [4, 3], [0, 1]])
+//     const engine_list = [new TagRemover(),
+//       new LocalOptimizer(10),
+//       new AutoReplacer(rule_set),
+//       new TagRemover(),
+//       new IBM5QubitMapper(),
+//       new SwapAndCNOTFlipper(connectivity),
+//       new LocalOptimizer(10)]
+//     const eng = new MainEngine(backend, engine_list)
+//     const unused_qubit = eng.allocateQubit()
+//     const qureg = eng.allocateQureg(3)
+//     // entangle the qureg
+//     Entangle.or(qureg)
+//     Tdag.or(qureg[0])
+//     Sdag.or(qureg[0])
+//     Barrier.or(qureg)
+//     new Rx(0.2).or(qureg[0])
+//
+//     unused_qubit.deallocate()
+//     // measure; should be all-0 or all-1
+//     new All(Measure).or(qureg)
+//     // run the circuit
+//     eng.flush()
+//     const prob_dict = eng.backend.getProbability([qureg[0], qureg[2], qureg[1]])
+//     console.log(prob_dict)
+//
+//     expect(prob_dict['111']).to.be.closeTo(0.38671875, 1e-12)
+//     expect(prob_dict['101']).to.be.closeTo(0.0263671875, 1e-12)
+//   });
+//
+//   it('should test_ibm_backend_functional_test', () => {
+//     const correct_info = ('{"qasms": [{"qasm": "\\ninclude \\"qelib1.inc\\";'
+// + '\\nqreg q[3];\\ncreg c[3];\\nh q[2];\\ncx q[2], q[0];'
+//         + '\\ncx q[2], q[1];\\ntdg q[2];\\nsdg q[2];'
+//         + '\\nbarrier q[2], q[0], q[1];'
+//         + '\\nu3(0.2, -pi/2, pi/2) q[2];\\nmeasure q[2] -> '
+//         + 'c[2];\\nmeasure q[0] -> c[0];\\nmeasure q[1] -> c[1];"}]'
+//         + ', "shots": 1024, "maxCredits": 5, "backend": {"name": '
+//         + '"simulator"}}')
+//
+//     const mock_send = async (args) => {
+//       return {
+//         'date': '2017-01-19T14:28:47.622Z',
+//         'data': {
+//           'time': 14.429004907608032,
+//           'counts': {
+//             '00111': 396,
+//             '00101': 27,
+//             '00000': 601
+//           },
+//           'qasm': ('...')
+//         }
+//       }
+//     }
+//
+//     IBMHTTPClient.send = mock_send
+//
+//     const backend = new IBMBackend({verbose: true})
+//     // no circuit has been executed -> raises exception
+//     expect(() => backend.getProbabilities([])).to.throw()
+//
+//     const rule_set = new DecompositionRuleSet(decompositions)
+//
+//     const engine_list = [new TagRemover(),
+//       new LocalOptimizer(10),
+//       new AutoReplacer(rule_set),
+//       new TagRemover(),
+//       new IBM5QubitMapper(),
+//       new SwapAndCNOTFlipper(ibmqx4_connections),
+//       new LocalOptimizer(10)]
+//     const eng = new MainEngine(backend, engine_list)
+//     const unused_qubit = eng.allocateQubit()
+//     const qureg = eng.allocateQureg(3)
+//     // entangle the qureg
+//     Entangle.or(qureg)
+//     Tdag.or(qureg[0])
+//     Sdag.or(qureg[0])
+//     Barrier.or(qureg)
+//     new Rx(0.2).or(qureg[0])
+//
+//     unused_qubit.deallocate()
+//     // measure; should be all-0 or all-1
+//     new All(Measure).or(qureg)
+//     // run the circuit
+//     eng.flush()
+//     const prob_dict = eng.backend.getProbabilities([qureg[0], qureg[2], qureg[1]])
+//     expect(prob_dict['111']).to.be.closeTo(0.38671875, 1e-12)
+//     expect(prob_dict['101']).to.be.closeTo(0.0263671875, 1e-12)
+//
+//     expect(() => eng.backend.getProbabilities(eng.allocateQubit())).to.throw()
+//   });
 })

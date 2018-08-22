@@ -15,26 +15,13 @@
  */
 
 import {assert, expect} from 'chai'
-import math from 'mathjs'
 import {BasicQubit, Qubit, Qureg} from '../../src/types/qubit'
 import {BasicEngine} from '../../src/cengines/basics'
 import MainEngine from '../../src/cengines/main'
 import {DummyEngine} from '../../src/cengines/testengine'
 import {Deallocate} from '../../src/ops/gates'
 
-const mc = math.complex
-const mm = math.matrix
-
 describe('Qubit test', () => {
-  it('should test subclass array', () => {
-
-  });
-  it('should test math complex type', () => {
-    const c = mc(1, -1)
-    console.log(c.re, c.im)
-    const a = mm([[1, 0], [0, 1]])
-    console.log(a._data)
-  });
 
   it('should test basic qubit', () => {
     const qubitID = [0, 1]

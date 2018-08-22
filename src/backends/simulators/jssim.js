@@ -345,10 +345,22 @@ the qubits given by the list of ids.
     return probability
   }
 
+  /**
+   * @ignore
+   * @param i
+   * @return {*}
+   * @private
+   */
   _getState(i) {
     return this._state.subset(math.index(i))
   }
 
+  /**
+   * @ignore
+   * @param i
+   * @param value
+   * @private
+   */
   _setState(i, value) {
     this._state.subset(math.index(i), value)
   }
@@ -437,19 +449,25 @@ TODO: Implement better estimates for s.
         })
         update = math.multiply(update, coeff)
         this._state = update
-        for (let i = 0; i < update.length; ++i) {
-          if ((i & mask) === mask) {
-            output_state[i] = math.add(output_state[i], update[i])
+
+        update.forEach((value, [m]) => {
+          if ((m & mask) === mask) {
+            const idx = math.index(m)
+            const v = math.add(output_state.subset(idx), value)
+            output_state.subset(idx, v)
           }
-        }
+        })
         nrm_change = math.norm(update)
         j += 1
       }
-      for (let i = 0; i < update.length; ++i) {
-        if ((i & mask) === mask) {
-          output_state[i] *= correction
+
+      update.forEach((value, [k]) => {
+        if ((k & mask) === mask) {
+          const idx = math.index(k)
+          const v = math.multiply(output_state.subset(idx), correction)
+          output_state.subset(idx, v)
         }
-      }
+      })
       this._state = math.clone(output_state)
     }
   }
