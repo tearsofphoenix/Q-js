@@ -19,4 +19,7 @@ const path = ext.getBinaryPath()
 
 const All = require(path)
 
+/**
+ * @ignore
+ */
 export default All

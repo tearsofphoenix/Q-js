@@ -484,4 +484,7 @@ Object.defineProperties(obj, {
   }
 })
 
+/**
+ * @ignore
+ */
 export default obj

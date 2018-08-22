@@ -23,6 +23,7 @@ import { LastEngineError } from '../meta/error'
 
 /**
  * @class BasicEngine
+ * @abstract
  * @desc
 Basic compiler engine: All compiler engines are derived from this class.
 It provides basic functionality such as qubit allocation/deallocation and
@@ -54,7 +55,6 @@ export class BasicEngine {
     whether it can be executed by the next engine(s).
 
     @param {Command} cmd Command for which to check availability.
-
     @return {boolean} true if the command can be executed.
 
     @throws {LastEngineError} If is_last_engine is true but isAvailable is not implemented.

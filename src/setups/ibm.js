@@ -23,6 +23,10 @@ import SwapAndCNOTFlipper from '../cengines/swapandcnotflipper'
 import decompositions from './decompositions'
 import IBM5QubitMapper, {ibmqx4_connections} from '../cengines/ibm5qubitmapper';
 
+/**
+ *
+ * @return {BasicEngine[]}
+ */
 export function getEngineList() {
   const rule_set = new DecompositionRuleSet(decompositions)
   return [new TagRemover(),

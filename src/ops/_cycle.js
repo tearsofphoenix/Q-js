@@ -17,10 +17,20 @@
 
 const shared = {}
 
+/**
+ * @ignore
+ * @param {string} key
+ * @param {any} value
+ */
 export function add(key, value) {
   shared[key] = value
 }
 
+/**
+ * @ignore
+ * @param {string} key
+ * @return {*}
+ */
 export function get(key) {
   return shared[key]
 }

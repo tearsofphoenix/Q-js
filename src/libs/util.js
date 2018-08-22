@@ -16,6 +16,7 @@
 import math from 'mathjs'
 
 /**
+ * @ignore
  * generate a n-Length Array filled by `0`
  * @param {number} n
  * @return {number[]}
@@ -29,6 +30,7 @@ export function zeros(n) {
 }
 
 /**
+ * @ignore
  * check if an array is `tuple`
  * @param {Array} value
  * @return {boolean}
@@ -46,6 +48,7 @@ export function arrayIsTuple(value) {
 }
 
 /**
+ * @ignore
  * force mark a value as `tuple`, internal usage only
  * @param value
  */
@@ -65,6 +68,7 @@ export function tuple(...args) {
 }
 
 /**
+ * @ignore
  * create copy of object, with same `class`
  * @param {Object} obj
  * @return {Object}
@@ -161,6 +165,7 @@ export function instanceOf(inst, cls) {
 }
 
 /**
+ * @ignore
  * return item * n string like python does.
  * @param {string} item
  * @param {number} n
@@ -175,6 +180,7 @@ export function genString(item, n) {
 }
 
 /**
+ * @ignore
  * assign value in `vector` into `matrix` by index in `indices`
  * @param {math.matrix} matrix
  * @param {number[]} indices
@@ -188,6 +194,14 @@ export function matrixRangeAssign(matrix, indices, vector) {
   }
 }
 
+/**
+ * @ignore
+ * @param matrix
+ * @param mstart
+ * @param mend
+ * @param vector
+ * @param vstart
+ */
 export function matrixRangeIndicesAssign(matrix, mstart, mend, vector, vstart) {
   if (Array.isArray(vector)) {
     for (let i = 0; i + mstart < mend; ++i) {
@@ -201,6 +215,7 @@ export function matrixRangeIndicesAssign(matrix, mstart, mend, vector, vstart) {
 }
 
 /**
+ * @ignore
  * return a row of matrix
  * @param {math.matrix} matrix
  * @param {number} index
@@ -212,6 +227,7 @@ export function matrixGetRow(matrix, index) {
 }
 
 /**
+ * @ignore
  * dot product of matrix & vector
  * @param {math.matrix} matrix
  * @param {number[]} vector

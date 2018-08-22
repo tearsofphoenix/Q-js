@@ -8,6 +8,7 @@ import {Toffoli} from '../../ops/shortcuts';
 import {tuple} from '../../libs/util';
 
 /**
+ * @ignore
  Recognize an arbitrary gate which has n>=2 control qubits, except a Toffoli gate.
 */
 export const _recognize_CnU = (cmd) => {
@@ -23,6 +24,7 @@ export const _recognize_CnU = (cmd) => {
 }
 
 /**
+ * @ignore
 Decompose a multi-controlled gate U into a single-controlled U.
     It uses (n-1) work qubits and 2 * (n-1) Toffoli gates.
  */

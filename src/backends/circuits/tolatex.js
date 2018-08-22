@@ -44,6 +44,11 @@ function maxOfDecimals(decimals = []) {
   return max
 }
 
+/**
+ * @ignore
+ * @type {{write_settings(Object): *, get_default_settings(): Object, _header(*): string, _body(Array<CircuitItem[]>, Object): string, _footer(): string}}
+ * @private
+ */
 export const _exports = {
   /**
 Write all settings to a json-file.
@@ -833,4 +838,7 @@ are connected on the given line.
   }
 }
 
+/**
+ * @ignore
+ */
 export default _exports

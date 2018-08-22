@@ -42,8 +42,8 @@ import Command from '../ops/command'
 import {LogicalQubitIDTag} from '../meta'
 
 /**
+ * @ignore
  Returns the circuit depth to execute these swaps.
-
  @param {Array.<Array>} swaps Each tuple contains two integers representing the two IDs of the qubits involved in the
     Swap operation
  @returns {number} Circuit depth to execute these swaps.

@@ -8,6 +8,11 @@ import {
 
 const TOLERANCE = 1e-12
 
+/**
+ * @ignore
+ * @param {number|{{re: number, im: number}}} c
+ * @return {number}
+ */
 export function phase(c) {
   if (typeof c === 'number') {
     return Math.atan2(0, c)
@@ -16,6 +21,7 @@ export function phase(c) {
 }
 
 /**
+ * @ignore
 Recognize an arbitrary one qubit gate which has a matrix property.
 
     It does not allow gates which have control qubits as otherwise the
@@ -34,6 +40,7 @@ export const _recognize_arb1qubit = (cmd) => {
 }
 
 /**
+ * @ignore
 It builds matrix U with parameters (a, b/2, c/2, d/2) and compares against
 matrix.
 
@@ -65,6 +72,7 @@ const _test_parameters = (matrix, a, b_half, c_half, d_half) => {
 }
 
 /**
+ * @ignore
 Given a 2x2 unitary matrix, find the parameters
 a, b/2, c/2, and d/2 such that
 matrix == [[exp(j*(a-b/2-d/2))*cos(c/2), -exp(j*(a-b/2+d/2))*sin(c/2)],

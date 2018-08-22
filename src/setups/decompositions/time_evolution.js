@@ -137,13 +137,20 @@ function _decompose_time_evolution_individual_terms(cmd) {
   }
 }
 
+/**
+ * @ignore
+ * @type {DecompositionRule}
+ */
 export const rule_commuting_terms = new DecompositionRule(
   TimeEvolution,
   _decompose_time_evolution_commuting_terms,
   _recognize_time_evolution_commuting_terms
 )
 
-
+/**
+ * @ignore
+ * @type {DecompositionRule}
+ */
 export const rule_individual_terms = new DecompositionRule(
   TimeEvolution,
   _decompose_time_evolution_individual_terms,

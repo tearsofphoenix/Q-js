@@ -24,7 +24,10 @@ const mc = math.complex
 const EQ_TOLERANCE = 1e-12
 
 
-// Define products of all Pauli operators for symbolic multiplication.
+/**
+ * Define products of all Pauli operators for symbolic multiplication.
+ * @ignore
+ */
 export const PAULI_OPERATOR_PRODUCTS = {
   [['I', 'I']]: [1.0, 'I'],
   [['I', 'X']]: [1.0, 'X'],
@@ -44,6 +47,11 @@ export const PAULI_OPERATOR_PRODUCTS = {
   [['Z', 'Y']]: [mc(0, -1), 'X']
 }
 
+/**
+ * @ignore
+ * @param {string} key
+ * @return {Array}
+ */
 export function stringToArray(key) {
   const parts = key.split(',').filter(item => item.length > 0)
   if (parts.length % 2 === 0) {

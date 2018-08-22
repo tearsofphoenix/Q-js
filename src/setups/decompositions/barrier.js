@@ -17,10 +17,21 @@
 import DecompositionRule from '../../cengines/replacer/decompositionrule'
 import {BarrierGate} from '../../ops/gates'
 
+/**
+ * @ignore
+ * @param cmd
+ * @private
+ */
 export function _decompose_barrier(cmd) {
   // Throw out all barriers if they are not supported.
 }
 
+/**
+ * @ignore
+ * @param cmd
+ * @return {boolean}
+ * @private
+ */
 export function _recognize_barrier(cmd) {
   // Recognize all barriers. "
   return true

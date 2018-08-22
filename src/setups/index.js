@@ -19,7 +19,10 @@ import TagRemover from '../cengines/tagremover'
 import decompositions from './decompositions'
 import LocalOptimizer from '../cengines/optimize'
 import {AutoReplacer} from '../cengines/replacer/replacer'
-
+/**
+ *
+ * @return {BasicEngine[]}
+ */
 export function getEngineList() {
   const rule_set = new DecompositionRuleSet(decompositions)
   return [new TagRemover(),

@@ -3,6 +3,11 @@ import {Compute, Uncompute} from '../../meta/compute';
 import {Rx, Ry, Rz} from '../../ops/gates';
 import DecompositionRule from '../../cengines/replacer/decompositionrule';
 
+/**
+ * @ignore
+ * @param {Command} cmd
+ * @private
+ */
 export const _decompose_ry = (cmd) => {
   const qubit = cmd.qubits[0]
   const eng = cmd.engine
@@ -17,6 +22,12 @@ export const _decompose_ry = (cmd) => {
   })
 }
 
+/**
+ * @ignore
+ * @param {Command} cmd
+ * @return {boolean}
+ * @private
+ */
 export const _recognize_RyNoCtrl = cmd => cmd.controlCount === 0
 
 export default [

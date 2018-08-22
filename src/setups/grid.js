@@ -14,6 +14,7 @@ import decompositions from './decompositions'
 import GridMapper from '../cengines/twodmapper';
 
 /**
+ * @ignore
  * @desc Remove any MathGates
  */
 export function high_level_gates(eng, cmd) {
@@ -79,7 +80,7 @@ export function getEngineList(num_rows, num_columns, one_qubit_gates = 'any', tw
     throw new Error("two_qubit_gates parameter must be 'any' or a tuple. "
         + 'When supplying only one gate, make sure to correctly '
         + "create the tuple (don't miss the comma), "
-        + 'e.g. two_qubit_gates=(CNOT,)')
+        + 'e.g. tuple(CNOT)')
   }
   if (one_qubit_gates !== 'any' && !Array.isArray(one_qubit_gates)) {
     throw new Error("one_qubit_gates parameter must be 'any' or a tuple.")

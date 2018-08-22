@@ -40,6 +40,10 @@ function create_unitary_matrix(a, b, c, d) {
   return result
 }
 
+/**
+ * @ignore
+ * @return {Array<Array<number[]>>}
+ */
 export function create_test_matrices() {
   const params = [[0.2, 0.3, 0.5, math.pi * 0.4],
     [1e-14, 0.3, 0.5, 0],

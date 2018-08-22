@@ -21,6 +21,7 @@ const Complex = math.complex().constructor
 const Matrix = math.matrix().constructor
 
 /**
+ * @ignore
  * check if value is complex number
  * @param {Object} value
  * @return {boolean}
@@ -30,6 +31,7 @@ export function isComplex(value) {
 }
 
 /**
+ * @ignore
  * check if value is number or complex number
  * @param {Object} value
  * @return {boolean}
@@ -39,6 +41,7 @@ export function isNumeric(value) {
 }
 
 /**
+ * @ignore
  * return intersection of s1 & s2
  * @param {Set} s1
  * @param {Set} s2
@@ -49,6 +52,7 @@ export function intersection(s1, s2) {
 }
 
 /**
+ * @ignore
  * return union set of s1 & s2
  * @param {Set} s1
  * @param {Set} s2
@@ -62,6 +66,7 @@ export function unionSet(s1, s2) {
 }
 
 /**
+ * @ignore
  * return symmetric difference of s1 & s2
  * @param {Set} s1
  * @param {Set} s2
@@ -75,6 +80,7 @@ export function symmetricDifference(s1, s2) {
 }
 
 /**
+ * @ignore
  * check if s1 is equal to s2
  * @param {Set} s1
  * @param {Set} s2
@@ -85,6 +91,7 @@ export function setEqual(s1, s2) {
 }
 
 /**
+ * @ignore
  * check if `superset` is the super set of `s`
  * @param {Set} superset
  * @param {Set} s
@@ -95,11 +102,18 @@ export function setIsSuperSet(superset, s) {
   return result.length === 0
 }
 
+/**
+ * @ignore
+ * @param {Set<*>} s1
+ * @param {Set<*>} s2
+ * @return {Set<*>}
+ */
 export function setDifference(s1, s2) {
   return new Set([...s1].filter(x => !s2.has(x)))
 }
 
 /**
+ * @ignore
  * create a Set contains numbers in range from 0 to n
  * @param {number} n
  * @return {Set<number>}
@@ -113,6 +127,7 @@ export function setFromRange(n) {
 }
 
 /**
+ * @ignore
  * create an array filled by number in range, active like python does
  * @param {number} start
  * @param {number} end
@@ -136,6 +151,7 @@ export function arrayFromRange(start, end, step) {
 }
 
 /**
+ * @ignore
  * return a random sample from `array` which length is `count`
  * @param {any[]} array
  * @param {number} count
@@ -156,6 +172,7 @@ export function randomSample(array, count) {
 }
 
 /**
+ * @ignore
  * test if two array(a1, a2) are equal, support instance of classes in this library
  * @param {Array} a1
  * @param {Array} a2
@@ -196,6 +213,7 @@ export function arrayEqual(a1, a2, itemCompareFunc) {
 }
 
 /**
+ * @ignore
  * @function
  * reverse version of `forEach`
  * @param {function} callbackFunc
@@ -210,6 +228,7 @@ Array.prototype.rforEach = function (callbackFunc) {
 }
 
 /**
+ * @ignore
  * @function
  * reverse version of `map`
  * @param {function} callbackFunc
@@ -227,6 +246,7 @@ Array.prototype.rmap = function (callbackFunc) {
 }
 
 /**
+ * @ignore
  * @function
  * return total exist count of `item` in array
  * @param {any} item
@@ -242,6 +262,7 @@ Array.prototype.count = function (item) {
 }
 
 /**
+ * @ignore
  * remove all existance of `target` from array
  * @param {any} target
  */
@@ -259,6 +280,7 @@ Array.prototype.remove = function (target) {
 }
 
 /**
+ * @ignore
  * return all regular expression match count of `substring` in string
  * @param {string} substring
  * @return {number}
@@ -305,6 +327,7 @@ export function len(v) {
 }
 
 /**
+ * @ignore
  * parse string contains 1/0 into bit array
  * @param {string} str
  * @return {boolean[]}
@@ -323,6 +346,7 @@ export function stringToBitArray(str) {
 }
 
 /**
+ * @ignore
  * return dot product of two complex vector(a1, a2)
  * @param {Complex[]} a1
  * @param {Complex[]} a2
@@ -344,6 +368,7 @@ export function complexVectorDot(a1, a2) {
 }
 
 /**
+ * @ignore
  * return n-length Array filled by item
  * @param {Function|any} item
  * @param {number} count
@@ -364,6 +389,7 @@ export function narray(item, count) {
 }
 
 /**
+ * @ignore
  * product loop on two Arrays p1 & p2
  * @param {Array} p1
  * @param {Array} p2
@@ -381,6 +407,7 @@ export function productLoop(p1, p2, func) {
 }
 
 /**
+ * @ignore
  * product loop on three Arrays p1 & p2 & p3
  * @param {Array} p1
  * @param {Array} p2
@@ -401,6 +428,7 @@ export function productLoop3(p1, p2, p3, func) {
 }
 
 /**
+ * @ignore
  * return (base ^ exp) % mod, it's fast and support big number
  * @param {number} base
  * @param {number}  exp

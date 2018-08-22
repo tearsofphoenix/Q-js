@@ -29,9 +29,13 @@ import {Control} from '../../meta/control';
 import {len} from '../polyfill';
 
 /**
+ * @ignore
  * Adds a classical constant c to the quantum integer (qureg) quint using Draper addition.
  * Note: Uses the Fourier-transform adder
  * see https://arxiv.org/abs/quant-ph/0008033
+ * @param {BasicEngine} eng
+ * @param {number} c
+ * @param {Array<Qubit>|Qureg} quint
  */
 export function add_constant(eng, c, quint) {
   Compute(eng, () => QFT.or(quint))
@@ -48,10 +52,15 @@ export function add_constant(eng, c, quint) {
 }
 
 /**
+ * @ignore
  * Modular adder by Beauregard
  * see https://arxiv.org/abs/quant-ph/0205095
 Adds a classical constant c to a quantum integer (qureg) quint modulo N
 using Draper addition and the construction
+ * @param {BasicEngine} eng
+ * @param {number} c
+ * @param {number} N
+ * @param {Array<Qubit>|Qureg} quint
  */
 export function add_constant_modN(eng, c, N, quint) {
   assert(c < N && c >= 0)
@@ -99,14 +108,14 @@ function inv_mod_N(a, N) {
 }
 
 /**
+ * @ignore
  * Modular multiplication by modular addition & shift, followed by uncompute
  https://arxiv.org/abs/quant-ph/0205095
 Multiplies a quantum integer by a classical number a modulo N, i.e.,
-
-|x> -> |a*x mod N>
-
-(only works if a and N are relative primes, otherwise the modular inverse
-does not exist).
+ ```
+  |x> -> |a*x mod N>
+ ```
+(only works if a and N are relative primes, otherwise the modular inverse does not exist).
  */
 export function mul_by_constant_modN(eng, c, N, quint_in) {
   assert(c < N && c >= 0)

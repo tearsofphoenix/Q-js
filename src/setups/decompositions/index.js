@@ -33,10 +33,10 @@ import timeevolution from './time_evolution'
 export default [
   ...arb1qubit2rzandry,
   ...barrier,
-  ...cnot2cz,
   ...carb1qubit2cnotrzandry,
-  ...crz2cxandrz,
+  ...cnot2cz,
   ...cnu2toffoliandcu,
+  ...crz2cxandrz,
   ...entangle,
   ...globalphase,
   ...ph2r,
@@ -45,6 +45,6 @@ export default [
   ...rx2rz,
   ...ry2rz,
   ...swap2cnot,
-  ...toffoli2cnotandtgate,
-  ...timeevolution
+  ...timeevolution,
+  ...toffoli2cnotandtgate
 ]

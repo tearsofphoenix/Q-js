@@ -12,7 +12,13 @@ const mm = math.multiply
 const mc = math.complex
 const TOLERANCE = 1e-12
 
-// Recognize single controlled one qubit gates with a matrix.
+/**
+ * @ignore
+ * Recognize single controlled one qubit gates with a matrix.
+ * @param {Command} cmd
+ * @return {boolean}
+ * @private
+ */
 export function _recognize_carb1qubit(cmd) {
   if (cmd.controlCount === 1) {
     try {
@@ -52,6 +58,7 @@ function _test_parameters(matrix, a, b, c_half) {
 }
 
 /**
+ * @ignore
 Recognizes a matrix which can be written in the following form:
 
     V = [[-sin(c/2) * exp(j*a), exp(j*(a-b)) * cos(c/2)],

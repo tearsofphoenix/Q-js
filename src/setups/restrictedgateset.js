@@ -60,9 +60,7 @@ Classical instructions gates such as e.g. Flush and Measure are
 automatically allowed.
 
     @example
-get_engine_list(one_qubit_gates=(Rz, Ry, Rx, H),
-    two_qubit_gates=(CNOT,),
-    other_gates=(TimeEvolution,))
+    getEngineList(tuple(Rz, Ry, Rx, H), tuple(CNOT), tuple(TimeEvolution))
 
 @param {string|Array.<BasicGate>} one_qubit_gates "any" allows any one qubit gate, otherwise provide
 a tuple of the allowed gates. If the gates are instances of a class (e.g. X), it allows all gates
@@ -74,16 +72,16 @@ Default is (CNOT,).
  @param {string|Array.<BasicGate>} other_gates A tuple of the allowed gates. If the gates are
 instances of a class (e.g. QFT), it allows all gates which are equal to it. If the gate is a
 class, it allows all instances of this class.
-@throws {Error} If input is for the gates is not "any" or a tuple.
 
-    @return {Array} A list of suitable compiler engines.
+@throws {Error} If input is for the gates is not "any" or a tuple.
+    @return {Array<BasicEngine>} A list of suitable compiler engines.
  */
 export function getEngineList(one_qubit_gates = 'any', two_qubit_gates = [CNOT], other_gates = []) {
   if (two_qubit_gates !== 'any' && !Array.isArray(two_qubit_gates)) {
     throw new Error("two_qubit_gates parameter must be 'any' or a tuple. "
         + 'When supplying only one gate, make sure to correctly '
         + "create the tuple (don't miss the comma), "
-        + 'e.g. two_qubit_gates=(CNOT,)')
+        + 'e.g. tuple(CNOT)')
   }
   if (one_qubit_gates !== 'any' && !Array.isArray(one_qubit_gates)) {
     throw new Error("one_qubit_gates parameter must be 'any' or a tuple.")

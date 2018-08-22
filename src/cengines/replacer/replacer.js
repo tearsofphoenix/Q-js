@@ -77,7 +77,7 @@ export class AutoReplacer extends BasicEngine {
   /**
    * @constructor
     @param {DecompositionRuleSet} decompositionRuleSet
-    @param {function} decomposition_chooser A function which, given the
+    @param {?function} decomposition_chooser A function which, given the
 Command to decompose and a list of potential Decomposition
 objects, determines (and then returns) the 'best'
 decomposition.

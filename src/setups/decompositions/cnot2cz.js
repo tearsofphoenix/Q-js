@@ -32,6 +32,12 @@ const _decompose_cnot = (cmd) => {
   Uncompute(eng)
 }
 
+/**
+ * @ignore
+ * @param cmd
+ * @return {boolean}
+ * @private
+ */
 export const _recognize_cnot = cmd => (cmd.controlCount === 1)
 
 export default [

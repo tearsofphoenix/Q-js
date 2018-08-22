@@ -29,7 +29,7 @@ import {LogicalQubitIDTag} from '../meta';
 /**
  * @class Position
  */
-class Position {
+export class Position {
   /**
    * @constructor
    * @param {number} current_row

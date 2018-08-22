@@ -16,7 +16,12 @@ const _decompose_rx = (cmd) => {
     Uncompute(eng)
   })
 }
-
+/**
+ * @ignore
+ * @param cmd
+ * @return {boolean}
+ * @private
+ */
 export const _recognize_RxNoCtrl = cmd => cmd.controlCount === 0
 
 export default [
