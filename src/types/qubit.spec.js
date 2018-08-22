@@ -21,11 +21,15 @@ import {BasicEngine} from '../cengines/basics'
 import MainEngine from '../cengines/main'
 import {DummyEngine} from '../cengines/testengine'
 import {Deallocate} from '../ops/gates';
+import {arrayEqual} from '../libs/polyfill';
 
 const mc = math.complex
 const mm = math.matrix
 
 describe('Qubit test', () => {
+  it('should test subclass array', () => {
+
+  });
   it('should test math complex type', () => {
     const c = mc(1, -1)
     console.log(c.re, c.im)
@@ -202,7 +206,7 @@ describe('Qubit test', () => {
     assert(rec.receivedCommands.length === 1)
   });
 
-  it('should test qureg to Number', function () {
+  it('should test qureg to Number', () => {
     const rec = new DummyEngine(true)
     const eng = new MainEngine(rec, [])
     const q = eng.allocateQureg(2)
@@ -213,7 +217,7 @@ describe('Qubit test', () => {
     expect(() => q2.toNumber()).to.throw()
   });
 
-  it('should test qureg equal', function () {
+  it('should test qureg equal', () => {
     const rec = new DummyEngine(true)
     const eng = new MainEngine(rec, [])
     const q = eng.allocateQureg(2)
@@ -224,7 +228,7 @@ describe('Qubit test', () => {
     expect(q.equal(new Array(...q))).to.equal(false)
   });
 
-  it('should test basic qubit array copy', function () {
+  it('should test basic qubit array copy', () => {
     const q = new BasicQubit(null, 0)
     const array = [q]
     const copy = BasicQubit.copyArray(array)

@@ -25,6 +25,9 @@ function stringKeyToIntArray(key) {
 }
 
 // export const ibmqx4_connections = new Set([2, 1], [4, 2], [2, 0], [3, 2], [3, 4], [1, 0])
+/**
+ * @type {Set<string>}
+ */
 export const ibmqx4_connections = new Set(['2,1', '4,2', '2,0', '3,2', '3,4', '1,0'])
 
 /**
