@@ -1,28 +1,28 @@
 {
   "type": "File",
   "start": 0,
-  "end": 9516,
+  "end": 9538,
   "loc": {
     "start": {
       "line": 1,
       "column": 0
     },
     "end": {
-      "line": 488,
+      "line": 491,
       "column": 0
     }
   },
   "program": {
     "type": "Program",
     "start": 0,
-    "end": 9516,
+    "end": 9538,
     "loc": {
       "start": {
         "line": 1,
         "column": 0
       },
       "end": {
-        "line": 488,
+        "line": 491,
         "column": 0
       }
     },
@@ -20326,55 +20326,75 @@
                 }
               ]
             }
-          ]
-        }
+          ],
+          "trailingComments": null
+        },
+        "trailingComments": [
+          {
+            "type": "CommentBlock",
+            "value": "*\r\n * @ignore\r\n ",
+            "start": 9496,
+            "end": 9516,
+            "loc": {
+              "start": {
+                "line": 487,
+                "column": 0
+              },
+              "end": {
+                "line": 489,
+                "column": 3
+              }
+            }
+          }
+        ]
       },
       {
         "type": "Identifier",
-        "start": 9496,
-        "end": 9514,
+        "start": 9518,
+        "end": 9536,
         "loc": {
           "start": {
-            "line": 487,
+            "line": 490,
             "column": 0
           },
           "end": {
-            "line": 487,
+            "line": 490,
             "column": 18
           }
         },
         "declaration": {
           "type": "Identifier",
-          "start": 9511,
-          "end": 9514,
+          "start": 9533,
+          "end": 9536,
           "loc": {
             "start": {
-              "line": 487,
+              "line": 490,
               "column": 15
             },
             "end": {
-              "line": 487,
+              "line": 490,
               "column": 18
             },
             "identifierName": "obj"
           },
-          "name": "obj"
+          "name": "obj",
+          "leadingComments": null
         },
-        "name": "_",
         "leadingComments": [],
+        "name": "_",
         "trailingComments": []
       },
       {
         "type": "ExportDefaultDeclaration",
-        "start": 9496,
-        "end": 9514,
+        "start": 9518,
+        "end": 9536,
         "loc": {
           "start": {
-            "line": 487,
+            "line": 490,
             "column": 0
           },
           "end": {
-            "line": 487,
+            "line": 490,
             "column": 18
           }
         },
@@ -20443,9 +20463,44 @@
             }
           ],
           "kind": "const",
-          "leadingComments": [],
+          "leadingComments": [
+            {
+              "type": "CommentBlock",
+              "value": "*\r\n * @ignore\r\n ",
+              "start": 9496,
+              "end": 9516,
+              "loc": {
+                "start": {
+                  "line": 487,
+                  "column": 0
+                },
+                "end": {
+                  "line": 489,
+                  "column": 3
+                }
+              }
+            }
+          ],
           "trailingComments": []
-        }
+        },
+        "leadingComments": [
+          {
+            "type": "CommentBlock",
+            "value": "*\r\n * @ignore\r\n ",
+            "start": 9496,
+            "end": 9516,
+            "loc": {
+              "start": {
+                "line": 487,
+                "column": 0
+              },
+              "end": {
+                "line": 489,
+                "column": 3
+              }
+            }
+          }
+        ]
       }
     ],
     "directives": []
@@ -21120,6 +21175,22 @@
         "end": {
           "line": 452,
           "column": 37
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\r\n * @ignore\r\n ",
+      "start": 9496,
+      "end": 9516,
+      "loc": {
+        "start": {
+          "line": 487,
+          "column": 0
+        },
+        "end": {
+          "line": 489,
+          "column": 3
         }
       }
     }
@@ -58325,6 +58396,22 @@
       }
     },
     {
+      "type": "CommentBlock",
+      "value": "*\r\n * @ignore\r\n ",
+      "start": 9496,
+      "end": 9516,
+      "loc": {
+        "start": {
+          "line": 487,
+          "column": 0
+        },
+        "end": {
+          "line": 489,
+          "column": 3
+        }
+      }
+    },
+    {
       "type": {
         "label": "export",
         "keyword": "export",
@@ -58339,15 +58426,15 @@
         "updateContext": null
       },
       "value": "export",
-      "start": 9496,
-      "end": 9502,
+      "start": 9518,
+      "end": 9524,
       "loc": {
         "start": {
-          "line": 487,
+          "line": 490,
           "column": 0
         },
         "end": {
-          "line": 487,
+          "line": 490,
           "column": 6
         }
       }
@@ -58367,15 +58454,15 @@
         "updateContext": null
       },
       "value": "default",
-      "start": 9503,
-      "end": 9510,
+      "start": 9525,
+      "end": 9532,
       "loc": {
         "start": {
-          "line": 487,
+          "line": 490,
           "column": 7
         },
         "end": {
-          "line": 487,
+          "line": 490,
           "column": 14
         }
       }
@@ -58393,15 +58480,15 @@
         "binop": null
       },
       "value": "obj",
-      "start": 9511,
-      "end": 9514,
+      "start": 9533,
+      "end": 9536,
       "loc": {
         "start": {
-          "line": 487,
+          "line": 490,
           "column": 15
         },
         "end": {
-          "line": 487,
+          "line": 490,
           "column": 18
         }
       }
@@ -58419,15 +58506,15 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 9516,
-      "end": 9516,
+      "start": 9538,
+      "end": 9538,
       "loc": {
         "start": {
-          "line": 488,
+          "line": 491,
           "column": 0
         },
         "end": {
-          "line": 488,
+          "line": 491,
           "column": 0
         }
       }

@@ -12,12 +12,6 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
-    "projectq/src/backends/simulators/cppsim.js~all",
-    "variable/index.html#static-variable-All",
-    "<span>All</span> <span class=\"search-result-import-path\">projectq/src/backends/simulators/cppsim.js</span>",
-    "variable"
-  ],
-  [
     "projectq/src/ops/metagates.js~all",
     "variable/index.html#static-variable-All",
     "<span>All</span> <span class=\"search-result-import-path\">projectq/src/ops/metagates.js</span>",
@@ -438,21 +432,15 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
-    "projectq/src/libs/util.js~objectcopy",
-    "function/index.html#static-function-ObjectCopy",
-    "<span>ObjectCopy</span> <span class=\"search-result-import-path\">projectq/src/libs/util.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/ops/qubitoperator.js~pauli_operator_products",
-    "variable/index.html#static-variable-PAULI_OPERATOR_PRODUCTS",
-    "<span>PAULI_OPERATOR_PRODUCTS</span> <span class=\"search-result-import-path\">projectq/src/ops/qubitoperator.js</span>",
-    "variable"
-  ],
-  [
     "projectq/src/ops/gates.js~ph",
     "class/src/ops/gates.js~Ph.html",
     "<span>Ph</span> <span class=\"search-result-import-path\">projectq/src/ops/gates.js</span>",
+    "class"
+  ],
+  [
+    "projectq/src/cengines/twodmapper.js~position",
+    "class/src/cengines/twodmapper.js~Position.html",
+    "<span>Position</span> <span class=\"search-result-import-path\">projectq/src/cengines/twodmapper.js</span>",
     "class"
   ],
   [
@@ -708,159 +696,15 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
-    "projectq/src/setups/decompositions/cnu2toffoliandcu.js~_decompose_cnu",
-    "function/index.html#static-function-_decompose_CnU",
-    "<span>_decompose_CnU</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/cnu2toffoliandcu.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/setups/decompositions/barrier.js~_decompose_barrier",
-    "function/index.html#static-function-_decompose_barrier",
-    "<span>_decompose_barrier</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/barrier.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/setups/decompositions/ry2rz.js~_decompose_ry",
-    "function/index.html#static-function-_decompose_ry",
-    "<span>_decompose_ry</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/ry2rz.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/backends/circuits/tolatex.js~_exports",
-    "variable/index.html#static-variable-_exports",
-    "<span>_exports</span> <span class=\"search-result-import-path\">projectq/src/backends/circuits/tolatex.js</span>",
-    "variable"
-  ],
-  [
-    "projectq/src/setups/decompositions/arb1qubit2rzandry.js~_find_parameters",
-    "function/index.html#static-function-_find_parameters",
-    "<span>_find_parameters</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/arb1qubit2rzandry.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/setups/decompositions/cnu2toffoliandcu.js~_recognize_cnu",
-    "function/index.html#static-function-_recognize_CnU",
-    "<span>_recognize_CnU</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/cnu2toffoliandcu.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/setups/decompositions/rx2rz.js~_recognize_rxnoctrl",
-    "function/index.html#static-function-_recognize_RxNoCtrl",
-    "<span>_recognize_RxNoCtrl</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/rx2rz.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/setups/decompositions/ry2rz.js~_recognize_rynoctrl",
-    "function/index.html#static-function-_recognize_RyNoCtrl",
-    "<span>_recognize_RyNoCtrl</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/ry2rz.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/setups/decompositions/arb1qubit2rzandry.js~_recognize_arb1qubit",
-    "function/index.html#static-function-_recognize_arb1qubit",
-    "<span>_recognize_arb1qubit</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/arb1qubit2rzandry.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/setups/decompositions/barrier.js~_recognize_barrier",
-    "function/index.html#static-function-_recognize_barrier",
-    "<span>_recognize_barrier</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/barrier.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/setups/decompositions/carb1qubit2cnotrzandry.js~_recognize_carb1qubit",
-    "function/index.html#static-function-_recognize_carb1qubit",
-    "<span>_recognize_carb1qubit</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/carb1qubit2cnotrzandry.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/setups/decompositions/cnot2cz.js~_recognize_cnot",
-    "function/index.html#static-function-_recognize_cnot",
-    "<span>_recognize_cnot</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/cnot2cz.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/setups/decompositions/carb1qubit2cnotrzandry.js~_recognize_v",
-    "function/index.html#static-function-_recognize_v",
-    "<span>_recognize_v</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/carb1qubit2cnotrzandry.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/ops/_cycle.js~add",
-    "function/index.html#static-function-add",
-    "<span>add</span> <span class=\"search-result-import-path\">projectq/src/ops/_cycle.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/math/constantmath.js~add_constant",
-    "function/index.html#static-function-add_constant",
-    "<span>add_constant</span> <span class=\"search-result-import-path\">projectq/src/libs/math/constantmath.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/math/constantmath.js~add_constant_modn",
-    "function/index.html#static-function-add_constant_modN",
-    "<span>add_constant_modN</span> <span class=\"search-result-import-path\">projectq/src/libs/math/constantmath.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~arrayequal",
-    "function/index.html#static-function-arrayEqual",
-    "<span>arrayEqual</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~arrayfromrange",
-    "function/index.html#static-function-arrayFromRange",
-    "<span>arrayFromRange</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/util.js~arrayistuple",
-    "function/index.html#static-function-arrayIsTuple",
-    "<span>arrayIsTuple</span> <span class=\"search-result-import-path\">projectq/src/libs/util.js</span>",
-    "function"
-  ],
-  [
     "projectq/src/libs/util.js~classhierachy",
     "function/index.html#static-function-classHierachy",
     "<span>classHierachy</span> <span class=\"search-result-import-path\">projectq/src/libs/util.js</span>",
     "function"
   ],
   [
-    "projectq/src/libs/polyfill.js~complexvectordot",
-    "function/index.html#static-function-complexVectorDot",
-    "<span>complexVectorDot</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/setups/decompositions/arb1qubit2rzandry.spec.js~create_test_matrices",
-    "function/index.html#static-function-create_test_matrices",
-    "<span>create_test_matrices</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/arb1qubit2rzandry.spec.js</span>",
-    "function"
-  ],
-  [
     "projectq/src/meta/util.js~dropengineafter",
     "function/index.html#static-function-dropEngineAfter",
     "<span>dropEngineAfter</span> <span class=\"search-result-import-path\">projectq/src/meta/util.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~expmod",
-    "function/index.html#static-function-expmod",
-    "<span>expmod</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/util.js~genstring",
-    "function/index.html#static-function-genString",
-    "<span>genString</span> <span class=\"search-result-import-path\">projectq/src/libs/util.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/ops/_cycle.js~get",
-    "function/index.html#static-function-get",
-    "<span>get</span> <span class=\"search-result-import-path\">projectq/src/ops/_cycle.js</span>",
     "function"
   ],
   [
@@ -906,12 +750,6 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
-    "projectq/src/setups/grid.js~high_level_gates",
-    "function/index.html#static-function-high_level_gates",
-    "<span>high_level_gates</span> <span class=\"search-result-import-path\">projectq/src/setups/grid.js</span>",
-    "function"
-  ],
-  [
     "projectq/src/cengines/ibm5qubitmapper.js~ibmqx4_connections",
     "variable/index.html#static-variable-ibmqx4_connections",
     "<span>ibmqx4_connections</span> <span class=\"search-result-import-path\">projectq/src/cengines/ibm5qubitmapper.js</span>",
@@ -936,27 +774,9 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
-    "projectq/src/libs/polyfill.js~intersection",
-    "function/index.html#static-function-intersection",
-    "<span>intersection</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~iscomplex",
-    "function/index.html#static-function-isComplex",
-    "<span>isComplex</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
     "projectq/src/libs/util.js~iskindclassof",
     "function/index.html#static-function-isKindclassOf",
     "<span>isKindclassOf</span> <span class=\"search-result-import-path\">projectq/src/libs/util.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~isnumeric",
-    "function/index.html#static-function-isNumeric",
-    "<span>isNumeric</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
     "function"
   ],
   [
@@ -972,153 +792,15 @@ window.esdocSearchIndex = [
     "function"
   ],
   [
-    "projectq/src/libs/util.js~marktuple",
-    "function/index.html#static-function-markTuple",
-    "<span>markTuple</span> <span class=\"search-result-import-path\">projectq/src/libs/util.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/util.js~matrixdot",
-    "function/index.html#static-function-matrixDot",
-    "<span>matrixDot</span> <span class=\"search-result-import-path\">projectq/src/libs/util.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/util.js~matrixgetrow",
-    "function/index.html#static-function-matrixGetRow",
-    "<span>matrixGetRow</span> <span class=\"search-result-import-path\">projectq/src/libs/util.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/util.js~matrixrangeassign",
-    "function/index.html#static-function-matrixRangeAssign",
-    "<span>matrixRangeAssign</span> <span class=\"search-result-import-path\">projectq/src/libs/util.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/util.js~matrixrangeindicesassign",
-    "function/index.html#static-function-matrixRangeIndicesAssign",
-    "<span>matrixRangeIndicesAssign</span> <span class=\"search-result-import-path\">projectq/src/libs/util.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/math/constantmath.js~mul_by_constant_modn",
-    "function/index.html#static-function-mul_by_constant_modN",
-    "<span>mul_by_constant_modN</span> <span class=\"search-result-import-path\">projectq/src/libs/math/constantmath.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~narray",
-    "function/index.html#static-function-narray",
-    "<span>narray</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/ops/gates.js~obj",
-    "variable/index.html#static-variable-obj",
-    "<span>obj</span> <span class=\"search-result-import-path\">projectq/src/ops/gates.js</span>",
-    "variable"
-  ],
-  [
-    "projectq/src/setups/decompositions/arb1qubit2rzandry.js~phase",
-    "function/index.html#static-function-phase",
-    "<span>phase</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/arb1qubit2rzandry.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~productloop3",
-    "function/index.html#static-function-productLoop3",
-    "<span>productLoop3</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~productloop",
-    "function/index.html#static-function-productLoop",
-    "<span>productLoop</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~randomsample",
-    "function/index.html#static-function-randomSample",
-    "<span>randomSample</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/cengines/linearmapper.js~return_swap_depth",
-    "function/index.html#static-function-return_swap_depth",
-    "<span>return_swap_depth</span> <span class=\"search-result-import-path\">projectq/src/cengines/linearmapper.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/setups/decompositions/time_evolution.js~rule_commuting_terms",
-    "variable/index.html#static-variable-rule_commuting_terms",
-    "<span>rule_commuting_terms</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/time_evolution.js</span>",
-    "variable"
-  ],
-  [
-    "projectq/src/setups/decompositions/time_evolution.js~rule_individual_terms",
-    "variable/index.html#static-variable-rule_individual_terms",
-    "<span>rule_individual_terms</span> <span class=\"search-result-import-path\">projectq/src/setups/decompositions/time_evolution.js</span>",
-    "variable"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~setdifference",
-    "function/index.html#static-function-setDifference",
-    "<span>setDifference</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~setequal",
-    "function/index.html#static-function-setEqual",
-    "<span>setEqual</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~setfromrange",
-    "function/index.html#static-function-setFromRange",
-    "<span>setFromRange</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~setissuperset",
-    "function/index.html#static-function-setIsSuperSet",
-    "<span>setIsSuperSet</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
     "projectq/src/ops/qubitoperator.js~stringtoarray",
     "function/index.html#static-function-stringToArray",
     "<span>stringToArray</span> <span class=\"search-result-import-path\">projectq/src/ops/qubitoperator.js</span>",
     "function"
   ],
   [
-    "projectq/src/libs/polyfill.js~stringtobitarray",
-    "function/index.html#static-function-stringToBitArray",
-    "<span>stringToBitArray</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~symmetricdifference",
-    "function/index.html#static-function-symmetricDifference",
-    "<span>symmetricDifference</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
     "projectq/src/libs/util.js~tuple",
     "function/index.html#static-function-tuple",
     "<span>tuple</span> <span class=\"search-result-import-path\">projectq/src/libs/util.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/polyfill.js~unionset",
-    "function/index.html#static-function-unionSet",
-    "<span>unionSet</span> <span class=\"search-result-import-path\">projectq/src/libs/polyfill.js</span>",
-    "function"
-  ],
-  [
-    "projectq/src/libs/util.js~zeros",
-    "function/index.html#static-function-zeros",
-    "<span>zeros</span> <span class=\"search-result-import-path\">projectq/src/libs/util.js</span>",
     "function"
   ],
   [
@@ -1759,13 +1441,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/backends/ibm/ibm.js~ibmbackend#didruncallback",
-    "class/src/backends/ibm/ibm.js~IBMBackend.html#instance-set-didRunCallback",
+    "class/src/backends/ibm/ibm.js~IBMBackend.html#instance-get-didRunCallback",
     "src/backends/ibm/ibm.js~IBMBackend#didRunCallback",
     "member"
   ],
   [
     "src/backends/ibm/ibm.js~ibmbackend#didruncallback",
-    "class/src/backends/ibm/ibm.js~IBMBackend.html#instance-get-didRunCallback",
+    "class/src/backends/ibm/ibm.js~IBMBackend.html#instance-set-didRunCallback",
     "src/backends/ibm/ibm.js~IBMBackend#didRunCallback",
     "member"
   ],
@@ -2413,13 +2095,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/cengines/basicmapper.js~basicmapperengine#currentmapping",
-    "class/src/cengines/basicmapper.js~BasicMapperEngine.html#instance-set-currentMapping",
+    "class/src/cengines/basicmapper.js~BasicMapperEngine.html#instance-get-currentMapping",
     "src/cengines/basicmapper.js~BasicMapperEngine#currentMapping",
     "member"
   ],
   [
     "src/cengines/basicmapper.js~basicmapperengine#currentmapping",
-    "class/src/cengines/basicmapper.js~BasicMapperEngine.html#instance-get-currentMapping",
+    "class/src/cengines/basicmapper.js~BasicMapperEngine.html#instance-set-currentMapping",
     "src/cengines/basicmapper.js~BasicMapperEngine#currentMapping",
     "member"
   ],
@@ -3480,6 +3162,42 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "src/cengines/twodmapper.js~position#constructor",
+    "class/src/cengines/twodmapper.js~Position.html#instance-constructor-constructor",
+    "src/cengines/twodmapper.js~Position#constructor",
+    "method"
+  ],
+  [
+    "src/cengines/twodmapper.js~position#current_column",
+    "class/src/cengines/twodmapper.js~Position.html#instance-member-current_column",
+    "src/cengines/twodmapper.js~Position#current_column",
+    "member"
+  ],
+  [
+    "src/cengines/twodmapper.js~position#current_row",
+    "class/src/cengines/twodmapper.js~Position.html#instance-member-current_row",
+    "src/cengines/twodmapper.js~Position#current_row",
+    "member"
+  ],
+  [
+    "src/cengines/twodmapper.js~position#final_column",
+    "class/src/cengines/twodmapper.js~Position.html#instance-member-final_column",
+    "src/cengines/twodmapper.js~Position#final_column",
+    "member"
+  ],
+  [
+    "src/cengines/twodmapper.js~position#final_row",
+    "class/src/cengines/twodmapper.js~Position.html#instance-member-final_row",
+    "src/cengines/twodmapper.js~Position#final_row",
+    "member"
+  ],
+  [
+    "src/cengines/twodmapper.js~position#row_after_step_1",
+    "class/src/cengines/twodmapper.js~Position.html#instance-member-row_after_step_1",
+    "src/cengines/twodmapper.js~Position#row_after_step_1",
+    "member"
+  ],
+  [
     "src/cengines/twodmapper.spec.js",
     "file/src/cengines/twodmapper.spec.js.html",
     "src/cengines/twodmapper.spec.js",
@@ -4303,13 +4021,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/ops/command.js~command#engine",
-    "class/src/ops/command.js~Command.html#instance-get-engine",
+    "class/src/ops/command.js~Command.html#instance-set-engine",
     "src/ops/command.js~Command#engine",
     "member"
   ],
   [
     "src/ops/command.js~command#engine",
-    "class/src/ops/command.js~Command.html#instance-set-engine",
+    "class/src/ops/command.js~Command.html#instance-get-engine",
     "src/ops/command.js~Command#engine",
     "member"
   ],
@@ -4357,13 +4075,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/ops/command.js~command#qubits",
-    "class/src/ops/command.js~Command.html#instance-get-qubits",
+    "class/src/ops/command.js~Command.html#instance-set-qubits",
     "src/ops/command.js~Command#qubits",
     "member"
   ],
   [
     "src/ops/command.js~command#qubits",
-    "class/src/ops/command.js~Command.html#instance-set-qubits",
+    "class/src/ops/command.js~Command.html#instance-get-qubits",
     "src/ops/command.js~Command#qubits",
     "member"
   ],
