@@ -96,9 +96,9 @@ outcomes (true/false).
     val = 0
 
     pos.forEach((looper, i) => {
-      res[i] = (((i_picked >> looper) & 1) == 1)
+      res[i] = ((i_picked >> looper) & 1) === 1
       mask |= (1 << looper)
-      val |= ((res[i] & 1) ** looper)
+      val |= ((res[i] & 1) << looper)
     })
 
     let nrm = 0.0
