@@ -27,18 +27,18 @@ static void returnNewSwap(std::vector<Match> &matchings, int numRows, int numCol
     // (0, 1, ...) and the destination columns numbered with an offset of
     // numColumns (0 + offset, 1+offset, ...)
 
-    for (int j = 0; j < numColumns; ++j) {
+    for (auto j = 0; j < numColumns; ++j) {
         add_vertex(g);
     }
-    for (int k = offset; k < offset + numColumns; ++k) {
+    for (auto k = offset; k < offset + numColumns; ++k) {
         add_vertex(g);
     }
 
     // Add an edge to the graph from (i, j+offset) for every element
     // currently in column i which should go to column j for the new
     // mapping
-    for (int row = 0; row < numRows; ++row) {
-        for (int column = 0; column < numColumns; ++column) {
+    for (auto row = 0; row < numRows; ++row) {
+        for (auto column = 0; column < numColumns; ++column) {
             auto destination_column = finalPositions[row][column];
             auto hasEdge = edge(column, destination_column + offset, g).second;
             if (!hasEdge) {
@@ -53,12 +53,12 @@ static void returnNewSwap(std::vector<Match> &matchings, int numRows, int numCol
 
     // Find perfect matching, remove those edges from the graph
     // and do it again:
-    for (int i = 0; i < numRows; ++i) {
+    for (auto i = 0; i < numRows; ++i) {
         Match mate(numColumns * 2);
         edmonds_maximum_cardinality_matching(g, &mate[0]);
         matchings[i] = mate;
         // Remove all edges of the current perfect matching
-        for (int node = 0; node < numColumns; ++node) {
+        for (auto node = 0; node < numColumns; ++node) {
             auto looper = mate[node];
             auto idx = looper;
             if (track[node][idx] == 1) {
@@ -71,10 +71,10 @@ static void returnNewSwap(std::vector<Match> &matchings, int numRows, int numCol
 }
 
 static void jsArrayToPositions(Local<Array> &array, PositionGrid &grid) {
-    for (int j = 0; j < array->Length(); ++j) {
+    for (uint32_t j = 0; j < array->Length(); ++j) {
         auto alooper = Local<Array>::Cast(array->Get(j));
         PositionVector vec(alooper->Length());
-        for (int k = 0; k < alooper->Length(); ++k) {
+        for (uint32_t k = 0; k < alooper->Length(); ++k) {
             vec[k] = alooper->Get(k)->Int32Value();
         }
         grid[j] = vec;
@@ -82,10 +82,10 @@ static void jsArrayToPositions(Local<Array> &array, PositionGrid &grid) {
 }
 
 static void matchingsToJS(Isolate *isolate, int size, std::vector<Match> &mathings, Local<Array> &array) {
-    for (int j = 0; j < mathings.size(); ++j) {
+    for (size_t j = 0; j < mathings.size(); ++j) {
         auto mLooper = mathings[j];
         auto dict = Object::New(isolate);
-        for (int k = 0; k < size; ++k) {
+        for (auto k = 0; k < size; ++k) {
             dict->Set(k, v8::Integer::New(isolate, mLooper[k]));
         }
 

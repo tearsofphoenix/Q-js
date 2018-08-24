@@ -7,7 +7,7 @@ using MatrixType = std::vector<Simulator::StateVector>;
 
 std::ostream& operator<<(std::ostream &os, Simulator::StateVector &vec) {
     os << "[";
-    for (int i = 0; i < vec.size(); ++i) {
+    for (size_t i = 0; i < vec.size(); ++i) {
         auto item = vec[i];
         os << "(" << item.real() << ", " << item.imag() << ") ";
     }
@@ -17,7 +17,7 @@ std::ostream& operator<<(std::ostream &os, Simulator::StateVector &vec) {
 
 std::ostream& operator<<(std::ostream &os, MatrixType &matrix) {
     os << "[";
-    for (int i = 0; i < matrix.size(); ++i) {
+    for (size_t i = 0; i < matrix.size(); ++i) {
         auto state = matrix[i];
         os << state;
     }
@@ -27,7 +27,7 @@ std::ostream& operator<<(std::ostream &os, MatrixType &matrix) {
 
 std::ostream& operator<<(std::ostream &os, Simulator::Term &term) {
     os << "[";
-    for (int i = 0; i < term.size(); ++i) {
+    for (size_t i = 0; i < term.size(); ++i) {
         auto item = term[i];
         os << "(" << item.first << ", " << item.second << ")";
     }
@@ -38,7 +38,7 @@ std::ostream& operator<<(std::ostream &os, Simulator::Term &term) {
 
 std::ostream& operator<<(std::ostream &os, Simulator::TermsDict &termsDict) {
     os << "[";
-    for (int i = 0; i < termsDict.size(); ++i) {
+    for (size_t i = 0; i < termsDict.size(); ++i) {
         auto pair = termsDict[i];
         os << pair.first << pair.second << std::endl;
     }
@@ -48,7 +48,7 @@ std::ostream& operator<<(std::ostream &os, Simulator::TermsDict &termsDict) {
 
 std::ostream& operator<<(std::ostream &os, Simulator::ComplexTermsDict &termsDict) {
     os << "[";
-    for (int i = 0; i < termsDict.size(); ++i) {
+    for (size_t i = 0; i < termsDict.size(); ++i) {
         auto pair = termsDict[i];
         os << pair.first << "(" << pair.second.real() << ", " << pair.second.imag() << "i)" << std::endl;
     }
@@ -59,7 +59,7 @@ std::ostream& operator<<(std::ostream &os, Simulator::ComplexTermsDict &termsDic
 
 std::ostream& operator<<(std::ostream &os, std::vector<bool> &vec) {
     os << "[";
-    for (int i = 0; i < vec.size(); ++i) {
+    for (size_t i = 0; i < vec.size(); ++i) {
         auto item = vec[i];
         os << item << " ";
     }
@@ -69,7 +69,7 @@ std::ostream& operator<<(std::ostream &os, std::vector<bool> &vec) {
 
 std::ostream& operator<<(std::ostream &os, std::vector<unsigned int> &vec) {
     os << "[";
-    for (int i = 0; i < vec.size(); ++i) {
+    for (size_t i = 0; i < vec.size(); ++i) {
         auto item = vec[i];
         os << item << " ";
     }
@@ -79,7 +79,7 @@ std::ostream& operator<<(std::ostream &os, std::vector<unsigned int> &vec) {
 
 std::ostream& operator<<(std::ostream &os, QuRegs &vec) {
     os << "[";
-    for (int i = 0; i < vec.size(); ++i) {
+    for (size_t i = 0; i < vec.size(); ++i) {
         auto item = vec[i];
         os << item << " ";
     }
@@ -139,7 +139,7 @@ void Wrapper::Init(v8::Local<v8::Object> exports) {
 void Wrapper::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (info.IsConstructCall()) {
         // Invoked as constructor: `new MyObject(...)`
-        int value = info[0]->IsUndefined() ? 0 : info[0]->NumberValue();
+        auto value = info[0]->IsUndefined() ? 0 : info[0]->NumberValue();
         Wrapper* obj = new Wrapper(value);
         obj->Wrap(info.This());
         info.GetReturnValue().Set(info.This());
@@ -229,7 +229,7 @@ void Wrapper::isClassical(const Nan::FunctionCallbackInfo<v8::Value> &info) {
 
 template <typename T, typename V>
 void jsToArray(Local<Array> &jsArray, V &ids) {
-    for (unsigned int i = 0; i < jsArray->Length(); i++) {
+    for (uint32_t i = 0; i < jsArray->Length(); i++) {
         Handle<Value> val = jsArray->Get(i);
         T numVal = val->Int32Value();
         ids.push_back(numVal);
@@ -238,22 +238,22 @@ void jsToArray(Local<Array> &jsArray, V &ids) {
 
 template <typename T>
 void arrayToJS(Isolate* isolate, Local<Array> &ret, T &result) {
-    for (int i = 0; i < result.size(); ++i) {
+    for (size_t i = 0; i < result.size(); ++i) {
         ret->Set(i, Number::New(isolate, result[i]));
     }
 }
 
-void jsToTermDictionary(Local<Array> &terms, Simulator::TermsDict &dict) {
-    for (int i = 0; i < terms->Length(); ++i) {
+void jsToTermDictionary(Isolate *isolate, Local<Array> &terms, Simulator::TermsDict &dict) {
+    for (uint32_t i = 0; i < terms->Length(); ++i) {
         Local<Value> v = terms->Get(i);
         Local<Array> pair = Local<Array>::Cast(v);
 
         auto a = Local<Array>::Cast(pair->Get(0));
         Simulator::Term t;
-        for (int j = 0; j < a->Length(); ++j) {
+        for (uint32_t j = 0; j < a->Length(); ++j) {
             auto aLooper = Local<Array>::Cast(a->Get(j));
             auto gate = aLooper->Get(1)->ToString();
-            String::Utf8Value value(gate);
+            String::Utf8Value value(isolate, gate);
             auto c = (*value)[0];
             t.push_back(std::make_pair((unsigned)aLooper->Get(0)->Uint32Value(), c));
         }
@@ -265,16 +265,16 @@ void jsToComplexTermDictionary(Isolate *isolate, Local<Array> &terms, Simulator:
     auto re = String::NewFromUtf8(isolate, "re");
     auto im = String::NewFromUtf8(isolate, "im");
 
-    for (int i = 0; i < terms->Length(); ++i) {
+    for (uint32_t i = 0; i < terms->Length(); ++i) {
         Local<Value> v = terms->Get(i);
         Local<Array> pair = Local<Array>::Cast(v);
 
         auto a = Local<Array>::Cast(pair->Get(0));
         Simulator::Term t;
-        for (int j = 0; j < a->Length(); ++j) {
+        for (uint32_t j = 0; j < a->Length(); ++j) {
             auto aLooper = Local<Array>::Cast(a->Get(j));
             auto g = aLooper->Get(1)->ToString();
-            String::Utf8Value value(g);
+            String::Utf8Value value(isolate, g);
             t.push_back(std::make_pair((unsigned)aLooper->Get(0)->Uint32Value(), (*value)[0]));
         }
 
@@ -295,7 +295,7 @@ void jsToStateVector(Isolate *iso, Local<Array> &array, Simulator::StateVector &
     auto re = String::NewFromUtf8(iso, "re");
     auto im = String::NewFromUtf8(iso, "im");
 
-    for (int i = 0; i < array->Length(); ++i) {
+    for (uint32_t i = 0; i < array->Length(); ++i) {
         Local<Value> v = array->Get(i);
 
         if (v->IsNumber()) {
@@ -324,7 +324,7 @@ void stateVectorToJS(Isolate* isolate, Simulator::StateVector &vec, Local<Array>
     auto re = String::NewFromUtf8(isolate, "re");
     auto im = String::NewFromUtf8(isolate, "im");
 
-    for (int i = 0; i < vec.size(); ++i) {
+    for (size_t i = 0; i < vec.size(); ++i) {
         auto value = vec[i];
 
         Local<Object> obj = Object::New(isolate);
@@ -363,7 +363,7 @@ void Wrapper::measureQubits(const Nan::FunctionCallbackInfo<v8::Value> &info) {
 }
 
 void jsToMatrix(Isolate *iso, Local<Array> &array, MatrixType &m) {
-    for (int i = 0; i < array->Length(); ++i) {
+    for (uint32_t i = 0; i < array->Length(); ++i) {
         auto aLooper = Local<Array>::Cast(array->Get(i));
         Simulator::StateVector vector;
         jsToStateVector(iso, aLooper, vector);
@@ -416,7 +416,7 @@ void Wrapper::emulateMath(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     };
     v8::Local<v8::Array> quregArray = v8::Local<v8::Array>::Cast(info[1]);
     QuRegs regs(quregArray->Length());
-    for (int i = 0; i < quregArray->Length(); ++i) {
+    for (uint32_t i = 0; i < quregArray->Length(); ++i) {
         Local<Value> val = quregArray->Get(i);
         Local<Array> qr = Local<Array>::Cast(val);
         std::vector<unsigned int> item;
@@ -440,9 +440,10 @@ void Wrapper::emulateMath(const Nan::FunctionCallbackInfo<v8::Value> &info) {
 
 void Wrapper::getExpectationValue(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
+    auto isolate = info.GetIsolate();
     Local<Array> terms = Local<Array>::Cast(info[0]);
     Simulator::TermsDict termsDict;
-    jsToTermDictionary(terms, termsDict);
+    jsToTermDictionary(isolate, terms, termsDict);
 
     Local<Array> a2 = Local<Array>::Cast(info[1]);
     std::vector<unsigned int> ids;
@@ -485,13 +486,14 @@ void Wrapper::applyQubitOperator(const Nan::FunctionCallbackInfo<v8::Value> &inf
 
 void Wrapper::emulateTimeEvolution(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
+    auto isolate = info.GetIsolate();
 
     auto a1 = Local<Array>::Cast(info[0]);
     auto a2 = info[1]->NumberValue();
     auto a3 = Local<Array>::Cast(info[2]);
     auto a4 = Local<Array>::Cast(info[3]);
     Simulator::TermsDict tdict;
-    jsToTermDictionary(a1, tdict);
+    jsToTermDictionary(isolate, a1, tdict);
     Simulator::calc_type time = a2;
     std::vector<unsigned int> ids;
     jsToArray<unsigned int>(a3, ids);

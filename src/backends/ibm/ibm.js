@@ -339,7 +339,6 @@ data / ask for username & password.
       })
       this._reset()
     } catch (e) {
-      console.log(347, e)
       throw new Error('Failed to run the circuit. Aborting.')
     }
   }
