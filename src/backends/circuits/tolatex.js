@@ -353,7 +353,7 @@ circuit.
       }
       const pos = maxOfDecimals(tmp)
       for (let l = min; l < max + 1; ++l) {
-        this.pos[l] = pos.add(this._gate_offset(gate))
+        this.pos[l] = pos.add(this._gate_pre_offset(gate))
       }
 
       let connections = ''
@@ -451,8 +451,9 @@ circuit.
     let name
     if (gate.texString) {
       name = gate.texString()
+    } else {
+      name = gate.toString()
     }
-    name = gate.toString()
     return name
   }
 
@@ -651,11 +652,19 @@ circuit.
    */
   _gate_pre_offset(gate) {
     if (gate instanceof DaggeredGate) {
-      gate = gate._gate
+      gate = gate.gate
     }
 
     const {gates} = this.settings
-    return gates[gate.constructor.name].pre_offset || this._gate_offset(gate)
+    const config = gates[gate.constructor.name]
+    let result
+    if (config) {
+      result = config.pre_offset
+    }
+    if (typeof result === 'undefined') {
+      result = this._gate_offset(gate)
+    }
+    return result
   }
 
   /**
@@ -759,7 +768,7 @@ are connected on the given line.
       const line_sep = this.settings.lines.double_lines_sep
       const shift1 = `${shift}${line_sep / 2.0}cm`
       const shift2 = `${shift}${-line_sep / 2.0}cm`
-      let edges_str = `\n\\draw ([${shift1}]${op1}.${loc1}) edge[edgestyle] ([${shift2}]${op2}.${loc2});`
+      let edges_str = `\n\\draw ([${shift1}]${op1}.${loc1}) edge[edgestyle] ([${shift1}]${op2}.${loc2});`
       edges_str += `\n\\draw ([${shift2}]${op1}.${loc1}) edge[edgestyle] ([${shift2}]${op2}.${loc2});`
       return edges_str
     }

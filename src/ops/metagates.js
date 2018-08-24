@@ -99,9 +99,9 @@ export class DaggeredGate extends BasicGate {
 
   texString() {
     if (this.gate.texString) {
-      return `$${this.gate.texString()}^\\dagger$`
+      return `${this.gate.texString()}\${}^\\dagger$`
     } else {
-      return `$${this.gate.toString()}^\\dagger$`
+      return `${this.gate.toString()}\${}^\\dagger$`
     }
   }
 }
