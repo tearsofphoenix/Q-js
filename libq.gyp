@@ -22,7 +22,7 @@
       '-fexceptions',
       '-frtti',
     ],
-    'include_dirs': [ 'backends/simulators/cppkernels', 'node_modules/nan' ],
+    'include_dirs': [ 'src/backends/simulators/cppkernels', '<!(node -e "require(\'nan\')")' ],
     'direct_dependent_settings': {
       'include_dirs': [ 'backends/simulators/cppkernels' ],
     },

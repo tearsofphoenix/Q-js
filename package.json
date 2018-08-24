@@ -1,6 +1,6 @@
 {
   "name": "projectq",
-  "version": "0.1.6",
+  "version": "0.1.14",
   "libq": "0.1.1",
   "private": false,
   "license": "Apache",
@@ -8,11 +8,12 @@
   "main": "./dist/index.js",
   "scripts": {
     "install": "node scripts/install.js",
+    "postinstall": "node scripts/build.js",
     "cover": "cross-env NODE_ENV=test nyc mocha --recursive ./test",
     "test": "mocha --require babel-register --require babel-polyfill --recursive ./test",
     "build": "node scripts/build.js --force",
     "doc": "./node_modules/.bin/esdoc",
-    "prepublish": "rimraf dist/* && babel ./src -d ./dist"
+    "prepublishOnly": "rimraf dist/* && babel ./src -d ./dist"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -56,6 +57,7 @@
   "files": [
     "dist/",
     "scripts/",
+    "src/backends/simulators/cppkernels/",
     "binding.gyp",
     "libq.gyp",
     ".babelrc",

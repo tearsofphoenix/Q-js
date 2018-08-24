@@ -1,0 +1,10 @@
+src/backends/simulators/cppkernels/cmake-build-debug/
+src/backends/simulators/cppkernels/.idea/
+.nyc_output
+coverage
+out
+docs/es
+*.log
+*.node
+settings.json
+log.txt
