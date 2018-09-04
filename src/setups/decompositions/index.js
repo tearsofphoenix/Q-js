@@ -27,6 +27,7 @@ import qft2crandhadamard from './qft2crandhadamard'
 import r2rzandph from './r2rzandph'
 import rx2rz from './rx2rz'
 import ry2rz from './ry2rz'
+import sqrtswap2cnot from './sqrtswap2cnot'
 import swap2cnot from './swap2cnot'
 import timeevolution from './time_evolution'
 
@@ -44,6 +45,7 @@ export default [
   ...r2rzandph,
   ...rx2rz,
   ...ry2rz,
+  ...sqrtswap2cnot,
   ...swap2cnot,
   ...timeevolution,
   ...toffoli2cnotandtgate

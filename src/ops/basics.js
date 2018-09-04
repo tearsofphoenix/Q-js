@@ -37,8 +37,8 @@ import Command from './command'
 import {arrayIsTuple, ObjectCopy} from '../libs/util'
 import {NotMergeable} from '../meta/error'
 
-const ANGLE_PRECISION = 12
-const ANGLE_TOLERANCE = 10 ** -ANGLE_PRECISION
+export const ANGLE_PRECISION = 12
+export const ANGLE_TOLERANCE = 10 ** -ANGLE_PRECISION
 
 /**
  * @abstract

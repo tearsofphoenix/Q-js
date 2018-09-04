@@ -43,3 +43,7 @@ export Gates from './gates'
 export {
   All, ControlledGate, DaggeredGate, C, Tensor
 } from './metagates'
+
+export StatePreparation from './statepreparation'
+
+export {UniformlyControlledRy, UniformlyControlledRz} from './uniformly_controlled_rotation'

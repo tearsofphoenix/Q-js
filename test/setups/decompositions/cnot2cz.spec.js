@@ -98,7 +98,6 @@ describe('cnot2cz test', () => {
         if (binary_state.length < 2) {
           binary_state = `0${binary_state}`
         }
-        console.log(binary_state)
         const test = test_sim.getAmplitude(binary_state, test_qb.concat(test_ctrl_qb))
         const correct = correct_sim.getAmplitude(binary_state, correct_qb.concat(correct_ctrl_qb))
 
