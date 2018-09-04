@@ -17,20 +17,20 @@
 import {expect} from 'chai'
 import math from 'mathjs'
 
-import {getInverse} from '../src/ops/_cycle';
+import {getInverse} from './src/ops/_cycle';
 import {
   BasicMathGate, QFT, Swap, Measure, All, H, X
-} from '../src/ops';
+} from './src/ops/index';
 import {
   DecompositionRuleSet, MainEngine, AutoReplacer,
   DummyEngine, InstructionFilter, TagRemover, LocalOptimizer
-} from '../src/cengines'
-import {MultiplyByConstantModN} from '../src/libs/math/gates'
-import {Control} from '../src/meta'
-import Simulator from '../src/backends/simulators/simulator'
-import decompositions from '../src/setups/decompositions'
-import mathrules from '../src/libs/math/defaultrules'
-import {expmod} from '../src/libs/polyfill'
+} from './src/cengines/index'
+import {MultiplyByConstantModN} from './src/libs/math/gates'
+import {Control} from './src/meta/index'
+import Simulator from './src/backends/simulators/simulator'
+import decompositions from './src/setups/decompositions/index'
+import mathrules from './src/libs/math/defaultrules'
+import {expmod} from './src/libs/polyfill'
 
 describe('test', () => {
   const rule_set = new DecompositionRuleSet([...mathrules, ...decompositions])

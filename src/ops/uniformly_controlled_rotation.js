@@ -1,7 +1,26 @@
 import math from 'mathjs'
 import deepEqual from 'deep-eql'
 import {BasicGate, ANGLE_PRECISION, ANGLE_TOLERANCE} from './basics'
-import {NotMergeable} from "../meta/error";
+import {NotMergeable} from '../meta/error'
+
+/**
+ * @param {number[]} angles
+ * @return {number[]}
+ */
+function roundAngles(angles) {
+  const rounded_angles = []
+  angles.forEach((angle) => {
+    let newAngle = math.round(angle % (4 * math.pi), ANGLE_PRECISION)
+    if (newAngle > 4 * math.pi - ANGLE_TOLERANCE) {
+      newAngle = 0
+    }
+    if (Object.is(newAngle, -0)) {
+      newAngle = 0
+    }
+    rounded_angles.push(newAngle)
+  })
+  return rounded_angles
+}
 
 /**
  * Uniformly controlled Ry gate as introduced in arXiv:quant-ph/0312218.
@@ -34,18 +53,11 @@ import {NotMergeable} from "../meta/error";
 export class UniformlyControlledRy extends BasicGate {
   /**
    * @constructor
+   * @param {number[]} angles
    */
   constructor(angles) {
     super()
-    const rounded_angles = []
-    angles.forEach(angle => {
-      let newAngle = math.round(angle % (4 * math.pi), ANGLE_PRECISION)
-      if (newAngle > 4 * math.pi - ANGLE_TOLERANCE) {
-        newAngle = 0
-      }
-      rounded_angles.push(newAngle)
-    })
-    this.angles = rounded_angles
+    this.angles = roundAngles(angles)
   }
 
   getInverse() {
@@ -105,18 +117,11 @@ export class UniformlyControlledRy extends BasicGate {
 export class UniformlyControlledRz extends BasicGate {
   /**
    * @constructor
+   * @param {number[]} angles
    */
   constructor(angles) {
     super()
-    const rounded_angles = []
-    angles.forEach(angle => {
-      let newAngle = math.round(angle % (4 * math.pi), ANGLE_PRECISION)
-      if (newAngle > 4 * math.pi - ANGLE_TOLERANCE) {
-        newAngle = 0
-      }
-      rounded_angles.push(newAngle)
-    })
-    this.angles = rounded_angles
+    this.angles = roundAngles(angles)
   }
 
   getInverse() {

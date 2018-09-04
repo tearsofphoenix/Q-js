@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {DecompositionRule} from '../../cengines'
+import DecompositionRule from '../../cengines/replacer/decompositionrule'
 import {CNOT, SqrtSwapGate, SqrtX} from '../../ops'
 import {len} from '../../libs/polyfill'
 import {Compute, Control, Uncompute} from '../../meta'
