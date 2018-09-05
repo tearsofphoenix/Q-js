@@ -118,10 +118,10 @@ export class BasicQubit {
  */
 export class Qubit extends BasicQubit {
   deallocate() {
-    // # If a user directly calls this function, then the qubit gets id == -1
-    // # but stays in active_qubits as it is not yet deleted, hence remove
-    // # it manually (if the garbage collector calls this function, then the
-    // # WeakRef in active qubits is already gone):
+    // If a user directly calls this function, then the qubit gets id == -1
+    // but stays in active_qubits as it is not yet deleted, hence remove
+    // it manually (if the garbage collector calls this function, then the
+    // WeakRef in active qubits is already gone):
     if (this.id === -1) {
       return
     }

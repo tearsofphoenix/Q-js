@@ -162,7 +162,8 @@ describe('tolatex test', () => {
     const settings = ToLatex.get_default_settings()
     settings.gates.AllocateQubitGate.draw_id = true
     const code = ToLatex._body(circuit_lines, settings)
-    console.log(code)
+    const c = ToLatex.toLatex(circuit_lines)
+    console.log(c)
     // swap draws 2 nodes + 2 lines each, so is sqrtswap gate, csqrtswap,
     // inv(sqrt_swap), and cswap.
     expect(code.count('swapstyle')).to.equal(36)
