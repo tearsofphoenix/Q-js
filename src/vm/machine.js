@@ -1,21 +1,27 @@
-import Simulator from '../backends/simulators/simulator'
+import Library from './library'
 
 import {
   OP_DECL_CREG,
   OP_DECL_GATE,
-  OP_DECL_OPAQUE,
+  OP_OPAQUE,
   OP_DECL_QREG,
   OP_INCLUDE,
   OP_VERSION,
   OP_U,
   OP_CX,
   OP_BARRIER,
-  OP_Reset,
-  OP_Measure, OP_Gate_OP, OP_TEST
-} from './operations'
+  OP_RESET,
+  OP_MEASURE, OP_GATE_OP, OP_TEST
+} from 'qasm/src/opcode'
+
+import parse from 'qasm/src/parser'
+import Simulator from '../backends/simulators/simulator'
+
 import qelib from './qelib'
 import MainEngine from '../cengines/main'
-import {All, Barrier, Measure, X} from '../ops'
+import {
+  All, Barrier, Measure, X
+} from '../ops'
 
 class Gate {
   constructor(name, params, qargs, body) {
@@ -36,17 +42,17 @@ class Gate {
 export default class Machine {
   constructor() {
     this.ops = []
-    this.libraries = {}
+    this.libraries = []
     this.currentContext = {}
     this.simulator = new Simulator()
     this.engine = new MainEngine(this.simulator)
     this.stack = []
     this.result = null
-    this.preloadLibraries()
+    this._init()
   }
 
-  preloadLibraries() {
-    this.libraries.qelib = qelib
+  _init() {
+    Library.addSearchPath(__dirname)
   }
 
   resolve(name) {
@@ -61,24 +67,21 @@ export default class Machine {
 
   tryInjectVariable(name, value) {
     if (this.isInCurrentContext(name)) {
-      throw new Error(`already have same variable in current context: ${name} ${ret}`)
+      throw new Error(`already have same variable in current context: ${name} ${value}`)
     }
     this.currentContext[name] = value
   }
 
-  loadLibraryToCurrentContext(op) {
+  loadLibrary(op) {
     const {args} = op
-    if (args.length === 1) {
-      const libraryName = args[0]
-      const lib = this.libraries[libraryName]
-      if (lib) {
-        Object.keys(lib).forEach(key => this.tryInjectVariable(key, lib[key]))
-      } else {
-        throw new Error('library not found!')
-      }
-    } else {
-      throw new Error('bad operation!')
+    const library = new Library(args[0])
+    const idx = this.libraries.findIndex(looper => looper.path === library.path)
+    if (idx !== -1) {
+      throw new Error('fail to duplicate load library!')
     }
+
+    library.load(this)
+    this.libraries.push(library)
   }
 
   defineGate(op) {
@@ -98,12 +101,8 @@ export default class Machine {
 
   defineCReg(op) {
     const [name, size] = op.args
-    if (this.isInCurrentContext(name)) {
-      throw new Error(`fail to duplicate declear same cureg ${name} ${size}`)
-    } else {
-      const creg = new Array(size)
-      this.tryInjectVariable(name, creg)
-    }
+    const creg = new Array(size)
+    this.tryInjectVariable(name, creg)
   }
 
   _runExpression(args) {
@@ -155,7 +154,7 @@ export default class Machine {
     let sum = 0
     creg.forEach(v => sum += v)
     if (sum === target) {
-      qops.forEach((opLooper) => this.execute(opLooper))
+      qops.forEach(opLooper => this.execute(opLooper))
     }
   }
 
@@ -172,7 +171,7 @@ export default class Machine {
         break
       }
       case OP_INCLUDE: {
-        this.loadLibraryToCurrentContext(op)
+        this.loadLibrary(op)
         break
       }
       case OP_DECL_GATE: {
@@ -187,7 +186,7 @@ export default class Machine {
         this.defineCReg(op)
         break
       }
-      case OP_DECL_OPAQUE: {
+      case OP_OPAQUE: {
         // TODO
         break
       }
@@ -200,15 +199,15 @@ export default class Machine {
         this.barrier(op)
         break
       }
-      case OP_Reset: {
+      case OP_RESET: {
         this.reset(op)
         break
       }
-      case OP_Measure: {
+      case OP_MEASURE: {
         this.measure(op)
         break
       }
-      case OP_Gate_OP: {
+      case OP_GATE_OP: {
         this.applyGate(op)
         break
       }
@@ -219,6 +218,17 @@ export default class Machine {
       default: {
         throw new Error(`unsupported operation ${op.code}`)
       }
+    }
+  }
+
+  /**
+   * @param {string} sourceCode
+   */
+  run(sourceCode) {
+    const result = parse(sourceCode)
+    const {value} = result
+    if (value && value.length > 0) {
+      value.forEach(op => this.execute(op))
     }
   }
 }
