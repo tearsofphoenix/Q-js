@@ -1,11 +1,12 @@
 import {expect} from 'chai'
 import path from 'path'
 import fs from 'fs'
-import {
-  OP_DECL_CREG, OP_DECL_QREG, OP_GATE_OP, OP_INCLUDE, OP_MEASURE, OP_VERSION
-} from 'qasm/src/opcode'
-import {parse, printOperations, opToString} from 'qasm'
+import {parse, printOperations, opToString, OPCode} from 'qasm'
 import Machine from '../../src/vm/machine'
+
+const {
+  OP_DECL_CREG, OP_DECL_QREG, OP_GATE_OP, OP_INCLUDE, OP_MEASURE, OP_VERSION
+} = OPCode
 
 describe('machine test', () => {
   it('should execute version op', () => {
@@ -41,7 +42,7 @@ describe('machine test', () => {
       {code: OP_DECL_QREG, args: ['q', 5]},
       {code: OP_DECL_CREG, args: ['c', 5]},
       {code: OP_GATE_OP, args: ['x', 'q', '[', 0, ']']},
-      {code: OP_MEASURE, args: ['q', '->', 'c']}
+      {code: OP_MEASURE, args: ['q', 'c']}
     ]
     ops.forEach(op => vm.execute(op))
     expect(vm.result).to.deep.equal([true, false, false, false, false])

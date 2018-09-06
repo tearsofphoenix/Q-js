@@ -1,6 +1,16 @@
 import Library from './library'
 
+import * as qasm from 'qasm'
+
+import Simulator from '../backends/simulators/simulator'
+
+import MainEngine from '../cengines/main'
 import {
+  All, Barrier, Measure, X
+} from '../ops'
+
+const {OPCode, parse} = qasm
+const {
   OP_DECL_CREG,
   OP_DECL_GATE,
   OP_OPAQUE,
@@ -12,16 +22,7 @@ import {
   OP_BARRIER,
   OP_RESET,
   OP_MEASURE, OP_GATE_OP, OP_TEST
-} from 'qasm/src/opcode'
-
-import parse from 'qasm/src/parser'
-import Simulator from '../backends/simulators/simulator'
-
-import qelib from './qelib'
-import MainEngine from '../cengines/main'
-import {
-  All, Barrier, Measure, X
-} from '../ops'
+} = OPCode
 
 class Gate {
   constructor(name, params, qargs, body) {
@@ -138,7 +139,7 @@ export default class Machine {
   }
 
   measure(op) {
-    const [quregName, _, cregName] = op.args
+    const [quregName, cregName] = op.args
     const qureg = this.resolve(quregName)
     const creg = this.resolve(cregName)
     new All(Measure).or(qureg)
