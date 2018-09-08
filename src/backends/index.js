@@ -15,6 +15,16 @@
  * limitations under the License.
  */
 
+export CircuitDrawer from './circuits/drawer'
+
+export ToLatex from './circuits/tolatex'
+
+export IBMBackend from './ibm/ibm'
+
+export Simulator from './simulators/simulator'
+
+export ClassicalSimulator from './simulators/classicalsimulator'
+
 export CommandPrinter from './printer'
 
 export ResourceCounter from './resource'
