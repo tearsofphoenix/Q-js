@@ -71,38 +71,40 @@ static void returnNewSwap(std::vector<Match> &matchings, int numRows, int numCol
 }
 
 static void jsArrayToPositions(Local<Array> &array, PositionGrid &grid) {
+    auto ctx = Nan::GetCurrentContext();
     for (uint32_t j = 0; j < array->Length(); ++j) {
-        auto alooper = Local<Array>::Cast(array->Get(j));
+        auto alooper = Local<Array>::Cast(array->Get(ctx, j).ToLocalChecked());
         PositionVector vec(alooper->Length());
         for (uint32_t k = 0; k < alooper->Length(); ++k) {
-            vec[k] = alooper->Get(k)->Int32Value();
+            vec[k] = alooper->Get(ctx, k).ToLocalChecked()->Int32Value(ctx).FromJust();
         }
         grid[j] = vec;
     }
 }
 
 static void matchingsToJS(Isolate *isolate, int size, std::vector<Match> &mathings, Local<Array> &array) {
+    auto ctx = isolate->GetCurrentContext();
     for (size_t j = 0; j < mathings.size(); ++j) {
         auto mLooper = mathings[j];
         auto dict = Object::New(isolate);
         for (auto k = 0; k < size; ++k) {
-            dict->Set(k, v8::Integer::New(isolate, mLooper[k]));
+            dict->Set(ctx, k, v8::Integer::New(isolate, mLooper[k]));
         }
 
-        array->Set(j, dict);
+        array->Set(ctx, j, dict);
     }
 }
 
 static void returnNewSwapWrapper(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-
     if (info.Length() < 2) {
         Nan::ThrowTypeError("Wrong number of arguments");
         return;
     }
 
     auto isolate = info.GetIsolate();
-    auto row = info[0]->Int32Value();
-    auto column = info[1]->Int32Value();
+    auto ctx = isolate->GetCurrentContext();
+    auto row = info[0]->Int32Value(ctx).FromJust();
+    auto column = info[1]->Int32Value(ctx).FromJust();
     auto array = Local<Array>::Cast(info[2]);
     PositionGrid grid(array->Length());
 
@@ -118,6 +120,7 @@ static void returnNewSwapWrapper(const Nan::FunctionCallbackInfo<v8::Value>& inf
 }
 
 void twodMapperInit(v8::Local<v8::Object> exports) {
-    exports->Set(Nan::New("returnNewSwap").ToLocalChecked(),
-                 Nan::New<v8::FunctionTemplate>(returnNewSwapWrapper)->GetFunction());
+    auto ctx = Nan::GetCurrentContext();
+    exports->Set(ctx, Nan::New("returnNewSwap").ToLocalChecked(),
+                 Nan::New<v8::FunctionTemplate>(returnNewSwapWrapper)->GetFunction(ctx).ToLocalChecked());
 }

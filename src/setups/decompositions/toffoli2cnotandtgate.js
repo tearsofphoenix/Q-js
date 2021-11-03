@@ -2,8 +2,8 @@
 import {tuple} from '../../libs/util';
 import Gates, {H, NOT, T} from '../../ops/gates';
 import {CNOT} from '../../ops/shortcuts';
-;
 import DecompositionRule from '../../cengines/replacer/decompositionrule';
+
 
 const {Tdag} = Gates
 

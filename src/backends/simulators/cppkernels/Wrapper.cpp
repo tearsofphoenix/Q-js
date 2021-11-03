@@ -131,15 +131,18 @@ void Wrapper::Init(v8::Local<v8::Object> exports) {
     Nan::SetPrototypeMethod(tpl, "run", run);
     Nan::SetPrototypeMethod(tpl, "cheat", cheat);
 
-    constructor.Reset(tpl->GetFunction());
-    exports->Set(Nan::New("Simulator").ToLocalChecked(), tpl->GetFunction());
+    auto ctx = Nan::GetCurrentContext();
+    constructor.Reset(tpl->GetFunction(ctx).ToLocalChecked());
+    exports->Set(ctx, Nan::New("Simulator").ToLocalChecked(), tpl->GetFunction(ctx).ToLocalChecked());
 }
 
 
 void Wrapper::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    auto isolate = info.GetIsolate();
+    auto context = isolate->GetCurrentContext();
     if (info.IsConstructCall()) {
         // Invoked as constructor: `new MyObject(...)`
-        auto value = info[0]->IsUndefined() ? 0 : info[0]->NumberValue();
+        auto value = info[0]->IsUndefined() ? 0 : info[0]->NumberValue(context).FromJust();
         Wrapper* obj = new Wrapper(value);
         obj->Wrap(info.This());
         info.GetReturnValue().Set(info.This());
@@ -149,19 +152,18 @@ void Wrapper::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         v8::Local<v8::Value> argv[argc] = { info[0] };
         v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
         #if NODE_MAJOR_VERSION == 10
-        auto isolate = info.GetIsolate();
-        auto context = isolate->GetCurrentContext();
         auto result = cons->NewInstance(context, argc, argv).ToLocalChecked();
         info.GetReturnValue().Set(result);
         #else
-        info.GetReturnValue().Set(cons->NewInstance(argc, argv));
+        info.GetReturnValue().Set(cons->NewInstance(context, argc, argv).ToLocalChecked());
         #endif
     }
 }
 
 void Wrapper::allocateQubit(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    auto ctx = Nan::GetCurrentContext();
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
-    unsigned int id = info[0]->Uint32Value();
+    auto id = info[0]->Uint32Value(ctx).FromJust();
 
     try {
         obj->_simulator->allocate_qubit(id);
@@ -175,7 +177,8 @@ void Wrapper::allocateQubit(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
 void Wrapper::deallocateQubit(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
-    unsigned int id = info[0]->Uint32Value();
+    auto ctx = Nan::GetCurrentContext();
+    unsigned int id = info[0]->Uint32Value(ctx).FromJust();
 
     try {
         obj->_simulator->deallocate_qubit(id);
@@ -191,9 +194,10 @@ void Wrapper::deallocateQubit(const Nan::FunctionCallbackInfo<v8::Value> &info) 
 }
 
 void Wrapper::getClassicalValue(const Nan::FunctionCallbackInfo<v8::Value> &info) {
+    auto ctx = Nan::GetCurrentContext();
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
-    unsigned int id = info[0]->Uint32Value();
-    double calc = info[1]->NumberValue();
+    unsigned int id = info[0]->Uint32Value(ctx).FromJust();
+    double calc = info[1]->NumberValue(ctx).FromJust();
 
     try {
         bool result = obj->_simulator->get_classical_value(id, calc);
@@ -210,9 +214,10 @@ void Wrapper::getClassicalValue(const Nan::FunctionCallbackInfo<v8::Value> &info
 }
 
 void Wrapper::isClassical(const Nan::FunctionCallbackInfo<v8::Value> &info) {
+    auto ctx = Nan::GetCurrentContext();
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
-    unsigned int id = info[0]->Uint32Value();
-    double calc = info[1]->NumberValue();
+    unsigned int id = info[0]->Uint32Value(ctx).FromJust();
+    double calc = info[1]->NumberValue(ctx).FromJust();
     try {
         bool result = obj->_simulator->is_classical(id, calc);
         info.GetReturnValue().Set(result);
@@ -229,110 +234,121 @@ void Wrapper::isClassical(const Nan::FunctionCallbackInfo<v8::Value> &info) {
 
 template <typename T, typename V>
 void jsToArray(Local<Array> &jsArray, V &ids) {
+    auto ctx = Nan::GetCurrentContext();
     for (uint32_t i = 0; i < jsArray->Length(); i++) {
-        Handle<Value> val = jsArray->Get(i);
-        T numVal = val->Int32Value();
+        Local<Value> elem;
+        jsArray->Get(ctx, i).ToLocal(&elem);
+        T numVal = elem->Int32Value(ctx).FromJust();
         ids.push_back(numVal);
     }
 }
 
 template <typename T>
 void arrayToJS(Isolate* isolate, Local<Array> &ret, T &result) {
+    auto ctx = isolate->GetCurrentContext();
     for (size_t i = 0; i < result.size(); ++i) {
-        ret->Set(i, Number::New(isolate, result[i]));
+        ret->Set(ctx, i, Number::New(isolate, result[i]));
     }
 }
 
 void jsToTermDictionary(Isolate *isolate, Local<Array> &terms, Simulator::TermsDict &dict) {
+    auto ctx = isolate->GetCurrentContext();
     for (uint32_t i = 0; i < terms->Length(); ++i) {
-        Local<Value> v = terms->Get(i);
-        Local<Array> pair = Local<Array>::Cast(v);
+        Local<Value> v;
+        terms->Get(ctx, i).ToLocal(&v);
+        auto pair = Local<Array>::Cast(v);
 
-        auto a = Local<Array>::Cast(pair->Get(0));
+        auto a = Local<Array>::Cast(pair->Get(ctx, 0).ToLocalChecked());
         Simulator::Term t;
         for (uint32_t j = 0; j < a->Length(); ++j) {
-            auto aLooper = Local<Array>::Cast(a->Get(j));
-            auto gate = aLooper->Get(1)->ToString();
+            auto aLooper = Local<Array>::Cast(a->Get(ctx, j).ToLocalChecked());
+            auto gate = aLooper->Get(ctx, 1).ToLocalChecked()->ToString(ctx).ToLocalChecked();
             String::Utf8Value value(isolate, gate);
             auto c = (*value)[0];
-            t.push_back(std::make_pair((unsigned)aLooper->Get(0)->Uint32Value(), c));
+            t.push_back(std::make_pair((unsigned)aLooper->Get(ctx, 0).ToLocalChecked()->Uint32Value(ctx).FromJust(), c));
         }
-        dict.push_back(std::make_pair(t, pair->Get(1)->NumberValue()));
+        dict.push_back(std::make_pair(t, pair->Get(ctx, 1).ToLocalChecked()->NumberValue(ctx).FromJust()));
     }
 }
 
 void jsToComplexTermDictionary(Isolate *isolate, Local<Array> &terms, Simulator::ComplexTermsDict &dict) {
-    auto re = String::NewFromUtf8(isolate, "re");
-    auto im = String::NewFromUtf8(isolate, "im");
+    auto re = String::NewFromUtf8(isolate, "re").ToLocalChecked();
+    auto im = String::NewFromUtf8(isolate, "im").ToLocalChecked();
+    auto ctx = isolate->GetCurrentContext();
 
     for (uint32_t i = 0; i < terms->Length(); ++i) {
-        Local<Value> v = terms->Get(i);
+        auto v = terms->Get(ctx, i).ToLocalChecked();
         Local<Array> pair = Local<Array>::Cast(v);
 
-        auto a = Local<Array>::Cast(pair->Get(0));
+        auto a = Local<Array>::Cast(pair->Get(ctx, 0).ToLocalChecked());
         Simulator::Term t;
         for (uint32_t j = 0; j < a->Length(); ++j) {
-            auto aLooper = Local<Array>::Cast(a->Get(j));
-            auto g = aLooper->Get(1)->ToString();
+            auto aLooper = Local<Array>::Cast(a->Get(ctx, j).ToLocalChecked());
+            auto g = aLooper->Get(ctx, 1).ToLocalChecked()->ToString(ctx).ToLocalChecked();
             String::Utf8Value value(isolate, g);
-            t.push_back(std::make_pair((unsigned)aLooper->Get(0)->Uint32Value(), (*value)[0]));
+            t.push_back(std::make_pair((unsigned)aLooper->Get(ctx, 0).ToLocalChecked()->Uint32Value(ctx).FromJust(), (*value)[0]));
         }
 
-        auto coefficient = pair->Get(1);
+        Local<Value> coefficient;
+        pair->Get(ctx, 1).ToLocal(&coefficient);
         if (coefficient->IsNumber()) {
-            dict.push_back(std::make_pair(t, Simulator::complex_type(coefficient->NumberValue())));
+            dict.push_back(std::make_pair(t, Simulator::complex_type(coefficient->NumberValue(ctx).FromJust())));
         } else {
-            auto obj = coefficient->ToObject();
-            auto reValue = obj->Get(re);
-            auto imValue = obj->Get(im);
+            Local<Object> obj = coefficient->ToObject(ctx).ToLocalChecked();
+            auto reValue = obj->Get(ctx, re).ToLocalChecked();
+            auto imValue = obj->Get(ctx, im).ToLocalChecked();
 
-            dict.push_back(std::make_pair(t, Simulator::complex_type(reValue->NumberValue(), imValue->NumberValue())));
+            dict.push_back(std::make_pair(t, Simulator::complex_type(reValue->NumberValue(ctx).FromJust(), imValue->NumberValue(ctx).FromJust())));
         }
     }
 }
 
 void jsToStateVector(Isolate *iso, Local<Array> &array, Simulator::StateVector &vec) {
-    auto re = String::NewFromUtf8(iso, "re");
-    auto im = String::NewFromUtf8(iso, "im");
+    auto re = String::NewFromUtf8(iso, "re").ToLocalChecked();
+    auto im = String::NewFromUtf8(iso, "im").ToLocalChecked();
+    auto ctx = iso->GetCurrentContext();
 
     for (uint32_t i = 0; i < array->Length(); ++i) {
-        Local<Value> v = array->Get(i);
+        Local<Value> v;
+        array->Get(ctx, i).ToLocal(&v);
 
         if (v->IsNumber()) {
-            vec.push_back(Simulator::complex_type(v->NumberValue()));
+            vec.push_back(Simulator::complex_type(v->NumberValue(ctx).FromJust()));
         } else {
-            auto obj = v->ToObject();
-            auto reValue = obj->Get(re);
-            auto imValue = obj->Get(im);
-            vec.push_back(Simulator::complex_type(reValue->NumberValue(), imValue->NumberValue()));
+            auto obj = v->ToObject(ctx).ToLocalChecked();
+            auto reValue = obj->Get(ctx, re).ToLocalChecked();
+            auto imValue = obj->Get(ctx, im).ToLocalChecked();
+            vec.push_back(Simulator::complex_type(reValue->NumberValue(ctx).FromJust(), imValue->NumberValue(ctx).FromJust()));
         }
     }
 }
 
 void mapToJSObject(Isolate *isolate, Simulator::Map &map, Local<Object> &dict) {
+    auto ctx = isolate->GetCurrentContext();
     for (auto i = map.begin(); i != map.end(); ++i) {
         auto key = i->first;
         auto value = i->second;
         auto k1 = Number::New(isolate, key);
         auto v1 = Number::New(isolate, value);
 
-        dict->Set(k1, v1);
+        dict->Set(ctx, k1, v1);
     }
 }
 
 void stateVectorToJS(Isolate* isolate, Simulator::StateVector &vec, Local<Array> &array) {
     auto re = String::NewFromUtf8(isolate, "re");
     auto im = String::NewFromUtf8(isolate, "im");
+    auto ctx = isolate->GetCurrentContext();
 
     for (size_t i = 0; i < vec.size(); ++i) {
         auto value = vec[i];
 
-        Local<Object> obj = Object::New(isolate);
+        auto obj = Object::New(isolate);
         auto reValue = Number::New(isolate, value.real());
         auto imValue = Number::New(isolate, value.imag());
-        obj->Set(re, reValue);
-        obj->Set(im, imValue);
-        array->Set(i, obj);
+        obj->Set(ctx, re.ToLocalChecked(), reValue);
+        obj->Set(ctx, im.ToLocalChecked(), imValue);
+        array->Set(ctx, i, obj);
     }
 }
 
@@ -363,8 +379,9 @@ void Wrapper::measureQubits(const Nan::FunctionCallbackInfo<v8::Value> &info) {
 }
 
 void jsToMatrix(Isolate *iso, Local<Array> &array, MatrixType &m) {
+    auto ctx = iso->GetCurrentContext();
     for (uint32_t i = 0; i < array->Length(); ++i) {
-        auto aLooper = Local<Array>::Cast(array->Get(i));
+        auto aLooper = Local<Array>::Cast(array->Get(ctx, i).ToLocalChecked());
         Simulator::StateVector vector;
         jsToStateVector(iso, aLooper, vector);
         m.push_back(vector);
@@ -401,6 +418,7 @@ void Wrapper::emulateMath(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Local<Function> cbFunc = Local<Function>::Cast(info[0]);
     Nan::Callback cb(cbFunc);
     auto isolate = info.GetIsolate();
+    auto ctx = isolate->GetCurrentContext();
 
     auto f = [&](std::vector<int>& x) {
         const int argc = 1;
@@ -417,8 +435,8 @@ void Wrapper::emulateMath(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     v8::Local<v8::Array> quregArray = v8::Local<v8::Array>::Cast(info[1]);
     QuRegs regs(quregArray->Length());
     for (uint32_t i = 0; i < quregArray->Length(); ++i) {
-        Local<Value> val = quregArray->Get(i);
-        Local<Array> qr = Local<Array>::Cast(val);
+        auto val = quregArray->Get(ctx, i).ToLocalChecked();
+        auto qr = Local<Array>::Cast(val);
         std::vector<unsigned int> item;
         jsToArray<unsigned int>(qr, item);
         regs.push_back(item);
@@ -487,9 +505,10 @@ void Wrapper::applyQubitOperator(const Nan::FunctionCallbackInfo<v8::Value> &inf
 void Wrapper::emulateTimeEvolution(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
     auto isolate = info.GetIsolate();
+    auto ctx = isolate->GetCurrentContext();
 
     auto a1 = Local<Array>::Cast(info[0]);
-    auto a2 = info[1]->NumberValue();
+    auto a2 = info[1]->NumberValue(ctx).FromJust();
     auto a3 = Local<Array>::Cast(info[2]);
     auto a4 = Local<Array>::Cast(info[3]);
     Simulator::TermsDict tdict;
@@ -536,6 +555,8 @@ void Wrapper::getProbability(const Nan::FunctionCallbackInfo<v8::Value> &info) {
 
 void Wrapper::getAmplitude(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     auto isolate = info.GetIsolate();
+    auto ctx = isolate->GetCurrentContext();
+
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
     Local<Array> i1 = Local<Array>::Cast(info[0]);
     std::vector<bool> bitString;
@@ -552,8 +573,8 @@ void Wrapper::getAmplitude(const Nan::FunctionCallbackInfo<v8::Value> &info) {
 //        info.GetReturnValue().Set(result.real());
 //    } else {
         Local<Object> ret = Object::New(isolate);
-        ret->Set(String::NewFromUtf8(isolate, "re"), Number::New(isolate, result.real()));
-        ret->Set(String::NewFromUtf8(isolate, "im"), Number::New(isolate, result.imag()));
+        ret->Set(ctx, String::NewFromUtf8(isolate, "re").ToLocalChecked(), Number::New(isolate, result.real()));
+        ret->Set(ctx, String::NewFromUtf8(isolate, "im").ToLocalChecked(), Number::New(isolate, result.imag()));
 
         info.GetReturnValue().Set(ret);
 //    }
@@ -625,6 +646,7 @@ void Wrapper::run(const Nan::FunctionCallbackInfo<v8::Value> &info) {
 
 void Wrapper::cheat(const Nan::FunctionCallbackInfo<v8::Value> &info) {
     auto isolate = info.GetIsolate();
+    auto ctx = isolate->GetCurrentContext();
 
     Wrapper* obj = ObjectWrap::Unwrap<Wrapper>(info.Holder());
 
@@ -641,8 +663,8 @@ void Wrapper::cheat(const Nan::FunctionCallbackInfo<v8::Value> &info) {
         stateVectorToJS(isolate, state, rs);
 
         auto ret = Array::New(isolate, 2);
-        ret->Set(0, rm);
-        ret->Set(1, rs);
+        ret->Set(ctx, 0, rm);
+        ret->Set(ctx, 1, rs);
 
         info.GetReturnValue().Set(ret);
 #if DEBUG

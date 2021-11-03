@@ -39,6 +39,7 @@
         'MACOSX_DEPLOYMENT_TARGET': '10.7'
       },
       'include_dirs': [
+        '/opt/homebrew/include',
         '<!(node -e "require(\'nan\')")',
         'D:/cygwin64/boost_1_68_0',
       ],

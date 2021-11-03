@@ -36,7 +36,7 @@ function afterBuild(options) {
         : 'Release',
     'binding.node');
 
-  mkdir(path.dirname(install), (err) => {
+  mkdir(path.dirname(install)).then((err) => {
     if (err && err.code !== 'EEXIST') {
       console.error(err.message);
       return;

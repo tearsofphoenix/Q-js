@@ -22,7 +22,11 @@
       '-fexceptions',
       '-frtti',
     ],
-    'include_dirs': [ 'src/backends/simulators/cppkernels', '<!(node -e "require(\'nan\')")' ],
+    'include_dirs': [ 
+      '/opt/homebrew/include',
+      'src/backends/simulators/cppkernels',
+      '<!(node -e "require(\'nan\')")' 
+    ],
     'direct_dependent_settings': {
       'include_dirs': [ 'backends/simulators/cppkernels' ],
     },
