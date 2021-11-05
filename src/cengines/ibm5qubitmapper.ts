@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-import {permutations} from 'itertools'
+import { permutations } from 'itertools'
 import BasicMapperEngine from './basicmapper'
 import { Allocate, FlushGate, NOT } from '../ops/gates'
 
 import IBMBackend from '../backends/ibm/ibm'
+import { ICommand } from '@/interfaces';
 
-function stringKeyToIntArray(key) {
+function stringKeyToIntArray(key: string) {
   return key.split(',').map(i => parseInt(i, 10))
 }
 
@@ -46,6 +47,10 @@ without performing Swaps, the mapping procedure
 **raises an Exception**.
  */
 export default class IBM5QubitMapper extends BasicMapperEngine {
+  _cmds: ICommand[];
+  _interactions: {
+    [key: string]: number
+  };
   /**
    * @constructor
 Initialize an IBM 5-qubit mapper compiler engine.
@@ -62,9 +67,9 @@ Initialize an IBM 5-qubit mapper compiler engine.
   Check if the IBM backend can perform the Command cmd and return true
 if so.
 
-  @param {Command} cmd The command to check
+  @param cmd The command to check
    */
-  isAvailable(cmd) {
+  isAvailable(cmd: ICommand) {
     return new IBMBackend().isAvailable(cmd)
   }
 
@@ -77,9 +82,9 @@ if so.
   /**
   Check if the command corresponds to a CNOT (controlled NOT gate).
 
-  @param {Command} cmd Command to check whether it is a controlled NOT gate.
+  @param cmd Command to check whether it is a controlled NOT gate.
   */
-  _isCNOT(cmd) {
+  _isCNOT(cmd: ICommand) {
     return (cmd.gate instanceof NOT.constructor && cmd.controlCount === 1)
   }
 
@@ -127,10 +132,10 @@ down the pipeline.
    */
   run() {
     if (Object.keys(this._currentMapping).length > 0 && Math.max(...Object.values(this._currentMapping)) > 4) {
-      throw new Error('Too many qubits allocated. The IBM Q '
-      + 'device supports at most 5 qubits and no '
-      + 'intermediate measurements / '
-      + 'reallocations.')
+      throw new Error(`Too many qubits allocated. The IBM Q 
+        device supports at most 5 qubits and no 
+        intermediate measurements / 
+        reallocations.`)
     }
     if (Object.keys(this._interactions).length > 0) {
       const logical_ids = Object.keys(this._currentMapping).map(k => parseInt(k, 10))
@@ -166,7 +171,7 @@ down the pipeline.
 
   @param {Command} cmd A command to store
    */
-  _store(cmd) {
+  _store(cmd: ICommand) {
     let target
     if (!(cmd.gate instanceof FlushGate)) {
       target = cmd.qubits[0][0].id
@@ -198,14 +203,14 @@ down the pipeline.
   Receives a command list and, for each command, stores it until
 completion.
 
-  @param {Command[]} commandList list of commands to receive.
+  @param commandList list of commands to receive.
 
-  @throws {Error} If mapping the CNOT gates to 1 qubit would require
+  @throws If mapping the CNOT gates to 1 qubit would require
 Swaps. The current version only supports remapping of CNOT
 gates without performing any Swaps due to the large costs
 associated with Swapping given the CNOT constraints.
    */
-  receive(commandList) {
+  receive(commandList: ICommand[]) {
     commandList.forEach((cmd) => {
       this._store(cmd)
       if (cmd.gate instanceof FlushGate) {

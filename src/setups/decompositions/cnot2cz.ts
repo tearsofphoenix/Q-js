@@ -15,14 +15,15 @@
  */
 
 // Decompose CNOT gates
-import { Compute, Uncompute } from '../../meta/compute';
-import { H, XGate } from '../../ops/gates';
-import { tuple } from '../../libs/util';
+import { Compute, Uncompute } from '@/meta/compute';
+import { H, XGate } from '@/ops/gates';
+import { tuple } from '@/libs/util';
 
-import { CZ } from '../../ops/shortcuts'
-import DecompositionRule from '../../cengines/replacer/decompositionrule';
+import { CZ } from '@/ops/shortcuts'
+import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { ICommand } from '@/interfaces';
 
-const _decompose_cnot = (cmd) => {
+const _decompose_cnot = (cmd: ICommand) => {
   const ctrl = cmd.controlQubits
   const eng = cmd.engine
   Compute(eng, () => {
@@ -38,7 +39,7 @@ const _decompose_cnot = (cmd) => {
  * @return {boolean}
  * @private
  */
-export const _recognize_cnot = cmd => (cmd.controlCount === 1)
+export const _recognize_cnot = (cmd: ICommand) => (cmd.controlCount === 1)
 
 export default [
   new DecompositionRule(XGate, _decompose_cnot, _recognize_cnot)

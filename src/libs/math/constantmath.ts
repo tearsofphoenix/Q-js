@@ -62,11 +62,11 @@ export function add_constant_modN(eng: IEngine, c: number, N: number, quint: IQu
 
   new AddConstant(c).or(quint)
 
-  let ancilla: IQubit;
+  let ancilla: IQureg;
 
   Compute(eng, () => {
-    SubConstant(N).or(quint)
-    ancilla = eng.allocateQubit()
+    SubConstant(N).or(quint);
+    ancilla = eng.allocateQubit();
     CNOT.or(tuple(quint[quint.length - 1], ancilla))
     Control(eng, ancilla, () => new AddConstant(N).or(quint))
   })
@@ -77,7 +77,7 @@ export function add_constant_modN(eng: IEngine, c: number, N: number, quint: IQu
     X.or(quint[quint.length - 1])
     CNOT.or(tuple(quint[quint.length - 1], ancilla))
     X.or(quint[quint.length - 1])
-    ancilla.deallocate()
+    ancilla.deallocate();
   })
 
   new AddConstant(c).or(quint)
@@ -112,7 +112,7 @@ Multiplies a quantum integer by a classical number a modulo N, i.e.,
  ```
 (only works if a and N are relative primes, otherwise the modular inverse does not exist).
  */
-export function mul_by_constant_modN(eng: IEngine, c: number, N: number, quint_in) {
+export function mul_by_constant_modN(eng: IEngine, c: number, N: number, quint_in: IQubit[][]) {
   assert(c < N && c >= 0)
   assert(math.gcd(c, N) === 1)
 

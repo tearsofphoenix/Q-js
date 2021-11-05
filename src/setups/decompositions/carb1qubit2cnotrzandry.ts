@@ -1,12 +1,13 @@
-import math from 'mathjs'
+import math, { Matrix } from 'mathjs'
 import assert from 'assert'
-import DecompositionRule from '../../cengines/replacer/decompositionrule';
+import DecompositionRule from '@/cengines/replacer/decompositionrule';
 import {
   BasicGate, Ph, Ry, Rz, X
-} from '../../ops';
-import { Control } from '../../meta';
-import { len, productLoop } from '../../libs/polyfill';
+} from '@/ops';
+import { Control } from '@/meta';
+import { len, productLoop } from '@/libs/polyfill';
 import { _find_parameters, phase } from './arb1qubit2rzandry'
+import { ICommand, IMathGate } from '@/interfaces';
 
 const mm = math.multiply
 const mc = math.complex
@@ -22,7 +23,7 @@ const TOLERANCE = 1e-12
 export function _recognize_carb1qubit(cmd: ICommand) {
   if (cmd.controlCount === 1) {
     try {
-      const m = cmd.gate.matrix
+      const m = (cmd.gate as IMathGate).matrix
       if (len(m) === 2) {
         return true
       }
@@ -40,21 +41,21 @@ matrix.
     V = [[-sin(c/2) * exp(j*a), exp(j*(a-b)) * cos(c/2)],
   [exp(j*(a+b)) * cos(c/2), exp(j*a) * sin(c/2)]]
 
-  @param {Array.<number[]>} matrix 2x2 matrix
-  @param {number} a Parameter of V
-  @param {number} b Parameter of V
-  @param {number} c_half c/2. Parameter of V
+  @param matrix 2x2 matrix
+  @param a Parameter of V
+  @param b Parameter of V
+  @param c_half c/2. Parameter of V
 
   @return {boolean} true if matrix elements of V and `matrix` are TOLERANCE close.
  */
-function _test_parameters(matrix, a, b, c_half) {
+function _test_parameters(matrix: Matrix, a: number, b: number, c_half: number): boolean {
   const { exp } = math
   const cosc = math.cos(c_half)
   const sinc = math.sin(c_half)
   const V = [
     [mm(mm(sinc, exp(mc(0, a))), -1), mm(exp(mc(0, a - b)), cosc)],
-    [mm(exp(mc(0, a + b)), cosc), mm(exp(mc(0, a)), sinc)]]
-  return math.deepEqual(V, matrix)
+    [mm(exp(mc(0, a + b)), cosc), mm(exp(mc(0, a)), sinc)]] as any;
+  return Boolean(math.deepEqual(V, matrix));
 }
 
 /**
@@ -67,10 +68,10 @@ Recognizes a matrix which can be written in the following form:
   @param {Array.<number[]>} matrix 2x2 matrix
   @return {boolean} false if it is not possible otherwise (a, b, c/2)
  */
-export function _recognize_v(matrix) {
-  let a
-  let b
-  let c_half
+export function _recognize_v(matrix: Matrix) {
+  let a: number;
+  let b: number = 0;
+  let c_half: number = 0;
   if (math.abs(matrix[0][0]) < TOLERANCE) {
     const t = phase(mm(matrix[0][1], matrix[1][0]))
     const two_a = math.mod(t, 2 * math.pi)
@@ -94,7 +95,8 @@ export function _recognize_v(matrix) {
         found = true
         return true
       }
-    })
+      return false;
+    });
 
     assert(found) // It should work for all matrices with matrix[0][0]==0.
     return [a, b, c_half]
@@ -148,6 +150,7 @@ export function _recognize_v(matrix) {
         found = true
         return true
       }
+      return false;
     })
     if (!found) {
       return []
@@ -184,10 +187,9 @@ D = Ry(-c/2)Rz(-b)
 This improvement is important for C(Y) or C(Z)
 
 For a proof follow Lemma 5.5 of Barenco et al.
- @param {Command} cmd
  */
-function _decompose_carb1qubit(cmd) {
-  const matrix = cmd.gate.matrix._data
+function _decompose_carb1qubit(cmd: ICommand) {
+  const matrix = (cmd.gate as IMathGate).matrix;
   const qb = cmd.qubits
   const eng = cmd.engine
 

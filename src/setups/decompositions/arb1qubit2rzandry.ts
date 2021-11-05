@@ -5,7 +5,7 @@ import DecompositionRule from '../../cengines/replacer/decompositionrule';
 import {
   BasicGate, Rz, Ry, Ph
 } from '../../ops';
-import { ICommand } from '@/interfaces';
+import { ICommand, IMathGate } from '@/interfaces';
 
 const TOLERANCE = 1e-12
 
@@ -26,7 +26,7 @@ carb1qubit2cnotrzandry instead.
  */
 export const _recognize_arb1qubit = (cmd: ICommand) => {
   try {
-    const m = cmd.gate.matrix;
+    const m = (cmd.gate as IMathGate).matrix;
     return len(m) === 2 && cmd.controlCount === 0
   } catch (e) {
     return false
@@ -47,9 +47,9 @@ matrix.
   @param c_half c/2. parameter of U
   @param d_half d/2. parameter of U
 
-@return {boolean} true if matrix elements of U and `matrix` are TOLERANCE close.
+@return true if matrix elements of U and `matrix` are TOLERANCE close.
  */
-const _test_parameters = (matrix: number[][], a: number, b_half: number, c_half: number, d_half: number) => {
+const _test_parameters = (matrix: Matrix, a: number, b_half: number, c_half: number, d_half: number) => {
   const mc = math.complex
   const mm = math.multiply
   const U = [
@@ -76,17 +76,17 @@ Note:
     If the matrix is element of SU(2) (determinant == 1), then
 we can choose a = 0.
 
-@param {Array.<number[]>} matrix 2x2 unitary matrix
+@param matrix 2x2 unitary matrix
 
-@return {number[]} parameters of the matrix: (a, b/2, c/2, d/2)
+@return parameters of the matrix: (a, b/2, c/2, d/2)
  */
-export const _find_parameters = (matrix: number[][]) => {
+export const _find_parameters = (matrix: Matrix) => {
   // Determine a, b/2, c/2 and d/2 (3 different cases).
   // Note: everything is modulo 2pi.
   let a: number;
-  let b_half;
-  let c_half;
-  let d_half;
+  let b_half: number = 0;
+  let c_half: number = 0;
+  let d_half: number = 0;
   const mm = math.multiply;
   // Case 1: sin(c/2) == 0:
   if (math.abs(matrix[0][1]) < TOLERANCE) {
@@ -113,6 +113,7 @@ export const _find_parameters = (matrix: number[][]) => {
         found = true
         return true
       }
+      return false;
     })
 
     if (!found) {
@@ -146,6 +147,7 @@ export const _find_parameters = (matrix: number[][]) => {
         found = true
         return true
       }
+      return false;
     })
     if (!found) {
       throw new Error(`Couldn't find parameters for matrix ${matrix},
@@ -192,6 +194,7 @@ export const _find_parameters = (matrix: number[][]) => {
         found = true
         return true
       }
+      return false;
     })
     if (!found) {
       throw new Error(`Couldn't find parameters for matrix ${matrix},
@@ -203,7 +206,7 @@ export const _find_parameters = (matrix: number[][]) => {
 }
 
 /**
- * @param {Command} cmd
+ * @param cmd
 Use Z-Y decomposition of Nielsen and Chuang (Theorem 4.1).
 
 An arbitrary one qubit gate matrix can be writen as
@@ -215,7 +218,7 @@ where a,b,c,d are real numbers.
 we can choose a = 0.
  */
 const _decompose_arb1qubit = (cmd: ICommand) => {
-  const matrix = cmd.gate.matrix._data.slice(0)
+  const matrix = (cmd.gate as IMathGate).matrix.clone() as any;
   const [a, b_half, c_half, d_half] = _find_parameters(matrix)
   const qb = cmd.qubits
   const eng = cmd.engine

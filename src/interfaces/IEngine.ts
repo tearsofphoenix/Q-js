@@ -14,7 +14,7 @@ interface IEngine {
     isMetaTagHandler?: (metaTag: Function) => boolean;
 
     getMeasurementResult(qubit: IQubit): boolean;
-    allocateQubit(dirty: boolean): IQureg;
+    allocateQubit(dirty?: boolean): IQureg;
     allocateQureg(n: number): IQureg;
 
     deallocateQubit(qubit: IQubit): void;

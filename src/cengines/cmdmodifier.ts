@@ -19,7 +19,8 @@ Contains a CommandModifier engine, which can be used to, e.g., modify the tags
 of all commands which pass by (see the AutoReplacer for an example).
 */
 
-import {BasicEngine} from './basics'
+import { BasicEngine } from './basics'
+import { ICommand, CommandModifyFunction } from '@/interfaces';
 
 /**
  * @class CommandModifier
@@ -28,11 +29,12 @@ CommandModifier is a compiler engine which applies a function to all
 incoming commands, sending on the resulting command instead of the original one.
  */
 export default class CommandModifier extends BasicEngine {
+  private _cmdModFunc: CommandModifyFunction;
   /**
    * @constructor
   Initialize the CommandModifier.
 
-    @param {function} cmdModFunc Function which, given a command cmd,
+    @param cmdModFunc Function which, given a command cmd,
     returns the command it should send instead.
 
     @example
@@ -41,7 +43,7 @@ function cmd_mod_fun(cmd)
 cmd.tags += [new MyOwnTag()]
 compiler_engine = new CommandModifier(cmd_mod_fun)
    */
-  constructor(cmdModFunc) {
+  constructor(cmdModFunc: CommandModifyFunction) {
     super()
     this._cmdModFunc = cmdModFunc
   }
@@ -50,10 +52,10 @@ compiler_engine = new CommandModifier(cmd_mod_fun)
   Receive a list of commands from the previous engine, modify all
    commands, and send them on to the next engine.
 
-    @param {Command[]} cmdList List of commands to receive and then (after modification) send on.
+    @param cmdList List of commands to receive and then (after modification) send on.
    */
-  receive(cmdList) {
-    const newList = cmdList.map(cmd => this._cmdModFunc(cmd))
-    this.send(newList)
+  receive(cmdList: ICommand[]) {
+    const newList = cmdList.map(cmd => this._cmdModFunc(cmd));
+    this.send(newList);
   }
 }

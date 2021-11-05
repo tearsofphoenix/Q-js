@@ -82,11 +82,11 @@ do_something(otherqubits)
  @example
  Control(eng, ctrlqubits, () => ...)
  */
-export function Control(engine: IEngine, qubits: IQubit[], func: Function) {
+export function Control(engine: IEngine, qubits: IQubit | IQubit[], func: Function) {
   if (qubits instanceof BasicQubit) {
     qubits = [qubits]
   }
-  const qs = qubits
+  const qs = qubits as IQubit[];
 
   const enter = () => {
     if (qs.length > 0) {

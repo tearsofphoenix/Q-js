@@ -97,7 +97,7 @@ objects. All functions within this class also work if
     this.gate = gate;
     this.tags = tags;
     this.qubits = qs;
-    this.controlQubits = controls;
+    this.controlQubits = controls as IQureg;
     this.engine = engine;
   }
 
@@ -111,7 +111,6 @@ objects. All functions within this class also work if
 
   /**
    * return the copy of current command
-   * @return {Command}
    */
   copy() {
     const qubits = this.qubits.map(looper => BasicQubit.copyArray(looper))
@@ -123,7 +122,7 @@ objects. All functions within this class also work if
     Get the command object corresponding to the inverse of this command.
     Inverts the gate (if possible) and creates a new command object from the result.
 
-    @throws {NotInvertible} If the gate does not provide an inverse (see BasicGate.getInverse)
+    @throws If the gate does not provide an inverse (see BasicGate.getInverse)
      */
   getInverse() {
     return new Command(this.engine, getInverse(this.gate), this.qubits, this.controlQubits, this.tags.slice(0))
@@ -148,12 +147,12 @@ objects. All functions within this class also work if
     @param qubits Array of quantum registers (i.e., tuple of lists of qubits)
     @return Ordered tuple of quantum registers
   */
-  orderQubits(qubits: IQubit[]): IQubit[] {
+  orderQubits(qubits: IQureg[]): IQureg[] {
     const orderedQubits = qubits.slice(0);
     const iqi = this.interchangeableQubitIndices
     iqi.forEach((old_positions) => {
       const new_positions = old_positions.slice(0).sort((a, b) => orderedQubits[a][0].id - orderedQubits[b][0].id)
-      const qubitsNewOrder: IQubit[] = [];
+      const qubitsNewOrder: IQureg[] = [];
       new_positions.forEach(l => qubitsNewOrder.push(orderedQubits[l]))
 
       old_positions.forEach((v, i) => {
@@ -181,7 +180,7 @@ If we can interchange qubits 0,1 and qubits 3,4,5,
   }
 
   get controlQubits() {
-    return this._controlQubits
+    return this._controlQubits as IQureg;
   }
 
   /**
@@ -225,7 +224,7 @@ WeakQubitRef objects) containing the control qubits and T[1:] contains
 the quantum registers to which the gate is applied.
   */
   get allQubits() {
-    return [this._controlQubits].concat(this.qubits)
+    return [this._controlQubits as IQureg].concat(this.qubits)
   }
 
   get controlCount() {
@@ -238,9 +237,9 @@ the quantum registers to which the gate is applied.
 
   /**
     Set / Change engine of all qubits to engine.
-    @param {BasicEngine} ng New owner of qubits and owner of this Command object
+    @param ng New owner of qubits and owner of this Command object
   */
-  set engine(ng) {
+  set engine(ng: IEngine) {
     this._engine = ng
     this.qubits.forEach((qureg) => {
       qureg.forEach((qubit) => {
@@ -265,9 +264,6 @@ the quantum registers to which the gate is applied.
     return false
   }
 
-  /**
-   * @return {string}
-   */
   toString() {
     let { qubits } = this
     const ctrlqubits = this.controlQubits
@@ -293,9 +289,6 @@ the quantum registers to which the gate is applied.
     return `${cs}${this.gate.toString()} | ${qs}`
   }
 
-  /**
-   * @return {string}
-   */
   inspect() {
     return this.toString()
   }

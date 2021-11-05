@@ -74,10 +74,9 @@ export class BasicQubit implements IQubit {
 
   /**
     Access the result of a previous measurement and return false / true (0 / 1)
-    @return {boolean}
   */
-  toBoolean() {
-    return this.engine.main.getMeasurementResult(this);
+  toBoolean(): boolean {
+    return Boolean(this.engine.main.getMeasurementResult(this));
   }
 
   /**
@@ -158,7 +157,6 @@ export class Qubit extends BasicQubit {
  * Quantum register class.
 Simplifies accessing measured values for single-qubit registers (no []-access necessary)
  and enables pretty-printing of general quantum registers).
- @class Qureg
  */
 export class Qureg extends Array implements IQureg {
   /**
@@ -253,16 +251,10 @@ export class Qureg extends Array implements IQureg {
     this.length = 0
   }
 
-  /**
-   * @return {BasicEngine}
-   */
   get engine() {
     return this[0].engine
   }
 
-  /**
-   * @param {BasicEngine} newEngine
-   */
   set engine(newEngine) {
     this.forEach(looper => looper.engine = newEngine)
   }

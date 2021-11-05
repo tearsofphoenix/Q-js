@@ -8,7 +8,6 @@
   "main": "./dist/index.js",
   "scripts": {
     "install": "node scripts/install.js",
-    "cover": "cross-env NODE_ENV=test nyc mocha --recursive ./test",
     "test": "jest",
     "build": "node scripts/build.js --force",
     "doc": "./node_modules/.bin/esdoc",
@@ -30,6 +29,8 @@
     "true-case-path": "^2.2.1"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.22",
+    "@types/jest": "^27.0.2",
     "@typescript-eslint/parser": "^5.3.0",
     "chai": "^4.1.2",
     "cross-env": "^5.2.0",
@@ -47,14 +48,16 @@
     "eslint-plugin-json-files": "0.8.1",
     "eslint-plugin-prettier": "3.1.1",
     "jest": "^27.3.1",
+    "jest-extended": "^1.1.0",
+    "jest-html-reporters": "^2.1.6",
     "jshint": "^2.9.6",
     "mkdirp": "^1.0.4",
     "mocha": "^5.2.0",
     "nan": "^2.15.0",
     "node-gyp": "^8.3.0",
     "npmlog": "^5.0.1",
-    "nyc": "^12.0.2",
     "sinon": "^6.1.5",
+    "ts-jest": "^27.0.7",
     "ts-loader": "^9.2.6",
     "typedoc": "^0.22.7",
     "typescript": "^4.4.4"
@@ -66,17 +69,5 @@
     "binding.gyp",
     "libq.gyp",
     ".eslintrc"
-  ],
-  "nyc": {
-    "require": [
-      "babel-register",
-      "babel-polyfill"
-    ],
-    "reporter": [
-      "lcov",
-      "text"
-    ],
-    "sourceMap": false,
-    "instrument": false
-  }
+  ]
 }

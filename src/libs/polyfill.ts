@@ -14,48 +14,38 @@
  * limitations under the License.
  */
 
-import math, { Matrix, Complex } from 'mathjs'
+import math, { Complex } from 'mathjs'
 import { instanceOf } from './util';
 
 /**
  * @ignore
  * check if value is complex number
- * @param {Object} value
- * @return {boolean}
  */
-export function isComplex(value) {
-  return value instanceof Complex;
+export function isComplex(value: any) {
+  return typeof value.re === 'number' && typeof value.im === 'number';
 }
 
 /**
  * @ignore
  * check if value is number or complex number
- * @param {Object} value
- * @return {boolean}
  */
-export function isNumeric(value) {
-  return (typeof value === 'number' || value instanceof Complex)
+export function isNumeric(value: any) {
+  return (typeof value === 'number') || isComplex(value);
 }
 
 /**
  * @ignore
  * return intersection of s1 & s2
- * @param {Set} s1
- * @param {Set} s2
- * @return {Set}
  */
-export function intersection(s1, s2) {
+export function intersection<T>(s1: Set<T>, s2: Set<T>): Set<T> {
   return new Set([...s1].filter(x => s2.has(x)))
 }
 
 /**
  * @ignore
  * return union set of s1 & s2
- * @param {Set} s1
- * @param {Set} s2
- * @return {Set<any>}
  */
-export function unionSet(s1, s2) {
+export function unionSet<T>(s1: Set<T>, s2: Set<T>): Set<T> {
   const s = [...s2].filter(x => !s1.has(x))
   const result = new Set(s1)
   s.forEach(x => result.add(x))
@@ -65,11 +55,8 @@ export function unionSet(s1, s2) {
 /**
  * @ignore
  * return symmetric difference of s1 & s2
- * @param {Set} s1
- * @param {Set} s2
- * @return {Set<*>}
  */
-export function symmetricDifference(s1, s2) {
+export function symmetricDifference<T>(s1: Set<T>, s2: Set<T>): Set<T> {
   const inset = intersection(s1, s2)
   const a = [...s1].filter(x => !inset.has(x))
   const b = [...s2].filter(x => !inset.has(x))
@@ -79,11 +66,8 @@ export function symmetricDifference(s1, s2) {
 /**
  * @ignore
  * check if s1 is equal to s2
- * @param {Set} s1
- * @param {Set} s2
- * @return {boolean}
  */
-export function setEqual(s1, s2) {
+export function setEqual<T>(s1: Set<T>, s2: Set<T>): boolean {
   return symmetricDifference(s1, s2).size === 0
 }
 
@@ -94,29 +78,21 @@ export function setEqual(s1, s2) {
  * @param {Set} s
  * @return {boolean}
  */
-export function setIsSuperSet(superset, s) {
+export function setIsSuperSet<T>(superset: Set<T>, s: Set<T>): boolean {
   const result = [...s].filter(x => !superset.has(x))
   return result.length === 0
 }
 
-/**
- * @ignore
- * @param {Set<*>} s1
- * @param {Set<*>} s2
- * @return {Set<*>}
- */
-export function setDifference(s1, s2) {
+export function setDifference<T>(s1: Set<T>, s2: Set<T>): Set<T> {
   return new Set([...s1].filter(x => !s2.has(x)))
 }
 
 /**
  * @ignore
  * create a Set contains numbers in range from 0 to n
- * @param {number} n
- * @return {Set<number>}
  */
-export function setFromRange(n) {
-  const result = new Set()
+export function setFromRange(n: number): Set<number> {
+  const result = new Set<number>()
   for (let i = 0; i < n; i++) {
     result.add(i)
   }
@@ -126,12 +102,8 @@ export function setFromRange(n) {
 /**
  * @ignore
  * create an array filled by number in range, active like python does
- * @param {number} start
- * @param {number} end
- * @param {number} step
- * @return {number[]}
  */
-export function arrayFromRange(start, end, step) {
+export function arrayFromRange(start: number, end: number, step: number): number[] {
   if (typeof end === 'undefined') {
     end = start
     start = 0
@@ -150,11 +122,8 @@ export function arrayFromRange(start, end, step) {
 /**
  * @ignore
  * return a random sample from `array` which length is `count`
- * @param {any[]} array
- * @param {number} count
- * @return {any[]}
  */
-export function randomSample(array, count) {
+export function randomSample<T>(array: T[], count: number): T[] {
   const result = []
   const { length } = array
   if (length >= count) {
@@ -184,8 +153,10 @@ export function arrayEqual<T>(a1: T[], a2: T[], itemCompareFunc?: Function) {
       for (let i = 0; i < l1; ++i) {
         const c = a1[i]
         const d = a2[i]
-        let func = itemCompareFunc
+        let func = itemCompareFunc;
+        // @ts-ignore
         if (!func && c.equal) {
+          // @ts-ignore
           func = (x: any, y: any) => Reflect.apply(c.equal, x, [y])
         }
         if (Array.isArray(c) && Array.isArray(d)) {
@@ -243,7 +214,8 @@ Array.prototype.rmap = function (callbackFunc: Function) {
  * return total exist count of `item` in array
  * @param {any} item
  */
-Array.prototype.count = function (item) {
+// @ts-ignore
+Array.prototype.count = function (item: any): number {
   let count = 0
   for (let i = 0; i < this.length; ++i) {
     if (this[i] === item) {
@@ -256,9 +228,9 @@ Array.prototype.count = function (item) {
 /**
  * @ignore
  * remove all existance of `target` from array
- * @param {any} target
  */
-Array.prototype.remove = function (target) {
+// @ts-ignore
+Array.prototype.remove = function (target: any) {
   let idx = -1
   for (let i = 0; i < this.length; ++i) {
     if (arrayEqual(this[i], target)) {
@@ -274,10 +246,9 @@ Array.prototype.remove = function (target) {
 /**
  * @ignore
  * return all regular expression match count of `substring` in string
- * @param {string} substring
- * @return {number}
  */
-String.prototype.count = function (substring) {
+// @ts-ignore
+String.prototype.count = function (substring: string): number {
   const exp = new RegExp(substring, 'g')
   const result = this.match(exp)
   if (result) return result.length
@@ -289,7 +260,7 @@ String.prototype.count = function (substring) {
  * @param {any} v
  * @return {number}
  */
-export function len(v) {
+export function len(v: any) {
   if (typeof v === 'undefined' || v === null) {
     return 0
   }
@@ -299,7 +270,7 @@ export function len(v) {
   if (v instanceof Set) {
     return v.size
   }
-  if (v instanceof Matrix) {
+  if (v.type && typeof v.size == 'function') {
     return v.size()[0]
   }
   if (instanceOf(v, String)) {
@@ -321,10 +292,8 @@ export function len(v) {
 /**
  * @ignore
  * parse string contains 1/0 into bit array
- * @param {string} str
- * @return {boolean[]}
  */
-export function stringToBitArray(str) {
+export function stringToBitArray(str: string): boolean[] {
   if (Array.isArray(str)) {
     return str
   }
@@ -344,7 +313,9 @@ export function stringToBitArray(str) {
 export function complexVectorDot(a1: Complex[], a2: Complex[]): Complex {
   let real = 0
   let image = 0
+  // @ts-ignore
   a1.forEach((c1, [i]) => {
+    // @ts-ignore
     const c2 = a2.subset(math.index(i));
     const r1 = math.re(c1) as number;
     const i1 = math.im(c1) as number;

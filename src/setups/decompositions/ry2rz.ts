@@ -2,14 +2,14 @@ import { Control } from '../../meta/control'
 import { Compute, Uncompute } from '../../meta/compute';
 import { Rx, Ry, Rz } from '../../ops/gates';
 import DecompositionRule from '../../cengines/replacer/decompositionrule';
-import { ICommand } from '@/interfaces';
+import { ICommand, IMathGate } from '@/interfaces';
 /**
  * @ignore
  */
 export const _decompose_ry = (cmd: ICommand) => {
   const qubit = cmd.qubits[0]
   const eng = cmd.engine
-  const angle = cmd.gate.angle
+  const angle = (cmd.gate as IMathGate).angle
 
   Control(eng, cmd.controlQubits, () => {
     Compute(eng, () => {
@@ -26,7 +26,7 @@ export const _decompose_ry = (cmd: ICommand) => {
  * @return {boolean}
  * @private
  */
-export const _recognize_RyNoCtrl = cmd => cmd.controlCount === 0
+export const _recognize_RyNoCtrl = (cmd: ICommand) => cmd.controlCount === 0
 
 export default [
   new DecompositionRule(Ry, _decompose_ry, _recognize_RyNoCtrl)

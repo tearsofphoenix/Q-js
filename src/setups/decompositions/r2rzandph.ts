@@ -1,7 +1,7 @@
 import { Control } from '../../meta/control';
 import DecompositionRule from '../../cengines/replacer/decompositionrule';
 import { R, Rz, Ph } from '../../ops/gates';
-import { ICommand } from '@/interfaces';
+import { ICommand, IMathGate } from '@/interfaces';
 
 const _decompose_R = (cmd: ICommand) => {
   const ctrl = cmd.controlQubits
@@ -9,8 +9,9 @@ const _decompose_R = (cmd: ICommand) => {
   const gate = cmd.gate
 
   Control(eng, ctrl, () => {
-    new Ph(0.5 * gate.angle).or(cmd.qubits)
-    new Rz(gate.angle).or(cmd.qubits)
+    const { angle } = (gate as IMathGate);
+    new Ph(0.5 * angle).or(cmd.qubits)
+    new Rz(angle).or(cmd.qubits)
   })
 }
 

@@ -6,8 +6,9 @@ import {
   X, H, EntangleGate
 } from '../../ops/gates';
 import DecompositionRule from '../../cengines/replacer/decompositionrule';
+import { ICommand } from '@/interfaces';
 
-const _decompose_entangle = (cmd) => {
+const _decompose_entangle = (cmd: ICommand) => {
   const qr = cmd.qubits[0]
   const eng = cmd.engine
 

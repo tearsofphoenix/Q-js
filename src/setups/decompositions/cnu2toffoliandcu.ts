@@ -6,12 +6,13 @@ import { BasicGate } from '../../ops/basics';
 import { Compute, Uncompute } from '../../meta/compute';
 import { Toffoli } from '../../ops/shortcuts';
 import { tuple } from '../../libs/util';
+import { ICommand } from '@/interfaces';
 
 /**
  * @ignore
  Recognize an arbitrary gate which has n>=2 control qubits, except a Toffoli gate.
 */
-export const _recognize_CnU = (cmd) => {
+export const _recognize_CnU = (cmd: ICommand) => {
   const count = cmd.controlCount
   if (count === 2) {
     if (!(cmd.gate instanceof XGate)) {
@@ -28,7 +29,7 @@ export const _recognize_CnU = (cmd) => {
 Decompose a multi-controlled gate U into a single-controlled U.
     It uses (n-1) work qubits and 2 * (n-1) Toffoli gates.
  */
-export const _decompose_CnU = (cmd) => {
+export const _decompose_CnU = (cmd: ICommand) => {
   const eng = cmd.engine
   const ctrl_qureg = cmd.controlQubits
   const { qubits, gate } = cmd

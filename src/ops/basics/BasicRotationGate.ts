@@ -51,9 +51,9 @@ export class BasicRotationGate extends BasicGate {
       Default implementation handles rotation gate of the same type, where
   angles are simply added.
       @throws {NotMergeable}  For non-rotation gates or rotation gates of different type.
-      @return {BasicRotationGate} New object representing the merged gates.
+      @return New object representing the merged gates.
      */
-    getMerged(other: IGate) {
+    getMerged(other: IGate): IGate {
         if (other instanceof BasicRotationGate) {
             return new (this.constructor as Ctor)(this.angle + other.angle);
         }
@@ -77,7 +77,7 @@ export class BasicRotationGate extends BasicGate {
         return `${this.constructor.name}$_{${this.angle}}$`
     }
 
-    equal(other: IGate) {
+    equal(other: IGate): boolean {
         if (other instanceof BasicRotationGate) {
             return this.angle == other.angle
         }

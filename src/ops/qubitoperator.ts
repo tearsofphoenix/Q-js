@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import math from 'mathjs'
+import math, { Complex } from 'mathjs'
 
 // QubitOperator stores a sum of Pauli operators acting on qubits."""
 import { isNumeric, symmetricDifference } from '../libs/polyfill'
@@ -118,6 +118,7 @@ are sorted according to the qubit number they act on,
 **value**: Coefficient of this term as a (complex) float
  */
 export default class QubitOperator {
+  terms: {};
   /**
    * @constructor
     The init function only allows to initialize one term. Additional terms
@@ -138,7 +139,7 @@ by in-place addition). Specifying the coefficient in the __init__
 is faster than by multiplying a QubitOperator with a scalar as
 calls an out-of-place multiplication.
 
-    @param {number|Complex} coefficient The coefficient of the
+    @param coefficient The coefficient of the
 first term of this QubitOperator. Default is 1.0.
     @param {Array.<Array>|string} term (optional, empy array, a array of arrays, or a string):
 1) Default is None which means there are no terms in the
@@ -155,9 +156,9 @@ of each tuple is a string, either 'X', 'Y' or 'Z',
 qubit 0, Z on qubit 2, and Y on qubit 5. The string should
 be sorted by the qubit number. '' is the identity.
 
-    @throws {QubitOperatorError} Invalid operators provided to QubitOperator.
+    @throws Invalid operators provided to QubitOperator.
      */
-  constructor(term, coefficient = 1.0) {
+  constructor(term?: string[] | string, coefficient: number | Complex = 1.0) {
     // assert coefficient as numeric
     this.terms = {}
     if (!isNumeric(coefficient)) {
@@ -184,7 +185,7 @@ be sorted by the qubit number. '' is the identity.
         listOPs.push([parseInt(el.substring(1), 10), el[0]])
       })
 
-      checkTerm(listOPs)
+      checkTerm(listOPs);
 
       term = listOPs.sort((a, b) => a[0] - b[0])
       this.terms[term] = coefficient
@@ -197,9 +198,9 @@ be sorted by the qubit number. '' is the identity.
     Eliminates all terms with coefficients close to zero and removes
 imaginary parts of coefficients that are close to zero.
 
-    @param {number} absTolerance Absolute tolerance, must be at least 0.0
+    @param absTolerance Absolute tolerance, must be at least 0.0
      */
-  compress(absTolerance = 1e-12) {
+  compress(absTolerance: number = 1e-12) {
     const new_terms = {}
     Object.keys(this.terms).forEach((key) => {
       let coeff = this.terms[key]
@@ -257,9 +258,8 @@ tolerance.
 
   /**
     In-place multiply (*=) terms with scalar or QubitOperator.
-    @param {Complex|number|QubitOperator} multiplier
   */
-  imul(multiplier) {
+  imul(multiplier: Complex | number | QubitOperator) {
     // Handle QubitOperator.
     if (multiplier instanceof QubitOperator) {
       const result_terms = {}
@@ -337,13 +337,11 @@ tolerance.
   /**
   Return self * multiplier for a scalar, or a QubitOperator.
 
-    @param {Complex|number|QubitOperator} multiplier A scalar, or a QubitOperator.
+    @param multiplier A scalar, or a QubitOperator.
 
-    @return {QubitOperator}
-
-    @throws {Error} Invalid type cannot be multiply with QubitOperator.
+    @throws Invalid type cannot be multiply with QubitOperator.
    */
-  mul(multiplier) {
+  mul(multiplier: Complex | number | QubitOperator) {
     if (isNumeric(multiplier) || multiplier instanceof QubitOperator) {
       const product = this.copy()
       return product.imul(multiplier)
@@ -353,10 +351,8 @@ tolerance.
 
   /**
    * in-Place add
-   * @param {Complex|number|QubitOperator} addend
-   * @return {QubitOperator}
    */
-  iadd(addend) {
+  iadd(addend: Complex | number | QubitOperator): QubitOperator {
     if (addend instanceof QubitOperator) {
       Object.keys(addend.terms).forEach((key) => {
         const value = this.terms[key]
@@ -378,18 +374,13 @@ tolerance.
     return this
   }
 
-  /**
-   *
-   * @param {Complex|number|QubitOperator} addend
-   * @return {QubitOperator}
-   */
-  add(addend) {
+  add(addend: Complex | number | QubitOperator) {
     const inst = this.copy()
     inst.iadd(addend)
     return inst
   }
 
-  div(divisor) {
+  div(divisor: number) {
     if (isNumeric(divisor)) {
       return this.mul(math.divide(1.0, divisor))
     } else {
@@ -399,10 +390,8 @@ tolerance.
 
   /**
    * in-Place dived by divisor
-   * @param {(Complex|number|QubitOperator)} divisor
- * @return {QubitOperator}
    */
-  idiv(divisor) {
+  idiv(divisor: number) {
     if (isNumeric(divisor)) {
       return this.imul(math.divide(1.0, divisor))
     } else {
@@ -412,10 +401,8 @@ tolerance.
 
   /**
    * in-Place subtract
-   * @param {Complex|number|QubitOperator} subtrahend
-   * @return {QubitOperator}
    */
-  isub(subtrahend) {
+  isub(subtrahend: Complex | number | QubitOperator) {
     if (subtrahend instanceof QubitOperator) {
       Object.keys(subtrahend.terms).forEach((key) => {
         const ov = subtrahend.terms[key]
@@ -436,14 +423,13 @@ tolerance.
     return this
   }
 
-  sub(subtrahend) {
+  sub(subtrahend: Complex | number | QubitOperator) {
     const ret = this.copy()
     return ret.isub(subtrahend)
   }
 
   /**
    * return negative of current qubit operator
-   * @return {QubitOperator}
    */
   negative() {
     return this.mul(-1.0)
@@ -451,7 +437,6 @@ tolerance.
 
   /**
    * return copy of current qubit operator
-   * @return {QubitOperator}
    */
   copy() {
     const terms = {}
@@ -463,7 +448,6 @@ tolerance.
 
   /**
    * string description of current qubit operator
-   * @return {string}
    */
   toString() {
     const keys = Object.keys(this.terms)

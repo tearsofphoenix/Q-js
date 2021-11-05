@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import {BasicEngine} from './basics'
-import {FlushGate} from '../ops/gates'
+import { ICommand, IEngine } from '@/interfaces';
+import { BasicEngine } from './basics'
+import { FlushGate } from '../ops/gates'
 
 /**
  * @class CompareEngine
@@ -24,6 +24,7 @@ import {FlushGate} from '../ops/gates'
  * return true if they contain the same commmands.
  */
 export class CompareEngine extends BasicEngine {
+  private _l: ICommand[][];
   /**
    * @constructor
    */
@@ -39,12 +40,9 @@ export class CompareEngine extends BasicEngine {
     return true
   }
 
-  /**
-   * @param {Command} cmd
-   */
-  cacheCMD(cmd) {
+  cacheCMD(cmd: ICommand) {
     // are there qubit ids that haven't been added to the list?
-    const allQubitIDList = []
+    const allQubitIDList: number[] = []
     cmd.allQubits.forEach((qureg) => {
       qureg.forEach(qubit => allQubitIDList.push(qubit.id))
     })
@@ -62,7 +60,7 @@ export class CompareEngine extends BasicEngine {
     allQubitIDList.forEach(qid => this._l[qid].push(cmd))
   }
 
-  receive(commandList) {
+  receive(commandList: ICommand[]) {
     const f = new FlushGate()
     commandList.forEach((cmd) => {
       if (!cmd.gate.equal(f)) {
@@ -77,17 +75,14 @@ export class CompareEngine extends BasicEngine {
 
   /**
    * test if c1 & c2 are equal
-   * @param c1 {Command}
-   * @param c2 {Command}
-   * @return {boolean}
    */
-  compareCMDs(c1, c2) {
+  compareCMDs(c1: ICommand, c2: ICommand) {
     const item = c2.copy()
     item.engine = c1.engine
-    return c1.equal(item)
+    return c1.equal(item);
   }
 
-  equal(engine) {
+  equal(engine: IEngine) {
     const len = this._l.length
     if (!(engine instanceof CompareEngine) || len !== engine._l.length) {
       return false
@@ -136,9 +131,10 @@ export class CompareEngine extends BasicEngine {
     list so they are ordered according to when they are received.
  */
 export class DummyEngine extends BasicEngine {
+  saveCommands: boolean;
+  receivedCommands: ICommand[];
   /**
-   * @constructor
-   * @param {boolean} saveCommands default is false
+   * @param saveCommands default is false
    */
   constructor(saveCommands = false) {
     super()
@@ -150,7 +146,7 @@ export class DummyEngine extends BasicEngine {
     return true
   }
 
-  receive(commandList) {
+  receive(commandList: ICommand[]) {
     if (this.saveCommands) {
       this.receivedCommands = this.receivedCommands.concat(commandList)
     }

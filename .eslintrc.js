@@ -21,6 +21,7 @@ module.exports = {
     es6: true,
   },
   rules: {
+    "indent": ["error", 2],
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/no-useless-constructor': 'off',
@@ -67,7 +68,7 @@ module.exports = {
     'prefer-spread': 'off',
     'consistent-return': 'off',
     'array-callback-return': 'off',
-    'no-async-promise-executor': 'off',    
+    'no-async-promise-executor': 'off',
     'jsx-a11y/mouse-events-have-key-events': 'off',
     'class-methods-use-this': 'off',
     'operator-assignment': 'off',
@@ -93,13 +94,13 @@ module.exports = {
         endOfLine: 'auto',
       },
     ],
-    'import/dynamic-import-chunkname': 'warn',    
+    'import/dynamic-import-chunkname': 'warn',
     'local-rules/handle-reaction-disposer': 'warn',
-    'local-rules/handle-window-open': 'warn',    
+    'local-rules/handle-window-open': 'warn',
     'import/extensions': 'off',
     'security/detect-non-literal-fs-filename': 'off',
   },
-  settings: {    
+  settings: {
     'import/ignore': ['node_modules', 'build'],
   },
   overrides: [
@@ -116,6 +117,6 @@ module.exports = {
         'jest/valid-expect-in-promise': 'error',
         'jest/no-identical-title': 'warn',
       },
-    }    
+    }
   ],
 };

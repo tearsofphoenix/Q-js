@@ -15,9 +15,10 @@
  */
 
 import assert from 'assert'
-import {BasicEngine} from './basics'
-import {ComputeTag, UncomputeTag} from '../meta/tag'
-import {instanceOf} from '../libs/util'
+import { BasicEngine } from './basics'
+import { ComputeTag, UncomputeTag } from '../meta/tag'
+import { instanceOf } from '../libs/util'
+import { ICommand } from '@/interfaces';
 
 /**
  *  @class TagRemover
@@ -28,9 +29,9 @@ order to enable optimizations across meta-function boundaries (compute/
 action/uncompute or loops after unrolling)
  */
 export default class TagRemover extends BasicEngine {
+  private _tags: any[];
   /**
-    @constructor
-    @param {Array.<function>} tags A list of meta tag classes (e.g., [ComputeTag, UncomputeTag])
+    @param tags A list of meta tag classes (e.g., [ComputeTag, UncomputeTag])
     denoting the tags to remove
   */
   constructor(tags = [ComputeTag, UncomputeTag]) {
@@ -39,21 +40,18 @@ export default class TagRemover extends BasicEngine {
     this._tags = tags
   }
 
-  /**
-   * @param {function} tag
-   */
-  _isTagIn(tag) {
-    return instanceOf(tag, this._tags)
+  _isTagIn(tag: any) {
+    return instanceOf(tag, this._tags);
   }
 
   /**
     Receive a list of commands from the previous engine, remove all tags
-which are an instance of at least one of the meta tags provided in the
-constructor, and then send them on to the next compiler engine.
-
-    @param {Command[]} commandList List of commands to receive and then (after removing tags) send on.
+  which are an instance of at least one of the meta tags provided in the
+  constructor, and then send them on to the next compiler engine.
+  
+    @param commandList List of commands to receive and then (after removing tags) send on.
   */
-  receive(commandList) {
+  receive(commandList: ICommand[]) {
     commandList.forEach((cmd) => {
       cmd.tags = cmd.tags.filter(t => !this._isTagIn(t))
       this.send([cmd])

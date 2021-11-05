@@ -19,7 +19,7 @@ import { BasicEngine } from './basics'
 import { FlushGate } from '../ops/gates'
 import BasicMapperEngine from './basicmapper'
 import Command from '../ops/command'
-import { BasicQubit } from '../meta/qubit';
+import { BasicQubit, Qureg } from '../meta/qubit';
 import { NotYetMeasuredError } from '../meta/error'
 import { getEngineList } from '../setups'
 import Simulator from '../backends/simulators/simulator'
@@ -82,7 +82,7 @@ Alternatively, one can specify all compiler engines explicitly, e.g.,
       const engines = [new AutoReplacer(rule_set), new TagRemover(), new LocalOptimizer(3)]
       const eng = new MainEngine(new Simulator(), engines)
   */
-  constructor(backend: IEngine, engineList: IEngine[], verbose: boolean = false) {
+  constructor(backend: IEngine, engineList?: IEngine[], verbose: boolean = false) {
     super()
     if (!backend) {
       backend = new Simulator()
@@ -247,6 +247,6 @@ eng.getMeasurementResult(qubit[0]) == qubit.toNumber()
       this.activeQubits = new Set()
     }
 
-    this.receive([new Command(this, new FlushGate(), [[new BasicQubit(this, -1)]])])
+    this.receive([new Command(this, new FlushGate(), [new Qureg([new BasicQubit(this, -1)])])])
   }
 }

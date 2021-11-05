@@ -1,7 +1,7 @@
 import { Control } from '../../meta/control'
 import { Ph, R } from '../../ops/gates';
 import DecompositionRule from '../../cengines/replacer/decompositionrule';
-import { ICommand } from '@/interfaces';
+import { ICommand, IMathGate } from '@/interfaces';
 
 // Decompose the controlled phase gate (C^nPh(phase)).
 const _decompose_Ph = (cmd: ICommand) => {
@@ -9,7 +9,7 @@ const _decompose_Ph = (cmd: ICommand) => {
   const gate = cmd.gate
   const eng = cmd.engine
 
-  Control(eng, ctrl.slice(1), () => new R(gate.angle).or(ctrl[0]))
+  Control(eng, ctrl.slice(1), () => new R((gate as IMathGate).angle).or(ctrl[0]))
 }
 
 // Recognize the controlled phase gate.

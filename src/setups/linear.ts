@@ -12,8 +12,10 @@ import LocalOptimizer from '../cengines/optimize';
 import LinearMapper from '../cengines/linearmapper';
 import math from '../libs/math/defaultrules'
 import decompositions from './decompositions'
+import { IEngine, ICommand, IGate, GateClass, IQubit } from '@/interfaces';
+import { SpecialGate } from './constants';
 
-function high_level_gates(eng, cmd) {
+function high_level_gates(eng: IEngine, cmd: ICommand) {
   const g = cmd.gate
   if (g.equal(QFT) || getInverse(g).equal(QFT) || g.equal(Swap)) {
     return true
@@ -23,7 +25,7 @@ function high_level_gates(eng, cmd) {
   return true
 }
 
-function one_and_two_qubit_gates(eng, cmd) {
+function one_and_two_qubit_gates(eng: IEngine, cmd: ICommand) {
   const all_qubits = []
   cmd.allQubits.forEach(qr => qr.forEach(q => all_qubits.push(q)))
 
@@ -57,12 +59,12 @@ automatically allowed.
     @example
     getEngineList(10, false, tuple(Rz, Ry, Rx, H), tuple(CNOT))
 
-  @param {number} num_qubits Number of qubits in the chain
-  @param {boolean} cyclic If a circle or not. Default is false
-  @param {string|Array.<BasicGate>} one_qubit_gates "any" allows any one qubit gate, otherwise provide
+  @param num_qubits Number of qubits in the chain
+  @param cyclic If a circle or not. Default is false
+  @param one_qubit_gates "any" allows any one qubit gate, otherwise provide
 a tuple of the allowed gates. If the gates are instances of a class (e.g. X), it allows all gates
 which are equal to it. If the gate is a class (Rz), it allows all instances of this class. Default is "any"
-  @param {string|Array.<BasicGate>} two_qubit_gates "any" allows any two qubit gate, otherwise provide
+  @param two_qubit_gates "any" allows any two qubit gate, otherwise provide
 a tuple of the allowed gates. If the gates are instances of a class (e.g. CNOT), it allows all gates
 which are equal to it. If the gate is a class, it allows all instances of this class.
 Default is (CNOT, Swap).
@@ -70,20 +72,22 @@ Default is (CNOT, Swap).
 
     @return {Array<BasicEngine>} A list of suitable compiler engines.
  */
-export function getEngineList(num_qubits, cyclic = false, one_qubit_gates = 'any', two_qubit_gates = [CNOT, Swap]) {
-  if (two_qubit_gates !== 'any' && !Array.isArray(two_qubit_gates)) {
+export function getEngineList(num_qubits: number, cyclic: boolean = false,
+  one_qubit_gates: IGate[] | SpecialGate = SpecialGate.Any,
+  two_qubit_gates: IGate[] | SpecialGate = [CNOT, Swap]) {
+  if (two_qubit_gates !== SpecialGate.Any && !Array.isArray(two_qubit_gates)) {
     throw new Error("two_qubit_gates parameter must be 'any' or a tuple. "
       + 'When supplying only one gate, make sure to correctly '
       + "create the tuple (don't miss the comma), "
       + 'e.g. tuple(CNOT)')
   }
-  if (one_qubit_gates !== 'any' && !Array.isArray(one_qubit_gates)) {
+  if (one_qubit_gates !== SpecialGate.Any && !Array.isArray(one_qubit_gates)) {
     throw new Error("one_qubit_gates parameter must be 'any' or a tuple.")
   }
   const rule_set = new DecompositionRuleSet([...math, ...decompositions])
-  const allowed_gate_classes = []
-  const allowed_gate_instances = []
-  if (one_qubit_gates !== 'any') {
+  const allowed_gate_classes: GateClass[] = []
+  const allowed_gate_instances: any[] = []
+  if (one_qubit_gates !== SpecialGate.Any) {
     one_qubit_gates.forEach((gate) => {
       if (typeof gate === 'function') {
         allowed_gate_classes.push(gate)
@@ -92,7 +96,7 @@ export function getEngineList(num_qubits, cyclic = false, one_qubit_gates = 'any
       }
     })
   }
-  if (two_qubit_gates !== 'any') {
+  if (two_qubit_gates !== SpecialGate.Any) {
     two_qubit_gates.forEach((gate) => {
       if (typeof gate === 'function') {
         //  Controlled gate classes don't yet exists and would require
@@ -107,17 +111,17 @@ export function getEngineList(num_qubits, cyclic = false, one_qubit_gates = 'any
     })
   }
 
-  function low_level_gates(eng, cmd) {
-    const all_qubits = []
+  function low_level_gates(eng: IEngine, cmd: ICommand) {
+    const all_qubits: IQubit[] = [];
     cmd.allQubits.forEach(qr => qr.forEach(q => all_qubits.push(q)))
 
     assert(all_qubits.length <= 2)
     if (cmd.gate instanceof ClassicalInstructionGate) {
       // This is required to allow Measure, Allocate, Deallocate, Flush
       return true
-    } else if (one_qubit_gates === 'any' && len(all_qubits) === 1) {
+    } else if (one_qubit_gates === SpecialGate.Any && len(all_qubits) === 1) {
       return true
-    } else if (two_qubit_gates === 'any' && len(all_qubits) === 2) {
+    } else if (two_qubit_gates === SpecialGate.Any && len(all_qubits) === 2) {
       return true
     } else if (instanceOf(cmd.gate, allowed_gate_classes)) {
       return true

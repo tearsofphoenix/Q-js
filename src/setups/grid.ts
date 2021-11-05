@@ -12,7 +12,9 @@ import LocalOptimizer from '../cengines/optimize'
 import math from '../libs/math/defaultrules'
 import decompositions from './decompositions'
 import GridMapper from '../cengines/twodmapper';
-import { ICommand, IEngine, IQubit } from '@/interfaces';
+import { GateClass, ICommand, IEngine, IGate, IQubit } from '@/interfaces';
+import { SpecialGate } from './constants';
+
 /**
  * @ignore
  * @desc Remove any MathGates
@@ -75,21 +77,23 @@ function one_and_two_qubit_gates(eng: IEngine, cmd: ICommand) {
 
  @return {Array<BasicEngine>} A list of suitable compiler engines.
  */
-export function getEngineList(num_rows, num_columns, one_qubit_gates = 'any', two_qubit_gates = [CNOT, Swap]) {
-  if (two_qubit_gates !== 'any' && !Array.isArray(two_qubit_gates)) {
+export function getEngineList(num_rows: number, num_columns: number,
+  one_qubit_gates: IGate[] | SpecialGate = SpecialGate.Any,
+  two_qubit_gates: IGate[] | SpecialGate = [CNOT, Swap]) {
+  if (two_qubit_gates !== SpecialGate.Any && !Array.isArray(two_qubit_gates)) {
     throw new Error("two_qubit_gates parameter must be 'any' or a tuple. "
       + 'When supplying only one gate, make sure to correctly '
       + "create the tuple (don't miss the comma), "
       + 'e.g. tuple(CNOT)')
   }
-  if (one_qubit_gates !== 'any' && !Array.isArray(one_qubit_gates)) {
+  if (one_qubit_gates !== SpecialGate.Any && !Array.isArray(one_qubit_gates)) {
     throw new Error("one_qubit_gates parameter must be 'any' or a tuple.")
   }
   const rule_set = new DecompositionRuleSet([...math, ...decompositions])
-  const allowed_gate_classes = []
-  const allowed_gate_instances = []
+  const allowed_gate_classes: GateClass[] = [];
+  const allowed_gate_instances: any[] = [];
 
-  if (one_qubit_gates !== 'any') {
+  if (one_qubit_gates !== SpecialGate.Any) {
     one_qubit_gates.forEach((gate) => {
       if (typeof gate === 'function') {
         allowed_gate_classes.push(gate)
@@ -98,7 +102,7 @@ export function getEngineList(num_rows, num_columns, one_qubit_gates = 'any', tw
       }
     })
   }
-  if (two_qubit_gates !== 'any') {
+  if (two_qubit_gates !== SpecialGate.Any) {
     two_qubit_gates.forEach((gate) => {
       if (typeof gate === 'function') {
         //  Controlled gate classes don't yet exists and would require
@@ -113,7 +117,7 @@ export function getEngineList(num_rows, num_columns, one_qubit_gates = 'any', tw
     })
   }
 
-  function low_level_gates(eng, cmd) {
+  function low_level_gates(eng: IEngine, cmd: ICommand) {
     const allqubits = []
     cmd.allQubits.forEach(qr => qr.forEach(q => allqubits.push(q)))
 
@@ -121,9 +125,9 @@ export function getEngineList(num_rows, num_columns, one_qubit_gates = 'any', tw
     if (cmd.gate instanceof ClassicalInstructionGate) {
       // This is required to allow Measure, Allocate, Deallocate, Flush
       return true
-    } else if (one_qubit_gates === 'any' && allqubits.length === 1) {
+    } else if (one_qubit_gates === SpecialGate.Any && allqubits.length === 1) {
       return true
-    } else if (two_qubit_gates === 'any' && allqubits.length === 2) {
+    } else if (two_qubit_gates === SpecialGate.Any && allqubits.length === 2) {
       return true
     } else if (instanceOf(cmd.gate, allowed_gate_classes)) {
       return true

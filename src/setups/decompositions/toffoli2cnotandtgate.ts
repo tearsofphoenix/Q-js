@@ -1,4 +1,4 @@
-// """ Decompose the Toffoli gate into CNOT, H, T, and Tdagger gates. """
+// Decompose the Toffoli gate into CNOT, H, T, and Tdagger gates. """
 import { tuple } from '../../libs/util';
 import Gates, { H, NOT, T } from '../../ops/gates';
 import { CNOT } from '../../ops/shortcuts';
@@ -31,7 +31,7 @@ const _decompose_toffoli = (cmd: ICommand) => {
   H.or(target)
 }
 
-const _recognize_toffoli = cmd => cmd.controlCount === 2
+const _recognize_toffoli = (cmd: ICommand) => cmd.controlCount === 2
 
 export default [
   new DecompositionRule(NOT.constructor, _decompose_toffoli, _recognize_toffoli)

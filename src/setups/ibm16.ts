@@ -35,10 +35,6 @@ const grid_to_physical = {
   15: 9
 }
 
-/**
- *
- * @return {BasicEngine[]}
- */
 export function getEngineList() {
   const rule_set = new DecompositionRuleSet([...math, ...decompositions])
   return [

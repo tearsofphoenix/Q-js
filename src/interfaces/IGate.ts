@@ -1,3 +1,4 @@
+import { Matrix } from 'mathjs';
 import { ICopy } from './ICopy';
 import { QObject } from './IQubit';
 
@@ -14,6 +15,11 @@ interface IGate extends ICopy<IGate> {
 interface IMathGate extends IGate {
     a: number;
     N: number;
+    angle: number;
+    matrix: Matrix;
+    hamiltonian: any;
 }
 
-export { IGate, IMathGate };
+type GateClass = new (...args: any[]) => IGate;
+
+export { IGate, IMathGate, GateClass };

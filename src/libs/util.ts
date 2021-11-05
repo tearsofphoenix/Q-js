@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import math from 'mathjs'
+import math, { Matrix } from 'mathjs'
 
 /**
  * @ignore
  * generate a n-Length Array filled by `0`
- * @param {number} n
- * @return {number[]}
  */
-export function zeros(n) {
+export function zeros(n: number): number[] {
   const array = new Array(n)
   for (let i = 0; i < n; ++i) {
     array[i] = 0
@@ -61,7 +59,7 @@ export function markTuple(value: any) {
  * @param args
  * @return {Array}
  */
-export function tuple(...args) {
+export function tuple(...args: any) {
   const result = new Array(...args)
   markTuple(result)
   return result
@@ -81,10 +79,8 @@ export function ObjectCopy(obj: {}) {
 
 /**
  * return class hierachy of `cls`
- * @param {function} cls
- * @return {function[]}
  */
-export function classHierachy(cls) {
+export function classHierachy(cls: any) {
   const result = []
   if (typeof cls === 'function') {
     let { name } = cls
@@ -103,7 +99,7 @@ export function classHierachy(cls) {
  * @param {function} superClass
  * @return {boolean}
  */
-export function isSubclassOf(cls, superClass) {
+export function isSubclassOf(cls: any, superClass: any): boolean {
   if (typeof cls === 'function' && typeof superClass === 'function') {
     const targetName = superClass.name
     let { name } = cls
@@ -122,11 +118,8 @@ export function isSubclassOf(cls, superClass) {
 
 /**
  * check if `cls` is kind of `superClass`, will return true if cls is superClass
- * @param {function} cls
- * @param {function} superClass
- * @return {boolean}
  */
-export function isKindclassOf(cls, superClass) {
+export function isKindclassOf(cls: any, superClass: any): boolean {
   if (typeof cls === 'function' && typeof superClass === 'function') {
     const targetName = superClass.name
     let { name } = cls
@@ -143,11 +136,8 @@ export function isKindclassOf(cls, superClass) {
 
 /**
  * check if `inst` is instance of `cls`, specialized for some class
- * @param {any} inst
- * @param {function} cls
- * @return {boolean}
  */
-export function instanceOf(inst, cls) {
+export function instanceOf(inst: any, cls: any): boolean {
   if (Array.isArray(cls)) {
     return cls.some(looper => instanceOf(inst, looper))
   }
@@ -167,11 +157,8 @@ export function instanceOf(inst, cls) {
 /**
  * @ignore
  * return item * n string like python does.
- * @param {string} item
- * @param {number} n
- * @return {string}
  */
-export function genString(item, n) {
+export function genString(item: string, n: number): string {
   let str = ''
   for (let i = 0; i < n; ++i) {
     str += item
@@ -182,11 +169,8 @@ export function genString(item, n) {
 /**
  * @ignore
  * assign value in `vector` into `matrix` by index in `indices`
- * @param {math.matrix} matrix
- * @param {number[]} indices
- * @param {number[]} vector
  */
-export function matrixRangeAssign(matrix, indices, vector) {
+export function matrixRangeAssign(matrix: Matrix, indices: number[], vector: any) {
   if (Array.isArray(vector)) {
     indices.forEach(idx => matrix.subset(math.index(idx), vector[idx]))
   } else {
@@ -194,15 +178,7 @@ export function matrixRangeAssign(matrix, indices, vector) {
   }
 }
 
-/**
- * @ignore
- * @param matrix
- * @param mstart
- * @param mend
- * @param vector
- * @param vstart
- */
-export function matrixRangeIndicesAssign(matrix, mstart, mend, vector, vstart) {
+export function matrixRangeIndicesAssign(matrix: Matrix, mstart: number, mend: number, vector: any, vstart: number) {
   if (Array.isArray(vector)) {
     for (let i = 0; i + mstart < mend; ++i) {
       matrix.subset(math.index(i + mstart), vector[vstart + i])
@@ -217,11 +193,8 @@ export function matrixRangeIndicesAssign(matrix, mstart, mend, vector, vstart) {
 /**
  * @ignore
  * return a row of matrix
- * @param {math.matrix} matrix
- * @param {number} index
- * @return {number[]}
  */
-export function matrixGetRow(matrix, index) {
+export function matrixGetRow(matrix: Matrix, index: number) {
   const rows = math.size(matrix).valueOf()[1];
   return math.flatten(math.subset(matrix, math.index(index, math.range(0, rows))));
 }
@@ -229,11 +202,8 @@ export function matrixGetRow(matrix, index) {
 /**
  * @ignore
  * dot product of matrix & vector
- * @param {math.matrix} matrix
- * @param {number[]} vector
- * @return {math.matrix}
  */
-export function matrixDot(matrix, vector) {
+export function matrixDot(matrix: Matrix, vector: any) {
   const [rows] = matrix.size()
   const result = []
   for (let i = 0; i < rows; ++i) {

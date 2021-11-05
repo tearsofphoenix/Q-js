@@ -25,20 +25,19 @@ import { tuple } from '../libs/util';
 import Command from '../ops/command';
 import { BasicQubit } from '../meta/qubit';
 import { LogicalQubitIDTag } from '../meta';
+import { ICommand } from '@/interfaces';
 
 /**
  * @class Position
  */
 export class Position {
-  /**
-   * @constructor
-   * @param {number} current_row
-   * @param {number} current_column
-   * @param {number} final_row
-   * @param {number} final_column
-   * @param {number} row_after_step_1
-   */
-  constructor(current_row, current_column, final_row, final_column, row_after_step_1) {
+  current_row: number;
+  current_column: number;
+  final_row: number;
+  final_column: number;
+  row_after_step_1: number;
+
+  constructor(current_row: number, current_column: number, final_row: number, final_column: number, row_after_step_1: number) {
     this.current_row = current_row
     this.current_column = current_column
     this.final_row = final_row
@@ -47,8 +46,16 @@ export class Position {
   }
 }
 
+type GridArguments = {
+  num_rows: number;
+  num_columns: number;
+  mapped_ids_to_backend_ids?: {};
+  storage?: number;
+  optimization_function?: Function;
+  num_optimization_steps?: number
+}
+
 /**
- * @class GridMapper
  * @desc
 Mapper to a 2-D grid graph.
 
@@ -85,13 +92,10 @@ mappings which have been applied
  */
 export default class GridMapper extends BasicMapperEngine {
   /**
-   * @constructor
   Initialize a GridMapper compiler engine.
-
-    @param {{num_rows: number, num_columns: number, mapped_ids_to_backend_ids: ?Object, storage: ?number, optimization_function: ?function, num_optimization_steps: ?number}} args
     @throws {Error} if incorrect `mapped_ids_to_backend_ids` parameter
    */
-  constructor(args) {
+  constructor(args: GridArguments) {
     super()
     /**
      * @type {Object}
@@ -498,7 +502,7 @@ which don't store any information.
     const active_ids = new Set(Array.from(this._currently_allocated_ids).map(k => parseInt(k, 10)))
     Object.keys(this._current_row_major_mapping).forEach(logical_id => active_ids.add(parseInt(logical_id, 10)))
 
-    let new_stored_commands = []
+    let new_stored_commands: ICommand[] = []
     for (let i = 0; i < this._stored_commands.length; ++i) {
       const cmd = this._stored_commands[i]
       if (len(active_ids) === 0) {

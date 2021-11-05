@@ -81,9 +81,9 @@ correct input parameter of a Command object which is:
     4) -> Gate | ([qubit], )
     5) -> Gate | (qureg, [qubit])
  
-@param {Qubit|Qubit[]|Qureg|Qureg[]} qubits a Qubit object, a list of Qubit objects, a Qureg object,
+@param qubits a Qubit object, a list of Qubit objects, a Qureg object,
     or a tuple of Qubit or Qureg objects (can be mixed).
-@returns {Qureg[]} Canonical representation A tuple containing Qureg (or list of Qubits) objects.
+@returns Canonical representation A tuple containing Qureg (or list of Qubits) objects.
      */
   static makeTupleOfQureg(qubits: QObject): IQureg[] {
     const isTuple = arrayIsTuple(qubits);

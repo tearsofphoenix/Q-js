@@ -15,11 +15,11 @@
  */
 
 import assert from 'assert'
-import {BasicEngine} from './basics'
-import {FastForwardingGate} from '../ops/basics';
-import {FlushGate} from '../ops/gates'
-import {instanceOf} from '../libs/util'
-import {NotMergeable} from '../meta/error';
+import { BasicEngine } from './basics'
+import { FastForwardingGate } from '../ops/basics';
+import { FlushGate } from '../ops/gates'
+import { instanceOf } from '../libs/util'
+import { NotMergeable } from '../meta/error';
 
 
 /**
@@ -47,10 +47,10 @@ export default class LocalOptimizer extends BasicEngine {
 
   /**
    * Send n gate operations of the qubit with index idx to the next engine.
-   * @param {number} idx qubit index
-   * @param {number} n command position in qubit idx's command list
+   * @param idx qubit index
+   * @param n command position in qubit idx's command list
    */
-  sendQubitPipeline(idx, n) {
+  sendQubitPipeline(idx: number, n: number) {
     if (typeof idx !== 'number') {
       idx = parseInt(idx, 10)
     }
@@ -101,12 +101,11 @@ export default class LocalOptimizer extends BasicEngine {
     Return all indices of a command, each index corresponding to the
     command's index in one of the qubits' command lists.
 
-    @param {number} idx qubit index
-    @param {number} i command position in qubit idx's command list
-    @param {number[]} IDs IDs of all qubits involved in the command
-    @return {number[]}
+    @param idx qubit index
+    @param i command position in qubit idx's command list
+    @param IDs IDs of all qubits involved in the command
   */
-  getGateIndices(idx, i, IDs) {
+  getGateIndices(idx: number, i: number, IDs: number[]): number[] {
     if (typeof idx !== 'number') {
       idx = parseInt(idx, 10)
     }
@@ -128,9 +127,9 @@ export default class LocalOptimizer extends BasicEngine {
       }
     })
 
-    const indices = []
+    const indices: number[] = []
     IDs.forEach((Id) => {
-      const identical_indices = []
+      const identical_indices: number[] = []
       this._l[Id].forEach((c, j) => {
         if (c.equal(cmd)) {
           identical_indices.push(j)
@@ -163,12 +162,12 @@ getInverse functions of the gate (see, e.g., BasicRotationGate).
     }
 
     while (i < limit - 1) {
-    // can be dropped if two in a row are self-inverses
+      // can be dropped if two in a row are self-inverses
       const cmd = this._l[idx][i]
       const inv = cmd.getInverse()
 
       if (inv.equal(this._l[idx][i + 1])) {
-      // determine index of this gate on all qubits
+        // determine index of this gate on all qubits
         const qubitids = []
         cmd.allQubits.forEach(sublist => sublist.forEach(qb => qubitids.push(qb.id)))
         const gid = this.getGateIndices(idx, i, qubitids)

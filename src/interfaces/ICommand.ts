@@ -1,8 +1,9 @@
 import { IGate } from './IGate';
 import { IQubit, IQureg } from './IQubit';
 import { IEngine } from './IEngine';
+import { IEquality } from './IEquality';
 
-interface ICommand {
+interface ICommand extends IEquality<ICommand> {
     gate: IGate;
     tags: any[];
     qubits: IQureg[];

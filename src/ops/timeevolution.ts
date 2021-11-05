@@ -16,11 +16,12 @@
 
 import assert from 'assert'
 import math from 'mathjs'
-import {BasicGate} from './basics'
-import QubitOperator, {stringToArray} from './qubitoperator'
-import {setEqual, isComplex, isNumeric} from '../libs/polyfill'
-import {Ph} from './gates'
-import {NotMergeable} from "../meta/error";
+import { BasicGate } from './basics'
+import QubitOperator, { stringToArray } from './qubitoperator'
+import { setEqual, isComplex, isNumeric } from '../libs/polyfill'
+import { Ph } from './gates'
+import { NotMergeable } from "../meta/error";
+import { IGate, QObject } from '@/interfaces';
 
 /**
  * @class TimeEvolution
@@ -44,20 +45,21 @@ Attributes:
 hamiltonian(QubitOperator): hamiltonaian H
  */
 export default class TimeEvolution extends BasicGate {
+  time: number;
+  hamiltonian: QubitOperator;
   /**
-   * @constructor
     Note:
 The hamiltonian must be hermitian and therefore only terms with
     real coefficients are allowed.
     Coefficients are internally converted to float.
 
-    @param {number} time time to evolve under (can be negative).
-    @param {QubitOperator} hamiltonian hamiltonian to evolve under.
+    @param time time to evolve under (can be negative).
+    @param hamiltonian hamiltonian to evolve under.
 
-    @throws {Error} If time is not a numeric type and hamiltonian is not a QubitOperator.
-    @throws {NotHermitianOperatorError} If the input hamiltonian is not hermitian (only real coefficients).
+    @throws If time is not a numeric type and hamiltonian is not a QubitOperator.
+    @throws If the input hamiltonian is not hermitian (only real coefficients).
    */
-  constructor(time, hamiltonian) {
+  constructor(time: number, hamiltonian: QubitOperator) {
     super()
     if (typeof time !== 'number') {
       throw new Error('time needs to be a (real) numeric type.')
@@ -77,16 +79,16 @@ The hamiltonian must be hermitian and therefore only terms with
             this.hamiltonian.terms[term] = math.re(item)
           } else {
             throw new Error('hamiltonian must be '
-                + 'hermitian and hence only '
-                + 'have real coefficients.')
+              + 'hermitian and hence only '
+              + 'have real coefficients.')
           }
         } else {
           this.hamiltonian.terms[term] = item
         }
       } else {
         throw new Error('hamiltonian must be '
-        + 'hermitian and hence only '
-        + 'have real coefficients.')
+          + 'hermitian and hence only '
+          + 'have real coefficients.')
       }
     })
   }
@@ -115,14 +117,14 @@ We are not comparing if terms are proportional to each other with
 to zero because we cannot choose a suitable absolute error which
 works for everyone. Use, e.g., a decomposition rule for that.
 
-   @param {TimeEvolution} other TimeEvolution gate
+   @param other TimeEvolution gate
 
-   @throws {NotMergeable} If the other gate is not a TimeEvolution gate or
+   @throws If the other gate is not a TimeEvolution gate or
     hamiltonians are not suitable for merging.
 
    @return {TimeEvolution} New TimeEvolution gate equivalent to the two merged gates.
    */
-  getMerged(other) {
+  getMerged(other: IGate): IGate {
     const rel_tol = 1e-9
     if (!(other instanceof TimeEvolution)) {
       throw new NotMergeable('Cannot merge these two gates.')
@@ -144,8 +146,8 @@ works for everyone. Use, e.g., a decomposition rule for that.
         }
       })
 
-      const newTime = this.time + other.time / factor
-      return new TimeEvolution(newTime, this.hamiltonian)
+      const newTime = this.time + other.time / factor;
+      return new TimeEvolution(newTime, this.hamiltonian);
     } else {
       throw new NotMergeable('Cannot merge these two gates.')
     }
@@ -183,10 +185,10 @@ TimeEvolution(2.0, h) | [wavefunction[1], wavefunction[3]]
 
 which is only a two qubit gate.
 
-    @param {Array.<Qubit>|Qureg|Qubit} qubits one Qubit object, one list of Qubit objects, one Qureg
+    @param qubits one Qubit object, one list of Qubit objects, one Qureg
       object, or a tuple of the former three cases.
   */
-  or(qubits) {
+  or(qubits: QObject) {
     // Check that input is only one qureg or one qubit
     qubits = BasicGate.makeTupleOfQureg(qubits)
     if (qubits.length !== 1) {
@@ -239,7 +241,7 @@ which is only a two qubit gate.
     cmd.apply()
   }
 
-  equal() {
+  equal(): boolean {
     throw new Error('Not implemented')
   }
 
