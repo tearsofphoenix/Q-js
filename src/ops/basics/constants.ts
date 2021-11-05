@@ -1,0 +1,2 @@
+export const ANGLE_PRECISION = 12
+export const ANGLE_TOLERANCE = 10 ** -ANGLE_PRECISION
