@@ -1,14 +1,13 @@
 import math from 'mathjs'
+// @ts-ignore
 import deepEqual from 'deep-eql'
-import {BasicGate, ANGLE_PRECISION, ANGLE_TOLERANCE} from './basics'
-import {NotMergeable} from '../meta/error'
+import { BasicGate, ANGLE_PRECISION, ANGLE_TOLERANCE } from './basics'
+import { NotMergeable } from '../meta/error'
+import { IGate } from '@/interfaces';
 
-/**
- * @param {number[]} angles
- * @return {number[]}
- */
-function roundAngles(angles) {
-  const rounded_angles = []
+
+function roundAngles(angles: number[]) {
+  const rounded_angles: number[] = []
   angles.forEach((angle) => {
     let newAngle = math.round(angle % (4 * math.pi), ANGLE_PRECISION)
     if (newAngle > 4 * math.pi - ANGLE_TOLERANCE) {
@@ -48,14 +47,10 @@ function roundAngles(angles) {
  angles(list[float]): Rotation angles. Ry(angles[k]) is applied
  conditioned on the control qubits being in state
  k.
- * @class UniformlyControlledRy
  */
 export class UniformlyControlledRy extends BasicGate {
-  /**
-   * @constructor
-   * @param {number[]} angles
-   */
-  constructor(angles) {
+  angles: number[];
+  constructor(angles: number[]) {
     super()
     this.angles = roundAngles(angles)
   }
@@ -64,7 +59,7 @@ export class UniformlyControlledRy extends BasicGate {
     return new UniformlyControlledRy(this.angles.map(angle => -angle))
   }
 
-  getMerged(other) {
+  getMerged(other: IGate) {
     if (other instanceof UniformlyControlledRy) {
       const angles = other.angles.map((a1, idx) => a1 + this.angles[idx])
       return new UniformlyControlledRy(angles)
@@ -78,7 +73,7 @@ export class UniformlyControlledRy extends BasicGate {
     return `UniformlyControlledRy([${str}])`
   }
 
-  equal(other) {
+  equal(other: IGate) {
     if (other instanceof UniformlyControlledRy) {
       return deepEqual(this.angles, other.angles)
     }
@@ -115,11 +110,8 @@ export class UniformlyControlledRy extends BasicGate {
  @class UniformlyControlledRz
  */
 export class UniformlyControlledRz extends BasicGate {
-  /**
-   * @constructor
-   * @param {number[]} angles
-   */
-  constructor(angles) {
+  angles: number[];
+  constructor(angles: number[]) {
     super()
     this.angles = roundAngles(angles)
   }
@@ -128,7 +120,7 @@ export class UniformlyControlledRz extends BasicGate {
     return new UniformlyControlledRz(this.angles.map(angle => -angle))
   }
 
-  getMerged(other) {
+  getMerged(other: IGate) {
     if (other instanceof UniformlyControlledRz) {
       const angles = other.angles.map((a1, idx) => a1 + this.angles[idx])
       return new UniformlyControlledRz(angles)
@@ -142,7 +134,7 @@ export class UniformlyControlledRz extends BasicGate {
     return `UniformlyControlledRz([${str}])`
   }
 
-  equal(other) {
+  equal(other: IGate) {
     if (other instanceof UniformlyControlledRz) {
       return deepEqual(this.angles, other.angles)
     }

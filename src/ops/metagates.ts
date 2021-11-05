@@ -28,12 +28,12 @@ As well as the meta functions
 and upon failure returns a DaggeredGate)
 * C (Creates an n-ary controlled version of an arbitrary gate)
 */
-import math from 'mathjs'
+import math, { Matrix } from 'mathjs'
 import { BasicGate } from './basics'
 import { Control } from '../meta/control'
 import Cycle, { getInverse } from './_cycle'
 import { arrayIsTuple } from '../libs/util'
-import { IGate, QObject } from '@/interfaces';
+import { IGate, IQureg, QObject } from '@/interfaces';
 
 /**
  * @class DaggeredGate
@@ -60,6 +60,7 @@ the decomposition function inside a "with Dagger"-statement.
  */
 export class DaggeredGate extends BasicGate {
   gate: IGate;
+  _matrix: Matrix;
   /**
    * @constructor
     Initialize a DaggeredGate representing the inverse of the gate 'gate'.
@@ -70,6 +71,7 @@ export class DaggeredGate extends BasicGate {
     super()
     this.gate = gate;
     try {
+      // @ts-ignore
       this._matrix = math.ctranspose(gate.matrix);
     } catch (e) {
       console.warn(e);
@@ -170,8 +172,8 @@ qureg. The following quregs belong to the gate.
      */
   or(qubits: QObject) {
     qubits = BasicGate.makeTupleOfQureg(qubits)
-    let ctrl = []
-    const gateQuregs = []
+    let ctrl: IQureg[] = []
+    const gateQuregs: IQureg[] = []
     let addingToControls = true
     qubits.forEach((reg) => {
       if (addingToControls) {
@@ -185,9 +187,9 @@ qureg. The following quregs belong to the gate.
     // Test that there were enough control quregs and that that
     // the last control qubit was the last qubit in a qureg.
     if (ctrl.length !== this.n) {
-      throw new Error('Wrong number of control qubits. '
-        + 'First qureg(s) need to contain exactly '
-        + 'the required number of control quregs.')
+      throw new Error(`Wrong number of control qubits. 
+        First qureg(s) need to contain exactly 
+        the required number of control quregs.`);
     }
 
     Control(gateQuregs[0][0].engine, ctrl, () => this.gate.or(gateQuregs))

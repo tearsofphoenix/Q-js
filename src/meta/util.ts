@@ -14,29 +14,32 @@
  * limitations under the License.
  */
 
+import { IEngine } from '@/interfaces';
 /**
 Inserts an engine into the singly-linked list of engines.
     It also sets the correct main_engine for engine_to_insert.
 
-@param {BasicEngine} prevEngine The engine just before the insertion point.
-@param {BasicEngine} engineToInsert The engine to insert at the insertion point.
+@param prevEngine The engine just before the insertion point.
+@param engineToInsert The engine to insert at the insertion point.
  */
-export function insertEngine(prevEngine, engineToInsert) {
-  engineToInsert.main = prevEngine.main
-  engineToInsert.next = prevEngine.next
-  prevEngine.next = engineToInsert
+export function insertEngine(prevEngine: IEngine, engineToInsert: IEngine): void {
+  engineToInsert.main = prevEngine.main;
+  engineToInsert.next = prevEngine.next;
+  prevEngine.next = engineToInsert;
 }
 
 /**
 Removes an engine from the singly-linked list of engines.
 
-    @param {BasicEngine} engine The engine just before the engine to drop.
-    @return {BasicEngine} The dropped engine.
+    @param engine The engine just before the engine to drop.
+    @return The dropped engine.
  */
-export function dropEngineAfter(engine) {
-  const e = engine.next
-  engine.next = e.next
-  delete e.next
-  delete e.main
-  return e
+export function dropEngineAfter(engine: IEngine): IEngine {
+  const e = engine.next;
+  engine.next = e.next;
+  // @ts-ignore
+  delete e.next;
+  // @ts-ignore
+  delete e.main;
+  return e;
 }

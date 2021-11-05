@@ -41,7 +41,7 @@ matrix.
     U = [[exp(j*(a-b/2-d/2))*cos(c/2), -exp(j*(a-b/2+d/2))*sin(c/2)],
   [exp(j*(a+b/2-d/2))*sin(c/2), exp(j*(a+b/2+d/2))*cos(c/2)]]
 
-  @param {Array.<number[]>} matrix 2x2 matrix
+  @param matrix 2x2 matrix
   @param a parameter of U
   @param b_half b/2. parameter of U
   @param c_half c/2. parameter of U
@@ -49,7 +49,7 @@ matrix.
 
 @return {boolean} true if matrix elements of U and `matrix` are TOLERANCE close.
  */
-const _test_parameters = (matrix: Matrix, a: number, b_half: number, c_half: number, d_half: number) => {
+const _test_parameters = (matrix: number[][], a: number, b_half: number, c_half: number, d_half: number) => {
   const mc = math.complex
   const mm = math.multiply
   const U = [
@@ -84,10 +84,10 @@ export const _find_parameters = (matrix: number[][]) => {
   // Determine a, b/2, c/2 and d/2 (3 different cases).
   // Note: everything is modulo 2pi.
   let a: number;
-  let b_half
-  let c_half
-  let d_half
-  const mm = math.multiply
+  let b_half;
+  let c_half;
+  let d_half;
+  const mm = math.multiply;
   // Case 1: sin(c/2) == 0:
   if (math.abs(matrix[0][1]) < TOLERANCE) {
     const t = phase(mm(matrix[0][0], matrix[1][1]))
@@ -106,9 +106,9 @@ export const _find_parameters = (matrix: number[][]) => {
     // As we have fixed a, we need to find correct sign for cos(c/2)
     const possible_c_half = [0.0, math.pi]
     let found = false
-    productLoop(possible_b_half, possible_c_half, (_b, _c) => {
-      b_half = _b
-      c_half = _c
+    productLoop(possible_b_half, possible_c_half, (_b: number, _c: number) => {
+      b_half = _b;
+      c_half = _c;
       if (_test_parameters(matrix, a, b_half, c_half, d_half)) {
         found = true
         return true

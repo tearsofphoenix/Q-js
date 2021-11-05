@@ -8,7 +8,7 @@ interface ICommand {
     qubits: IQureg[];
     controlQubits: IQubit[];
     engine: IEngine;
-    allQubits: IQubit[];
+    allQubits: IQureg[];
     controlCount: number;
     addControlQubits(qubits: IQubit[]): void;
     apply(): void;

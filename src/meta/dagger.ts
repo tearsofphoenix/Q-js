@@ -24,11 +24,12 @@ Tools to easily invert a sequence of gates.
 })
 */
 
-import {BasicEngine} from '../cengines/basics'
-import {Allocate, Deallocate} from '../ops/gates'
-import {insertEngine, dropEngineAfter} from './util'
-import {setEqual} from '../libs/polyfill';
-import {QubitManagementError} from './error';
+import { BasicEngine } from '../cengines/basics'
+import { Allocate, Deallocate } from '../ops/gates'
+import { insertEngine, dropEngineAfter } from './util'
+import { setEqual } from '../libs/polyfill';
+import { QubitManagementError } from './error';
+import { IEngine, ICommand } from '@/interfaces';
 
 /**
  * @class DaggerEngine
@@ -36,9 +37,10 @@ import {QubitManagementError} from './error';
  *  Stores all commands and, when done, inverts the circuit & runs it.
 */
 export class DaggerEngine extends BasicEngine {
-  /**
-   * @constructor
-   */
+  commands: ICommand[];
+  allocateQubitIDs: Set<number>;
+  deallocateQubitIDs: Set<number>;
+
   constructor() {
     super()
     this.commands = []
@@ -53,25 +55,26 @@ export class DaggerEngine extends BasicEngine {
     if (!setEqual(this.deallocateQubitIDs, this.allocateQubitIDs)) {
       throw new QubitManagementError(
         "\n Error. Qubits have been allocated in 'with "
-          + "Dagger(eng)' context,\n which have not explicitely "
-          + 'been deallocated.\n'
-          + 'Correct usage:\n'
-          + 'with Dagger(eng):\n'
-          + '    qubit = eng.allocateQubit()\n'
-          + '    ...\n'
-          + '    del qubit[0]\n'
+        + "Dagger(eng)' context,\n which have not explicitely "
+        + 'been deallocated.\n'
+        + 'Correct usage:\n'
+        + 'with Dagger(eng):\n'
+        + '    qubit = eng.allocateQubit()\n'
+        + '    ...\n'
+        + '    del qubit[0]\n'
       )
     }
-    this.commands.rforEach((cmd) => {
+    // @ts-ignore
+    this.commands.rforEach((cmd: ICommand) => {
       this.send([cmd.getInverse()])
     })
   }
 
   /**
     Receive a list of commands and store them for later inversion.
-    @param {Command[]} cmdList List of commands to temporarily store.
+    @param cmdList List of commands to temporarily store.
   */
-  receive(cmdList) {
+  receive(cmdList: ICommand[]) {
     cmdList.forEach((cmd) => {
       if (cmd.gate.equal(Allocate)) {
         this.allocateQubitIDs.add(cmd.qubits[0][0].id)
@@ -111,11 +114,10 @@ The **correct way** of handling qubit (de-)allocation is as follows:
     qb.deallocate() // sends deallocate gate (which becomes an allocate)
   })
 
- @param {BasicEngine} engine Engine which handles the commands (usually MainEngine)
- @param {function} func
+ @param engine Engine which handles the commands (usually MainEngine)
  */
-export function Dagger(engine, func) {
-  let daggerEngine = null
+export function Dagger(engine: IEngine, func: Function) {
+  let daggerEngine: DaggerEngine;
 
   const enter = () => {
     daggerEngine = new DaggerEngine()
@@ -123,8 +125,7 @@ export function Dagger(engine, func) {
   }
 
   const exit = () => {
-    daggerEngine.run()
-    daggerEngine = null
+    daggerEngine.run();
     dropEngineAfter(engine)
   }
 

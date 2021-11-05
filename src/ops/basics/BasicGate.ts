@@ -1,7 +1,8 @@
-import { ICommand, IEngine, IGate, IQubit, QObject, IQureg } from '@/interfaces';
+import { ICommand, IEngine, IGate, QObject, IQureg } from '@/interfaces';
 import { NotMergeable } from '@/meta/error';
-import { ObjectCopy } from '@/libs/util';
+import { ObjectCopy, arrayIsTuple } from '@/libs/util';
 import Command from '../command';
+import { BasicQubit } from '@/meta/qubit';
 /**
  * @abstract
  * @class BasicGate
@@ -87,14 +88,14 @@ correct input parameter of a Command object which is:
   static makeTupleOfQureg(qubits: QObject): IQureg[] {
     const isTuple = arrayIsTuple(qubits);
     if (!isTuple) {
-      qubits = [qubits]
+      qubits = [qubits as any];
     }
-    qubits.forEach((looper, idx) => {
+    (qubits as any[]).forEach((looper, idx) => {
       if (looper instanceof BasicQubit) {
         qubits[idx] = [looper]
       }
     })
-    return qubits.slice(0);
+    return (qubits as any[]).slice(0);
   }
 
   /**

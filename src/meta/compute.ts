@@ -31,17 +31,20 @@ import {
   unionSet, setEqual, setIsSuperSet, intersection
 } from '../libs/polyfill'
 import { QubitManagementError } from './error'
+import { ICommand, IEngine } from '@/interfaces';
 
 /**
  * @class ComputeEngine
  * @desc Adds Compute-tags to all commands and stores them (to later uncompute them automatically)
  */
 export class ComputeEngine extends BasicEngine {
-  /**
-   * @constructor
-   */
+  allocatedQubitIDs: Set<number>;
+  deallocatedQubitIDs: Set<number>;
+  private _compute: boolean;
+  private _l: ICommand[];
+
   constructor() {
-    super()
+    super();
     this._l = []
     this._compute = true
     // Save all qubit ids from qubits which are created or destroyed.
@@ -53,7 +56,7 @@ export class ComputeEngine extends BasicEngine {
     Modify the command tags, inserting an UncomputeTag.
     @param {Command} cmd Command to modify.
      */
-  addUnComputeTag(cmd) {
+  addUnComputeTag(cmd: ICommand) {
     cmd.tags.push(new UncomputeTag())
     return cmd
   }
@@ -71,7 +74,8 @@ uncompute.
   runUnCompute() {
     // No qubits allocated during Compute section -> do standard uncompute
     if (this.allocatedQubitIDs.size === 0) {
-      const cmds = this._l.rmap(cmd => this.addUnComputeTag(cmd.getInverse()))
+      // @ts-ignore
+      const cmds = this._l.rmap((cmd: ICommand) => this.addUnComputeTag(cmd.getInverse()))
       this.send(cmds)
       return
     }
@@ -88,7 +92,8 @@ uncompute.
     // Don't inspect each command as below -> faster uncompute
     // Just find qubits which have been allocated and deallocate them
     if (ids_local_to_compute.size === 0) {
-      this._l.rforEach((cmd) => {
+      // @ts-ignore
+      this._l.rforEach((cmd: ICommand) => {
         if (cmd.gate.equal(Allocate)) {
           const qubit_id = cmd.qubits[0][0].id
           // Remove this qubit from MainEngine.active_qubits and
@@ -119,13 +124,14 @@ uncompute.
     // There was at least one qubit allocated and deallocated within
     // compute section. Handle uncompute in most general case
     const new_local_id = {}
-    this._l.slice(0).rforEach((cmd) => {
+    // @ts-ignore
+    this._l.slice(0).rforEach((cmd: ICommand) => {
       if (cmd.gate.equal(Deallocate)) {
         assert(ids_local_to_compute.has(cmd.qubits[0][0].id))
         // Create new local qubit which lives within uncompute section
 
         // Allocate needs to have old tags + uncompute tag
-        const add_uncompute = (command, old_tags = cmd.tags.slice(0)) => {
+        const add_uncompute = (command: ICommand, old_tags = cmd.tags.slice(0)) => {
           command.tags = old_tags.concat([new UncomputeTag()])
           return command
         }
@@ -212,9 +218,9 @@ section which has not been allocated in Compute section
     Add ComputeTag to received cmd and send it on.
     Otherwise: send all received commands directly to next_engine.
 
-    @param {Command[]} commandList List of commands to receive.
+    @param commandList List of commands to receive.
    */
-  receive(commandList) {
+  receive(commandList: ICommand[]) {
     if (this._compute) {
       commandList.forEach((cmd) => {
         if (cmd.gate.equal(Allocate)) {
@@ -234,6 +240,8 @@ section which has not been allocated in Compute section
  * @class Uncompute
  */
 export class UncomputeEngine extends BasicEngine {
+  allocatedQubitIDs: Set<number>;
+  deallocatedQubitIDs: Set<number>;
   /**
    * @constructor
    */
@@ -247,9 +255,9 @@ export class UncomputeEngine extends BasicEngine {
   /**
   Receive commands and add an UncomputeTag to their tags.
 
-    @param {Command[]} commandList List of commands to handle.
+    @param commandList List of commands to handle.
    */
-  receive(commandList) {
+  receive(commandList: ICommand[]) {
     commandList.forEach((cmd) => {
       if (cmd.gate.equal(Allocate)) {
         this.allocatedQubitIDs.add(cmd.qubits[0][0].id)
@@ -312,16 +320,15 @@ using CustomUncompute.
 
     Failure to comply with these rules results in an exception being thrown.
  */
-export function Compute(engine, func) {
-  let computeEngine = null
+export function Compute(engine: IEngine, func: Function) {
+  let computeEngine: ComputeEngine;
   const enter = () => {
     computeEngine = new ComputeEngine()
     insertEngine(engine, computeEngine)
   }
 
   const exit = () => {
-    computeEngine.endCompute()
-    computeEngine = null
+    computeEngine.endCompute();
   }
 
   if (typeof func === 'function') {
@@ -354,10 +361,10 @@ Compute(eng, () => {
 @throws {QubitManagementError} If qubits are allocated within Compute or within
 CustomUncompute context but are not deallocated.
  */
-export function CustomUncompute(engine, func) {
+export function CustomUncompute(engine: IEngine, func: Function) {
   let allocatedQubitIDs = new Set()
   let deallocatedQubitIDs = new Set()
-  let uncomputeEngine = null
+  let uncomputeEngine: UncomputeEngine;
 
   const enter = () => {
     // first, remove the compute engine
@@ -415,7 +422,7 @@ Uncompute automatically.
   action(qubits)
   Uncompute(eng) // runs inverse of the compute section
  */
-export function Uncompute(engine) {
+export function Uncompute(engine: IEngine) {
   const compute_eng = engine.next
   if (!(compute_eng instanceof ComputeEngine)) {
     throw new Error('Invalid call to Uncompute: No corresponding "Compute" statement found.')

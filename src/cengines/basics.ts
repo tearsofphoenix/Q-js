@@ -87,12 +87,12 @@ the JavaScript program (using atexit), deallocating all qubits which are
 still alive. Qubit ids of dirty qubits are registered in MainEngine's
 dirty_qubits set.
 
-    @param {boolean} dirty If true, indicates that the allocated qubit may be
+    @param dirty If true, indicates that the allocated qubit may be
     dirty (i.e., in an arbitrary initial state).
 
-    @return {Qureg} Qureg of length 1, where the first entry is the allocated qubit.
+    @return Qureg of length 1, where the first entry is the allocated qubit.
   */
-  allocateQubit(dirty = false): IQureg {
+  allocateQubit(dirty: boolean = false): IQureg {
     const new_id = this.main.getNewQubitID();
     const qubit = new Qubit(this, new_id);
     const qb = new Qureg(qubit);
@@ -154,9 +154,9 @@ DirtyQubitTag() to Deallocate command.
   /**
     Check if there is a compiler engine handling the meta tag
 
-    @param {function} metaTag Meta tag class for which to check support
+    @param metaTag Meta tag class for which to check support
 
-    @return {boolean} true if one of the further compiler engines is a
+    @return true if one of the further compiler engines is a
 meta tag handler, i.e., engine.is_meta_tag_handler(meta_tag)
 returns true.
      */

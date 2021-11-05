@@ -1,10 +1,13 @@
-import {BasicGate} from './basics'
+import { BasicGate } from './basics'
+// @ts-ignore
 import deepEqual from 'deep-eql'
+import { IGate } from '@/interfaces';
 /**
  * Gate for transforming qubits in state |0> to any desired quantum state.
  * @class StatePreparation
  */
 export default class StatePreparation extends BasicGate {
+  private _finalState: any;
   /**
    * Initialize StatePreparation gate.
 
@@ -25,7 +28,7 @@ export default class StatePreparation extends BasicGate {
    * @constructor
    * @param finalState
    */
-  constructor(finalState) {
+  constructor(finalState: any) {
     super()
     this._finalState = finalState
   }
@@ -34,7 +37,7 @@ export default class StatePreparation extends BasicGate {
     return 'StatePreparation'
   }
 
-  equal(other) {
+  equal(other: IGate): boolean {
     if (other instanceof StatePreparation) {
       return deepEqual(this._finalState, other._finalState)
     }

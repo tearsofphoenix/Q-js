@@ -1,6 +1,6 @@
 
 import { ICommand } from './ICommand';
-import { IQubit } from './IQubit';
+import { IQubit, IQureg } from './IQubit';
 
 interface IEngine {
     isLastEngine: boolean;
@@ -14,8 +14,14 @@ interface IEngine {
     isMetaTagHandler?: (metaTag: Function) => boolean;
 
     getMeasurementResult(qubit: IQubit): boolean;
-    allocateQubit(): IQubit;
+    allocateQubit(dirty: boolean): IQureg;
+    allocateQureg(n: number): IQureg;
+
     deallocateQubit(qubit: IQubit): void;
+
+    isMetaTagSupported(tag: any): boolean;
+
+    autoDeallocateQubits?: () => void;
 }
 
 export { IEngine };

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {BasicGate} from './basics'
+import { BasicGate } from './basics'
 
 /**
  * Quantum Fourier Transform gate
@@ -27,5 +27,5 @@ export default class QFTGate extends BasicGate {
 
 export const QFT = new QFTGate()
 
-// Shortcut (instance of) :class:`projectq.ops.QFTGate`
+// @ts-ignore
 QFTGate.QFT = QFT

@@ -340,21 +340,18 @@ export function stringToBitArray(str) {
 /**
  * @ignore
  * return dot product of two complex vector(a1, a2)
- * @param {Complex[]} a1
- * @param {Complex[]} a2
- * @return {Complex}
  */
-export function complexVectorDot(a1, a2) {
+export function complexVectorDot(a1: Complex[], a2: Complex[]): Complex {
   let real = 0
   let image = 0
   a1.forEach((c1, [i]) => {
-    const c2 = a2.subset(math.index(i))
-    const r1 = math.re(c1)
-    const i1 = math.im(c1)
-    const r2 = math.re(c2)
-    const i2 = math.im(c2)
-    real += r1 * r2 - (-i1 * i2)
-    image += r1 * i2 - r2 * i1
+    const c2 = a2.subset(math.index(i));
+    const r1 = math.re(c1) as number;
+    const i1 = math.im(c1) as number;
+    const r2 = math.re(c2) as number;
+    const i2 = math.im(c2) as number;
+    real += r1 * r2 - (-i1 * i2);
+    image += r1 * i2 - r2 * i1;
   })
   return math.complex(real, image)
 }
@@ -366,11 +363,11 @@ export function complexVectorDot(a1, a2) {
  * @param {number} count
  * @return {Array}
  */
-export function narray(item, count) {
+export function narray<T>(item: (() => T) | T, count: number): T[] {
   const result = []
   if (typeof item === 'function') {
     for (let i = 0; i < count; ++i) {
-      result.push(item())
+      result.push((item as Function)());
     }
   } else {
     for (let i = 0; i < count; ++i) {
@@ -384,7 +381,7 @@ export function narray(item, count) {
  * @ignore
  * product loop on two Arrays p1 & p2
  */
-export function productLoop<T>(p1: T[], p2: T[], func: (e1: T, e2: T) => boolean) {
+export function productLoop<T>(p1: T[], p2: T[], func: (e1: T, e2: T) => boolean | undefined) {
   for (let i = 0; i < p1.length; ++i) {
     for (let j = 0; j < p2.length; ++j) {
       const stop = func(p1[i], p2[j])
@@ -398,12 +395,8 @@ export function productLoop<T>(p1: T[], p2: T[], func: (e1: T, e2: T) => boolean
 /**
  * @ignore
  * product loop on three Arrays p1 & p2 & p3
- * @param {Array} p1
- * @param {Array} p2
- * @param {Array} p3
- * @param {function} func
  */
-export function productLoop3(p1, p2, p3, func) {
+export function productLoop3<T>(p1: T[], p2: T[], p3: T[], func: (e1: T, e2: T, e3: T) => boolean | undefined) {
   for (let i = 0; i < p1.length; ++i) {
     for (let j = 0; j < p2.length; ++j) {
       for (let k = 0; k < p3.length; ++k) {
@@ -419,12 +412,8 @@ export function productLoop3(p1, p2, p3, func) {
 /**
  * @ignore
  * return (base ^ exp) % mod, it's fast and support big number
- * @param {number} base
- * @param {number}  exp
- * @param  {number} mod
- * @return {number}
  */
-export function expmod(base, exp, mod) {
+export function expmod(base: number, exp: number, mod: number): number {
   if (exp === 0) return 1
   if (exp % 2 === 0) {
     return Math.pow(expmod(base, (exp / 2), mod), 2) % mod

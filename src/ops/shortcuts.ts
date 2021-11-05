@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import {C} from './metagates'
-import {Rz, NOT, Z} from './gates'
+import { C } from './metagates'
+import { Rz, NOT, Z } from './gates'
 
-export function CRz(angle) {
+export function CRz(angle: number) {
   return C(new Rz(angle), 1)
 }
 

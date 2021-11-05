@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-export TimeEvolution from './timeevolution'
+export * from './timeevolution'
 
 export {
   CNOT, CRz, Toffoli, CX, CZ
 } from './shortcuts';
 
-export QubitOperator from './qubitoperator'
+export * from './qubitoperator'
 
-export QFTGate from './qftgate'
+export * from './qftgate'
 
-export {QFT} from './qftgate'
+export { QFT } from './qftgate'
 
-export Command from './command'
+export * from './command'
 
 export {
   BasicGate, BasicMathGate, BasicRotationGate, BasicPhaseGate, FastForwardingGate, ClassicalInstructionGate, SelfInverseGate
@@ -38,12 +38,12 @@ export {
   NOT, Ph, S, SGate, SqrtSwap, SqrtSwapGate, SqrtX, SqrtXGate, T, TGate, XGate, Y, YGate, ZGate
 } from './gates'
 
-export Gates from './gates'
+export * from './gates'
 
 export {
   All, ControlledGate, DaggeredGate, C, Tensor
 } from './metagates'
 
-export StatePreparation from './statepreparation'
+export * from './statepreparation'
 
-export {UniformlyControlledRy, UniformlyControlledRz} from './uniformly_controlled_rotation'
+export { UniformlyControlledRy, UniformlyControlledRz } from './uniformly_controlled_rotation'

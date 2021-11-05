@@ -85,7 +85,7 @@ export function add_constant_modN(eng: IEngine, c: number, N: number, quint: IQu
 
 
 // calculates the inverse of a modulo N
-function inv_mod_N(a, N) {
+function inv_mod_N(a: number, N: number): number {
   let s = 0
   let old_s = 1
   let r = N
@@ -112,7 +112,7 @@ Multiplies a quantum integer by a classical number a modulo N, i.e.,
  ```
 (only works if a and N are relative primes, otherwise the modular inverse does not exist).
  */
-export function mul_by_constant_modN(eng, c, N, quint_in) {
+export function mul_by_constant_modN(eng: IEngine, c: number, N: number, quint_in) {
   assert(c < N && c >= 0)
   assert(math.gcd(c, N) === 1)
 

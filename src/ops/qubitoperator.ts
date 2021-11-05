@@ -17,7 +17,7 @@
 import math from 'mathjs'
 
 // QubitOperator stores a sum of Pauli operators acting on qubits."""
-import {isNumeric, symmetricDifference} from '../libs/polyfill'
+import { isNumeric, symmetricDifference } from '../libs/polyfill'
 
 const mc = math.complex
 
@@ -47,12 +47,7 @@ export const PAULI_OPERATOR_PRODUCTS = {
   [['Z', 'Y']]: [mc(0, -1), 'X']
 }
 
-/**
- * @ignore
- * @param {string} key
- * @return {Array}
- */
-export function stringToArray(key) {
+export function stringToArray(key: string) {
   const parts = key.split(',').filter(item => item.length > 0)
   if (parts.length % 2 === 0) {
     const result = []
@@ -65,7 +60,7 @@ export function stringToArray(key) {
   }
 }
 
-function checkTerm(term) {
+function checkTerm(term: []) {
   term.forEach((localOperator) => {
     if (!Array.isArray(localOperator) || localOperator.length !== 2) {
       throw new Error('term specified incorrectly')
@@ -76,9 +71,9 @@ function checkTerm(term) {
     }
     if (typeof qubitNum !== 'number' || qubitNum < 0) {
       throw new Error('Invalid qubit number '
-          + 'provided to QubitTerm: '
-          + 'must be a non-negative '
-          + 'int.')
+        + 'provided to QubitTerm: '
+        + 'must be a non-negative '
+        + 'int.')
     }
   })
 }
@@ -227,11 +222,11 @@ less than the relative tolerance w.r.t. either other or self
 (symmetric test) or if the difference is less than the absolute
 tolerance.
 
-    @param {QubitOperator} other QubitOperator to compare against.
-    @param {number} realTolerance Relative tolerance, must be greater than 0.0
-    @param {number} absTolerance Absolute tolerance, must be at least 0.0
+    @param other QubitOperator to compare against.
+    @param realTolerance Relative tolerance, must be greater than 0.0
+    @param absTolerance Absolute tolerance, must be at least 0.0
   */
-  isClose(other, realTolerance = EQ_TOLERANCE, absTolerance = EQ_TOLERANCE) {
+  isClose(other: QubitOperator, realTolerance: number = EQ_TOLERANCE, absTolerance: number = EQ_TOLERANCE) {
     // terms which are in both
     const otherKeys = new Set(Object.keys(other.terms))
     const myKeys = Object.keys(this.terms)
@@ -328,15 +323,15 @@ tolerance.
       this.terms = result_terms
       return this
     } else // Handle scalars.
-    if (isNumeric(multiplier)) {
-      Object.keys(this.terms).forEach((key) => {
-        this.terms[key] = math.multiply(this.terms[key], multiplier)
-      })
-      return this
-    } else {
-      throw new Error('Cannot in-place multiply term of invalid type '
-        + 'to QubitTerm.')
-    }
+      if (isNumeric(multiplier)) {
+        Object.keys(this.terms).forEach((key) => {
+          this.terms[key] = math.multiply(this.terms[key], multiplier)
+        })
+        return this
+      } else {
+        throw new Error('Cannot in-place multiply term of invalid type '
+          + 'to QubitTerm.')
+      }
   }
 
   /**

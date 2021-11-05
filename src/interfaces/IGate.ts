@@ -7,6 +7,8 @@ interface IGate extends ICopy<IGate> {
     getMerged(other: IGate): IGate;
     getInverse(): IGate;
     or(q: QObject): void;
+
+    texString?: () => string;
 }
 
 interface IMathGate extends IGate {

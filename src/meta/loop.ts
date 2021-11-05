@@ -18,28 +18,27 @@ import { BasicEngine } from '../cengines/basics'
 import { setEqual } from '../libs/polyfill';
 import { dropEngineAfter, insertEngine } from './util';
 import { Allocate, Deallocate } from '../ops/gates'
-import { QubitManagementError } from './error'
+import { QubitManagementError } from './error';
+import { ICommand, IEngine, IQubit } from '@/interfaces';
 
 /**
  * @class LoopTag
  */
 export class LoopTag {
-  /**
-   * @constructor
-   * @param {number} num
-   */
-  constructor(num) {
-    this.num = num
-    this.id = LoopTag.loop_tag_id
-    LoopTag.loop_tag_id += 1
+  static loop_tag_id: number = 0;
+  num: number;
+  id: number;
+
+  constructor(num: number) {
+    this.num = num;
+    this.id = LoopTag.loop_tag_id;
+    LoopTag.loop_tag_id += 1;
   }
 
-  equal(other) {
+  equal(other: any) {
     return other instanceof LoopTag && other.id === this.id && this.num === other.num
   }
 }
-
-LoopTag.loop_tag_id = 0
 
 /**
  * @class LoopEngine
@@ -49,22 +48,29 @@ handler engine is available.
     If there is one, it adds a loop_tag to the commands and sends them on.
  */
 export class LoopEngine extends BasicEngine {
+  _tag: LoopTag;
+  _cmdList: ICommand[];
+  _allocatedQubitIDs: Set<number>;
+  _deallocatedQubitIDs: Set<number>;
+  _nextEnginesSupportLoopTag: boolean;
+  _refsToLocalQB: {
+    [key: number]: IQubit[]
+  }
   /**
-   * @constructor
-    @param {number} num Number of loop iterations.
+    @param num Number of loop iterations.
    */
-  constructor(num) {
+  constructor(num: number) {
     super()
-    this._tag = new LoopTag(num)
-    this._cmdList = []
-    this._allocatedQubitIDs = new Set()
-    this._deallocatedQubitIDs = new Set()
+    this._tag = new LoopTag(num);
+    this._cmdList = [];
+    this._allocatedQubitIDs = new Set();
+    this._deallocatedQubitIDs = new Set();
     // key: qubit id of a local qubit, i.e. a qubit which has been allocated
     //     and deallocated within the loop body.
     // value: list contain reference to each weakref qubit with this qubit
     //        id either within control_qubits or qubits.
-    this._refsToLocalQB = {}
-    this._nextEnginesSupportLoopTag = false
+    this._refsToLocalQB = {};
+    this._nextEnginesSupportLoopTag = false;
   }
 
   /**
@@ -127,10 +133,10 @@ unrolled and ancilla qubits have been allocated within the loop body,
     then store a reference all these qubit ids (to change them when
 unrolling the loop)
 
-@param {Command[]} commandList List of commands to store and later
+@param commandList List of commands to store and later
 unroll or, if there is a LoopTag-handling engine, add the LoopTag.
    */
-  receive(commandList) {
+  receive(commandList: ICommand[]) {
     if (this._nextEnginesSupportLoopTag || this.next.isMetaTagSupported(LoopTag)) {
       // Loop tag is supported, send everything with a LoopTag
       // Don't check is_meta_tag_supported anymore
@@ -180,9 +186,6 @@ unroll or, if there is a LoopTag-handling engine, add the LoopTag.
 
 
 /**
- * @param {BasicEngine} engine
- * @param {number} num
- * @param {function} func
 Loop n times over an entire code block.
 
     @example
@@ -211,10 +214,10 @@ The **correct way** of handling qubit (de-)allocation is as follows:
     qb.deallocate() // sends deallocate gate
   })
  */
-export function Loop(engine, num, func) {
+export function Loop(engine: IEngine, num: number, func: Function) {
   if (typeof num === 'number' && num >= 0 && num % 1 === 0) {
     const _num = num
-    let _loopEngine
+    let _loopEngine: LoopEngine;
     const enter = () => {
       if (_num !== 1) {
         _loopEngine = new LoopEngine(num)
@@ -224,8 +227,7 @@ export function Loop(engine, num, func) {
 
     const exit = () => {
       if (_num !== 1) {
-        _loopEngine.run()
-        _loopEngine = null
+        _loopEngine.run();
         dropEngineAfter(engine)
       }
     }

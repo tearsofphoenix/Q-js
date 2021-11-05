@@ -64,10 +64,10 @@ export class LogicalQubitIDTag {
     if (Array.isArray(array)) {
       for (let i = 0; i < array.length; ++i) {
         if (this.equal(array[i])) {
-          return true
+          return true;
         }
       }
     }
-    return false
+    return false;
   }
 }
