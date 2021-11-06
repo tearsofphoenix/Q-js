@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-import { IEquality } from "@/interfaces"
+import { IEquality, ILogicalQubitIDTag } from "@/interfaces";
 
-/**
- * @class ComputeTag
- */
 export class ComputeTag {
   equal(other: any) {
     return other instanceof ComputeTag
@@ -43,10 +40,7 @@ export class DirtyQubitTag {
   }
 }
 
-/**
- * @class LogicalQubitIDTag
- */
-export class LogicalQubitIDTag {
+export class LogicalQubitIDTag implements ILogicalQubitIDTag {
   logicalQubitID: number;
   constructor(logicalQubitID: number) {
     this.logicalQubitID = logicalQubitID;

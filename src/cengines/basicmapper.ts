@@ -47,11 +47,11 @@ are the mapped qubit ids.
     this._currentMapping = {};
   }
 
-  get currentMapping() {
+  public get currentMapping() {
     return { ...this._currentMapping };
   }
 
-  set currentMapping(newMap) {
+  public set currentMapping(newMap) {
     this._currentMapping = newMap
   }
 

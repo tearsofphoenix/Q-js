@@ -20,10 +20,10 @@ import { FastForwardingGate } from '../ops/basics';
 import { FlushGate } from '../ops/gates'
 import { instanceOf } from '../libs/util'
 import { NotMergeable } from '../meta/error';
+import { ICommand, IQubit } from '@/interfaces';
 
 
 /**
- * @class LocalOptimizer
  * @desc is a compiler engine which optimizes locally (merging
 rotations, cancelling gates with their inverse) in a local window of user-
 defined size.
@@ -35,11 +35,12 @@ gates using the get_merged and getInverse functions of the gate (if
 to a qubit contains >=m gates, the pipeline is sent on to the next engine.
  */
 export default class LocalOptimizer extends BasicEngine {
+  private _l: { [key: number]: ICommand[] };
+  private _m: number;
   /**
-   * @constructor
-   * @param {number} m Number of gates to cache per qubit, before sending on the first gate.
+   * @param m Number of gates to cache per qubit, before sending on the first gate.
    */
-  constructor(m = 5) {
+  constructor(m: number = 5) {
     super()
     this._l = {} // dict of lists containing operations for each qubit
     this._m = m // wait for m gates before sending on
@@ -50,7 +51,7 @@ export default class LocalOptimizer extends BasicEngine {
    * @param idx qubit index
    * @param n command position in qubit idx's command list
    */
-  sendQubitPipeline(idx: number, n: number) {
+  sendQubitPipeline(idx: number | string, n: number) {
     if (typeof idx !== 'number') {
       idx = parseInt(idx, 10)
     }
@@ -62,7 +63,7 @@ export default class LocalOptimizer extends BasicEngine {
     // send all gates before n-qubit gate for other qubits involved
     // --> recursively call send_helper
     for (let i = 0; i < count; ++i) {
-      const other_involved_qubits = []
+      const other_involved_qubits: IQubit[] = [];
       il[i].allQubits.forEach(qreg => qreg.forEach((qb) => {
         if (qb.id !== idx) {
           other_involved_qubits.push(qb)
@@ -145,10 +146,8 @@ export default class LocalOptimizer extends BasicEngine {
 getInverse functions of the gate (see, e.g., BasicRotationGate).
 
     It does so for all qubit command lists.
-   @param {number} idx
-   @param {number} lim
    */
-  optimize(idx, lim) {
+  optimize(idx: number | string, lim?: number) {
     if (typeof idx !== 'number') {
       idx = parseInt(idx, 10)
     }
@@ -168,7 +167,7 @@ getInverse functions of the gate (see, e.g., BasicRotationGate).
 
       if (inv.equal(this._l[idx][i + 1])) {
         // determine index of this gate on all qubits
-        const qubitids = []
+        const qubitids: number[] = [];
         cmd.allQubits.forEach(sublist => sublist.forEach(qb => qubitids.push(qb.id)))
         const gid = this.getGateIndices(idx, i, qubitids)
         // check that there are no other gates between this and its
@@ -195,7 +194,7 @@ getInverse functions of the gate (see, e.g., BasicRotationGate).
       try {
         const merged_command = this._l[idx][i].getMerged(this._l[idx][i + 1])
         // determine index of this gate on all qubits
-        const qubitids = []
+        const qubitids: number[] = [];
         const c = this._l[idx][i]
         c.allQubits.forEach(sublist => sublist.forEach(qb => qubitids.push(qb.id)))
 
@@ -262,11 +261,10 @@ getInverse functions of the gate (see, e.g., BasicRotationGate).
 
   /**
     Cache a command, i.e., inserts it into the command lists of all qubits involved.
-    @param {Command} cmd
   */
-  cacheCMD(cmd) {
+  cacheCMD(cmd: ICommand) {
     // are there qubit ids that haven't been added to the list?
-    const ids = []
+    const ids: number[] = [];
     cmd.allQubits.forEach(sublist => sublist.forEach(qubit => ids.push(qubit.id)))
 
     // add gate command to each of the qubits involved
@@ -284,12 +282,12 @@ getInverse functions of the gate (see, e.g., BasicRotationGate).
     Receive commands from the previous engine and cache them.
     If a flush gate arrives, the entire buffer is sent on.
   */
-  receive(commandList) {
+  receive(commandList: ICommand[]) {
     commandList.forEach((cmd) => {
       if (instanceOf(cmd.gate, FlushGate)) {
         Object.keys(this._l).forEach((idx) => {
           const v = this._l[idx]
-          this.optimize(idx)
+          this.optimize(idx);
           this.sendQubitPipeline(idx, v.length)
         })
 

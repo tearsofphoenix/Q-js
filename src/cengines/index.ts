@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-export TagRemover from './tagremover';
+export * from './tagremover';
 
-export IBM5QubitMapper from './ibm5qubitmapper';
+export * from './ibm5qubitmapper';
 
-export {BasicEngine, ForwarderEngine} from './basics'
+export { BasicEngine, ForwarderEngine } from './basics'
 
-export CommandModifier from './cmdmodifier'
+export * from './cmdmodifier'
 
-export MainEngine from './main'
+export * from './main'
 
-export ManualMapper from './manualmapper'
+export * from './manualmapper'
 
-export LocalOptimizer from './optimize'
+export * from './optimize'
 
-export SwapAndCNOTFlipper from './swapandcnotflipper'
+export * from './swapandcnotflipper'
 
-export {DummyEngine, CompareEngine} from './testengine'
+export { DummyEngine, CompareEngine } from './testengine'
 
-export DecompositionRuleSet from './replacer/decompositionruleset'
+export * from './replacer/decompositionruleset'
 
-export DecompositionRule from './replacer/decompositionrule'
+export * from './replacer/decompositionrule'
 
-export {AutoReplacer, InstructionFilter} from './replacer/replacer'
+export { AutoReplacer, InstructionFilter } from './replacer/replacer'

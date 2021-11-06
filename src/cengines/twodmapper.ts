@@ -25,7 +25,7 @@ import { tuple } from '../libs/util';
 import Command from '../ops/command';
 import { BasicQubit } from '../meta/qubit';
 import { LogicalQubitIDTag } from '../meta';
-import { ICommand } from '@/interfaces';
+import { ICommand, IQubit, IQureg } from '@/interfaces';
 
 /**
  * @class Position
@@ -35,9 +35,9 @@ export class Position {
   current_column: number;
   final_row: number;
   final_column: number;
-  row_after_step_1: number;
+  row_after_step_1?: number;
 
-  constructor(current_row: number, current_column: number, final_row: number, final_column: number, row_after_step_1: number) {
+  constructor(current_row: number, current_column: number, final_row: number, final_column: number, row_after_step_1?: number) {
     this.current_row = current_row
     this.current_column = current_column
     this.final_row = final_row
@@ -49,7 +49,9 @@ export class Position {
 type GridArguments = {
   num_rows: number;
   num_columns: number;
-  mapped_ids_to_backend_ids?: {};
+  mapped_ids_to_backend_ids?: {
+    [key: number]: number;
+  };
   storage?: number;
   optimization_function?: Function;
   num_optimization_steps?: number
@@ -91,16 +93,42 @@ mapping, value is the number of such
 mappings which have been applied
  */
 export default class GridMapper extends BasicMapperEngine {
+  num_rows: number;
+  num_columns: number;
+  num_qubits: number;
+  _stored_commands: ICommand[];
+  _mapped_ids_to_backend_ids: {
+    [key: number]: number;
+  };
+  _backend_ids_to_mapped_ids: {
+    [key: number]: number;
+  };
+  _current_row_major_mapping: {
+    [key: number]: number;
+  };
+  storage: number;
+  optimization_function: Function;
+  num_optimization_steps: number;
+  num_mappings: number;
+  depth_of_swaps: {
+    [key: number]: number;
+  };
+  num_of_swaps_per_mapping: {
+    [key: number]: number;
+  };
+  _currently_allocated_ids: Set<number>;
+  _map_2d_to_1d: {
+    [key: number]: number;
+  };
+  _map_1d_to_2d: {
+    [key: number]: number;
+  };
   /**
   Initialize a GridMapper compiler engine.
     @throws {Error} if incorrect `mapped_ids_to_backend_ids` parameter
    */
   constructor(args: GridArguments) {
     super()
-    /**
-     * @type {Object}
-     * @property {number} args.num_rows
-     */
     const {
       num_rows, num_columns, mapped_ids_to_backend_ids,
       storage = 1000,
@@ -109,16 +137,16 @@ export default class GridMapper extends BasicMapperEngine {
     } = args
 
     /**
-     * @property {number} this.num_rows Number of rows in the grid
-     * @property {number} this.num_columns Number of columns in the grid.
-     * @property {number} this.num_qubits
-     * @property {Object<number, number>} this._mapped_ids_to_backend_ids
-     * @property {Object<number, number>} this._backend_ids_to_mapped_ids
+     * @property num_rows Number of rows in the grid
+     * @property num_columns Number of columns in the grid.
+     * @property num_qubits
+     * @property _mapped_ids_to_backend_ids
+     * @property _backend_ids_to_mapped_ids
      *      Stores a mapping from mapped ids which are 0,...,this.num_qubits-1 in row-major order
      *      on the grid to the corresponding qubit ids of the backend. Key: mapped id. Value: corresponding backend id.
      *      Default is None which means backend ids are identical to mapped ids.
-     * @property {Object<number, number>} this._current_row_major_mapping
-     * @property {number} this.storage Number of gates to temporarily store
+     * @property _current_row_major_mapping
+     * @property storage Number of gates to temporarily store
      * @property {function} this.optimization_function
      *      Function which takes a list of swaps and returns a cost value. Mapper chooses a permutation
      *      which minimizes this cost. Default optimizes for circuit depth.
@@ -133,7 +161,7 @@ export default class GridMapper extends BasicMapperEngine {
     this.num_qubits = num_rows * num_columns
     // Internally we use the mapped ids until sending a command.
     // Before sending we use this map to translate to backend ids:
-    this._mapped_ids_to_backend_ids = mapped_ids_to_backend_ids
+    this._mapped_ids_to_backend_ids = mapped_ids_to_backend_ids!;
     if (typeof this._mapped_ids_to_backend_ids === 'undefined' || this._mapped_ids_to_backend_ids === null) {
       this._mapped_ids_to_backend_ids = {}
       for (let i = 0; i < this.num_qubits; ++i) {
@@ -149,8 +177,8 @@ export default class GridMapper extends BasicMapperEngine {
     this._backend_ids_to_mapped_ids = {}
 
     Object.keys(this._mapped_ids_to_backend_ids).forEach((mapped_id) => {
-      const backend_id = this._mapped_ids_to_backend_ids[mapped_id]
-      this._backend_ids_to_mapped_ids[backend_id] = mapped_id
+      const backend_id = this._mapped_ids_to_backend_ids[mapped_id] as number;
+      this._backend_ids_to_mapped_ids[backend_id] = mapped_id as any;
     })
     // As we use internally the mapped ids which are in row-major order,
     // we have an internal current mapping which maps from logical ids to
@@ -208,7 +236,7 @@ export default class GridMapper extends BasicMapperEngine {
   }
 
   get currentMapping() {
-    return super.currentMapping
+    return super.currentMapping;
   }
 
   set currentMapping(newMapping) {
@@ -221,13 +249,13 @@ export default class GridMapper extends BasicMapperEngine {
       Object.keys(newMapping).forEach((logical_id) => {
         const backend_id = newMapping[logical_id]
         const value = this._backend_ids_to_mapped_ids[backend_id]
-        this._current_row_major_mapping[logical_id] = parseInt(value, 10)
+        this._current_row_major_mapping[logical_id] = parseInt(value as any, 10);
       })
     }
   }
 
   // Only allows 1 || two qubit gates.
-  isAvailable(cmd) {
+  isAvailable(cmd: ICommand) {
     let num_qubits = 0
     cmd.allQubits.forEach(qureg => num_qubits += qureg.length)
     return num_qubits <= 2
@@ -248,7 +276,9 @@ mapping to apply these gates on a first come first served basis.
    */
   returnNewMapping() {
     // Change old mapping to 1D in order to use LinearChain heuristic
-    let old_mapping_1d
+    let old_mapping_1d: {
+      [key: number]: number;
+    }
     if (this._current_row_major_mapping) {
       old_mapping_1d = {}
       Object.keys(this._current_row_major_mapping).forEach((logical_id) => {
@@ -278,12 +308,8 @@ mapping to apply these gates on a first come first served basis.
 
   /**
    * If swapped (inplace), then return swap operation so that `key(element0) < key(element1)`
-   @param {Position} element0
-   @param {Position} element1
-   @param {function(arg: Position): number} key
-   @return {Array<number>|undefined}
    */
-  _compareAndSwap(element0, element1, key) {
+  _compareAndSwap(element0: Position, element1: Position, key: (arg: Position) => number) {
     if (key(element0) > key(element1)) {
       const mapped_id0 = (element0.current_column + element0.current_row * this.num_columns)
       const mapped_id1 = (element1.current_column + element1.current_row * this.num_columns)
@@ -304,12 +330,9 @@ mapping to apply these gates on a first come first served basis.
   }
 
   /**
-   * @param {Array<Position[]>} final_positions
-   * @param {function(arg: Position): number} key
-   * @return {Array<number[]>}
    * @private
    */
-  _sortWithinRows(final_positions, key) {
+  _sortWithinRows(final_positions: Position[][], key: (arg: Position) => number) {
     const swap_operations = []
     for (let row = 0; row < this.num_rows; ++row) {
       let finished_sorting = false
@@ -340,12 +363,9 @@ mapping to apply these gates on a first come first served basis.
   }
 
   /**
-   * @param {Array<Position[]>} final_positions
-   * @param {function(arg: Position): number} key
-   * @return {Array<number[]>}
    * @private
    */
-  _sortWithinColumns(final_positions, key) {
+  _sortWithinColumns(final_positions: Position[][], key: (arg: Position) => number) {
     const swap_operations = []
     for (let column = 0; column < this.num_columns; ++column) {
       let finished_sorting = false
@@ -397,10 +417,10 @@ which don't store any information.
 
     const new_row_major_mapping = this.returnNewMapping()
     // Find permutation of matchings with lowest cost
-    let swaps
-    let lowest_cost
+    let swaps: number[][] = [];
+    let lowest_cost: number = 0;
     const matchings_numbers = arrayFromRange(this.num_rows)
-    const ps = []
+    const ps: number[][][] = [];
     if (this.num_optimization_steps <= math.factorial(this.num_rows)) {
       for (const looper of permutations(matchings_numbers, this.num_rows)) {
         ps.push(looper)
@@ -425,14 +445,15 @@ which don't store any information.
         lowest_cost = this.optimization_function(trial_swaps)
       }
     })
+
     if (swaps.length > 0) { // first mapping requires no swaps
       // Allocate all mapped qubit ids (which are not already allocated,
       // i.e., contained in this._currently_allocated_ids)
-      let mapped_ids_used = new Set()
+      let mapped_ids_used = new Set<number>()
       for (const logical_id of this._currently_allocated_ids) {
         mapped_ids_used.add(this._current_row_major_mapping[logical_id])
       }
-      const not_allocated_ids = setDifference(setFromRange(this.num_qubits), mapped_ids_used)
+      const not_allocated_ids = setDifference<number>(setFromRange(this.num_qubits), mapped_ids_used)
       for (const mapped_id of not_allocated_ids) {
         const qb = new BasicQubit(this, this._mapped_ids_to_backend_ids[mapped_id])
         const cmd = new Command(this, new AllocateQubitGate(), tuple([qb]))
@@ -536,7 +557,7 @@ which don't store any information.
         }
       } else {
         let send_gate = true
-        const mapped_ids = new Set()
+        const mapped_ids = new Set<number>()
 
         for (let k = 0; k < cmd.allQubits.length; ++k) {
           const qureg = cmd.allQubits[k]
@@ -580,9 +601,9 @@ which don't store any information.
   /**
   Receives a command list and, for each command, stores it until
   we do a mapping (FlushGate || Cache of stored commands is full).
-   @param {Command[]} command_list  list of commands to receive.
+   @param command_list  list of commands to receive.
   */
-  receive(command_list) {
+  receive(command_list: ICommand[]) {
     command_list.forEach((cmd) => {
       if (cmd.gate instanceof FlushGate) {
         while (this._stored_commands.length > 0) {
@@ -609,7 +630,7 @@ which don't store any information.
     @return {Array.<number[]>} List of tuples. Each tuple is a swap operation which needs to be
       applied. Tuple contains the two mapped qubit ids for the Swap.
    */
-  returnSwaps(old_mapping, new_mapping, permutation) {
+  returnSwaps(old_mapping, new_mapping, permutation?: number[][]) {
     if (typeof permutation === 'undefined') {
       permutation = arrayFromRange(this.num_rows)
     }
@@ -624,7 +645,7 @@ which don't store any information.
     }
 
     // move qubits which are in both mappings
-    const used_mapped_ids = new Set()
+    const used_mapped_ids = new Set<number>()
 
     Object.keys(old_mapping).forEach((logical_id) => {
       if (logical_id in new_mapping) {
@@ -642,13 +663,13 @@ which don't store any information.
     })
     // exchange all remaining None with the not yet used mapped ids
     const all_ids = setFromRange(this.num_qubits)
-    let not_used_mapped_ids = Array.from(setDifference(all_ids, used_mapped_ids))
+    let not_used_mapped_ids: number[] = Array.from(setDifference<number>(all_ids, used_mapped_ids));
     not_used_mapped_ids = not_used_mapped_ids.sort((a, b) => b - a)
 
     for (let row = 0; row < this.num_rows; ++row) {
       for (let column = 0; column < this.num_columns; ++column) {
         if (typeof final_positions[row][column] === 'undefined') {
-          const mapped_id = not_used_mapped_ids.pop()
+          const mapped_id: number = not_used_mapped_ids.pop()!;
           const new_column = mapped_id % this.num_columns
           const new_row = Math.floor(mapped_id / this.num_columns)
           const info_container = new Position(row, column, new_row, new_column)
@@ -689,7 +710,7 @@ which don't store any information.
     }
 
     // 2. Sort inside all the rows
-    let swaps = this._sortWithinColumns(final_positions, x => x.row_after_step_1)
+    let swaps = this._sortWithinColumns(final_positions, x => x.row_after_step_1!)
     swap_operations = swap_operations.concat(swaps)
     // 3. Sort inside all the columns
     swaps = this._sortWithinRows(final_positions, x => x.final_column)

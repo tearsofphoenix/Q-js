@@ -103,7 +103,7 @@ export function setFromRange(n: number): Set<number> {
  * @ignore
  * create an array filled by number in range, active like python does
  */
-export function arrayFromRange(start: number, end: number, step: number): number[] {
+export function arrayFromRange(start: number, end?: number, step?: number): number[] {
   if (typeof end === 'undefined') {
     end = start
     start = 0

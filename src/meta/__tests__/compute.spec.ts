@@ -27,6 +27,7 @@ import {
 } from '@/meta/compute'
 import { tuple } from '@/libs/util'
 import { QubitManagementError } from '@/meta/error'
+import { IQureg } from '@/interfaces'
 
 describe('compute test', () => {
   it('should test compute tag', () => {
@@ -153,7 +154,7 @@ describe('compute test', () => {
     Compute(eng, () => {
 
     })
-    let a = null
+    let a: IQureg;
     expect(() => {
       CustomUncompute(eng, () => {
         a = eng.allocateQubit()
@@ -167,16 +168,18 @@ describe('compute test', () => {
     // which was created during compute context.
     const backend = new DummyEngine(true)
     const eng = new MainEngine(backend, [new DummyEngine()])
-    let ancilla
+    let ancilla: IQureg;
     Compute(eng, () => {
       ancilla = eng.allocateQubit()
       expect(ancilla[0].id).not.to.equal(-1)
       new Rx(0.6).or(ancilla)
     })
     // Test that ancilla qubit has been registered in MainEngine.active_qubits
+    // @ts-ignore
     expect(eng.activeQubits.has(ancilla[0])).to.equal(true)
     Uncompute(eng)
     // Test that ancilla id has been set to -1
+    // @ts-ignore
     expect(ancilla[0].id).to.equal(-1)
     // Test that ancilla is not anymore in active qubits
     // TODO: fixme

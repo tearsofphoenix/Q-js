@@ -91,13 +91,13 @@ if so.
   /**
   Determines the cost of the circuit with the given mapping.
 
-  @param {Object} mapping Dictionary with key, value pairs where keys are
+  @param mapping Dictionary with key, value pairs where keys are
     logical qubit ids and the corresponding value is the physical
     location on the IBM Q chip.
-  @return {number} Cost measure taking into account CNOT directionality or None
+  @return Cost measure taking into account CNOT directionality or None
     if the circuit cannot be executed given the mapping.
   */
-  determineCost(mapping) {
+  determineCost(mapping: { [key: number]: number }): number {
     let cost = 0
     const connections = ibmqx4_connections
     const keys = Object.keys(this._interactions)
@@ -115,7 +115,7 @@ if so.
         if (v) {
           cost += this._interactions[tpl]
         } else {
-          return undefined
+          return 0
         }
       }
     }
@@ -125,7 +125,6 @@ if so.
   /**
   Runs all stored gates.
 
-  @throws {Error}
   If the mapping to the IBM backend cannot be performed or if
   the mapping was already determined but more CNOTs get sent
 down the pipeline.
@@ -169,10 +168,10 @@ down the pipeline.
   /**
   Store a command and handle CNOTs.
 
-  @param {Command} cmd A command to store
+  @param cmd A command to store
    */
   _store(cmd: ICommand) {
-    let target
+    let target: number;
     if (!(cmd.gate instanceof FlushGate)) {
       target = cmd.qubits[0][0].id
     }

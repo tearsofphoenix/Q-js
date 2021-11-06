@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import math from 'mathjs'
+import math, { matrix } from 'mathjs'
 import { expect } from 'chai'
 import {
-  classHierachy, isSubclassOf, isKindclassOf, matrixDot
+  classHierachy, isSubclassOf, isKindclassOf, matrixDot, hashArray
 } from '@/libs/util'
 import { HGate } from '@/ops/gates'
 import { BasicGate, SelfInverseGate } from '@/ops/basics'
@@ -52,10 +52,10 @@ describe('util test', () => {
   });
 
   it('should test matrixDot', () => {
-    const m = math.matrix([[1, 2], [3, 4]])
-    const v = math.matrix([1, 2])
+    const m = matrix([[1, 2], [3, 4]])
+    const v = matrix([1, 2])
     const result = matrixDot(m, v)
-    expect(result).to.deep.equal(math.matrix([5, 11]))
+    expect(result).to.deep.equal(matrix([5, 11]))
   });
 
   it('should test expmod', () => {
@@ -65,4 +65,14 @@ describe('util test', () => {
     expect(expmod(7, 399, 165)).to.equal(118)
     expect(expmod(67, 32768, 212)).to.equal(81)
   });
-})
+
+  describe('hashArray', () => {
+    it('should has same hash', () => {
+      const a = [1, 2, 3, 4, 5];
+      const b = [2, undefined];
+      expect(hashArray(a)).to.equal('1_2_3_4_5');
+      // @ts-ignore
+      expect(hashArray(b)).to.equal('2_');
+    });
+  });
+});

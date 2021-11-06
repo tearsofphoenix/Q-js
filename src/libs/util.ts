@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import math, { Matrix } from 'mathjs'
+import { size, flatten, subset, index as mindex, matrix as mm, dot as mdot, range, Matrix } from 'mathjs';
 
 /**
  * @ignore
@@ -172,20 +172,20 @@ export function genString(item: string, n: number): string {
  */
 export function matrixRangeAssign(matrix: Matrix, indices: number[], vector: any) {
   if (Array.isArray(vector)) {
-    indices.forEach(idx => matrix.subset(math.index(idx), vector[idx]))
+    indices.forEach(idx => matrix.subset(mindex(idx), vector[idx]))
   } else {
-    indices.forEach((idx, i) => matrix.subset(math.index(idx), vector.subset(math.index(i))))
+    indices.forEach((idx, i) => matrix.subset(mindex(idx), vector.subset(mindex(i))))
   }
 }
 
 export function matrixRangeIndicesAssign(matrix: Matrix, mstart: number, mend: number, vector: any, vstart: number) {
   if (Array.isArray(vector)) {
     for (let i = 0; i + mstart < mend; ++i) {
-      matrix.subset(math.index(i + mstart), vector[vstart + i])
+      matrix.subset(mindex(i + mstart), vector[vstart + i])
     }
   } else {
     for (let i = 0; i + mstart < mend; ++i) {
-      matrix.subset(math.index(i + mstart), vector.subset(math.index(vstart + i)))
+      matrix.subset(mindex(i + mstart), vector.subset(mindex(vstart + i)))
     }
   }
 }
@@ -195,8 +195,8 @@ export function matrixRangeIndicesAssign(matrix: Matrix, mstart: number, mend: n
  * return a row of matrix
  */
 export function matrixGetRow(matrix: Matrix, index: number) {
-  const rows = math.size(matrix).valueOf()[1];
-  return math.flatten(math.subset(matrix, math.index(index, math.range(0, rows))));
+  const rows = size(matrix).valueOf()[1];
+  return flatten(subset(matrix, mindex(index, range(0, rows))));
 }
 
 /**
@@ -208,7 +208,11 @@ export function matrixDot(matrix: Matrix, vector: any) {
   const result = []
   for (let i = 0; i < rows; ++i) {
     const row = matrixGetRow(matrix, i)
-    result.push(math.dot(row, vector))
+    result.push(mdot(row, vector))
   }
-  return math.matrix(result)
+  return mm(result);
+}
+
+export function hashArray<T>(array: T[]): string {
+  return array.join('_');
 }

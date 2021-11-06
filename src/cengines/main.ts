@@ -50,7 +50,6 @@ export default class MainEngine extends BasicEngine {
   verbose: boolean;
   private _measurements: Map<number, number>;
   /**
-   * @constructor
   Initialize the main compiler engine and all compiler engines.
 
     Sets 'next_engine'- and 'main_engine'-attributes of all compiler

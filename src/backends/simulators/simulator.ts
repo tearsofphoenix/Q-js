@@ -374,7 +374,7 @@ deallocation, and (controlled) single-qubit gate.
             }
           })
           if (logical_id_tag) {
-            qb = new BasicQubit(qb.engine, logical_id_tag.logical_qubit_id)
+            qb = new BasicQubit(qb.engine, logical_id_tag.logicalQubitID)
           }
           this.main.setMeasurementResult(qb, out[i])
           i += 1

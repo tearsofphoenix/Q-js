@@ -203,7 +203,7 @@ which is only a two qubit gate.
       return
     }
     const num_qubits = qubits[0].length
-    let non_trivial_qubits = new Set()
+    let non_trivial_qubits = new Set<number>();
 
     keys.forEach(key => {
       const term = stringToArray(key)
@@ -219,9 +219,9 @@ which is only a two qubit gate.
     // this.hamiltonian which are ordered from
     // 0,...,len(non_trivial_qubits) - 1
     const new_index = {}
-    non_trivial_qubits = Array.from(non_trivial_qubits).sort()
+    const nonTrivialQubitsArray = Array.from(non_trivial_qubits).sort()
 
-    non_trivial_qubits.forEach((looper, i) => {
+    nonTrivialQubitsArray.forEach((looper, i) => {
       new_index[looper] = i
     })
 
@@ -235,7 +235,7 @@ which is only a two qubit gate.
     })
 
     const new_gate = new TimeEvolution(this.time, new_hamiltonian)
-    const new_qubits = non_trivial_qubits.map((looper) => qubits[0][looper])
+    const new_qubits = nonTrivialQubitsArray.map((looper) => qubits[0][looper])
     // Apply new gate
     const cmd = new_gate.generateCommand(new_qubits)
     cmd.apply()

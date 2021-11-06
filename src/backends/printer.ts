@@ -24,6 +24,7 @@ import { FlushGate, Measure } from '../ops/gates'
 import { LogicalQubitIDTag } from '../meta/tag'
 import { BasicQubit } from '../meta/qubit'
 import { LastEngineError } from '../meta/error'
+import { ICommand, ILogicalQubitIDTag } from '@/interfaces';
 
 /**
  * @class CommandPrinter
@@ -32,15 +33,17 @@ import { LastEngineError } from '../meta/error'
  * to sending them on to the next compiler engine.
  */
 export default class CommandPrinter extends BasicEngine {
+  _acceptInput: boolean;
+  _defaultMeasure: boolean;
+  _inPlace: boolean;
   /**
-   * @constructor
-  @param {boolean} acceptInput If accept_input is true, the printer queries
+  @param acceptInput If accept_input is true, the printer queries
   the user to input measurement results if the CommandPrinter is
   the last engine. Otherwise, all measurements yield
-  @param {boolean} defaultMeasure Default measurement result (if accept_input is false).
-  @param {boolean} inPlace If in_place is true, all output is written on the same line of the terminal.
+  @param defaultMeasure Default measurement result (if accept_input is false).
+  @param inPlace If in_place is true, all output is written on the same line of the terminal.
   */
-  constructor(acceptInput = true, defaultMeasure = false, inPlace = false) {
+  constructor(acceptInput: boolean = true, defaultMeasure: boolean = false, inPlace: boolean = false) {
     super()
     this._acceptInput = acceptInput
     this._defaultMeasure = defaultMeasure
@@ -51,10 +54,10 @@ export default class CommandPrinter extends BasicEngine {
     Specialized implementation of isAvailable: Returns true if the
     CommandPrinter is the last engine (since it can print any command).
 
-    @param {Command} cmd Command of which to check availability (all Commands can be printed).
-    @return {boolean} true, unless the next engine cannot handle the Command (if there is a next engine).
+    @param cmd Command of which to check availability (all Commands can be printed).
+    @return true, unless the next engine cannot handle the Command (if there is a next engine).
    */
-  isAvailable(cmd) {
+  isAvailable(cmd: ICommand) {
     try {
       return super.isAvailable(cmd)
     } catch (e) {
@@ -71,9 +74,9 @@ export default class CommandPrinter extends BasicEngine {
     the user for the measurement result (if accept_input = true) / Set
     the result to 0 (if it's false).
 
-    @param {Command} cmd Command to print.
+    @param cmd Command to print.
    */
-  printCMD(cmd) {
+  printCMD(cmd: ICommand) {
     if (this.isLastEngine && cmd.gate.equal(Measure)) {
       assert(cmd.controlCount === 0)
       console.log(cmd.toString())
@@ -89,9 +92,9 @@ export default class CommandPrinter extends BasicEngine {
           })
 
           if (logicQubitTag) {
-            qubit = new BasicQubit(qubit.engine, logicQubitTag.logical_qubit_id)
+            qubit = new BasicQubit(qubit.engine, (logicQubitTag as ILogicalQubitIDTag).logicalQubitID);
           }
-          this.main.setMeasurementResult(qubit, m)
+          this.main.setMeasurementResult!(qubit, m);
         })
       })
     } else if (this._inPlace) {
@@ -105,9 +108,9 @@ export default class CommandPrinter extends BasicEngine {
   Receive a list of commands from the previous engine, print the
 commands, and then send them on to the next engine.
 
-    @param {Command[]} commandList List of Commands to print (and potentially send on to the next engine).
+    @param commandList List of Commands to print (and potentially send on to the next engine).
    */
-  receive(commandList) {
+  receive(commandList: ICommand[]) {
     commandList.forEach((cmd) => {
       if (!(cmd.gate instanceof FlushGate)) {
         this.printCMD(cmd)

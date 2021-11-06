@@ -20,12 +20,15 @@ Contains a (slow) JavaScript simulator.
     Please compile the c++ simulator for large-scale simulations.
 */
 import assert from 'assert'
-import math from 'mathjs'
+import {
+  abs, add, complex, divide, index, clone, im, re, exp,
+  matrix, multiply, ones, zeros, sqrt,
+  Complex,
+} from 'mathjs'
 import {
   matrixDot,
   matrixRangeAssign,
   matrixRangeIndicesAssign,
-  zeros
 } from '../../libs/util'
 import {
   len, setEqual, complexVectorDot
@@ -33,7 +36,6 @@ import {
 import { stringToArray } from '../../ops/qubitoperator'
 
 /**
- * @class JSSimulator
  * @desc
 NodeJS implementation of a quantum computer simulator.
 
@@ -42,26 +44,27 @@ not an option (for some reason). It has the same features but is much
 slower, so please consider building the c++ version for larger experiments.
  */
 export default class Simulator {
-  /**
-   * @constructor
-   */
+  _state: number[];
+  _map: {
+    [key: number]: number;
+  }
+  _numQubits: number;
   constructor() {
     // ignore seed
-    this._state = math.ones(1)
+    this._state = ones(1) as number[];
     this._map = {}
     this._numQubits = 0
   }
 
   /**
   Return the qubit index to bit location map and the corresponding state
-vector.
+  vector.
 
     This function can be used to measure expectation values more efficiently (emulation).
 
-    @return {Array}
-A tuple where the first entry is a dictionary mapping qubit indices
-to bit-locations and the second entry is the corresponding state
-vector
+    A tuple where the first entry is a dictionary mapping qubit indices
+    to bit-locations and the second entry is the corresponding state
+    vector
    */
   cheat() {
     return [this._map, this._state._data.slice(0)]
@@ -71,22 +74,22 @@ vector
   Measure the qubits with IDs ids and return a list of measurement
 outcomes (true/false).
 
-    @param {number[]} ids List of qubit IDs to measure.
+    @param ids List of qubit IDs to measure.
 
-    @return {boolean[]} List of measurement results (containing either true or false).
+    @return List of measurement results (containing either true or false).
    */
-  measureQubits(ids) {
+  measureQubits(ids: number[]): boolean[] {
     const P = Math.random()
     let val = 0.0
     let i_picked = 0
     while (val < P && i_picked < len(this._state)) {
-      val = math.add(val, math.abs(this._getState(i_picked) || math.complex(0, 0)) ** 2)
+      val = add(val, abs(this._getState(i_picked) || complex(0, 0)) ** 2) as number;
       i_picked += 1
     }
 
     i_picked -= 1
 
-    const res = []
+    const res: boolean[] = []
     const pos = ids.map((ID) => {
       res.push(false)
       return this._map[ID]
@@ -107,22 +110,22 @@ outcomes (true/false).
       if ((mask & i) !== val) {
         this._setState(i, 0.0)
       } else {
-        const tmp = math.abs(looper)
-        nrm = math.add(nrm, math.multiply(tmp, tmp))
+        const tmp = abs(looper)
+        nrm = add(nrm, multiply(tmp, tmp)) as number;
       }
     })
     // normalize
     const scale = 1.0 / Math.sqrt(nrm)
-    this._state = math.multiply(this._state, scale)
+    this._state = multiply(this._state, scale)
     return res
   }
 
   /**
   Allocate a qubit.
 
-    @param {number} ID ID of the qubit which is being allocated.
+    @param ID ID of the qubit which is being allocated.
    */
-  allocateQubit(ID) {
+  allocateQubit(ID: number) {
     this._map[ID] = this._numQubits
     this._numQubits += 1
     this._state.resize([1 << this._numQubits], 0)
@@ -132,24 +135,24 @@ outcomes (true/false).
   Return the classical value of a classical bit (i.e., a qubit which has
 been measured / uncomputed).
 
-   @param {number} ID ID of the qubit of which to get the classical value.
-   @param {number} tolerance Tolerance for numerical errors when determining
+   @param ID ID of the qubit of which to get the classical value.
+   @param tolerance Tolerance for numerical errors when determining
 whether the qubit is indeed classical.
 
     @throws {Error} If the qubit is in a superposition, i.e., has not been measured / uncomputed.
 */
-  getClassicalValue(ID, tolerance = 1.e-10) {
+  getClassicalValue(ID: number, tolerance: number = 1.e-10): number {
     const pos = this._map[ID]
     let up = false
     let down = false
 
     for (let i = 0; i < len(this._state); i += (1 << (pos + 1))) {
       for (let j = 0; j < (1 << pos); ++j) {
-        if (math.abs(this._getState(i + j)) > tolerance) {
+        if (abs(this._getState(i + j)) > tolerance) {
           up = true
         }
 
-        if (math.abs(this._getState(i + j + (1 << pos)) || 0) > tolerance) {
+        if (abs(this._getState(i + j + (1 << pos)) || 0) > tolerance) {
           down = true
         }
 
@@ -162,20 +165,20 @@ whether the qubit is indeed classical.
       }
     }
 
-    return down
+    return down ? 1 : 0;
   }
 
   /**
   Deallocate a qubit (if it has been measured / uncomputed).
 
-   @param {number} ID ID of the qubit to deallocate.
+   @param ID ID of the qubit to deallocate.
 
-   @throws {Error} If the qubit is in a superposition, i.e., has not been measured / uncomputed.
+   @throws If the qubit is in a superposition, i.e., has not been measured / uncomputed.
    */
-  deallocateQubit(ID) {
+  deallocateQubit(ID: number) {
     const pos = this._map[ID]
     const cv = this.getClassicalValue(ID)
-    const newstate = math.zeros(1 << (this._numQubits - 1))
+    const newstate = zeros(1 << (this._numQubits - 1))
     let k = 0
     for (let i = (1 << pos) * cv; i < len(this._state); i += 1 << (pos + 1)) {
       matrixRangeIndicesAssign(newstate, k, k + (1 << pos), this._state, i)
@@ -200,9 +203,9 @@ whether the qubit is indeed classical.
   /**
   Get control mask from list of control qubit IDs.
 
-    @return {number} A mask which represents the control qubits in binary.
+    @return A mask which represents the control qubits in binary.
    */
-  getControlMask(ctrlids) {
+  getControlMask(ctrlids: number[]) {
     let mask = 0
     ctrlids.forEach((ctrlid) => {
       const ctrlpos = this._map[ctrlid]
@@ -214,16 +217,16 @@ whether the qubit is indeed classical.
   /**
   Emulate a math function (e.g., BasicMathGate).
 
-    @param {function} f Function executing the operation to emulate.
-    @param {Array.<number[]>} qubitIDs List of lists of qubit IDs to which
+    @param f Function executing the operation to emulate.
+    @param qubitIDs List of lists of qubit IDs to which
         the gate is being applied. Every gate is applied to a tuple of
         quantum registers, which corresponds to this 'list of lists'.
-    @param {number[]} ctrlQubitIDs List of control qubit ids.
+    @param ctrlQubitIDs List of control qubit ids.
    */
-  emulateMath(f, qubitIDs, ctrlQubitIDs) {
+  emulateMath(f: Function, qubitIDs: number[][], ctrlQubitIDs: number[]) {
     const mask = this.getControlMask(ctrlQubitIDs)
     // determine qubit locations from their IDs
-    const qb_locs = []
+    const qb_locs: number[][] = [];
     qubitIDs.forEach((qureg) => {
       qb_locs.push([])
       qureg.forEach((qubitID) => {
@@ -231,7 +234,7 @@ whether the qubit is indeed classical.
       })
     })
 
-    const newstate = math.zeros(len(this._state))
+    const newstate = zeros(len(this._state))
 
     this._state.forEach((looper, _i) => {
       const i = _i[0]
@@ -253,9 +256,9 @@ whether the qubit is indeed classical.
             }
           })
         })
-        newstate.subset(math.index(newI), looper)
+        newstate.subset(index(newI), looper)
       } else {
-        newstate.subset(math.index(i), looper)
+        newstate.subset(index(i), looper)
       }
     })
 
@@ -270,18 +273,18 @@ whether the qubit is indeed classical.
 
     @return Expectation value
    */
-  getExpectationValue(termsArray, IDs) {
+  getExpectationValue(termsArray: T[][], IDs: number[]) {
     let expectation = 0.0
-    const current_state = math.clone(this._state)
+    const current_state = clone(this._state)
     termsArray.forEach(([term, coefficient]) => {
       this.applyTerm(term, IDs)
       const tmp = complexVectorDot(current_state, this._state)
-      const delta = math.multiply(coefficient, tmp)
-      expectation = math.add(expectation, delta)
-      this._state = math.clone(current_state)
+      const delta = multiply(coefficient, tmp)
+      expectation = add(expectation, delta)
+      this._state = clone(current_state)
     })
-    if (math.im(expectation) === 0) {
-      return math.re(expectation)
+    if (im(expectation) === 0) {
+      return re(expectation)
     }
     return expectation
   }
@@ -289,33 +292,33 @@ whether the qubit is indeed classical.
   /**
   Apply a (possibly non-unitary) qubit operator to qubits.
 
-    @param {Array.<Array>} termsArray Operator array (see QubitOperator.terms)
-    @param {number[]} IDs List of qubit ids upon which the operator acts.
+    @param termsArray Operator array (see QubitOperator.terms)
+    @param IDs List of qubit ids upon which the operator acts.
   */
-  applyQubitOperator(termsArray, IDs) {
-    let new_state = math.zeros(len(this._state))
-    const current_state = math.clone(this._state)
+  applyQubitOperator<T>(termsArray: T[][], IDs: number[]) {
+    let new_state = zeros(len(this._state))
+    const current_state = clone(this._state)
     termsArray.forEach(([term, coefficient]) => {
       this.applyTerm(term, IDs)
-      const temp = math.multiply(this._state, coefficient)
-      new_state = math.add(new_state, temp)
-      this._state = math.clone(current_state)
+      const temp = multiply(this._state, coefficient)
+      new_state = add(new_state, temp)
+      this._state = clone(current_state)
     })
     this._state = new_state
   }
 
   /**
   Return the probability of the outcome `bit_string` when measuring
-the qubits given by the list of ids.
-
-    @param {boolean[]|number[]} bitString Measurement outcome.
-    @param {number[]} IDs List of qubit ids determining the ordering.
-
+  the qubits given by the list of ids.
+  
+    @param bitString Measurement outcome.
+    @param IDs List of qubit ids determining the ordering.
+  
     @return Probability of measuring the provided bit string.
-
+  
     @throws {Error} if an unknown qubit id was provided.
    */
-  getProbability(bitString, IDs) {
+  getProbability(bitString: number[], IDs: number[]) {
     const n = IDs.length
     for (let i = 0; i < n; ++i) {
       const id = IDs[i]
@@ -339,44 +342,32 @@ the qubits given by the list of ids.
       const i = _i[0]
       if ((i & mask) === bit_str) {
         const e = val
-        probability += math.re(e) ** 2 + math.im(e) ** 2
+        probability += re(e) ** 2 + im(e) ** 2
       }
     })
     return probability
   }
 
-  /**
-   * @ignore
-   * @param i
-   * @return {*}
-   * @private
-   */
-  _getState(i) {
-    return this._state.subset(math.index(i))
+  _getState(i: number) {
+    return this._state.subset(index(i))
   }
 
-  /**
-   * @ignore
-   * @param i
-   * @param value
-   * @private
-   */
-  _setState(i, value) {
-    this._state.subset(math.index(i), value)
+  _setState(i: number, value: number) {
+    this._state.subset(index(i), value)
   }
 
   /**
   Return the probability amplitude of the supplied `bit_string`.
     The ordering is given by the list of qubit ids.
-
+  
    @param {boolean[]|number[]} bitString Computational basis state
    @param {number[]} IDs List of qubit ids determining the ordering. Must contain all allocated qubits.
-
+  
     @return Probability amplitude of the provided bit string.
-
+  
     @throws {Error} if the second argument is not a permutation of all allocated qubits.
    */
-  getAmplitude(bitString, IDs) {
+  getAmplitude(bitString: number[], IDs: number[]): number {
     const s1 = new Set(IDs)
     const s2 = new Set(Object.keys(this._map).map(k => parseInt(k, 10)))
     if (!setEqual(s1, s2)) {
@@ -395,25 +386,25 @@ the qubits given by the list of ids.
   }
 
   /**
-Applies exp(-i*time*H) to the wave function, i.e., evolves under
-the Hamiltonian H for a given time. The terms in the Hamiltonian
-are not required to commute.
-
+  Applies exp(-i*time*H) to the wave function, i.e., evolves under
+  the Hamiltonian H for a given time. The terms in the Hamiltonian
+  are not required to commute.
+  
     This function computes the action of the matrix exponential using
-ideas from Al-Mohy and Higham, 2011.
-TODO: Implement better estimates for s.
-
-   @param {Array.<Array>} terms_dict Operator dictionary (see QubitOperator.terms) defining the Hamiltonian.
-   @param {number} time Time to evolve for
-   @param {number[]} ids A list of qubit IDs to which to apply the evolution.
-   @param {number[]} ctrlids A list of control qubit IDs.
+  ideas from Al-Mohy and Higham, 2011.
+  TODO: Implement better estimates for s.
+  
+   @param terms_dict Operator dictionary (see QubitOperator.terms) defining the Hamiltonian.
+   @param time Time to evolve for
+   @param ids A list of qubit IDs to which to apply the evolution.
+   @param ctrlids A list of control qubit IDs.
   */
-  emulateTimeEvolution(terms_dict, time, ids, ctrlids) {
+  emulateTimeEvolution(terms_dict: number[][], time: number, ids: number[], ctrlids: number[]): void {
     // Determine the (normalized) trace, which is nonzero only for identity
     // terms:
     let tr = 0
     let sum = 0
-    const newTerms = []
+    const newTerms: number[][] = [];
     terms_dict.forEach(([t, c]) => {
       if (t.length === 0) {
         tr += c
@@ -424,51 +415,51 @@ TODO: Implement better estimates for s.
     })
 
     terms_dict = newTerms
-    const op_nrm = math.abs(time) * sum
+    const op_nrm = abs(time) * sum
     // rescale the operator by s:
     const s = Math.floor(op_nrm + 1)
-    const correction = math.exp(math.complex(0, -time * tr / (s * 1.0)))
-    const output_state = math.clone(this._state)
+    const correction = exp(complex(0, -time * tr / (s * 1.0)))
+    const output_state = clone(this._state)
     const mask = this.getControlMask(ctrlids)
 
     for (let i = 0; i < s; ++i) {
       let j = 0
       let nrm_change = 1.0
-      let update
+      let update;
       while (nrm_change > 1.e-12) {
-        const coeff = math.divide(math.complex(0, -time), s * (j + 1))
-        const current_state = math.clone(this._state)
+        const coeff = divide(complex(0, -time), s * (j + 1))
+        const current_state = clone(this._state)
         update = 0
         terms_dict.forEach(([t, c]) => {
           this.applyTerm(t, ids)
-          this._state = math.multiply(this._state, c)
+          this._state = multiply(this._state, c)
 
-          update = math.add(this._state, update)
+          update = add(this._state, update)
           // update += this._state
-          this._state = math.clone(current_state)
+          this._state = clone(current_state)
         })
-        update = math.multiply(update, coeff)
+        update = multiply(update, coeff)
         this._state = update
 
         update.forEach((value, [m]) => {
           if ((m & mask) === mask) {
-            const idx = math.index(m)
-            const v = math.add(output_state.subset(idx), value)
+            const idx = index(m)
+            const v = add(output_state.subset(idx), value)
             output_state.subset(idx, v)
           }
         })
-        nrm_change = math.norm(update)
+        nrm_change = norm(update)
         j += 1
       }
 
       update.forEach((value, [k]) => {
         if ((k & mask) === mask) {
-          const idx = math.index(k)
-          const v = math.multiply(output_state.subset(idx), correction)
+          const idx = index(k)
+          const v = multiply(output_state.subset(idx), correction)
           output_state.subset(idx, v)
         }
       })
-      this._state = math.clone(output_state)
+      this._state = clone(output_state)
     }
   }
 
@@ -481,14 +472,14 @@ TODO: Implement better estimates for s.
 
   /**
   Applies a QubitOperator term to the state vector. (Helper function for time evolution & expectation)
-
-    @param {Array} term One term of QubitOperator.terms
-    @param {number[]} ids Term index to Qubit ID mapping
-    @param {number[]} controlIDs Control qubit IDs
+  
+    @param term One term of QubitOperator.terms
+    @param ids Term index to Qubit ID mapping
+    @param controlIDs Control qubit IDs
   */
-  applyTerm(term, ids, controlIDs = []) {
+  applyTerm(term, ids: number[], controlIDs: number[] = []) {
     const X = [[0.0, 1.0], [1.0, 0.0]]
-    const Y = [[0.0, math.complex(0, -1)], [math.complex(0, 1), 0.0]]
+    const Y = [[0.0, complex(0, -1)], [complex(0, 1), 0.0]]
     const Z = [[1.0, 0.0], [0.0, -1.0]]
     const gates = { X, Y, Z }
     term.forEach((local_op) => {
@@ -500,12 +491,12 @@ TODO: Implement better estimates for s.
   /**
   Applies the k-qubit gate matrix m to the qubits with indices ids,
     using ctrlids as control qubits.
-
-    @param {Array.<Array.<number>>} m 2^k x 2^k complex matrix describing the k-qubit gate.
-    @param {number[]} ids A list containing the qubit IDs to which to apply the gate.
-    @param {number[]} ctrlids A list of control qubit IDs (i.e., the gate is only applied where these qubits are 1).
+  
+    @param m 2^k x 2^k complex matrix describing the k-qubit gate.
+    @param ids A list containing the qubit IDs to which to apply the gate.
+    @param ctrlids A list of control qubit IDs (i.e., the gate is only applied where these qubits are 1).
    */
-  applyControlledGate(m, ids, ctrlids) {
+  applyControlledGate(m: number[][], ids: number[], ctrlids: number[]): void {
     const mask = this.getControlMask(ctrlids)
     if (len(m) === 2) {
       const k = ids[0]
@@ -519,18 +510,18 @@ TODO: Implement better estimates for s.
 
   /**
   Applies the single qubit gate matrix m to the qubit at position `pos`
-using `mask` to identify control qubits.
-
-   @param {Array.<Array.<number>>} m 2x2 complex matrix describing the single-qubit gate.
-    @param {number} pos Bit-position of the qubit.
-    @param {number} mask Bit-mask where set bits indicate control qubits.
+  using `mask` to identify control qubits.
+  
+    @param m 2x2 complex matrix describing the single-qubit gate.
+    @param pos Bit-position of the qubit.
+    @param mask Bit-mask where set bits indicate control qubits.
    */
-  _singleQubitGate(m, pos, mask) {
+  _singleQubitGate(m: number[][], pos: number, mask: number) {
     const kernel = (u, d, m) => {
-      const ma = math.add
-      const mm = math.multiply
-      d = d || math.complex(0, 0)
-      u = u || math.complex(0, 0)
+      const ma = add
+      const mm = multiply
+      d = d || complex(0, 0)
+      u = u || complex(0, 0)
       const r1 = ma(mm(u, m[0][0]), mm(d, m[0][1]))
       const r2 = ma(mm(u, m[1][0]), mm(d, m[1][1]))
       return [r1, r2]
@@ -552,19 +543,19 @@ using `mask` to identify control qubits.
 
   /**
   Applies the k-qubit gate matrix m to the qubits at `pos`
-using `mask` to identify control qubits.
-
-   @param {Array.<number[]>} m 2^k x 2^k complex matrix describing the k-qubit gate.
-   @param {number[]} pos List of bit-positions of the qubits.
-   @param {number} mask Bit-mask where set bits indicate control qubits.
+  using `mask` to identify control qubits.
+  
+   @param m 2^k x 2^k complex matrix describing the k-qubit gate.
+   @param pos List of bit-positions of the qubits.
+   @param mask Bit-mask where set bits indicate control qubits.
    see follows the description in https://arxiv.org/abs/1704.01127
    */
-  _multiQubitGate(m, pos, mask) {
+  _multiQubitGate(m: number[][], pos: number[], mask: number) {
     const inactive = Object.keys(this._map).map(k => parseInt(k, 10)).filter(p => !pos.includes(p))
 
-    const matrix = math.matrix(m)
-    const subvec = zeros(1 << pos.length)
-    const subvec_idx = zeros(subvec.length)
+    const ma = matrix(m);
+    const subvec = zeros(1 << pos.length) as number[];
+    const subvec_idx = zeros(subvec.length) as number[];
     for (let c = 0; c < (1 << inactive.length); ++c) {
       // determine base index (state of inactive qubits)
       let base = 0
@@ -583,22 +574,22 @@ using `mask` to identify control qubits.
           offset |= ((x >> i) & 1) << pos[i]
         }
         subvec_idx[x] = base | offset
-        subvec[x] = this._getState(subvec_idx[x]) || math.complex(0, 0)
+        subvec[x] = this._getState(subvec_idx[x]) || complex(0, 0)
       }
 
       // perform mat-vec mul
-      matrixRangeAssign(this._state, subvec_idx, matrixDot(matrix, subvec))
+      matrixRangeAssign(this._state, subvec_idx, matrixDot(ma, subvec))
     }
   }
 
   /**
   Set wavefunction and qubit ordering.
-
-    @param {Complex[]} wavefunction Array of complex amplitudes describing the wavefunction (must be normalized).
-    @param {Array} ordering List of ids describing the new ordering of qubits
-(i.e., the ordering of the provided wavefunction).
+  
+    @param wavefunction Array of complex amplitudes describing the wavefunction (must be normalized).
+    @param ordering List of ids describing the new ordering of qubits
+  (i.e., the ordering of the provided wavefunction).
    */
-  setWavefunction(wavefunction, ordering) {
+  setWavefunction(wavefunction: Complex[], ordering) {
     // wavefunction contains 2^n values for n qubits
     assert(wavefunction.length === (1 << ordering.length))
 
@@ -614,7 +605,7 @@ using `mask` to identify control qubits.
         + 'allocated previously (call eng.flush()).')
     }
 
-    this._state = math.matrix(wavefunction)
+    this._state = matrix(wavefunction)
     const map = {}
     for (let i = 0; i < ordering.length; ++i) {
       map[ordering[i]] = i
@@ -624,7 +615,7 @@ using `mask` to identify control qubits.
 
   /**
   Collapse a quantum register onto a classical basis state.
-
+  
     @param {number[]} ids Qubit IDs to collapse.
     @param {boolean[]} values Measurement outcome for each of the qubit IDs in `ids`.
     @throws {Error} If probability of outcome is ~0 or unknown qubits are provided.
@@ -652,20 +643,20 @@ using `mask` to identify control qubits.
     this._state.forEach((looper, _i) => {
       const i = _i[0]
       if ((mask & i) === val) {
-        nrm += math.abs(this._getState(i)) ** 2
+        nrm += abs(this._getState(i)) ** 2
       }
     })
 
     if (nrm < 1.e-12) {
       throw new Error('collapse_wavefunction(): Invalid collapse! Probability is ~0.')
     }
-    const inv_nrm = 1.0 / math.sqrt(nrm)
+    const inv_nrm = 1.0 / sqrt(nrm)
     this._state.forEach((looper, _i) => {
       const i = _i[0]
       if ((mask & i) !== val) {
         this._setState(i, 0)
       } else {
-        this._setState(i, math.multiply(looper, inv_nrm))
+        this._setState(i, multiply(looper, inv_nrm))
       }
     })
   }

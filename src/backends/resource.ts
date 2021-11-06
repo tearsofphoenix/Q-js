@@ -21,15 +21,14 @@ import {
 } from '../ops/gates'
 import { LogicalQubitIDTag } from '../meta/tag'
 import { BasicQubit } from '../meta/qubit'
+import { genString } from '../libs/util';
+import { ICommand } from '@/interfaces';
 
-import { genString } from '../libs/util'
-
-function parseStringKey(key) {
-  return key.split(',')
+function parseStringKey(key: string) {
+  return key.split(',');
 }
 
 /**
- * @class ResourceCounter
  * @desc
 ResourceCounter is a compiler engine which counts the number of gates and
 max. number of active qubits.
@@ -48,9 +47,18 @@ Properties:
 acyclic graph (DAG) of the program.
  */
 export default class ResourceCounter extends BasicEngine {
-  /**
-   * @constructor
-   */
+  _previous_max_depth: number;
+  max_width: number;
+  private _active_qubits: number;
+  gate_counts: {
+    [key: string]: number;
+  };
+  gate_class_counts: {
+    [key: string]: number;
+  };
+  _depth_of_qubit: {
+    [key: string]: number;
+  };
   constructor() {
     super()
     this.gate_counts = {}
@@ -66,10 +74,10 @@ export default class ResourceCounter extends BasicEngine {
     Specialized implementation of isAvailable: Returns true if the
     ResourceCounter is the last engine (since it can count any command).
 
-    @param {Command} cmd Command for which to check availability (all Commands can be counted).
-    @return {boolean} true, unless the next engine cannot handle the Command (if there is a next engine).
+    @param cmd Command for which to check availability (all Commands can be counted).
+    @return true, unless the next engine cannot handle the Command (if there is a next engine).
    */
-  isAvailable(cmd) {
+  isAvailable(cmd: ICommand) {
     try {
       return super.isAvailable(cmd)
     } catch (e) {
@@ -80,9 +88,6 @@ export default class ResourceCounter extends BasicEngine {
     }
   }
 
-  /**
-   * @return {number}
-   */
   get depthOfDag() {
     if (this._depth_of_qubit) {
       const current_max = Math.max(...Object.values(this._depth_of_qubit))
@@ -92,11 +97,7 @@ export default class ResourceCounter extends BasicEngine {
     }
   }
 
-  /**
-   *
-   * @param {Command} cmd
-   */
-  addCMD(cmd) {
+  addCMD(cmd: ICommand) {
     const qid = cmd.qubits[0][0].id
     if (cmd.gate.equal(Allocate)) {
       this._active_qubits += 1
@@ -111,20 +112,20 @@ export default class ResourceCounter extends BasicEngine {
         qureg.forEach((qubit) => {
           this._depth_of_qubit[qubit.id] += 1
           //  Check if a mapper assigned a different logical id
-          let logical_id_tag
+          let logical_id_tag: LogicalQubitIDTag | undefined = undefined;
           cmd.tags.forEach((tag) => {
             if (tag instanceof LogicalQubitIDTag) {
               logical_id_tag = tag
             }
           })
           if (logical_id_tag) {
-            qubit = new BasicQubit(qubit.engine, logical_id_tag.logical_qubit_id)
+            qubit = new BasicQubit(qubit.engine, (logical_id_tag as LogicalQubitIDTag).logicalQubitID);
           }
-          this.main.setMeasurementResult(qubit, 0)
+          this.main.setMeasurementResult!(qubit, false);
         })
       })
     } else {
-      const qubit_ids = new Set()
+      const qubit_ids = new Set<number>();
       cmd.allQubits.forEach((qureg) => {
         qureg.forEach((qubit) => {
           qubit_ids.add(qubit.id)
@@ -166,11 +167,7 @@ export default class ResourceCounter extends BasicEngine {
     }
   }
 
-  /**
-   *
-   * @param {Command[]} commandList
-   */
-  receive(commandList) {
+  receive(commandList: ICommand[]) {
     commandList.forEach((cmd) => {
       if (!(cmd.gate instanceof FlushGate)) {
         this.addCMD(cmd)
@@ -184,13 +181,12 @@ export default class ResourceCounter extends BasicEngine {
   /**
   Return the string representation of this ResourceCounter.
 
-  @return {string}
     A summary (string) of resources used, including gates, number of
     calls, and max. number of qubits that were active at the same time.
    */
   toString() {
     if (Object.keys(this.gate_counts).length > 0) {
-      const gate_class_list = []
+      const gate_class_list: string[] = []
       Object.keys(this.gate_class_counts).forEach((gate_class_description) => {
         const num = this.gate_class_counts[gate_class_description]
         const [gate_class, ctrl_cnt] = parseStringKey(gate_class_description)
@@ -198,7 +194,7 @@ export default class ResourceCounter extends BasicEngine {
         gate_class_list.push(`${name} : ${num}`)
       })
 
-      const gate_list = []
+      const gate_list: string[] = [];
       Object.keys(this.gate_counts).forEach((gate_description) => {
         const num = this.gate_counts[gate_description]
         const [gate, ctrl_cnt] = parseStringKey(gate_description)

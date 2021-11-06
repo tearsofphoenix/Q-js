@@ -11,9 +11,11 @@ interface ICommand extends IEquality<ICommand> {
     engine: IEngine;
     allQubits: IQureg[];
     controlCount: number;
+
     addControlQubits(qubits: IQubit[]): void;
     apply(): void;
     getInverse(): ICommand;
+    getMerged(other: ICommand): ICommand;
     copy(): ICommand;
 }
 

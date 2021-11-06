@@ -156,7 +156,7 @@ Temporarily store the command cmd.
       for (let i = 0; i < cmd.tags.length; ++i) {
         const t = cmd.tags[i]
         if (t instanceof LogicalQubitIDTag) {
-          logical_id = t.logical_qubit_id
+          logical_id = t.logicalQubitID
           break
         }
       }

@@ -15,7 +15,7 @@
  */
 
 import assert from 'assert'
-import bigInt from 'big-integer'
+import bigInt, { BigInteger } from 'big-integer'
 import { BasicEngine } from '../../cengines/basics'
 import { BasicQubit } from '../../meta/qubit'
 import {
@@ -30,9 +30,9 @@ import {
 import { BasicMathGate } from '../../ops/basics'
 import { LogicalQubitIDTag } from '../../meta/tag'
 import { instanceOf } from '../../libs/util'
+import { ICommand, IQubit, IQureg } from '@/interfaces';
 
 /**
- * @class ClassicalSimulator
  * @desc
 A simple introspective simulator that only permits classical operations.
 
@@ -41,32 +41,31 @@ A simple introspective simulator that only permits classical operations.
 from/to bits and registers of bits.
  */
 export default class ClassicalSimulator extends BasicEngine {
-  /**
-   * @constructor
-   */
+  _state: BigInteger;
+  _bit_positions: {
+    [key: number]: number;
+  }
   constructor() {
     super();
-    this._state = bigInt(0)
+    this._state = bigInt(0);
     this._bit_positions = {}
   }
 
   /**
   Converts a qubit from a logical to a mapped qubit if there is a mapper.
 
-  @param {Qubit} qubit Logical quantum bit
+  @param qubit Logical quantum bit
    */
-  convertLogicalToMappedQubit(qubit) {
+  convertLogicalToMappedQubit(qubit: IQubit) {
     const { mapper } = this.main
     if (mapper) {
-      const v = mapper.currentMapping[qubit.id]
+      const v = mapper.currentMapping![qubit.id];
       if (typeof v === 'undefined') {
-        throw new Error('Unknown qubit id. '
-          + 'Please make sure you have called '
-          + 'eng.flush().')
+        throw new Error(`Unknown qubit id. Please make sure you have called 'eng.flush()'.`);
       }
-      return new BasicQubit(qubit.engine, v)
+      return new BasicQubit(qubit.engine, v);
     } else {
-      return qubit
+      return qubit;
     }
   }
 
@@ -78,17 +77,17 @@ If there is a mapper present in the compiler, this function
 automatically converts from logical qubits to mapped qubits for
   the qureg argument.
 
-  @param {Qubit} qubit The bit to read.
+  @param qubit The bit to read.
 
-  @return {number} 0 if the target bit is off, 1 if it's on.
+  @return 0 if the target bit is off, 1 if it's on.
    */
-  readBit(qubit) {
+  readBit(qubit: IQubit) {
     qubit = this.convertLogicalToMappedQubit(qubit)
     return this.readMappedBit(qubit)
   }
 
   // Internal use only. Does not change logical to mapped qubits.
-  readMappedBit(mappedQubit) {
+  readMappedBit(mappedQubit: IQubit) {
     const p = this._bit_positions[mappedQubit.id]
     return this._state.shiftRight(p).and(1).toJSNumber()
   }
@@ -101,16 +100,16 @@ If there is a mapper present in the compiler, this function
 automatically converts from logical qubits to mapped qubits for
   the qureg argument.
 
-    @param {Qubit} qubit The bit to write.
-    @param {boolean|number} value Writes 1 if this value is truthy, else 0.
+    @param qubit The bit to write.
+    @param value Writes 1 if this value is truthy, else 0.
   */
-  writeBit(qubit, value) {
+  writeBit(qubit: IQubit, value: boolean | number) {
     qubit = this.convertLogicalToMappedQubit(qubit)
     this.writeMappedBit(qubit, value)
   }
 
   // Internal use only. Does not change logical to mapped qubits.
-  writeMappedBit(mappedQubit, value) {
+  writeMappedBit(mappedQubit: IQubit, value: boolean | number) {
     const p = this._bit_positions[mappedQubit.id]
     if (value) {
       this._state = this._state.or(bigInt(1).shiftLeft(p))
@@ -124,11 +123,11 @@ automatically converts from logical qubits to mapped qubits for
   Returns a mask, to compare against the state, with bits from the
 register set to 1 and other bits set to 0.
 
-@param {Qureg} qureg The bits whose positions should be set.
+  @param qureg The bits whose positions should be set.
 
-  @return {number} The mask.
+  @return The mask.
    */
-  mask(qureg) {
+  mask(qureg: IQureg) {
     let t = 0
     qureg.forEach(q => t |= 1 << this._bit_positions[q.id])
     return t
@@ -142,17 +141,17 @@ If there is a mapper present in the compiler, this function
 automatically converts from logical qubits to mapped qubits for
   the qureg argument.
 
-  @param {Qureg} qureg The group of bits to read, in little-endian order.
+  @param qureg The group of bits to read, in little-endian order.
 
-  @return {number} Little-endian register value.
+  @return Little-endian register value.
    */
-  readRegister(qureg) {
-    const new_qureg = []
+  readRegister(qureg: IQureg) {
+    const new_qureg: IQubit[] = [];
     qureg.forEach(qubit => new_qureg.push(this.convertLogicalToMappedQubit(qubit)))
-    return this.readMappedRegister(new_qureg)
+    return this.readMappedRegister(new_qureg);
   }
 
-  readMappedRegister(mappedQureg) {
+  readMappedRegister(mappedQureg: IQubit[]) {
     let t = 0
     mappedQureg.forEach((_, i) => t |= this.readMappedBit(mappedQureg[i]) << i)
     return t
@@ -166,27 +165,27 @@ If there is a mapper present in the compiler, this function
 automatically converts from logical qubits to mapped qubits for
   the qureg argument.
 
-   @param {Qureg} qureg  The bits to write, in little-endian order.
-   @param {number} value  The integer value to store. Must fit in the register.
+   @param qureg  The bits to write, in little-endian order.
+   @param value  The integer value to store. Must fit in the register.
    */
-  writeRegister(qureg, value) {
-    const new_qureg = []
+  writeRegister(qureg: IQureg, value: number) {
+    const new_qureg: IQubit[] = []
     qureg.forEach(qubit => new_qureg.push(this.convertLogicalToMappedQubit(qubit)))
     this.writeMappedRegister(new_qureg, value)
   }
 
-  writeMappedRegister(mappedQureg, value) {
+  writeMappedRegister(mappedQureg: IQubit[], value: number) {
     if (value < 0 || value >= (2 ** mappedQureg.length)) {
       throw new Error("Value won't fit in register.")
     }
     mappedQureg.forEach((_, i) => this.writeMappedBit(mappedQureg[i], (value >> i) & 1))
   }
 
-  isAvailable(cmd) {
+  isAvailable(cmd: ICommand) {
     return instanceOf(cmd.gate, [MeasureGate, AllocateQubitGate, DeallocateQubitGate, BasicMathGate, FlushGate, XGate])
   }
 
-  receive(commandList) {
+  receive(commandList: ICommand[]) {
     commandList.forEach((cmd) => {
       this.handle(cmd)
     })
@@ -195,11 +194,7 @@ automatically converts from logical qubits to mapped qubits for
     }
   }
 
-  /**
-   *
-   * @param {Command} cmd
-   */
-  handle(cmd) {
+  handle(cmd: ICommand) {
     if (cmd.gate instanceof FlushGate) {
       return
     }
@@ -207,17 +202,17 @@ automatically converts from logical qubits to mapped qubits for
     if (cmd.gate.equal(Measure)) {
       cmd.qubits.forEach(qr => qr.forEach((qb) => {
         // Check if a mapper assigned a different logical id
-        let logical_id_tag
+        let logical_id_tag: LogicalQubitIDTag | undefined = undefined;
         cmd.tags.forEach((tag) => {
           if (tag instanceof LogicalQubitIDTag) {
             logical_id_tag = tag
           }
         })
-        let log_qb = qb
+        let log_qb = qb;
         if (logical_id_tag) {
-          log_qb = new BasicQubit(qb.engine, logical_id_tag.logical_qubit_id)
+          log_qb = new BasicQubit(qb.engine, (logical_id_tag as LogicalQubitIDTag).logicalQubitID);
         }
-        this.main.setMeasurementResult(log_qb, this.readMappedBit(qb))
+        this.main.setMeasurementResult!(log_qb, Boolean(this.readMappedBit(qb)));
       }))
       return
     }
@@ -245,7 +240,7 @@ automatically converts from logical qubits to mapped qubits for
       return
     }
 
-    const controls_mask = this.mask(cmd.controlQubits)
+    const controls_mask = this.mask(cmd.controlQubits as any);
     const meets_controls = this._state.and(controls_mask).eq(bigInt(controls_mask))
 
     if (cmd.gate instanceof XGate) {
