@@ -21,10 +21,9 @@ import { All } from '../ops/metagates'
 import { instanceOf, tuple } from '../libs/util';
 import { CNOT } from '../ops/shortcuts'
 import CommandModifier from './cmdmodifier'
-import { ICommand } from '@/interfaces';
+import { ICommand, IQubit } from '@/interfaces';
 
 /**
- * @class SwapAndCNOTFlipper
  * @desc
 Flips CNOTs and translates Swaps to CNOTs where necessary.
 
@@ -125,7 +124,7 @@ export default class SwapAndCNOTFlipper extends BasicEngine {
       if (this.needsFlipping(cmd)) {
         this.sendCNOT(cmd, cmd.controlQubits, cmd.qubits[0], true)
       } else if (this.isSwap(cmd)) {
-        const qubits = [];
+        const qubits: IQubit[] = [];
         cmd.qubits.forEach(qr => qr.forEach(qb => qubits.push(qb)))
         const ids = qubits.map(qb => qb.id)
         assert(ids.length === 2)

@@ -14,6 +14,7 @@ interface IQubit {
 }
 
 interface IQureg extends Array<IQubit> {
+    toNumber(): number;
     add(other: IQubit[] | IQureg): IQureg;
     deallocate(): void;
 }

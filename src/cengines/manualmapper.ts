@@ -17,7 +17,6 @@ import { ICommand } from '@/interfaces';
 import BasicMapperEngine from './basicmapper'
 
 /**
- * @class ManualMapper
  * @desc
 Manual Mapper which adds QubitPlacementTags to Allocate gate commands
 according to a user-specified mapping.
@@ -27,7 +26,6 @@ according to a user-specified mapping.
 export default class ManualMapper extends BasicMapperEngine {
   private map: Function;
   /**
-   * @constructor
     Initialize the mapper to a given mapping. If no mapping function is
 provided, the qubit id is used as the location.
 

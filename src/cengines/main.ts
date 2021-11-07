@@ -46,7 +46,7 @@ mapper (BasicMapperEngine): Access to the mapper if there is one.
 export default class MainEngine extends BasicEngine {
   backend: IEngine;
   private _qubitIdx: number;
-  private mapper: BasicMapperEngine;
+  mapper: BasicMapperEngine;
   verbose: boolean;
   private _measurements: Map<number, number>;
   /**
@@ -237,7 +237,7 @@ eng.getMeasurementResult(qubit[0]) == qubit.toNumber()
   /**
     Flush the entire circuit down the pipeline, clearing potential buffers (of, e.g., optimizers).
 
-    @param {boolean} deallocateQubits If true, deallocates all qubits that are
+    @param deallocateQubits If true, deallocates all qubits that are
     still alive (invalidating references to them by setting their id to -1).
   */
   flush(deallocateQubits = false) {

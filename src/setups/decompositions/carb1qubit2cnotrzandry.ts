@@ -1,4 +1,4 @@
-import math, { Matrix } from 'mathjs'
+import math, { complex, multiply, Matrix } from 'mathjs'
 import assert from 'assert'
 import DecompositionRule from '@/cengines/replacer/decompositionrule';
 import {
@@ -9,12 +9,12 @@ import { len, productLoop } from '@/libs/polyfill';
 import { _find_parameters, phase } from './arb1qubit2rzandry'
 import { ICommand, IMathGate } from '@/interfaces';
 
-const mm = math.multiply
-const mc = math.complex
+const mm = multiply
+const mc = complex
 const TOLERANCE = 1e-12
 
 /**
- * @ignore
+* 
  * Recognize single controlled one qubit gates with a matrix.
  * @param {Command} cmd
  * @return {boolean}
@@ -59,7 +59,7 @@ function _test_parameters(matrix: Matrix, a: number, b: number, c_half: number):
 }
 
 /**
- * @ignore
+* 
 Recognizes a matrix which can be written in the following form:
 
     V = [[-sin(c/2) * exp(j*a), exp(j*(a-b)) * cos(c/2)],
@@ -72,10 +72,11 @@ export function _recognize_v(matrix: Matrix) {
   let a: number;
   let b: number = 0;
   let c_half: number = 0;
+  const PI = Math.PI;
   if (math.abs(matrix[0][0]) < TOLERANCE) {
     const t = phase(mm(matrix[0][1], matrix[1][0]))
-    const two_a = math.mod(t, 2 * math.pi)
-    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * math.pi - TOLERANCE) {
+    const two_a = math.mod(t, 2 * PI)
+    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * PI - TOLERANCE) {
       // from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
       // w.l.g. we can choose a==0 because (see U above)
       // c/2 -> c/2 + pi would have the same effect as as a==0 -> a==pi.
@@ -84,9 +85,9 @@ export function _recognize_v(matrix: Matrix) {
       a = two_a / 2.0
     }
     const two_b = phase(matrix[1][0]) - phase(matrix[0][1])
-    const possible_b = [math.mod(two_b / 2.0, 2 * math.pi),
-    math.mod(two_b / 2.0 + math.pi, 2 * math.pi)]
-    const possible_c_half = [0, math.pi]
+    const possible_b = [math.mod(two_b / 2.0, 2 * PI),
+    math.mod(two_b / 2.0 + PI, 2 * PI)]
+    const possible_c_half = [0, PI]
     let found = false
     productLoop(possible_b, possible_c_half, (_b, _c) => {
       b = _b
@@ -102,8 +103,8 @@ export function _recognize_v(matrix: Matrix) {
     return [a, b, c_half]
   } else if (math.abs(matrix[0][1]) < TOLERANCE) {
     const t = phase(mm(mm(matrix[0][0], matrix[1][1]), -1))
-    const two_a = math.mod(t, 2 * math.pi)
-    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * math.pi - TOLERANCE) {
+    const two_a = math.mod(t, 2 * PI)
+    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * PI - TOLERANCE) {
       // from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
       // w.l.g. we can choose a==0 because (see U above)
       // c/2 -> c/2 + pi would have the same effect as as a==0 -> a==pi.
@@ -112,7 +113,7 @@ export function _recognize_v(matrix: Matrix) {
       a = two_a / 2.0
     }
     b = 0
-    const possible_c_half = [math.pi / 2.0, 3.0 / 2.0 * math.pi]
+    const possible_c_half = [PI / 2.0, 3.0 / 2.0 * PI]
     const found = false
     for (let i = 0; i < possible_c_half.length; ++i) {
       c_half = possible_c_half[i]
@@ -123,8 +124,8 @@ export function _recognize_v(matrix: Matrix) {
     return []
   } else {
     const t = mm(mm(-1.0, matrix[0][0]), matrix[1][1])
-    const two_a = math.mod(phase(t), 2 * math.pi)
-    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * math.pi - TOLERANCE) {
+    const two_a = math.mod(phase(t), 2 * PI)
+    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * PI - TOLERANCE) {
       // from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
       // w.l.g. we can choose a==0 because (see U above)
       // c/2 -> c/2 + pi would have the same effect as as a==0 -> a==pi.
@@ -134,14 +135,14 @@ export function _recognize_v(matrix: Matrix) {
     }
     const two_b = phase(matrix[1][0]) - phase(matrix[0][1])
     const possible_b = [
-      math.mod((two_b / 2.0), 2 * math.pi),
-      math.mod((two_b / 2.0 + math.pi), 2 * math.pi)]
+      math.mod((two_b / 2.0), 2 * PI),
+      math.mod((two_b / 2.0 + PI), 2 * PI)]
     const tmp = math.acos(math.abs(matrix[1][0]))
     const possible_c_half = [
-      math.mod(tmp, 2 * math.pi),
-      math.mod(tmp + math.pi, 2 * math.pi),
-      math.mod(-1.0 * tmp, 2 * math.pi),
-      math.mod(-1.0 * tmp + math.pi, 2 * math.pi)]
+      math.mod(tmp, 2 * PI),
+      math.mod(tmp + PI, 2 * PI),
+      math.mod(-1.0 * tmp, 2 * PI),
+      math.mod(-1.0 * tmp + PI, 2 * PI)]
     let found = false
     productLoop(possible_b, possible_c_half, (_b, _c) => {
       b = _b

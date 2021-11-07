@@ -4,7 +4,6 @@ import deepEqual from 'deep-eql'
 import { IGate } from '@/interfaces';
 /**
  * Gate for transforming qubits in state |0> to any desired quantum state.
- * @class StatePreparation
  */
 export default class StatePreparation extends BasicGate {
   private _finalState: any;
@@ -25,7 +24,6 @@ export default class StatePreparation extends BasicGate {
    final_state(list[complex]): wavefunction of the desired
    quantum state. len(final_state) must
    be 2**len(qureg). Must be normalized!
-   * @constructor
    * @param finalState
    */
   constructor(finalState: any) {

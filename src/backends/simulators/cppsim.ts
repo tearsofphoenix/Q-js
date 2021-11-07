@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-const ext = require('../../../scripts/extensions')
+const ext = require('@/../scripts/extensions')
 const path = ext.getBinaryPath()
 
 const All = require(path)
 
-/**
- * @ignore
- */
 export default All

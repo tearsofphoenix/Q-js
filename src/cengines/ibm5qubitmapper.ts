@@ -32,7 +32,6 @@ function stringKeyToIntArray(key: string) {
 export const ibmqx4_connections = new Set(['2,1', '4,2', '2,0', '3,2', '3,4', '1,0'])
 
 /**
- * @class IBM5QubitMapper
  * @desc
 Mapper for the 5-qubit IBM backend.
 
@@ -52,7 +51,6 @@ export default class IBM5QubitMapper extends BasicMapperEngine {
     [key: string]: number
   };
   /**
-   * @constructor
 Initialize an IBM 5-qubit mapper compiler engine.
 
   Resets the mapping.

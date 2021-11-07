@@ -1,11 +1,11 @@
 
 // Decompose the entangle gate.
-import { Control } from '../../meta/control';
-import { All } from '../../ops/metagates';
+import { Control } from '@/meta/control';
+import { All } from '@/ops/metagates';
 import {
   X, H, EntangleGate
-} from '../../ops/gates';
-import DecompositionRule from '../../cengines/replacer/decompositionrule';
+} from '@/ops/gates';
+import DecompositionRule from '@/cengines/replacer/decompositionrule';
 import { ICommand } from '@/interfaces';
 
 const _decompose_entangle = (cmd: ICommand) => {

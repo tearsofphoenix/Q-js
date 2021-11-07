@@ -17,11 +17,11 @@
 import assert from 'assert'
 import fs from 'fs'
 import { Decimal } from 'decimal.js'
-import { len, narray } from '../../libs/polyfill'
+import { len, narray } from '@/libs/polyfill'
 import {
   DaggeredGate, X, Measure, Allocate, Deallocate, Z, Swap, SqrtSwap
-} from '../../ops'
-import { getInverse } from '../../ops/_cycle'
+} from '@/ops'
+import { getInverse } from '@/ops/_cycle'
 
 // decimalToString
 function dts(number) {
@@ -45,7 +45,7 @@ function maxOfDecimals(decimals = []) {
 }
 
 /**
- * @ignore
+* 
  * @type {{write_settings(Object): *, get_default_settings(): Object, _header(*): string, _body(Array<CircuitItem[]>, Object): string, _footer(): string}}
  * @private
  */
@@ -283,7 +283,6 @@ function toLatex(circuit) {
 _exports.toLatex = toLatex
 
 /**
- * @class _Circ2Tikz
  * @desc
 The Circ2Tikz class takes a circuit (list of lists of CircuitItem objects)
 and turns them into Latex/TikZ code.
@@ -292,7 +291,6 @@ and turns them into Latex/TikZ code.
  */
 export class _Circ2Tikz {
   /**
-   * @constructor
   Initialize a circuit to latex converter object.
 
     @param {Object} settings Dictionary of settings to use for the TikZ image.
@@ -848,6 +846,6 @@ are connected on the given line.
 }
 
 /**
- * @ignore
+* 
  */
 export default _exports

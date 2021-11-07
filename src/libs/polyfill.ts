@@ -18,7 +18,7 @@ import math, { Complex } from 'mathjs'
 import { instanceOf } from './util';
 
 /**
- * @ignore
+* 
  * check if value is complex number
  */
 export function isComplex(value: any) {
@@ -26,7 +26,7 @@ export function isComplex(value: any) {
 }
 
 /**
- * @ignore
+* 
  * check if value is number or complex number
  */
 export function isNumeric(value: any) {
@@ -34,7 +34,7 @@ export function isNumeric(value: any) {
 }
 
 /**
- * @ignore
+* 
  * return intersection of s1 & s2
  */
 export function intersection<T>(s1: Set<T>, s2: Set<T>): Set<T> {
@@ -42,7 +42,7 @@ export function intersection<T>(s1: Set<T>, s2: Set<T>): Set<T> {
 }
 
 /**
- * @ignore
+* 
  * return union set of s1 & s2
  */
 export function unionSet<T>(s1: Set<T>, s2: Set<T>): Set<T> {
@@ -53,7 +53,7 @@ export function unionSet<T>(s1: Set<T>, s2: Set<T>): Set<T> {
 }
 
 /**
- * @ignore
+* 
  * return symmetric difference of s1 & s2
  */
 export function symmetricDifference<T>(s1: Set<T>, s2: Set<T>): Set<T> {
@@ -64,7 +64,7 @@ export function symmetricDifference<T>(s1: Set<T>, s2: Set<T>): Set<T> {
 }
 
 /**
- * @ignore
+* 
  * check if s1 is equal to s2
  */
 export function setEqual<T>(s1: Set<T>, s2: Set<T>): boolean {
@@ -72,11 +72,8 @@ export function setEqual<T>(s1: Set<T>, s2: Set<T>): boolean {
 }
 
 /**
- * @ignore
+* 
  * check if `superset` is the super set of `s`
- * @param {Set} superset
- * @param {Set} s
- * @return {boolean}
  */
 export function setIsSuperSet<T>(superset: Set<T>, s: Set<T>): boolean {
   const result = [...s].filter(x => !superset.has(x))
@@ -88,7 +85,7 @@ export function setDifference<T>(s1: Set<T>, s2: Set<T>): Set<T> {
 }
 
 /**
- * @ignore
+* 
  * create a Set contains numbers in range from 0 to n
  */
 export function setFromRange(n: number): Set<number> {
@@ -100,7 +97,7 @@ export function setFromRange(n: number): Set<number> {
 }
 
 /**
- * @ignore
+* 
  * create an array filled by number in range, active like python does
  */
 export function arrayFromRange(start: number, end?: number, step?: number): number[] {
@@ -120,7 +117,7 @@ export function arrayFromRange(start: number, end?: number, step?: number): numb
 }
 
 /**
- * @ignore
+* 
  * return a random sample from `array` which length is `count`
  */
 export function randomSample<T>(array: T[], count: number): T[] {
@@ -138,7 +135,7 @@ export function randomSample<T>(array: T[], count: number): T[] {
 }
 
 /**
- * @ignore
+* 
  * test if two array(a1, a2) are equal, support instance of classes in this library
  */
 export function arrayEqual<T>(a1: T[], a2: T[], itemCompareFunc?: Function) {
@@ -177,7 +174,7 @@ export function arrayEqual<T>(a1: T[], a2: T[], itemCompareFunc?: Function) {
 }
 
 /**
- * @ignore
+* 
  * @function
  * reverse version of `forEach`
  */
@@ -192,7 +189,7 @@ Array.prototype.rforEach = function (callbackFunc: Function) {
 }
 
 /**
- * @ignore
+* 
  * @function
  * reverse version of `map`
  */
@@ -209,7 +206,7 @@ Array.prototype.rmap = function (callbackFunc: Function) {
 }
 
 /**
- * @ignore
+* 
  * @function
  * return total exist count of `item` in array
  * @param {any} item
@@ -226,7 +223,7 @@ Array.prototype.count = function (item: any): number {
 }
 
 /**
- * @ignore
+* 
  * remove all existance of `target` from array
  */
 // @ts-ignore
@@ -244,7 +241,7 @@ Array.prototype.remove = function (target: any) {
 }
 
 /**
- * @ignore
+* 
  * return all regular expression match count of `substring` in string
  */
 // @ts-ignore
@@ -290,7 +287,7 @@ export function len(v: any) {
 }
 
 /**
- * @ignore
+* 
  * parse string contains 1/0 into bit array
  */
 export function stringToBitArray(str: string): boolean[] {
@@ -307,7 +304,7 @@ export function stringToBitArray(str: string): boolean[] {
 }
 
 /**
- * @ignore
+* 
  * return dot product of two complex vector(a1, a2)
  */
 export function complexVectorDot(a1: Complex[], a2: Complex[]): Complex {
@@ -328,7 +325,7 @@ export function complexVectorDot(a1: Complex[], a2: Complex[]): Complex {
 }
 
 /**
- * @ignore
+* 
  * return n-length Array filled by item
  * @param {Function|any} item
  * @param {number} count
@@ -349,7 +346,7 @@ export function narray<T>(item: (() => T) | T, count: number): T[] {
 }
 
 /**
- * @ignore
+* 
  * product loop on two Arrays p1 & p2
  */
 export function productLoop<T>(p1: T[], p2: T[], func: (e1: T, e2: T) => boolean | undefined) {
@@ -364,7 +361,7 @@ export function productLoop<T>(p1: T[], p2: T[], func: (e1: T, e2: T) => boolean
 }
 
 /**
- * @ignore
+* 
  * product loop on three Arrays p1 & p2 & p3
  */
 export function productLoop3<T>(p1: T[], p2: T[], p3: T[], func: (e1: T, e2: T, e3: T) => boolean | undefined) {
@@ -381,7 +378,7 @@ export function productLoop3<T>(p1: T[], p2: T[], p3: T[], func: (e1: T, e2: T, 
 }
 
 /**
- * @ignore
+* 
  * return (base ^ exp) % mod, it's fast and support big number
  */
 export function expmod(base: number, exp: number, mod: number): number {

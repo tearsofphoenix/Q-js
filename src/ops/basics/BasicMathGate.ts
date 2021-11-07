@@ -61,10 +61,9 @@ return (a,b,c+a*b)
 export class BasicMathGate extends BasicGate {
   mathFunc: Function;
   /**
-   * @constructor
     Initialize a BasicMathGate by providing the mathematical function that it implements.
 
-    @param {function} mathFunc Function which takes as many int values as
+    @param mathFunc Function which takes as many int values as
 input, as the gate takes registers. For each of these values,
     it then returns the output (i.e., it returns a list/tuple of
 output values).

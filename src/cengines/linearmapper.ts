@@ -43,7 +43,7 @@ import { LogicalQubitIDTag } from '../meta'
 import { ICommand } from '@/interfaces';
 
 /**
- * @ignore
+* 
  Returns the circuit depth to execute these swaps.
  @param swaps Each tuple contains two integers representing the two IDs of the qubits involved in the
     Swap operation

@@ -21,8 +21,6 @@ import { DirtyQubitTag } from '../meta/tag'
 import { LastEngineError } from '../meta/error'
 
 /**
- * @class BasicEngine
- * @abstract
  * @desc
 Basic compiler engine: All compiler engines are derived from this class.
 It provides basic functionality such as qubit allocation/deallocation and
@@ -44,7 +42,6 @@ export class BasicEngine implements IEngine {
   dirtyQubits = new Set<number>();
   activeQubits = new Set<IQubit>();
   /**
-   * @constructor
    Initialize the basic engine.
 
     Initializes local variables such as _next_engine, _main_engine, etc. to None.
@@ -187,7 +184,6 @@ returns true.
 }
 
 /**
- * @class ForwarderEngine
  * @desc
     A ForwarderEngine is a trivial engine which forwards all commands to the next engine.
 
@@ -197,8 +193,6 @@ that meta operations still work (e.g., with Compute).
 export class ForwarderEngine extends BasicEngine {
   cmdModFunc: CommandModifyFunction;
   /**
-   * @constructor
-
     @param engine Engine to forward all commands to.
     @param cmdModFunc Function which is called before sending a
 command. Each command cmd is replaced by the command it

@@ -79,7 +79,6 @@ export default class Command implements ICommand {
   private _controlQubits: IQubit[];
   private _engine: IEngine;
   /**
-   * @constructor
     Note:
 control qubits (Command.control_qubits) are stored as a
 list of qubits, and command tags (Command.tags) as a list of tag-

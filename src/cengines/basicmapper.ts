@@ -23,7 +23,6 @@ import CommandModifier from './cmdmodifier';
 import { ICommand, IQubit, IQureg } from '@/interfaces';
 
 /**
- * @class BasicMapperEngine
  * @desc
 Defines the parent class from which all mappers should be derived.
 
@@ -36,7 +35,6 @@ export default class BasicMapperEngine extends BasicEngine {
     [key: number]: number
   };
   /**
-   * @constructor
   Parent class for all Mappers.
 
 this.current_mapping (dict): Keys are the logical qubit ids and values

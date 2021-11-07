@@ -1,0 +1,5 @@
+interface IQubitOperator {
+
+}
+
+export { IQubitOperator };

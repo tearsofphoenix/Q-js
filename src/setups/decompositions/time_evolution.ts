@@ -8,15 +8,13 @@ if the hamiltonian has only one term or if all the terms commute with each
 */
 
 import assert from 'assert'
-import QubitOperator, { stringToArray } from '../../ops/qubitoperator';
-import { len, setEqual, setFromRange } from '../../libs/polyfill';
-import { Compute, Control, Uncompute } from '../../meta';
-import TimeEvolution from '../../ops/timeevolution';
-import { tuple } from '../../libs/util';
-import DecompositionRule from '../../cengines/replacer/decompositionrule';
-import {
-  CNOT, Rx, Ry, Rz, H
-} from '../../ops';
+import QubitOperator, { stringToArray } from '@/ops/qubitoperator';
+import { len, setEqual, setFromRange } from '@/libs/polyfill';
+import { Compute, Control, Uncompute } from '@/meta';
+import TimeEvolution from '@/ops/timeevolution';
+import { tuple } from '@/libs/util';
+import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { CNOT, Rx, Ry, Rz, H } from '@/ops';
 import { ICommand } from '@/interfaces';
 
 // Recognize all TimeEvolution gates with >1 terms but which all commute.
@@ -45,7 +43,7 @@ function _recognize_time_evolution_commuting_terms(cmd: ICommand) {
   return true
 }
 
-function _decompose_time_evolution_commuting_terms(cmd) {
+function _decompose_time_evolution_commuting_terms(cmd: ICommand) {
   const qureg = cmd.qubits
   const eng = cmd.engine
   const { hamiltonian, time } = cmd.gate
@@ -59,7 +57,7 @@ function _decompose_time_evolution_commuting_terms(cmd) {
   })
 }
 
-function _recognize_time_evolution_individual_terms(cmd) {
+function _recognize_time_evolution_individual_terms(cmd: ICommand) {
   return len(cmd.gate.hamiltonian.terms) === 1
 }
 
@@ -79,9 +77,8 @@ Simulation of electronic structure Hamiltonians using quantum computers,
     or
 
 Nielsen and Chuang, Quantum Computation and Information.
- @param {Command} cmd
  */
-function _decompose_time_evolution_individual_terms(cmd) {
+function _decompose_time_evolution_individual_terms(cmd: ICommand) {
   assert(len(cmd.qubits) === 1)
   const qureg = cmd.qubits[0]
   const eng = cmd.engine
@@ -138,20 +135,12 @@ function _decompose_time_evolution_individual_terms(cmd) {
   }
 }
 
-/**
- * @ignore
- * @type {DecompositionRule}
- */
 export const rule_commuting_terms = new DecompositionRule(
   TimeEvolution,
   _decompose_time_evolution_commuting_terms,
   _recognize_time_evolution_commuting_terms
 )
 
-/**
- * @ignore
- * @type {DecompositionRule}
- */
 export const rule_individual_terms = new DecompositionRule(
   TimeEvolution,
   _decompose_time_evolution_individual_terms,

@@ -15,8 +15,8 @@
  */
 
 import { expect } from 'chai'
-import math from 'mathjs'
-import { TrivialMapper } from './shared.spec'
+import math, { Matrix, Complex, zeros, identity } from 'mathjs'
+import { TrivialMapper } from './shared'
 import { BasicGate, BasicMathGate } from '@/ops/basics'
 import { DummyEngine } from '@/cengines/testengine';
 import MainEngine from '@/cengines/main';
@@ -38,14 +38,9 @@ import LocalOptimizer from '@/cengines/optimize';
 import QubitOperator, { stringToArray } from '@/ops/qubitoperator';
 import BasicMapperEngine from '@/cengines/basicmapper'
 import TimeEvolution from '@/ops/timeevolution';
+import { ICommand } from '@/interfaces';
 
-/**
- *
- * @param m {Matrix}
- * @param idx {number}
- * @return {Complex}
- */
-function getMatrixValue(m, idx) {
+function getMatrixValue(m: Matrix, idx: number): Complex {
   let v
   if (m.subset) {
     v = m.subset(math.index(idx))
@@ -59,6 +54,7 @@ function getMatrixValue(m, idx) {
 }
 
 class Mock1QubitGate extends BasicGate {
+  cnt: number;
   constructor() {
     super()
     this.cnt = 0
@@ -71,6 +67,7 @@ class Mock1QubitGate extends BasicGate {
 }
 
 class Mock6QubitGate extends BasicGate {
+  cnt: number;
   constructor() {
     super()
     this.cnt = 0
@@ -83,6 +80,7 @@ class Mock6QubitGate extends BasicGate {
 }
 
 class MockNoMatrixGate extends BasicGate {
+  cnt: number;
   constructor() {
     super()
     this.cnt = 0
@@ -96,14 +94,12 @@ class MockNoMatrixGate extends BasicGate {
 
 class Plus2Gate extends BasicMathGate {
   constructor() {
-    super((x) => {
-      return [x + 2]
-    })
+    super((x: number) => [x + 2]);
   }
 }
 
 function convertNativeMatrix(vec) {
-  const m = math.zeros(vec.length)
+  const m = zeros(vec.length);
   vec.forEach((val, idx) => {
     m.subset(math.index(idx), math.complex(val.re, val.im))
   })
@@ -116,9 +112,9 @@ const settings = [
 ]
 
 settings.forEach(([testName, gate_fusion, rndSeed, forceSimulation]) => {
-  describe(testName, () => {
+  describe(testName as string, () => {
     it('should test_simulator_is_available', () => {
-      const sim = new Simulator(gate_fusion, rndSeed, forceSimulation)
+      const sim = new Simulator(gate_fusion as boolean, rndSeed as any, forceSimulation as boolean);
 
       const backend = new DummyEngine(true)
       const eng = new MainEngine(backend, [])
@@ -272,7 +268,7 @@ settings.forEach(([testName, gate_fusion, rndSeed, forceSimulation]) => {
 
       class LargerGate extends BasicGate {
         get matrix() {
-          return math.identiy(2 ** 6)
+          return identiy(2 ** 6)
         }
       }
 
@@ -798,7 +794,7 @@ settings.forEach(([testName, gate_fusion, rndSeed, forceSimulation]) => {
       const sim = new Simulator(gate_fusion, rndSeed, forceSimulation)
       const mapper = new BasicMapperEngine()
 
-      const receive = (command_list) => { }
+      const receive = (command_list: ICommand[]) => { }
 
       mapper.receive = receive
       const eng = new MainEngine(sim, [mapper])

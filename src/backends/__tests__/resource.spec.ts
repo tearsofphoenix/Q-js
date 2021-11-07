@@ -29,9 +29,9 @@ import { CNOT } from '@/ops/shortcuts';
 import { All } from '@/ops/metagates';
 import { NotYetMeasuredError } from '@/meta/error';
 import { QFT } from '@/ops/qftgate';
-
+import { ICommand } from '@/interfaces';
 class MockEngine {
-  isAvailable(cmd) {
+  isAvailable(cmd: ICommand) {
     return false
   }
 }
@@ -39,13 +39,13 @@ class MockEngine {
 describe('resource test', () => {
   it('should test_resource_counter_isavailable', () => {
     const resource_counter = new ResourceCounter()
-    resource_counter.next = new MockEngine()
+    resource_counter.next = new MockEngine() as any;
 
-    expect(resource_counter.isAvailable('test')).to.equal(false)
-    resource_counter.next = null
+    expect(resource_counter.isAvailable('test' as any)).to.equal(false)
+    resource_counter.next = null as any;
     resource_counter.isLastEngine = true
 
-    expect(resource_counter.isAvailable('test')).to.equal(true)
+    expect(resource_counter.isAvailable('test' as any)).to.equal(true)
   });
 
   it('should test_resource_counter_measurement', () => {
@@ -89,22 +89,22 @@ describe('resource test', () => {
     expect(resource_counter.depthOfDag).to.equal(5)
 
     const str_repr = resource_counter.toString()
-    console.log(str_repr)
-    const m = str_repr.match(/\sHGate\s:\s1/g)
-    expect(m.length).to.equal(1)
-    expect(str_repr.match(/\sXGate\s:\s1/g).length).to.equal(1)
-    expect(str_repr.match(/\sCXGate\s:\s1/g).length).to.equal(1)
-    expect(str_repr.match(/\sRz\s:\s2/g).length).to.equal(1)
-    expect(str_repr.match(/\sAllocateQubitGate\s:\s3/g).length).to.equal(1)
-    expect(str_repr.match(/\sDeallocateQubitGate\s:\s1/g).length).to.equal(1)
 
-    expect(str_repr.match(/\sH\s:\s1/g).length).to.equal(1)
-    expect(str_repr.match(/\sX\s:\s1/g).length).to.equal(1)
-    expect(str_repr.match(/\sCX\s:\s1/g).length).to.equal(1)
-    expect(str_repr.match(/\sRz\(0.1\)\s:\s1/g).length).to.equal(1)
-    expect(str_repr.match(/\sRz\(0.3\)\s:\s1/g).length).to.equal(1)
-    expect(str_repr.match(/\sAllocate\s:\s3/g).length).to.equal(1)
-    expect(str_repr.match(/\sDeallocate\s:\s1/g).length).to.equal(1)
+    const m = str_repr.match(/\sHGate\s:\s1/g)!;
+    expect(m.length).to.equal(1)
+    expect(str_repr.match(/\sXGate\s:\s1/g)!.length).to.equal(1)
+    expect(str_repr.match(/\sCXGate\s:\s1/g)!.length).to.equal(1)
+    expect(str_repr.match(/\sRz\s:\s2/g)!.length).to.equal(1)
+    expect(str_repr.match(/\sAllocateQubitGate\s:\s3/g)!.length).to.equal(1)
+    expect(str_repr.match(/\sDeallocateQubitGate\s:\s1/g)!.length).to.equal(1)
+
+    expect(str_repr.match(/\sH\s:\s1/g)!.length).to.equal(1)
+    expect(str_repr.match(/\sX\s:\s1/g)!.length).to.equal(1)
+    expect(str_repr.match(/\sCX\s:\s1/g)!.length).to.equal(1)
+    expect(str_repr.match(/\sRz\(0.1\)\s:\s1/g)!.length).to.equal(1)
+    expect(str_repr.match(/\sRz\(0.3\)\s:\s1/g)!.length).to.equal(1)
+    expect(str_repr.match(/\sAllocate\s:\s3/g)!.length).to.equal(1)
+    expect(str_repr.match(/\sDeallocate\s:\s1/g)!.length).to.equal(1)
 
     backend.receivedCommands.forEach(cmd => console.log(cmd.toString()))
     const cmds = backend.receivedCommands

@@ -15,11 +15,11 @@
  */
 
 import DecompositionRule from '@/cengines/replacer/decompositionrule';
-import { BarrierGate } from '../../ops/gates';
+import { BarrierGate } from '@/ops/gates';
 import { ICommand } from '@/interfaces';
 
 /**
- * @ignore
+* 
  * @param cmd
  * @private
  */

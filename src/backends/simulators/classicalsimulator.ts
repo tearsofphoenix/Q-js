@@ -16,8 +16,8 @@
 
 import assert from 'assert'
 import bigInt, { BigInteger } from 'big-integer'
-import { BasicEngine } from '../../cengines/basics'
-import { BasicQubit } from '../../meta/qubit'
+import { BasicEngine } from '@/cengines/basics'
+import { BasicQubit } from '@/meta/qubit'
 import {
   Allocate,
   AllocateQubitGate, Deallocate,
@@ -26,10 +26,10 @@ import {
   Measure,
   MeasureGate,
   XGate
-} from '../../ops/gates'
-import { BasicMathGate } from '../../ops/basics'
-import { LogicalQubitIDTag } from '../../meta/tag'
-import { instanceOf } from '../../libs/util'
+} from '@/ops/gates'
+import { BasicMathGate } from '@/ops/basics'
+import { LogicalQubitIDTag } from '@/meta/tag'
+import { instanceOf } from '@/libs/util'
 import { ICommand, IQubit, IQureg } from '@/interfaces';
 
 /**

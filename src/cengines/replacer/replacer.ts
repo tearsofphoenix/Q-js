@@ -35,7 +35,6 @@ this function, which then returns whether this command can be executed
 export class InstructionFilter extends BasicEngine {
   private _filterFunc: FilterFunction;
   /**
-   * @constructor
   Initializer: The provided filterfun returns true for all commands
 which do not need replacement and false for commands that do.
 

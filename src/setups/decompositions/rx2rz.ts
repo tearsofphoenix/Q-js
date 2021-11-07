@@ -1,7 +1,7 @@
-import { Control } from '../../meta/control'
-import { Compute, Uncompute } from '../../meta/compute';
-import { H, Rx, Rz } from '../../ops/gates';
-import DecompositionRule from '../../cengines/replacer/decompositionrule';
+import { Control } from '@/meta/control'
+import { Compute, Uncompute } from '@/meta/compute';
+import { H, Rx, Rz } from '@/ops/gates';
+import DecompositionRule from '@/cengines/replacer/decompositionrule';
 import { ICommand, IMathGate } from '@/interfaces';
 
 const _decompose_rx = (cmd: ICommand) => {
@@ -18,7 +18,7 @@ const _decompose_rx = (cmd: ICommand) => {
   })
 }
 /**
- * @ignore
+* 
  * @param cmd
  * @return {boolean}
  * @private

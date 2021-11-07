@@ -28,7 +28,7 @@ import { AutoReplacer } from '@/cengines/replacer/replacer'
 import DecompositionRuleSet from '@/cengines/replacer/decompositionruleset'
 import { BasicQubit } from '@/meta/qubit'
 import { DummyEngine } from '@/cengines/testengine'
-import { TrivialMapper } from './shared.spec'
+import { TrivialMapper } from './shared'
 
 describe('classical simulator test', () => {
   const mapper = new TrivialMapper()

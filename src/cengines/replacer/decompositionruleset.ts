@@ -79,7 +79,6 @@ export class Decomposition {
   decompose: Function;
   check: CheckFunction;
   /**
-   * @constructor
     Construct the Decomposition object.
 
     @param replacementFunc when called with a `Command` object, decomposes this command.

@@ -14,37 +14,39 @@
  * limitations under the License.
  */
 
-import math, { Complex } from 'mathjs'
+import { hashArray as ha, arrayFromHash as ah, kEmptyTerms } from '@/libs/term';
+import { abs, complex, Complex, multiply, max, re, im, subtract, divide, add } from 'mathjs'
 
 // QubitOperator stores a sum of Pauli operators acting on qubits."""
 import { isNumeric, symmetricDifference } from '../libs/polyfill'
 
-const mc = math.complex
+type NumericScalar = Complex | number;
+
+const mc = complex
 
 const EQ_TOLERANCE = 1e-12
 
-
 /**
  * Define products of all Pauli operators for symbolic multiplication.
- * @ignore
+ * 
  */
 export const PAULI_OPERATOR_PRODUCTS = {
-  [['I', 'I']]: [1.0, 'I'],
-  [['I', 'X']]: [1.0, 'X'],
-  [['X', 'I']]: [1.0, 'X'],
-  [['I', 'Y']]: [1.0, 'Y'],
-  [['Y', 'I']]: [1.0, 'Y'],
-  [['I', 'Z']]: [1.0, 'Z'],
-  [['Z', 'I']]: [1.0, 'Z'],
-  [['X', 'X']]: [1.0, 'I'],
-  [['Y', 'Y']]: [1.0, 'I'],
-  [['Z', 'Z']]: [1.0, 'I'],
-  [['X', 'Y']]: [mc(0, 1), 'Z'],
-  [['X', 'Z']]: [mc(0, -1), 'Y'],
-  [['Y', 'X']]: [mc(0, -1), 'Z'],
-  [['Y', 'Z']]: [mc(0, 1), 'X'],
-  [['Z', 'X']]: [mc(0, 1), 'Y'],
-  [['Z', 'Y']]: [mc(0, -1), 'X']
+  [ha(['I', 'I'])]: [1.0, 'I'],
+  [ha(['I', 'X'])]: [1.0, 'X'],
+  [ha(['X', 'I'])]: [1.0, 'X'],
+  [ha(['I', 'Y'])]: [1.0, 'Y'],
+  [ha(['Y', 'I'])]: [1.0, 'Y'],
+  [ha(['I', 'Z'])]: [1.0, 'Z'],
+  [ha(['Z', 'I'])]: [1.0, 'Z'],
+  [ha(['X', 'X'])]: [1.0, 'I'],
+  [ha(['Y', 'Y'])]: [1.0, 'I'],
+  [ha(['Z', 'Z'])]: [1.0, 'I'],
+  [ha(['X', 'Y'])]: [mc(0, 1), 'Z'],
+  [ha(['X', 'Z'])]: [mc(0, -1), 'Y'],
+  [ha(['Y', 'X'])]: [mc(0, -1), 'Z'],
+  [ha(['Y', 'Z'])]: [mc(0, 1), 'X'],
+  [ha(['Z', 'X'])]: [mc(0, 1), 'Y'],
+  [ha(['Z', 'Y'])]: [mc(0, -1), 'X']
 }
 
 export function stringToArray(key: string) {
@@ -60,22 +62,19 @@ export function stringToArray(key: string) {
   }
 }
 
-function checkTerm(term: []) {
+function checkTerm(term: any[][]) {
   term.forEach((localOperator) => {
     if (!Array.isArray(localOperator) || localOperator.length !== 2) {
       throw new Error('term specified incorrectly')
     }
     const [qubitNum, action] = localOperator
     if (typeof action !== 'string' || 'XYZ'.indexOf(action) === -1) {
-      throw new Error('Invalid action provided: must be string \'X\', \'Y\', or \'Z\'.')
+      throw new Error(`Invalid action provided: must be string 'X', 'Y', or 'Z'.`)
     }
     if (typeof qubitNum !== 'number' || qubitNum < 0) {
-      throw new Error('Invalid qubit number '
-        + 'provided to QubitTerm: '
-        + 'must be a non-negative '
-        + 'int.')
+      throw new Error(`Invalid qubit number provided to QubitTerm: must be a non-negative int.`);
     }
-  })
+  });
 }
 
 /**
@@ -118,9 +117,10 @@ are sorted according to the qubit number they act on,
 **value**: Coefficient of this term as a (complex) float
  */
 export default class QubitOperator {
-  terms: {};
+  terms: {
+    [key: string]: NumericScalar;
+  };
   /**
-   * @constructor
     The init function only allows to initialize one term. Additional terms
 have to be added using += (which is fast) or using + of two
 QubitOperator objects:
@@ -141,7 +141,7 @@ calls an out-of-place multiplication.
 
     @param coefficient The coefficient of the
 first term of this QubitOperator. Default is 1.0.
-    @param {Array.<Array>|string} term (optional, empy array, a array of arrays, or a string):
+    @param term (optional, empy array, a array of arrays, or a string):
 1) Default is None which means there are no terms in the
 QubitOperator hence it is the "zero" Operator
 2) An empty tuple means there are no non-trivial Pauli
@@ -158,7 +158,7 @@ be sorted by the qubit number. '' is the identity.
 
     @throws Invalid operators provided to QubitOperator.
      */
-  constructor(term?: string[] | string, coefficient: number | Complex = 1.0) {
+  constructor(term?: any[][] | string, coefficient: NumericScalar = 1.0) {
     // assert coefficient as numeric
     this.terms = {}
     if (!isNumeric(coefficient)) {
@@ -169,26 +169,16 @@ be sorted by the qubit number. '' is the identity.
       // leave it empty
     } else if (Array.isArray(term)) {
       if (term.length === 0) {
-        this.terms[[]] = coefficient
+        this.terms[kEmptyTerms] = coefficient;
       } else {
-        checkTerm(term)
+        checkTerm(term);
         term = term.sort((a, b) => a[0] - b[0])
-        this.terms[term] = coefficient
+        this.terms[ha(term)] = coefficient;
       }
     } else if (typeof term === 'string') {
-      const listOPs = []
-      const parts = term.split(/\s+/).filter(item => item.length > 0)
-      parts.forEach((el) => {
-        if (el.length < 2) {
-          throw new Error('term specified incorrectly.')
-        }
-        listOPs.push([parseInt(el.substring(1), 10), el[0]])
-      })
-
+      const listOPs = ah(term);
       checkTerm(listOPs);
-
-      term = listOPs.sort((a, b) => a[0] - b[0])
-      this.terms[term] = coefficient
+      this.terms[ha(listOPs)] = coefficient;
     } else {
       throw new Error('term specified incorrectly.')
     }
@@ -204,10 +194,10 @@ imaginary parts of coefficients that are close to zero.
     const new_terms = {}
     Object.keys(this.terms).forEach((key) => {
       let coeff = this.terms[key]
-      if (math.abs(math.im(coeff)) <= absTolerance) {
-        coeff = math.re(coeff)
+      if (abs(im(coeff) as number) <= absTolerance) {
+        coeff = re(coeff) as number;
       }
-      if (math.abs(coeff) > absTolerance) {
+      if (abs(coeff as number) > absTolerance) {
         new_terms[key] = coeff
       }
     })
@@ -236,8 +226,8 @@ tolerance.
       const a = this.terms[term]
       const b = other.terms[term]
       //
-      const tmp = math.multiply(realTolerance, math.max(math.abs(a), math.abs(b)))
-      if (math.abs(math.subtract(a, b)) > math.max(tmp, absTolerance)) {
+      const tmp = multiply(realTolerance, max(abs(a as number), abs(b as number)));
+      if (abs(subtract(a as number, b as number)) > max(tmp, absTolerance)) {
         return false
       }
     }
@@ -246,10 +236,10 @@ tolerance.
     for (const term of diff) {
       const value = this.terms[term]
       if (typeof value !== 'undefined') {
-        if (math.abs(value) > absTolerance) {
+        if (abs(value as number) > absTolerance) {
           return false
         }
-      } else if (math.abs(other.terms[term]) > absTolerance) {
+      } else if (abs(other.terms[term] as number) > absTolerance) {
         return false
       }
     }
@@ -259,20 +249,20 @@ tolerance.
   /**
     In-place multiply (*=) terms with scalar or QubitOperator.
   */
-  imul(multiplier: Complex | number | QubitOperator) {
+  imul(multiplier: NumericScalar | QubitOperator) {
     // Handle QubitOperator.
     if (multiplier instanceof QubitOperator) {
       const result_terms = {}
       Object.keys(this.terms).forEach((left_term) => {
-        const leftKey = stringToArray(left_term)
+        const leftKey = ah(left_term);
         Object.keys(multiplier.terms).forEach((right_term) => {
-          let new_coefficient = math.multiply(this.terms[left_term], multiplier.terms[right_term])
+          let new_coefficient = multiply(this.terms[left_term], multiplier.terms[right_term])
           // Loop through local operators and create new sorted list
           // of representing the product local operator
           let product_operators = []
           let left_operator_index = 0
           let right_operator_index = 0
-          const rightKey = stringToArray(right_term)
+          const rightKey = ah(right_term);
           const n_operators_left = leftKey.length
           const n_operators_right = rightKey.length
 
@@ -284,12 +274,12 @@ tolerance.
             if (left_qubit === right_qubit) {
               left_operator_index += 1
               right_operator_index += 1
-              const [scalar, loc_op] = PAULI_OPERATOR_PRODUCTS[[left_loc_op, right_loc_op]]
+              const [scalar, loc_op] = PAULI_OPERATOR_PRODUCTS[ha([left_loc_op, right_loc_op])];
 
               // Add new term.
               if (loc_op !== 'I') {
                 product_operators.push([left_qubit, loc_op])
-                new_coefficient = math.multiply(new_coefficient, scalar)
+                new_coefficient = multiply(new_coefficient, scalar as NumericScalar);
               }
               // Note if loc_op == 'I', then scalar == 1.0
 
@@ -313,10 +303,12 @@ tolerance.
 
           // Add to result dict
           const tmp_key = product_operators
-          if (tmp_key in result_terms) {
-            result_terms[tmp_key] = math.add(result_terms[tmp_key], new_coefficient)
+          const tk = ha(tmp_key);
+
+          if (tk in result_terms) {
+            result_terms[tk] = add(result_terms[tk], new_coefficient);
           } else {
-            result_terms[tmp_key] = new_coefficient
+            result_terms[tk] = new_coefficient;
           }
         })
       })
@@ -325,7 +317,7 @@ tolerance.
     } else // Handle scalars.
       if (isNumeric(multiplier)) {
         Object.keys(this.terms).forEach((key) => {
-          this.terms[key] = math.multiply(this.terms[key], multiplier)
+          this.terms[key] = multiply(this.terms[key], multiplier) as NumericScalar;
         })
         return this
       } else {
@@ -341,7 +333,7 @@ tolerance.
 
     @throws Invalid type cannot be multiply with QubitOperator.
    */
-  mul(multiplier: Complex | number | QubitOperator) {
+  mul(multiplier: NumericScalar | QubitOperator) {
     if (isNumeric(multiplier) || multiplier instanceof QubitOperator) {
       const product = this.copy()
       return product.imul(multiplier)
@@ -352,14 +344,14 @@ tolerance.
   /**
    * in-Place add
    */
-  iadd(addend: Complex | number | QubitOperator): QubitOperator {
+  iadd(addend: NumericScalar | QubitOperator): QubitOperator {
     if (addend instanceof QubitOperator) {
       Object.keys(addend.terms).forEach((key) => {
         const value = this.terms[key]
         const ov = addend.terms[key]
         if (typeof value !== 'undefined') {
-          const tmp = math.add(ov, value)
-          if (math.abs(tmp) > 0) {
+          const tmp = add(ov, value) as NumericScalar;
+          if (abs(tmp as number) > 0) {
             this.terms[key] = tmp
           } else {
             delete this.terms[key]
@@ -374,15 +366,15 @@ tolerance.
     return this
   }
 
-  add(addend: Complex | number | QubitOperator) {
+  add(addend: NumericScalar | QubitOperator) {
     const inst = this.copy()
     inst.iadd(addend)
     return inst
   }
 
-  div(divisor: number) {
+  div(divisor: NumericScalar) {
     if (isNumeric(divisor)) {
-      return this.mul(math.divide(1.0, divisor))
+      return this.mul(divide(1.0, divisor) as NumericScalar);
     } else {
       throw new Error('Cannot divide QubitOperator by non-scalar type.')
     }
@@ -391,9 +383,9 @@ tolerance.
   /**
    * in-Place dived by divisor
    */
-  idiv(divisor: number) {
+  idiv(divisor: NumericScalar) {
     if (isNumeric(divisor)) {
-      return this.imul(math.divide(1.0, divisor))
+      return this.imul(divide(1.0, divisor) as NumericScalar)
     } else {
       throw new Error('Cannot divide QubitOperator by non-scalar type.')
     }
@@ -402,19 +394,19 @@ tolerance.
   /**
    * in-Place subtract
    */
-  isub(subtrahend: Complex | number | QubitOperator) {
+  isub(subtrahend: NumericScalar | QubitOperator) {
     if (subtrahend instanceof QubitOperator) {
       Object.keys(subtrahend.terms).forEach((key) => {
         const ov = subtrahend.terms[key]
         const v = this.terms[key]
         if (typeof v !== 'undefined') {
-          if (math.abs(math.subtract(v, ov)) > 0) {
-            this.terms[key] = math.subtract(v, ov)
+          if (abs(subtract(v, ov) as number) > 0) {
+            this.terms[key] = subtract(v, ov) as number;
           } else {
             delete this.terms[key]
           }
         } else {
-          this.terms[key] = math.subtract(0, ov)
+          this.terms[key] = subtract(0, ov) as number;
         }
       })
     } else {
@@ -423,7 +415,7 @@ tolerance.
     return this
   }
 
-  sub(subtrahend: Complex | number | QubitOperator) {
+  sub(subtrahend: NumericScalar | QubitOperator) {
     const ret = this.copy()
     return ret.isub(subtrahend)
   }
@@ -456,7 +448,7 @@ tolerance.
     }
     let string_rep = ''
     keys.forEach((term) => {
-      const parts = stringToArray(term)
+      const parts = ah(term);
       const v = this.terms[term]
       let tmp_string = `${v}`
       if (parts.length === 0) {

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { BasicGate } from '../../ops/basics'
-import { isKindclassOf } from '../../libs/util'
+import { BasicGate } from '@/ops/basics'
+import { isKindclassOf } from '@/libs/util'
 import { ICommand } from '@/interfaces';
 
 export type CheckFunction = (cmd: ICommand) => boolean;
@@ -29,7 +29,6 @@ export default class DecompositionRule {
   gateDecomposer: Function;
   gateRecognizer: CheckFunction;
   /**
-   * @constructor
     @param gateClass The type of gate that this rule decomposes.
 
     The gate class is redundant information used to make lookups

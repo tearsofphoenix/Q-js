@@ -1,15 +1,15 @@
 
-import { Control } from '../../meta/control'
-import { XGate } from '../../ops/gates';
-import DecompositionRule from '../../cengines/replacer/decompositionrule';
-import { BasicGate } from '../../ops/basics';
-import { Compute, Uncompute } from '../../meta/compute';
-import { Toffoli } from '../../ops/shortcuts';
-import { tuple } from '../../libs/util';
+import { Control } from '@/meta/control'
+import { XGate } from '@/ops/gates';
+import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { BasicGate } from '@/ops/basics';
+import { Compute, Uncompute } from '@/meta/compute';
+import { Toffoli } from '@/ops/shortcuts';
+import { tuple } from '@/libs/util';
 import { ICommand } from '@/interfaces';
 
 /**
- * @ignore
+* 
  Recognize an arbitrary gate which has n>=2 control qubits, except a Toffoli gate.
 */
 export const _recognize_CnU = (cmd: ICommand) => {
@@ -25,7 +25,7 @@ export const _recognize_CnU = (cmd: ICommand) => {
 }
 
 /**
- * @ignore
+* 
 Decompose a multi-controlled gate U into a single-controlled U.
     It uses (n-1) work qubits and 2 * (n-1) Toffoli gates.
  */

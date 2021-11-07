@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 import math from 'mathjs'
-import { BasicMathGate } from '../../ops/basics'
+import { BasicMathGate } from '@/ops/basics'
 import { IGate } from '@/interfaces';
+
 /**
- * @class AddConstant
  * @desc
 Add a constant to a quantum number represented by a quantum register,
     stored from low- to high-bit.
@@ -60,7 +60,7 @@ export class AddConstant extends BasicMathGate {
 Subtract a constant from a quantum number represented by a quantum
 register, stored from low- to high-bit.
 
-    @param {number} a Constant to subtract
+    @param a Constant to subtract
 
     @example
 
@@ -73,7 +73,6 @@ export function SubConstant(a: number) {
 }
 
 /**
- * @class AddConstantModN
  * @desc
 Add a constant to a quantum number represented by a quantum register
 modulo N.
@@ -90,7 +89,6 @@ export class AddConstantModN extends BasicMathGate {
   a: number;
   N: number;
   /**
-   * @constructor
   Initializes the gate to the number to add modulo N.
 
     @param a Number to add to a quantum register (0 <= a < N).
@@ -138,7 +136,6 @@ export function SubConstantModN(a: number, N: number) {
 }
 
 /**
- * @class MultiplyByConstantModN
  * @desc
 Multiply a quantum number represented by a quantum register by a constant
 modulo N.
@@ -154,11 +151,10 @@ export class MultiplyByConstantModN extends BasicMathGate {
   a: number;
   N: number;
   /**
-   * @constructor
   Initializes the gate to the number to multiply with modulo N.
 
-   @param {number} a Number by which to multiply a quantum register (0 <= a < N).
-   @param {number} N Number modulo which the multiplication is carried out.
+   @param a Number by which to multiply a quantum register (0 <= a < N).
+   @param N Number modulo which the multiplication is carried out.
 
     It also initializes its base class, BasicMathGate, with the
   corresponding function, so it can be emulated efficiently.

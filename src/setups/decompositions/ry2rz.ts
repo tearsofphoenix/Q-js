@@ -1,10 +1,10 @@
-import { Control } from '../../meta/control'
-import { Compute, Uncompute } from '../../meta/compute';
-import { Rx, Ry, Rz } from '../../ops/gates';
-import DecompositionRule from '../../cengines/replacer/decompositionrule';
+import { Control } from '@/meta/control'
+import { Compute, Uncompute } from '@/meta/compute';
+import { Rx, Ry, Rz } from '@/ops/gates';
+import DecompositionRule from '@/cengines/replacer/decompositionrule';
 import { ICommand, IMathGate } from '@/interfaces';
 /**
- * @ignore
+* 
  */
 export const _decompose_ry = (cmd: ICommand) => {
   const qubit = cmd.qubits[0]
@@ -21,7 +21,7 @@ export const _decompose_ry = (cmd: ICommand) => {
 }
 
 /**
- * @ignore
+* 
  * @param {Command} cmd
  * @return {boolean}
  * @private

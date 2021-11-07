@@ -161,7 +161,6 @@ Simplifies accessing measured values for single-qubit registers (no []-access ne
 export class Qureg extends Array implements IQureg {
   /**
    * a little different with `Array`: when pass an array as argument, will copy the passed array
-   * @constructor
    */
   constructor(...args: any[]) {
     const arg0 = args[0]
@@ -174,10 +173,8 @@ export class Qureg extends Array implements IQureg {
 
   /**
    * test if two Quregs are equal
-   * @param {Qureg|Object} other
-   * @return {boolean}
    */
-  equal(other: any) {
+  equal(other: IQubit | IQureg): boolean {
     if (other instanceof Qureg) {
       return arrayEqual(this, other, (x: any, y: any) => x.equal(y))
     }
@@ -186,8 +183,7 @@ export class Qureg extends Array implements IQureg {
 
   /**
    * only supported when `length === 1`, use the qubit value as qureg value
-   * @throws {Error} will throw when `length !== 1`
-   * @return {boolean}
+   * @throws will throw when `length !== 1`
    */
   toBoolean() {
     if (this.length === 1) {
@@ -199,10 +195,9 @@ export class Qureg extends Array implements IQureg {
 
   /**
    * number representation
-   * @return {number}
    */
   toNumber() {
-    return this.toBoolean() ? 1 : 0
+    return this.toBoolean() ? 1 : 0;
   }
 
   /**
@@ -215,7 +210,6 @@ export class Qureg extends Array implements IQureg {
 
   /**
    * string description
-   * @return {string}
    */
   toString() {
     if (this.length === 0) return 'Qureg[]'

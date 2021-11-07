@@ -18,7 +18,6 @@ this.angle. Its inverse is the same gate with the negated argument.
 export class BasicRotationGate extends BasicGate {
     angle: number;
     /**
-     * @constructor
         Initialize a basic rotation gate.
       @param angle Angle of rotation (saved modulo 4 * pi)
      */

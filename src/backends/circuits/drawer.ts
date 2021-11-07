@@ -15,36 +15,36 @@
  */
 
 import assert from 'assert'
-import { LastEngineError } from '../../meta/error'
-import { arrayEqual, len } from '../../libs/polyfill'
+import { LastEngineError } from '@/meta/error'
+import { arrayEqual, len } from '@/libs/polyfill'
 
 import {
   Allocate, Deallocate, FlushGate, Measure
-} from '../../ops';
-import { BasicEngine } from '../../cengines'
-import ToLatex from './tolatex'
+} from '@/ops';
+import { BasicEngine } from '@/cengines'
+import ToLatex from './tolatex';
+import { ICommand, IGate } from '@/interfaces';
 
 /**
  * @class CircuitItem
  */
 export class CircuitItem {
   private gate: IGate;
+  lines: number[];
+  ctrl_lines: number[];
+  id: number;
   /**
-   * @constructor
-    @param {BasicGate} gate
-    @param {number[]} lines Circuit lines the gate acts on.
-    @param {number[]} ctrl_lines Circuit lines which control the gate.
+    @param gate
+    @param lines Circuit lines the gate acts on.
+    @param ctrl_lines Circuit lines which control the gate.
   */
-  constructor(gate, lines, ctrl_lines) {
+  constructor(gate: IGate, lines: number[], ctrl_lines: number[]) {
     this.gate = gate
     this.lines = lines
     this.ctrl_lines = ctrl_lines
     this.id = -1
   }
 
-  /**
-   * @return {CircuitItem}
-   */
   copy() {
     const l = Array.isArray(this.lines) ? this.lines.slice(0) : this.lines
     const cl = Array.isArray(this.ctrl_lines) ? this.ctrl_lines.slice(0) : this.ctrl_lines
@@ -53,11 +53,7 @@ export class CircuitItem {
     return inst
   }
 
-  /**
-   * @param {(CircuitItem|Object)} other
-   * @return {boolean}
-   */
-  equal(other) {
+  equal(other: any): boolean {
     if (other instanceof CircuitItem) {
       let f = false
       if (this.gate.equal) {
@@ -73,7 +69,6 @@ export class CircuitItem {
 }
 
 /**
- * @class CircuitDrawer
  * @desc
 CircuitDrawer is a compiler engine which generates TikZ code for drawing
   quantum circuits.
@@ -150,23 +145,27 @@ true:
   },
  */
 export class CircuitDrawer extends BasicEngine {
+  _accept_input: boolean;
+  _default_measure: number;
+  _qubit_lines = {}
+  _free_lines = []
+  _map = {}
   /**
-   * @constructor
   Initialize a circuit drawing engine.
 
       The TikZ code generator uses a settings file (settings.json), which
     can be altered by the user. It contains gate widths, heights, offsets,
       etc.
 
-    @param {boolean} accept_input If accept_input is true, the printer queries
+    @param accept_input If accept_input is true, the printer queries
     the user to input measurement results if the CircuitDrawer is
     the last engine. Otherwise, all measurements yield the result
     default_measure (0 or 1).
-    @param {number} default_measure Default value to use as measurement
+    @param default_measure Default value to use as measurement
     results if accept_input is false and there is no underlying
     backend to register real measurement results.
    */
-  constructor(accept_input = false, default_measure = 0) {
+  constructor(accept_input: boolean = false, default_measure: number = 0) {
     super()
     this._accept_input = accept_input
     this._default_measure = default_measure
@@ -179,10 +178,10 @@ export class CircuitDrawer extends BasicEngine {
   Specialized implementation of isAvailable: Returns true if the
     CircuitDrawer is the last engine (since it can print any command).
 
-    @param {Command} cmd Command for which to check availability (all Commands can be printed).
-    @return {boolean} true, unless the next engine cannot handle the Command (if there is a next engine).
+    @param cmd Command for which to check availability (all Commands can be printed).
+    @return true, unless the next engine cannot handle the Command (if there is a next engine).
    */
-  isAvailable(cmd) {
+  isAvailable(cmd: ICommand) {
     try {
       return super.isAvailable(cmd)
     } catch (e) {
@@ -231,9 +230,9 @@ export class CircuitDrawer extends BasicEngine {
     arrives if accept_input was set to true. Otherwise, it uses the
     default_measure parameter to register the measurement outcome.
 
-      @param {Command} cmd Command to add to the circuit diagram.
+      @param cmd Command to add to the circuit diagram.
    */
-  printCMD(cmd) {
+  printCMD(cmd: ICommand) {
     if (cmd.gate.equal(Allocate)) {
       const qubit_id = cmd.qubits[0][0].id
       if (!(qubit_id in this._map)) {
@@ -255,7 +254,7 @@ export class CircuitDrawer extends BasicEngine {
         } else {
           m = this._default_measure
         }
-        this.main.setMeasurementResult(qubit, m)
+        this.main.setMeasurementResult!(qubit, m);
       }))
     }
 
@@ -282,7 +281,6 @@ export class CircuitDrawer extends BasicEngine {
     node my_circuit.js | pdflatex
 
     where my_circuit.js calls this function and prints it to the terminal.
-   @return {string}
    */
   getLatex() {
     const qubit_lines = {}
@@ -314,9 +312,9 @@ export class CircuitDrawer extends BasicEngine {
   Receive a list of commands from the previous engine, print the
     commands, and then send them on to the next engine.
 
-    @param {Command[]} commandList List of Commands to print (and potentially send on to the next engine).
+    @param commandList List of Commands to print (and potentially send on to the next engine).
   */
-  receive(commandList) {
+  receive(commandList: ICommand[]) {
     commandList.forEach((cmd) => {
       if (!(cmd.gate instanceof FlushGate)) {
         this.printCMD(cmd)

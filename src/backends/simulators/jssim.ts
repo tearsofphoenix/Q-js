@@ -29,11 +29,11 @@ import {
   matrixDot,
   matrixRangeAssign,
   matrixRangeIndicesAssign,
-} from '../../libs/util'
+} from '@/libs/util'
 import {
   len, setEqual, complexVectorDot
-} from '../../libs/polyfill'
-import { stringToArray } from '../../ops/qubitoperator'
+} from '@/libs/polyfill'
+import { stringToArray } from '@/ops/qubitoperator'
 
 /**
  * @desc

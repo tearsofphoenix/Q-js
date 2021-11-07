@@ -42,7 +42,7 @@ hamiltonian = 0.5 * QubitOperator("X0 Z1 Y5")
 
 Attributes:
     time(float, int): time t
-hamiltonian(QubitOperator): hamiltonaian H
+hamiltonian(QubitOperator): hamiltonian H
  */
 export default class TimeEvolution extends BasicGate {
   time: number;

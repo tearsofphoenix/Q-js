@@ -236,15 +236,10 @@ section which has not been allocated in Compute section
   }
 }
 
-/**
- * @class Uncompute
- */
 export class UncomputeEngine extends BasicEngine {
   allocatedQubitIDs: Set<number>;
   deallocatedQubitIDs: Set<number>;
-  /**
-   * @constructor
-   */
+
   constructor() {
     super()
     // Save all qubit ids from qubits which are created or destroyed.

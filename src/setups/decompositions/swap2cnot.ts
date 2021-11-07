@@ -1,9 +1,9 @@
-import { Compute, Uncompute } from '../../meta/compute';
-import { CNOT } from '../../ops/shortcuts';
-import { tuple } from '../../libs/util';
-import { Control } from '../../meta/control';
-import DecompositionRule from '../../cengines/replacer/decompositionrule';
-import { SwapGate } from '../../ops/gates';
+import { Compute, Uncompute } from '@/meta/compute';
+import { CNOT } from '@/ops/shortcuts';
+import { tuple } from '@/libs/util';
+import { Control } from '@/meta/control';
+import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { SwapGate } from '@/ops/gates';
 import { ICommand } from '@/interfaces';
 
 const _decompose_swap = (cmd: ICommand) => {

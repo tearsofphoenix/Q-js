@@ -1,10 +1,10 @@
 import math, { Complex, Matrix } from 'mathjs'
-import { Control } from '../../meta';
-import { len, productLoop, productLoop3 } from '../../libs/polyfill';
-import DecompositionRule from '../../cengines/replacer/decompositionrule';
+import { Control } from '@/meta';
+import { len, productLoop, productLoop3 } from '@/libs/polyfill';
+import DecompositionRule from '@/cengines/replacer/decompositionrule';
 import {
   BasicGate, Rz, Ry, Ph
-} from '../../ops';
+} from '@/ops';
 import { ICommand, IMathGate } from '@/interfaces';
 
 const TOLERANCE = 1e-12
@@ -17,7 +17,7 @@ export function phase(c: number | Complex): number {
 }
 
 /**
- * @ignore
+* 
 Recognize an arbitrary one qubit gate which has a matrix property.
 
     It does not allow gates which have control qubits as otherwise the
@@ -34,7 +34,7 @@ export const _recognize_arb1qubit = (cmd: ICommand) => {
 }
 
 /**
- * @ignore
+* 
 It builds matrix U with parameters (a, b/2, c/2, d/2) and compares against
 matrix.
 
@@ -66,7 +66,7 @@ const _test_parameters = (matrix: Matrix, a: number, b_half: number, c_half: num
 }
 
 /**
- * @ignore
+* 
 Given a 2x2 unitary matrix, find the parameters
 a, b/2, c/2, and d/2 such that
 matrix == [[exp(j*(a-b/2-d/2))*cos(c/2), -exp(j*(a-b/2+d/2))*sin(c/2)],
@@ -88,11 +88,12 @@ export const _find_parameters = (matrix: Matrix) => {
   let c_half: number = 0;
   let d_half: number = 0;
   const mm = math.multiply;
+  const PI = Math.PI;
   // Case 1: sin(c/2) == 0:
   if (math.abs(matrix[0][1]) < TOLERANCE) {
     const t = phase(mm(matrix[0][0], matrix[1][1]))
-    const two_a = math.mod(t, 2 * math.pi)
-    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * math.pi - TOLERANCE) {
+    const two_a = math.mod(t, 2 * PI)
+    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * PI - TOLERANCE) {
       // from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
       // w.l.g. we can choose a==0 because (see U above)
       // c/2 -> c/2 + pi would have the same effect as as a==0 -> a==pi.
@@ -102,9 +103,9 @@ export const _find_parameters = (matrix: Matrix) => {
     }
     d_half = 0 // w.l.g
     const b = phase(matrix[1][1]) - phase(matrix[0][0])
-    const possible_b_half = [math.mod(b / 2.0, 2 * math.pi), math.mod(b / 2.0 + math.pi, 2 * math.pi)]
+    const possible_b_half = [math.mod(b / 2.0, 2 * PI), math.mod(b / 2.0 + PI, 2 * PI)]
     // As we have fixed a, we need to find correct sign for cos(c/2)
-    const possible_c_half = [0.0, math.pi]
+    const possible_c_half = [0.0, PI]
     let found = false
     productLoop(possible_b_half, possible_c_half, (_b: number, _c: number) => {
       b_half = _b;
@@ -125,8 +126,8 @@ export const _find_parameters = (matrix: Matrix) => {
   // Case 2: cos(c/2) == 0:
   else if (math.abs(matrix[0][0]) < TOLERANCE) {
     const t = phase(mm(mm(matrix[0][1], matrix[1][0]), -1))
-    const two_a = math.mod(t, 2 * math.pi)
-    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * math.pi - TOLERANCE) {
+    const two_a = math.mod(t, 2 * PI)
+    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * PI - TOLERANCE) {
       // from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
       // w.l.g. we can choose a==0 because (see U above)
       // c/2 -> c/2 + pi would have the same effect as as a==0 -> a==pi.
@@ -135,10 +136,10 @@ export const _find_parameters = (matrix: Matrix) => {
       a = two_a / 2.0
     }
     d_half = 0 // w.l.g
-    const b = phase(matrix[1][0]) - phase(matrix[0][1]) + math.pi
-    const possible_b_half = [math.mod(b / 2.0, 2 * math.pi), math.mod(b / 2.0 + math.pi, 2 * math.pi)]
+    const b = phase(matrix[1][0]) - phase(matrix[0][1]) + PI
+    const possible_b_half = [math.mod(b / 2.0, 2 * PI), math.mod(b / 2.0 + PI, 2 * PI)]
     // As we have fixed a, we need to find correct sign for sin(c/2)
-    const possible_c_half = [math.pi / 2.0, 3.0 / 2.0 * math.pi]
+    const possible_c_half = [PI / 2.0, 3.0 / 2.0 * PI]
     let found = false
     productLoop(possible_b_half, possible_c_half, (_b, _c) => {
       b_half = _b
@@ -158,8 +159,8 @@ export const _find_parameters = (matrix: Matrix) => {
   // Case 3: sin(c/2) != 0 and cos(c/2) !=0:
   else {
     const t = phase(mm(matrix[0][0], matrix[1][1]))
-    const two_a = math.mod(t, 2 * math.pi)
-    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * math.pi - TOLERANCE) {
+    const two_a = math.mod(t, 2 * PI)
+    if (math.abs(two_a) < TOLERANCE || math.abs(two_a) > 2 * PI - TOLERANCE) {
       // from 2a==0 (mod 2pi), it follows that a==0 or a==pi,
       // w.l.g. we can choose a==0 because (see U above)
       // c/2 -> c/2 + pi would have the same effect as as a==0 -> a==pi.
@@ -167,24 +168,24 @@ export const _find_parameters = (matrix: Matrix) => {
     } else {
       a = two_a / 2.0
     }
-    const two_d = 2.0 * phase(matrix[0][1]) - 2.0 * phase(matrix[0][0])
+    const two_d = 2.0 * phase(matrix[0][1]) - 2.0 * phase(matrix[0][0]);
     const possible_d_half = [
-      math.mod(two_d / 4.0, 2 * math.pi),
-      math.mod(two_d / 4.0 + math.pi / 2.0, 2 * math.pi),
-      math.mod(two_d / 4.0 + math.pi, 2 * math.pi),
-      math.mod(two_d / 4.0 + 3.0 / 2.0 * math.pi, 2 * math.pi)]
+      math.mod(two_d / 4.0, 2 * PI),
+      math.mod(two_d / 4.0 + PI / 2.0, 2 * PI),
+      math.mod(two_d / 4.0 + PI, 2 * PI),
+      math.mod(two_d / 4.0 + 3.0 / 2.0 * PI, 2 * PI)]
     const two_b = 2.0 * phase(matrix[1][0]) - 2.0 * phase(matrix[0][0])
     const possible_b_half = [
-      math.mod(two_b / 4.0, 2 * math.pi),
-      math.mod(two_b / 4.0 + math.pi / 2.0, 2 * math.pi),
-      math.mod(two_b / 4.0 + math.pi, 2 * math.pi),
-      math.mod(two_b / 4.0 + 3.0 / 2.0 * math.pi, 2 * math.pi)]
+      math.mod(two_b / 4.0, 2 * PI),
+      math.mod(two_b / 4.0 + PI / 2.0, 2 * PI),
+      math.mod(two_b / 4.0 + PI, 2 * PI),
+      math.mod(two_b / 4.0 + 3.0 / 2.0 * PI, 2 * PI)]
     const tmp = math.acos(math.abs(matrix[1][1]))
     const possible_c_half = [
-      math.mod(tmp, 2 * math.pi),
-      math.mod(tmp + math.pi, 2 * math.pi),
-      math.mod(-1.0 * tmp, 2 * math.pi),
-      math.mod(-1.0 * tmp + math.pi, 2 * math.pi)]
+      math.mod(tmp, 2 * PI),
+      math.mod(tmp + PI, 2 * PI),
+      math.mod(-1.0 * tmp, 2 * PI),
+      math.mod(-1.0 * tmp + PI, 2 * PI)]
     let found = false
     productLoop3(possible_b_half, possible_c_half, possible_d_half, (_b, _c, _d) => {
       b_half = _b

@@ -33,13 +33,9 @@ import { UncomputeTag, ComputeTag } from './tag'
 import { instanceOf } from '../libs/util'
 import { ICommand, IEngine, IQubit } from '@/interfaces';
 
-/**
- * @class ControlEngine
- */
 export class ControlEngine extends BasicEngine {
   qubits: IQubit[];
   /**
-   * @constructor
     @param qubits qubits conditional on which the following operations are executed.
      */
   constructor(qubits: IQubit[]) {

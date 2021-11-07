@@ -23,7 +23,6 @@ import { BasicEngine } from './basics'
 import { ICommand, CommandModifyFunction } from '@/interfaces';
 
 /**
- * @class CommandModifier
  * @desc
 CommandModifier is a compiler engine which applies a function to all
 incoming commands, sending on the resulting command instead of the original one.
@@ -31,7 +30,6 @@ incoming commands, sending on the resulting command instead of the original one.
 export default class CommandModifier extends BasicEngine {
   private _cmdModFunc: CommandModifyFunction;
   /**
-   * @constructor
   Initialize the CommandModifier.
 
     @param cmdModFunc Function which, given a command cmd,

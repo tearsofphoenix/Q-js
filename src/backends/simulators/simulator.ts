@@ -16,20 +16,20 @@
 
 import assert from 'assert'
 import math from 'mathjs'
-import { BasicEngine } from '../../cengines/basics'
+import { BasicEngine } from '@/cengines/basics'
 import SimulatorBackend from './jssim'
 import CPPSimulatorBackend from './cppsim'
 
 import {
   Allocate, AllocateQubitGate, Deallocate, DeallocateQubitGate, FlushGate, Measure, MeasureGate
-} from '../../ops/gates';
-import { BasicMathGate } from '../../ops/basics';
-import TimeEvolution from '../../ops/timeevolution';
-import { BasicQubit } from '../../meta/qubit'
-import { stringToArray } from '../../ops/qubitoperator'
-import { LogicalQubitIDTag } from '../../meta/tag'
-import { instanceOf } from '../../libs/util';
-import { len, stringToBitArray } from '../../libs/polyfill';
+} from '@/ops/gates';
+import { BasicMathGate } from '@/ops/basics';
+import TimeEvolution from '@/ops/timeevolution';
+import { BasicQubit } from '@/meta/qubit'
+import { stringToArray } from '@/ops/qubitoperator'
+import { LogicalQubitIDTag } from '@/meta/tag'
+import { instanceOf } from '@/libs/util';
+import { len, stringToBitArray } from '@/libs/polyfill';
 import { ICommand } from '@/interfaces';
 
 /**
@@ -48,7 +48,6 @@ export OMP_PROC_BIND=spread # bind threads to processors by spreading
  */
 export default class Simulator extends BasicEngine {
   /**
-   * @constructor
   Construct the C++/JavaScript-simulator object and initialize it with a
   random seed.
 

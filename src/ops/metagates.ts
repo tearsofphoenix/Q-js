@@ -62,7 +62,6 @@ export class DaggeredGate extends BasicGate {
   gate: IGate;
   _matrix: Matrix;
   /**
-   * @constructor
     Initialize a DaggeredGate representing the inverse of the gate 'gate'.
 
     @param gate Any gate object of which to represent the inverse.
@@ -141,7 +140,6 @@ export class ControlledGate extends BasicGate {
   gate: IGate;
   n: number;
   /**
-   * @constructor
     @param gate Gate to wrap.
     @param n Number of control qubits.
   */
@@ -168,7 +166,7 @@ controls.
     However, the n-th control qubit needs to be the last qubit in a
 qureg. The following quregs belong to the gate.
 
-    @param {Array.<Qureg>} qubits qubits to which to apply the gate.
+    @param qubits qubits to which to apply the gate.
      */
   or(qubits: QObject) {
     qubits = BasicGate.makeTupleOfQureg(qubits)

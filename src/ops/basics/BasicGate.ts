@@ -11,7 +11,6 @@ import { BasicQubit } from '@/meta/qubit';
 export class BasicGate implements IGate {
   interchangeableQubitIndices: number[][];
   /**
-   * @constructor
     Note:
 Set interchangeable qubit indices!
     (gate.interchangeable_qubit_indices)

@@ -17,7 +17,7 @@
 
 import assert from 'assert'
 import math from 'mathjs'
-import { Compute, CustomUncompute, Uncompute } from '../../meta/compute'
+import { Compute, CustomUncompute, Uncompute } from '@/meta/compute'
 import { QFT } from '@/ops/qftgate'
 import { R, Swap, X } from '@/ops/gates'
 import {
@@ -25,12 +25,12 @@ import {
 } from './gates';
 import { tuple } from '../util';
 import { CNOT } from '@/ops/shortcuts';
-import { Control } from '../../meta/control';
+import { Control } from '@/meta/control';
 import { len } from '../polyfill';
 import { IEngine, IQubit, IQureg } from '@/interfaces';
 
 /**
- * @ignore
+* 
  * Adds a classical constant c to the quantum integer (qureg) quint using Draper addition.
  * Note: Uses the Fourier-transform adder
  * see https://arxiv.org/abs/quant-ph/0008033
@@ -51,7 +51,7 @@ export function add_constant(eng: IEngine, c: number, quint: IQubit[] | IQureg) 
 }
 
 /**
- * @ignore
+* 
  * Modular adder by Beauregard
  * see https://arxiv.org/abs/quant-ph/0205095
 Adds a classical constant c to a quantum integer (qureg) quint modulo N
@@ -103,7 +103,7 @@ function inv_mod_N(a: number, N: number): number {
 }
 
 /**
- * @ignore
+* 
  * Modular multiplication by modular addition & shift, followed by uncompute
  https://arxiv.org/abs/quant-ph/0205095
 Multiplies a quantum integer by a classical number a modulo N, i.e.,

@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import math, { matrix } from 'mathjs'
+import { matrix } from 'mathjs'
 import { expect } from 'chai'
-import {
-  classHierachy, isSubclassOf, isKindclassOf, matrixDot, hashArray
-} from '@/libs/util'
+import { classHierachy, isSubclassOf, isKindclassOf, matrixDot } from '@/libs/util'
+import { hashArray, arrayFromHash } from '@/libs/term';
 import { HGate } from '@/ops/gates'
 import { BasicGate, SelfInverseGate } from '@/ops/basics'
 import { Qureg } from '@/meta/qubit'
@@ -68,11 +67,21 @@ describe('util test', () => {
 
   describe('hashArray', () => {
     it('should has same hash', () => {
-      const a = [1, 2, 3, 4, 5];
-      const b = [2, undefined];
-      expect(hashArray(a)).to.equal('1_2_3_4_5');
+      const a = [[1, 'X'], [2, 'Y']];
+      expect(hashArray(a)).to.equal('X1 Y2');
       // @ts-ignore
-      expect(hashArray(b)).to.equal('2_');
+      expect(hashArray([])).to.equal('');
+    });
+  });
+
+  describe('array from hash', () => {
+    it('should convert hash to array', () => {
+      const hash = 'X1 Y2';
+      expect(arrayFromHash(hash)).to.deep.equal([[1, 'X'], [2, 'Y']]);
+      const h2 = 'X1';
+      expect(arrayFromHash(h2)).to.deep.equal([[1, 'X']]);
+      const h3 = 'X2 Y0 Z13';
+      expect(arrayFromHash(h3)).to.deep.equal([[0, 'Y'], [2, 'X'], [13, 'Z']]);
     });
   });
 });

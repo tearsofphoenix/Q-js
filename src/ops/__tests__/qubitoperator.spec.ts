@@ -15,39 +15,14 @@
  */
 
 import { expect } from 'chai'
-import math from 'mathjs'
-import QubitOperator, { PAULI_OPERATOR_PRODUCTS } from '@/ops/qubitoperator'
+import { complex, divide, multiply, add, pow, Complex, equal } from 'mathjs'
+import QubitOperator from '@/ops/qubitoperator'
 import { tuple } from '@/libs/util'
+import { hashArray as ha, arrayFromHash } from '@/libs/term';
 
-const mc = math.complex
+const mc = complex
 
 describe('qubit operator test', () => {
-  it('should test pauli operator product unchanged', () => {
-    const correct = {
-      [['I', 'I']]: [1.0, 'I'],
-      [['I', 'X']]: [1.0, 'X'],
-      [['X', 'I']]: [1.0, 'X'],
-      [['I', 'Y']]: [1.0, 'Y'],
-      [['Y', 'I']]: [1.0, 'Y'],
-      [['I', 'Z']]: [1.0, 'Z'],
-      [['Z', 'I']]: [1.0, 'Z'],
-      [['X', 'X']]: [1.0, 'I'],
-      [['Y', 'Y']]: [1.0, 'I'],
-      [['Z', 'Z']]: [1.0, 'I'],
-      [['X', 'Y']]: [mc(0, 1), 'Z'],
-      [['X', 'Z']]: [mc(0, -1), 'Y'],
-      [['Y', 'X']]: [mc(0, -1), 'Z'],
-      [['Y', 'Z']]: [mc(0, 1), 'X'],
-      [['Z', 'X']]: [mc(0, 1), 'Y'],
-      [['Z', 'Y']]: [mc(0, -1), 'X']
-    }
-
-    Object.keys(correct).forEach((key) => {
-      const value = correct[key]
-      const v2 = PAULI_OPERATOR_PRODUCTS[key]
-      expect(value).to.deep.equal(v2)
-    })
-  });
 
   it('should test init defaults', () => {
     const op = new QubitOperator()
@@ -60,14 +35,14 @@ describe('qubit operator test', () => {
       const loc_op = tuple([0, 'X'], [5, 'Y'], [6, 'Z'])
       const qubit_op = new QubitOperator(loc_op, coefficient)
       expect(Object.keys(qubit_op.terms).length).to.equal(1)
-      expect(math.equal(qubit_op.terms[loc_op], coefficient)).to.equal(true)
+      expect(equal(qubit_op.terms[ha(loc_op)], coefficient)).to.equal(true)
     })
   });
 
   it('should test_init_str', () => {
     const qubit_op = new QubitOperator('X0 Y5 Z12', -1.0)
     const correct = tuple([0, 'X'], [5, 'Y'], [12, 'Z'])
-    const value = qubit_op.terms[correct]
+    const value = qubit_op.terms[ha(correct)];
     expect(typeof value !== 'undefined').to.equal(true)
     expect(value).to.equal(-1.0)
   });
@@ -75,13 +50,13 @@ describe('qubit operator test', () => {
   it('should test_init_str_identity', () => {
     const qubit_op = new QubitOperator('', 2.0)
     expect(Object.keys(qubit_op.terms).length).to.equal(1)
-    const value = qubit_op.terms[[]]
+    const value = qubit_op.terms[ha([])];
     expect(typeof value !== 'undefined').to.equal(true)
     expect(value).to.equal(2.0)
   });
 
   it('should test_init_bad_coefficient', () => {
-    expect(() => new QubitOperator('X0', '0.5')).to.throw()
+    expect(() => new QubitOperator('X0', '0.5' as any)).to.throw()
   });
 
   it('should test_init_bad_action', () => {
@@ -133,7 +108,7 @@ describe('qubit operator test', () => {
     expect(Object.keys(a.terms).length).to.equal(1)
     Object.keys(a.terms).forEach((key) => {
       const v = a.terms[key]
-      expect(math.equal(v, mc(1.0, 1))).to.equal(true)
+      expect(equal(v, mc(1.0, 1))).to.equal(true)
     })
 
     a = new QubitOperator('X0', mc(1.1, 1))
@@ -142,7 +117,7 @@ describe('qubit operator test', () => {
     expect(Object.keys(a.terms).length).to.equal(1)
     Object.keys(a.terms).forEach((key) => {
       const v = a.terms[key]
-      expect(math.equal(v, 1.1)).to.equal(true)
+      expect(equal(v, 1.1)).to.equal(true)
     })
 
     a = new QubitOperator('X0', mc(1.1, 1)).add(new QubitOperator('X1', mc(0, 1.e-6)))
@@ -214,8 +189,8 @@ describe('qubit operator test', () => {
       const loc_op = tuple([1, 'X'], [2, 'Y'])
       const qubit_op = new QubitOperator(loc_op)
       qubit_op.imul(multiplier)
-      const v = qubit_op.terms[loc_op]
-      expect(math.equal(v, multiplier)).to.equal(true)
+      const v = qubit_op.terms[ha(loc_op)]
+      expect(equal(v, multiplier)).to.equal(true)
     })
   });
 
@@ -223,12 +198,12 @@ describe('qubit operator test', () => {
     const op1 = new QubitOperator(tuple([0, 'Y'], [3, 'X'], [8, 'Z'], [11, 'X']), mc(0, 3.0))
     const op2 = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
     op1.imul(op2)
-    const correct_coefficient = math.multiply(math.multiply(mc(0, 1.0), mc(0, 3.0)), 0.5)
+    const correct_coefficient = multiply(multiply(mc(0, 1.0), mc(0, 3.0)), 0.5)
     const correct_term = tuple([0, 'Y'], [1, 'X'], [3, 'Z'], [11, 'X'])
 
     expect(Object.keys(op1.terms).length).to.equal(1)
-    const v = op1.terms[correct_term]
-    expect(math.equal(v, correct_coefficient)).to.equal(true)
+    const v = op1.terms[ha(correct_term)];
+    expect(equal(v, correct_coefficient)).to.equal(true)
   });
 
   it('should test_imul_qubit_op_2', () => {
@@ -237,9 +212,10 @@ describe('qubit operator test', () => {
 
     op3.imul(op4)
     op4.imul(op3)
-    const v = op3.terms[[2, 'Z']]
+    const v = op3.terms[ha([2, 'Z'])];
+
     expect(!!v).to.equal(true)
-    expect(math.equal(v, mc(0, 1.5))).to.equal(true)
+    expect(equal(v, mc(0, 1.5))).to.equal(true)
   });
 
   it('should test_imul_bidir', () => {
@@ -248,34 +224,34 @@ describe('qubit operator test', () => {
     op_a.imul(op_b)
     op_b.imul(op_a)
 
-    const v = op_a.terms[[2, 'Z']]
-    expect(math.equal(v, mc(0, 1.5))).to.equal(true)
-    const c = op_b.terms[[[0, 'X'], [1, 'Y']]]
-    expect(math.equal(c, mc(0, -2.25))).to.equal(true)
+    const v = op_a.terms[ha([2, 'Z'])]
+    expect(equal(v, mc(0, 1.5))).to.equal(true)
+    const c = op_b.terms[ha([[0, 'X'], [1, 'Y']])]
+    expect(equal(c, mc(0, -2.25))).to.equal(true)
   });
 
   it('should test_imul_bad_multiplier', () => {
     const op = new QubitOperator(tuple([1, 'Y'], [0, 'X']), mc(0, -1))
-    expect(() => op.imul('1')).to.throw()
+    expect(() => op.imul('1' as any)).to.throw()
   });
 
   it('should test_mul_by_scalarzero', () => {
     const op = new QubitOperator(tuple([1, 'Y'], [0, 'X']), mc(0, -1)).mul(0)
-    const key = [[0, 'X'], [1, 'Y']]
+    const key = ha([[0, 'X'], [1, 'Y']]);
     const v = op.terms[key]
-    expect(math.equal(v, mc(0, 0))).to.equal(true)
+    expect(equal(v, mc(0, 0))).to.equal(true)
   });
 
   it('should test_mul_bad_multiplier', () => {
     let op = new QubitOperator(tuple([1, 'Y'], [0, 'X']), mc(0, -1))
-    expect(() => op = op.mul('0.5')).to.throw()
+    expect(() => op = op.mul('0.5' as any)).to.throw()
   });
 
   it('should test_mul_out_of_place', () => {
     const op1 = new QubitOperator(tuple([0, 'Y'], [3, 'X'], [8, 'Z'], [11, 'X']), mc(0, 3.0))
     const op2 = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
     const op3 = op1.mul(op2)
-    const correct_coefficient = math.multiply(math.multiply(mc(0, 1), mc(0, 3)), 0.5)
+    const correct_coefficient = multiply(multiply(mc(0, 1), mc(0, 3)), 0.5) as Complex;
     const correct_term = tuple([0, 'Y'], [1, 'X'], [3, 'Z'], [11, 'X'])
 
     expect(op1.isClose(new QubitOperator(tuple([0, 'Y'], [3, 'X'], [8, 'Z'], [11, 'X']), mc(0, 3.0)))).to.equal(true)
@@ -294,8 +270,8 @@ describe('qubit operator test', () => {
     op.iadd(new QubitOperator(tuple([1, 'Z'], [3, 'X'], [8, 'Z']), 1.2))
     op.iadd(new QubitOperator(tuple([1, 'Z'], [3, 'Y'], [9, 'Z']), mc(0, 1.4)))
     const res = op.mul(op)
-    const correct = new QubitOperator([], math.add((0.5 ** 2) + (1.2 ** 2), math.pow(mc(0, 1.4), 2)))
-    correct.iadd(new QubitOperator(tuple([1, 'Y'], [3, 'Z']), math.multiply(math.multiply(mc(0, 2), mc(0, 1)), 0.6)))
+    const correct = new QubitOperator([], add((0.5 ** 2) + (1.2 ** 2), pow(mc(0, 1.4), 2)) as Complex);
+    correct.iadd(new QubitOperator(tuple([1, 'Y'], [3, 'Z']), multiply(multiply(mc(0, 2), mc(0, 1)), 0.6) as Complex));
     expect(res.isClose(correct)).to.equal(true)
   });
 
@@ -306,7 +282,7 @@ describe('qubit operator test', () => {
       const op2 = op.copy()
       const original = op.copy()
       const res = op.div(divisor)
-      const correct = op.mul(math.divide(1.0, divisor))
+      const correct = op.mul(divide(1.0, divisor) as Complex);
 
       expect(res.isClose(correct)).to.equal(true)
       // Test if done out of place
@@ -317,7 +293,7 @@ describe('qubit operator test', () => {
 
   it('should test_truediv_bad_divisor', () => {
     const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
-    expect(() => op.div('0.5')).to.throw()
+    expect(() => op.div('0.5' as any)).to.throw()
   });
 
   it('should test_itruediv_and_idiv', () => {
@@ -326,7 +302,7 @@ describe('qubit operator test', () => {
       const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
       const op2 = op.copy()
       const original = op.copy()
-      const correct = op.mul(math.divide(1.0, divisor))
+      const correct = op.mul(divide(1.0, divisor) as Complex);
 
       op.idiv(divisor)
       op2.idiv(divisor)
@@ -342,7 +318,7 @@ describe('qubit operator test', () => {
 
   it('should test_itruediv_bad_divisor', () => {
     const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
-    expect(() => op.idiv('0.5')).to.throw()
+    expect(() => op.idiv('0.5' as any)).to.throw()
   });
 
   it('should test_iadd_cancellation', () => {
@@ -354,8 +330,8 @@ describe('qubit operator test', () => {
   });
 
   it('should test_iadd_different_term', () => {
-    const term_a = tuple([1, 'X'], [3, 'Y'], [8, 'Z'])
-    const term_b = tuple([1, 'Z'], [3, 'Y'], [8, 'Z'])
+    const term_a = ha(tuple([1, 'X'], [3, 'Y'], [8, 'Z']));
+    const term_b = ha(tuple([1, 'Z'], [3, 'Y'], [8, 'Z']));
     const a = new QubitOperator(term_a, 1.0)
     a.iadd(new QubitOperator(term_b, 0.5))
     expect(Object.keys(a.terms).length).to.equal(2)
@@ -371,12 +347,12 @@ describe('qubit operator test', () => {
 
   it('should test_iadd_bad_addend', () => {
     const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
-    expect(() => op.iadd('0.5')).to.throw()
+    expect(() => op.iadd('0.5' as any)).to.throw()
   });
 
   it('should test add', () => {
-    const term_a = tuple([1, 'X'], [3, 'Y'], [8, 'Z'])
-    const term_b = tuple([1, 'Z'], [3, 'Y'], [8, 'Z'])
+    const term_a = ha(tuple([1, 'X'], [3, 'Y'], [8, 'Z']));
+    const term_b = ha(tuple([1, 'Z'], [3, 'Y'], [8, 'Z']));
     const a = new QubitOperator(term_a, 1.0)
     const b = new QubitOperator(term_b, 0.5)
     const res = a.add(b).add(b)
@@ -390,12 +366,12 @@ describe('qubit operator test', () => {
 
   it('should test_add_bad_addend', () => {
     const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
-    expect(() => op.add('0.5')).to.throw()
+    expect(() => op.add('0.5' as any)).to.throw()
   });
 
   it('should test sub', () => {
-    const term_a = tuple([1, 'X'], [3, 'Y'], [8, 'Z'])
-    const term_b = tuple([1, 'Z'], [3, 'Y'], [8, 'Z'])
+    const term_a = ha(tuple([1, 'X'], [3, 'Y'], [8, 'Z']));
+    const term_b = ha(tuple([1, 'Z'], [3, 'Y'], [8, 'Z']));
     const a = new QubitOperator(term_a, 1.0)
     const b = new QubitOperator(term_b, 0.5)
     const res = a.sub(b)
@@ -411,12 +387,12 @@ describe('qubit operator test', () => {
 
   it('should test_sub_bad_addend', () => {
     const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
-    expect(() => op.sub('0.5')).to.throw()
+    expect(() => op.sub('0.5' as any)).to.throw()
   });
 
   it('should test_isub_different_term', () => {
-    const term_a = tuple([1, 'X'], [3, 'Y'], [8, 'Z'])
-    const term_b = tuple([1, 'Z'], [3, 'Y'], [8, 'Z'])
+    const term_a = ha(tuple([1, 'X'], [3, 'Y'], [8, 'Z']));
+    const term_b = ha(tuple([1, 'Z'], [3, 'Y'], [8, 'Z']));
     const a = new QubitOperator(term_a, 1.0)
     a.isub(new QubitOperator(term_b, 0.5))
     expect(Object.keys(a.terms).length).to.equal(2)
@@ -431,7 +407,7 @@ describe('qubit operator test', () => {
 
   it('should test_isub_bad_addend', () => {
     const op = new QubitOperator(tuple([1, 'X'], [3, 'Y'], [8, 'Z']), 0.5)
-    expect(() => op.isub('0.5')).to.throw()
+    expect(() => op.isub('0.5' as any)).to.throw()
   });
 
   it('should test_neg', () => {

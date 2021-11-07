@@ -16,7 +16,7 @@ import { GateClass, ICommand, IEngine, IGate, IQubit } from '@/interfaces';
 import { SpecialGate } from './constants';
 
 /**
- * @ignore
+* 
  * @desc Remove any MathGates
  */
 export function high_level_gates(eng: IEngine, cmd: ICommand) {

@@ -5,3 +5,4 @@ export * from './IQubit';
 export * from './IGate';
 export * from './IEquality';
 export * from './ITag';
+export * from './IQubitOperator';

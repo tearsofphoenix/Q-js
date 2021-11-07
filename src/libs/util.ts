@@ -16,7 +16,7 @@
 import { size, flatten, subset, index as mindex, matrix as mm, dot as mdot, range, Matrix } from 'mathjs';
 
 /**
- * @ignore
+* 
  * generate a n-Length Array filled by `0`
  */
 export function zeros(n: number): number[] {
@@ -28,7 +28,7 @@ export function zeros(n: number): number[] {
 }
 
 /**
- * @ignore
+* 
  * check if an array is `tuple`
  * @param {Array} value
  * @return {boolean}
@@ -46,7 +46,7 @@ export function arrayIsTuple(value: any) {
 }
 
 /**
- * @ignore
+* 
  * force mark a value as `tuple`, internal usage only
  * @param value
  */
@@ -57,16 +57,15 @@ export function markTuple(value: any) {
 /**
  * create `tuple` from arguments
  * @param args
- * @return {Array}
  */
-export function tuple(...args: any) {
-  const result = new Array(...args)
-  markTuple(result)
-  return result
+export function tuple(...args: any[]) {
+  const result = new Array(...args);
+  markTuple(result);
+  return result;
 }
 
 /**
- * @ignore
+* 
  * create copy of object, with same `class`
  */
 export function ObjectCopy(obj: {}) {
@@ -155,7 +154,7 @@ export function instanceOf(inst: any, cls: any): boolean {
 }
 
 /**
- * @ignore
+* 
  * return item * n string like python does.
  */
 export function genString(item: string, n: number): string {
@@ -167,7 +166,7 @@ export function genString(item: string, n: number): string {
 }
 
 /**
- * @ignore
+* 
  * assign value in `vector` into `matrix` by index in `indices`
  */
 export function matrixRangeAssign(matrix: Matrix, indices: number[], vector: any) {
@@ -191,7 +190,7 @@ export function matrixRangeIndicesAssign(matrix: Matrix, mstart: number, mend: n
 }
 
 /**
- * @ignore
+* 
  * return a row of matrix
  */
 export function matrixGetRow(matrix: Matrix, index: number) {
@@ -200,7 +199,7 @@ export function matrixGetRow(matrix: Matrix, index: number) {
 }
 
 /**
- * @ignore
+* 
  * dot product of matrix & vector
  */
 export function matrixDot(matrix: Matrix, vector: any) {
@@ -211,8 +210,4 @@ export function matrixDot(matrix: Matrix, vector: any) {
     result.push(mdot(row, vector))
   }
   return mm(result);
-}
-
-export function hashArray<T>(array: T[]): string {
-  return array.join('_');
 }

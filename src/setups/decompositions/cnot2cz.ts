@@ -34,7 +34,7 @@ const _decompose_cnot = (cmd: ICommand) => {
 }
 
 /**
- * @ignore
+* 
  * @param cmd
  * @return {boolean}
  * @private
