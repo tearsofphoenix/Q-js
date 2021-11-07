@@ -15,13 +15,14 @@
  */
 
 import assert from 'assert'
-import math from 'mathjs'
+import * as math from 'mathjs'
 import { BasicGate } from './basics'
-import QubitOperator, { stringToArray } from './qubitoperator'
+import QubitOperator from './qubitoperator'
 import { setEqual, isComplex, isNumeric } from '../libs/polyfill'
 import { Ph } from './gates'
 import { NotMergeable } from "../meta/error";
 import { IGate, QObject } from '@/interfaces';
+import { hashArray as ha, arrayFromHash as ah } from '@/libs/term';
 
 /**
  * @class TimeEvolution
@@ -76,7 +77,7 @@ The hamiltonian must be hermitian and therefore only terms with
       if (isNumeric(item)) {
         if (isComplex(item)) {
           if (math.im(item) === 0) {
-            this.hamiltonian.terms[term] = math.re(item)
+            this.hamiltonian.terms[term] = math.re(item) as number;
           } else {
             throw new Error('hamiltonian must be '
               + 'hermitian and hence only '
@@ -132,21 +133,21 @@ works for everyone. Use, e.g., a decomposition rule for that.
     const k1 = Object.keys(this.hamiltonian.terms)
     const k2 = Object.keys(other.hamiltonian.terms)
     if (setEqual(new Set(k1), new Set(k2))) {
-      let factor
+      let factor: number;
       Object.keys(this.hamiltonian.terms).forEach((term) => {
         const v1 = this.hamiltonian.terms[term]
         const v2 = other.hamiltonian.terms[term]
         if (typeof factor === 'undefined') {
-          factor = math.divide(v1, v2)
+          factor = math.divide(v1, v2) as number;
         } else {
-          const tmp = math.divide(v1, v2)
-          if (math.abs(math.subtract(factor, tmp)) > rel_tol * math.max(math.abs(factor), math.abs(tmp))) {
+          const tmp = math.divide(v1, v2) as number;
+          if (math.abs(math.subtract(factor, tmp) as number) > rel_tol * math.max(math.abs(factor), math.abs(tmp) as number)) {
             throw new NotMergeable('Cannot merge these two gates.')
           }
         }
       })
 
-      const newTime = this.time + other.time / factor;
+      const newTime = this.time + other.time / (factor!);
       return new TimeEvolution(newTime, this.hamiltonian);
     } else {
       throw new NotMergeable('Cannot merge these two gates.')
@@ -197,18 +198,18 @@ which is only a two qubit gate.
     // Check that if hamiltonian has only an identity term,
     // apply a global phase
     const keys = Object.keys(this.hamiltonian.terms)
-    const v = this.hamiltonian.terms[[]]
+    const v = this.hamiltonian.terms[ha([])];
     if (keys.length === 1 && typeof v !== 'undefined') {
-      new Ph(math.multiply(-this.time, v)).or(qubits[0][0])
+      new Ph(math.multiply(-this.time, v) as number).or(qubits[0][0])
       return
     }
     const num_qubits = qubits[0].length
     let non_trivial_qubits = new Set<number>();
 
     keys.forEach(key => {
-      const term = stringToArray(key)
+      const term = ah(key);
       term.forEach(([index, action]) => {
-        non_trivial_qubits.add(index)
+        non_trivial_qubits.add(index as number);
       })
     })
 
@@ -229,9 +230,9 @@ which is only a two qubit gate.
     assert(Object.keys(new_hamiltonian.terms).length === 0, '')
 
     Object.keys(this.hamiltonian.terms).forEach((term) => {
-      const parts = stringToArray(term)
+      const parts = ah(term);
       const newTerm = parts.map(([index, action]) => [new_index[index], action])
-      new_hamiltonian.terms[newTerm] = this.hamiltonian.terms[term]
+      new_hamiltonian.terms[ha(newTerm)] = this.hamiltonian.terms[term]
     })
 
     const new_gate = new TimeEvolution(this.time, new_hamiltonian)

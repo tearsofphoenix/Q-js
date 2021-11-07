@@ -15,7 +15,7 @@
  */
 
 import { expect } from 'chai'
-import math from 'mathjs'
+import { complex, Complex, exp, deepEqual, matrix } from 'mathjs'
 import QubitOperator from '@/ops/qubitoperator'
 import TimeEvolution from '@/ops/timeevolution'
 import { tuple } from '@/libs/util'
@@ -23,8 +23,10 @@ import { BasicGate } from '@/ops/basics'
 import MainEngine from '@/cengines/main'
 import { DummyEngine } from '@/cengines/testengine'
 import { Ph } from '@/ops/gates';
+import { hashArray as ha, arrayFromHash as ah } from '@/libs/term';
+import { IMathGate } from '@/interfaces';
 
-const mc = math.complex
+const mc = complex
 
 describe('time evolution test', () => {
   it('should test_time_evolution_init_int_time', () => {
@@ -52,17 +54,18 @@ describe('time evolution test', () => {
   it('should test_init_makes_copy', () => {
     let hamiltonian = new QubitOperator('X0 Z1')
     const gate = new TimeEvolution(2.1, hamiltonian)
+    // @ts-ignore
     hamiltonian = undefined
     expect(typeof gate.hamiltonian !== 'undefined').to.equal(true)
   });
 
   it('should test_init_bad_time', () => {
     const hamiltonian = new QubitOperator('Z2', 0.5)
-    expect(() => new TimeEvolution(mc(0, 1.5), hamiltonian)).to.throw()
+    expect(() => new TimeEvolution(mc(0, 1.5) as any, hamiltonian)).to.throw()
   });
 
   it('should test_init_bad_hamiltonian', () => {
-    expect(() => new TimeEvolution(2, 'something else')).to.throw()
+    expect(() => new TimeEvolution(2, 'something else' as any)).to.throw()
   });
 
   it('should test_init_not_hermitian', () => {
@@ -73,7 +76,7 @@ describe('time evolution test', () => {
   it('should test_init_cast_complex_to_float', () => {
     const hamiltonian = new QubitOperator('Z2', mc(2, 0))
     const gate = new TimeEvolution(1, hamiltonian)
-    const v = gate.hamiltonian.terms[tuple([2, 'Z'])]
+    const v = gate.hamiltonian.terms[ha(tuple([2, 'Z']))]
     expect(typeof v === 'number').to.equal(true)
     expect(v).to.equal(2.0)
   });
@@ -99,7 +102,7 @@ describe('time evolution test', () => {
     const gate = new TimeEvolution(2, hamiltonian)
     const hamiltonian2 = new QubitOperator('Z2', 4)
     const gate2 = new TimeEvolution(5, hamiltonian2)
-    const merged = gate.getMerged(gate2)
+    const merged = gate.getMerged(gate2) as TimeEvolution;
     // This is not a requirement, the hamiltonian could also be the other
     // if we change implementation
     expect(merged.hamiltonian.isClose(hamiltonian)).to.equal(true)
@@ -113,7 +116,7 @@ describe('time evolution test', () => {
     const hamiltonian2 = new QubitOperator('Z2', 4)
     hamiltonian2.iadd(new QubitOperator('X3', 2 + 1e-10))
     const gate2 = new TimeEvolution(5, hamiltonian2)
-    const merged = gate.getMerged(gate2)
+    const merged = gate.getMerged(gate2) as TimeEvolution;
     // This is not a requirement, the hamiltonian could also be the other
     // if we change implementation
     expect(merged.hamiltonian.isClose(hamiltonian)).to.equal(true)
@@ -155,15 +158,15 @@ describe('time evolution test', () => {
     eng.flush()
 
     const cmd1 = saving_backend.receivedCommands[1]
-    expect(cmd1.gate.hamiltonian.isClose(hamiltonian)).to.equal(true)
-    expect(cmd1.gate.time).to.equal(2.1)
+    expect((cmd1.gate as TimeEvolution).hamiltonian.isClose(hamiltonian)).to.equal(true)
+    expect((cmd1.gate as TimeEvolution).time).to.equal(2.1)
     expect(cmd1.qubits.length === 1 && cmd1.qubits[0].length === 1).to.equal(true)
     expect(cmd1.qubits[0][0].id === qubit[0].id).to.equal(true)
 
     const cmd2 = saving_backend.receivedCommands[2]
 
-    expect(cmd2.gate.hamiltonian.isClose(hamiltonian)).to.equal(true)
-    expect(cmd2.gate.time).to.equal(3)
+    expect((cmd2.gate as TimeEvolution).hamiltonian.isClose(hamiltonian)).to.equal(true)
+    expect((cmd2.gate as TimeEvolution).time).to.equal(3)
     expect(cmd2.qubits.length === 1 && cmd2.qubits[0].length === 1).to.equal(true)
     expect(cmd2.qubits[0][0].id === qubit[0].id).to.equal(true)
   });
@@ -192,15 +195,15 @@ describe('time evolution test', () => {
 
     const rescaled_h = new QubitOperator('X0 Z1', 2)
     const cmd1 = saving_backend.receivedCommands[5]
-    expect(cmd1.gate.hamiltonian.isClose(rescaled_h)).to.equal(true)
-    expect(cmd1.gate.time).to.equal(2.1)
+    expect((cmd1.gate as TimeEvolution).hamiltonian.isClose(rescaled_h)).to.equal(true)
+    expect((cmd1.gate as TimeEvolution).time).to.equal(2.1)
     expect(cmd1.qubits.length === 1 && cmd1.qubits[0].length === 2).to.equal(true)
     expect(cmd1.qubits[0][0].id === qureg[0].id).to.equal(true)
     expect(cmd1.qubits[0][1].id === qureg[4].id).to.equal(true)
 
     const cmd2 = saving_backend.receivedCommands[6]
-    expect(cmd2.gate.hamiltonian.isClose(rescaled_h)).to.equal(true)
-    expect(cmd2.gate.time).to.equal(3)
+    expect((cmd2.gate as TimeEvolution).hamiltonian.isClose(rescaled_h)).to.equal(true)
+    expect((cmd2.gate as TimeEvolution).time).to.equal(3)
     expect(cmd2.qubits.length === 1 && cmd2.qubits[0].length === 2).to.equal(true)
     expect(cmd2.qubits[0][0].id === qureg[0].id).to.equal(true)
     expect(cmd2.qubits[0][1].id === qureg[4].id).to.equal(true)
@@ -244,8 +247,8 @@ describe('time evolution test', () => {
     rescaled_h.iadd(new QubitOperator('Y1', 0.5))
 
     const cmd1 = saving_backend.receivedCommands[4]
-    expect(cmd1.gate.hamiltonian.isClose(rescaled_h)).to.equal(true)
-    expect(cmd1.gate.time).to.equal(2.1)
+    expect((cmd1.gate as TimeEvolution).hamiltonian.isClose(rescaled_h)).to.equal(true)
+    expect((cmd1.gate as TimeEvolution).time).to.equal(2.1)
     expect(cmd1.qubits.length === 1 && cmd1.qubits[0].length === 3).to.equal(true)
 
     expect(cmd1.qubits[0][0].id === qureg[0].id).to.equal(true)
@@ -281,10 +284,10 @@ describe('time evolution test', () => {
 
     expect(cmd.gate instanceof Ph).to.equal(true)
     expect(cmd.gate.equal(new Ph(-3.4 * 2.1))).to.equal(true)
-    const correct = math.matrix([
-      [math.exp(mc(0, -3.4 * 2.1)), 0],
-      [0, math.exp(mc(0, -3.4 * 2.1))]])
+    const correct = matrix([
+      [exp(mc(0, -3.4 * 2.1)), 0] as any,
+      [0, exp(mc(0, -3.4 * 2.1))]])
 
-    expect(math.deepEqual(cmd.gate.matrix, correct)).to.equal(true)
+    expect(deepEqual((cmd.gate as IMathGate).matrix, correct)).to.equal(true)
   });
 })

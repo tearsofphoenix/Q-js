@@ -15,7 +15,7 @@
  */
 
 import { expect } from 'chai'
-import math from 'mathjs'
+import * as math from 'mathjs'
 import { BasicMathGate, ClassicalInstructionGate } from '@/ops/basics';
 import { len } from '@/libs/polyfill';
 import DecompositionRuleSet from '@/cengines/replacer/decompositionruleset';

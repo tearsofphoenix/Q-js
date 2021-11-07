@@ -15,7 +15,8 @@
  */
 
 import { expect } from 'chai'
-import math, { Matrix, Complex, zeros, identity } from 'mathjs'
+import * as math from 'mathjs'
+import { Matrix, Complex, zeros, identity } from 'mathjs'
 import { TrivialMapper } from './shared'
 import { BasicGate, BasicMathGate } from '@/ops/basics'
 import { DummyEngine } from '@/cengines/testengine';

@@ -8,7 +8,7 @@ if the hamiltonian has only one term or if all the terms commute with each
 */
 
 import assert from 'assert'
-import QubitOperator, { stringToArray } from '@/ops/qubitoperator';
+import QubitOperator from '@/ops/qubitoperator';
 import { len, setEqual, setFromRange } from '@/libs/polyfill';
 import { Compute, Control, Uncompute } from '@/meta';
 import TimeEvolution from '@/ops/timeevolution';
@@ -16,10 +16,11 @@ import { tuple } from '@/libs/util';
 import DecompositionRule from '@/cengines/replacer/decompositionrule';
 import { CNOT, Rx, Ry, Rz, H } from '@/ops';
 import { ICommand } from '@/interfaces';
+import { arrayFromHash as ah } from '@/libs/term';
 
 // Recognize all TimeEvolution gates with >1 terms but which all commute.
 function _recognize_time_evolution_commuting_terms(cmd: ICommand) {
-  const { hamiltonian } = cmd.gate
+  const { hamiltonian } = cmd.gate as TimeEvolution;
   if (len(hamiltonian.terms) === 1) {
     return false
   } else {
@@ -27,12 +28,12 @@ function _recognize_time_evolution_commuting_terms(cmd: ICommand) {
     const keys = Object.keys(hamiltonian.terms)
     for (let i = 0; i < keys.length; ++i) {
       const k = keys[i]
-      const term = stringToArray(k)
+      const term = ah(k)
       const coefficient = hamiltonian.terms[k]
       const test_op = new QubitOperator(term, coefficient)
       for (let j = 0; j < keys.length; ++j) {
         const other = keys[j]
-        const other_op = new QubitOperator(stringToArray(other), hamiltonian.terms[other])
+        const other_op = new QubitOperator(ah(other), hamiltonian.terms[other])
         const commutator = test_op.mul(other_op).sub(other_op.mul(test_op))
         if (!commutator.isClose(id_op, 1e-9, 1e-9)) {
           return false
@@ -46,11 +47,11 @@ function _recognize_time_evolution_commuting_terms(cmd: ICommand) {
 function _decompose_time_evolution_commuting_terms(cmd: ICommand) {
   const qureg = cmd.qubits
   const eng = cmd.engine
-  const { hamiltonian, time } = cmd.gate
+  const { hamiltonian, time } = cmd.gate as TimeEvolution;
   Control(eng, cmd.controlQubits, () => {
     Object.keys(hamiltonian.terms).forEach((key) => {
       const coefficient = hamiltonian.terms[key]
-      const term = stringToArray(key)
+      const term = ah(key);
       const ind_operator = new QubitOperator(term, coefficient)
       new TimeEvolution(time, ind_operator).or(qureg)
     })
@@ -58,7 +59,7 @@ function _decompose_time_evolution_commuting_terms(cmd: ICommand) {
 }
 
 function _recognize_time_evolution_individual_terms(cmd: ICommand) {
-  return len(cmd.gate.hamiltonian.terms) === 1
+  return len((cmd.gate as TimeEvolution).hamiltonian.terms) === 1
 }
 
 /**
@@ -82,11 +83,11 @@ function _decompose_time_evolution_individual_terms(cmd: ICommand) {
   assert(len(cmd.qubits) === 1)
   const qureg = cmd.qubits[0]
   const eng = cmd.engine
-  const { time, hamiltonian } = cmd.gate
+  const { time, hamiltonian } = cmd.gate as TimeEvolution;
   assert(len(hamiltonian.terms) === 1)
-  let term = Object.keys(hamiltonian.terms)[0]
-  term = stringToArray(term)
-  const coefficient = hamiltonian.terms[term]
+  let firstTerm = Object.keys(hamiltonian.terms)[0]
+  const term = ah(firstTerm);
+  const coefficient = hamiltonian.terms[firstTerm] as number;
   const check_indices = new Set()
 
   // Check that hamiltonian is not identity term,

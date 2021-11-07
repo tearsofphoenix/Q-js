@@ -15,7 +15,8 @@
  */
 
 import { expect } from 'chai'
-import { complex, divide, multiply, add, pow, Complex, equal } from 'mathjs'
+import * as math from 'mathjs';
+import { complex, divide, multiply, add, pow, Complex, equal } from 'mathjs';
 import QubitOperator from '@/ops/qubitoperator'
 import { tuple } from '@/libs/util'
 import { hashArray as ha, arrayFromHash } from '@/libs/term';
@@ -23,6 +24,7 @@ import { hashArray as ha, arrayFromHash } from '@/libs/term';
 const mc = complex
 
 describe('qubit operator test', () => {
+  console.warn(math);
 
   it('should test init defaults', () => {
     const op = new QubitOperator()

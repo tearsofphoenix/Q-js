@@ -45,7 +45,8 @@ function _replace_multiplybyconstantmodN(cmd: ICommand) {
   const N = (cmd.gate as IMathGate).N;
   const quint = cmd.qubits[0];
 
-  Control(eng, cmd.controlQubits, () => mul_by_constant_modN(eng, c, N, quint));
+  // TODO:
+  Control(eng, cmd.controlQubits, () => mul_by_constant_modN(eng, c, N, quint as any));
 }
 
 export default [

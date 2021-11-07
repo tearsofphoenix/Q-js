@@ -28,7 +28,8 @@ As well as the meta functions
 and upon failure returns a DaggeredGate)
 * C (Creates an n-ary controlled version of an arbitrary gate)
 */
-import math, { Matrix } from 'mathjs'
+import * as math from 'mathjs';
+import { Matrix } from 'mathjs';
 import { BasicGate } from './basics'
 import { Control } from '../meta/control'
 import Cycle, { getInverse } from './_cycle'
@@ -190,7 +191,8 @@ qureg. The following quregs belong to the gate.
         the required number of control quregs.`);
     }
 
-    Control(gateQuregs[0][0].engine, ctrl, () => this.gate.or(gateQuregs))
+    // TODO:
+    Control(gateQuregs[0][0].engine, ctrl as any, () => this.gate.or(gateQuregs))
   }
 
   toString() {

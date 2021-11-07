@@ -9,7 +9,7 @@ only nearest neighbour qubits can perform a 2 qubit gate. The mapper
 uses Swap gates in order to move qubits next to each other.
 */
 import assert from 'assert'
-import math from 'mathjs'
+import * as math from 'mathjs'
 import { permutations } from 'itertools'
 import BasicMapperEngine from './basicmapper';
 import { return_swap_depth } from './linearmapper'

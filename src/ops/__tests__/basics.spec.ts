@@ -15,7 +15,7 @@
  */
 
 import { assert, expect } from 'chai'
-import math from 'mathjs'
+import * as math from 'mathjs'
 import MainEngine from '@/cengines/main'
 import { DummyEngine } from '@/cengines/testengine'
 import {
@@ -35,7 +35,7 @@ describe('basics test', () => {
     expect(basicGate.interchangeableQubitIndices).to.deep.equal([])
     expect(basicGate.getInverse).to.throw()
     try {
-      basicGate.getMerged('other gate')
+      basicGate.getMerged('other gate' as any);
     } catch (e) {
       assert(true)
     }
@@ -249,7 +249,7 @@ describe('basics test', () => {
   });
 
   it('should basic math gate', () => {
-    const mymathFunc = (a, b, c) => [a, b, c + a * b]
+    const mymathFunc = (a: number, b: number, c: number) => [a, b, c + a * b]
 
     class MyMultiplyGate extends BasicMathGate {
       constructor() {

@@ -15,7 +15,7 @@
  */
 
 import { expect } from 'chai'
-import math from 'mathjs'
+import * as math from 'mathjs'
 import Gates, {
   HGate,
   H,

@@ -30,10 +30,9 @@ import { stringToArray } from '@/ops/qubitoperator'
 import { LogicalQubitIDTag } from '@/meta/tag'
 import { instanceOf } from '@/libs/util';
 import { len, stringToBitArray } from '@/libs/polyfill';
-import { ICommand } from '@/interfaces';
+import { ICommand, IEngine, IMathGate, IQubit, IQubitOperator, IQureg } from '@/interfaces';
 
 /**
- * @class Simulator
  * @desc
 Simulator is a compiler engine which simulates a quantum computer using
 C++-based kernels.
@@ -47,15 +46,17 @@ export OMP_NUM_THREADS=4 # use 4 threads
 export OMP_PROC_BIND=spread # bind threads to processors by spreading
  */
 export default class Simulator extends BasicEngine {
+  private _simulator: IEngine;
+  private _gate_fusion: boolean;
   /**
   Construct the C++/JavaScript-simulator object and initialize it with a
   random seed.
 
-    @param {boolean} gate_fusion If true, gates are cached and only executed
+    @param gate_fusion If true, gates are cached and only executed
 once a certain gate-size has been reached (only has an effect
 for the c++ simulator).
-    @param {number} rnd_seed Random seed (uses random.randint(0, 4294967295) by default). Ignored currently!!!
-    @param {boolean} forceSimulation if true, will force use cpp simulator
+    @param rnd_seed Random seed (uses random.randint(0, 4294967295) by default). Ignored currently!!!
+    @param forceSimulation if true, will force use cpp simulator
 
 Example of gate_fusion Instead of applying a Hadamard gate to 5
 qubits, the simulator calculates the kronecker product of the 1-qubit
@@ -74,7 +75,7 @@ quantum algorithms.
 the docs which gives futher hints on how to build the C++
 extension.
    */
-  constructor(gate_fusion = false, rnd_seed = null, forceSimulation = false) {
+  constructor(gate_fusion: boolean = false, rnd_seed: number = null, forceSimulation: boolean = false) {
     super()
     if (!rnd_seed) {
       rnd_seed = Math.random()
@@ -95,16 +96,16 @@ with all arbitrarily-controlled gates which provide a
 gate-matrix (via gate.matrix) and acts on 5 or less qubits (not
 counting the control qubits).
 
-  @param {Command} cmd Command for which to check availability (single-qubit gate, arbitrary controls)
+  @param cmd Command for which to check availability (single-qubit gate, arbitrary controls)
 
-  @return {boolean} true if it can be simulated and false otherwise.
+  @return true if it can be simulated and false otherwise.
   */
-  isAvailable(cmd) {
+  isAvailable(cmd: ICommand) {
     if (instanceOf(cmd.gate, [MeasureGate, AllocateQubitGate, DeallocateQubitGate, BasicMathGate, TimeEvolution])) {
       return true
     }
     try {
-      const m = cmd.gate.matrix
+      const m = (cmd.gate as IMathGate).matrix;
       // Allow up to 5-qubit gates
       const [row, col] = m.size()
       if (row > 2 ** 5 || col > 2 ** 5) return false
@@ -116,20 +117,18 @@ counting the control qubits).
 
   /**
     Converts a qureg from logical to mapped qubits if there is a mapper.
-    @param {Array.<Qubit>|Qureg} qureg Logical quantum bits
+    @param qureg Logical quantum bits
   */
-  convertLogicalToMappedQureg(qureg) {
+  convertLogicalToMappedQureg(qureg: IQureg) {
     const { mapper } = this.main
     if (mapper) {
-      const mapped_qureg = []
+      const mapped_qureg: IQubit[] = []
       qureg.forEach((qubit) => {
-        const v = mapper.currentMapping[qubit.id]
+        const v = mapper.currentMapping![qubit.id]
         if (typeof v === 'undefined') {
-          throw new Error('Unknown qubit id. '
-            + 'Please make sure you have called '
-            + 'eng.flush().')
+          throw new Error(`Unknown qubit id. Please make sure you have called eng.flush().`);
         }
-        const new_qubit = new BasicQubit(qubit.engine, mapper.currentMapping[qubit.id])
+        const new_qubit = new BasicQubit(qubit.engine, mapper.currentMapping![qubit.id])
         mapped_qureg.push(new_qubit)
       })
       return mapped_qureg
@@ -141,7 +140,7 @@ counting the control qubits).
   Get the expectation value of qubit_operator w.r.t. the current wave
 function represented by the supplied quantum register.
 
-    @param {QubitOperator} qubitOperator  Operator to measure.
+    @param qubitOperator  Operator to measure.
     @param {Array.<Qubit>|Qureg} qureg  Quantum bits to measure.
 
     @return Expectation value
@@ -158,7 +157,7 @@ automatically converts from logical qubits to mapped qubits for
 
     @throws {Error} If `qubit_operator` acts on more qubits than present in the `qureg` argument.
    */
-  getExpectationValue(qubitOperator, qureg) {
+  getExpectationValue(qubitOperator: IQubitOperator, qureg: IQureg): number {
     qureg = this.convertLogicalToMappedQureg(qureg)
     const operator = []
     const num_qubits = qureg.length

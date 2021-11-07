@@ -5,7 +5,7 @@ import { IGate } from '@/interfaces';
 /**
  * Gate for transforming qubits in state |0> to any desired quantum state.
  */
-export default class StatePreparation extends BasicGate {
+export class StatePreparation extends BasicGate {
   private _finalState: any;
   /**
    * Initialize StatePreparation gate.
