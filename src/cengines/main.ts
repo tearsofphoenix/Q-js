@@ -17,16 +17,15 @@
 // Contains the main engine of every compiler engine pipeline, called MainEngine.
 import { BasicEngine } from './basics'
 import { FlushGate } from '../ops/gates'
-import BasicMapperEngine from './basicmapper'
+import { BasicMapperEngine } from './basicmapper'
 import Command from '../ops/command'
 import { BasicQubit, Qureg } from '../meta/qubit';
 import { NotYetMeasuredError } from '../meta/error'
 import { getEngineList } from '../setups'
-import Simulator from '../backends/simulators/simulator'
+import { Simulator } from '../backends/simulators/simulator'
 import { IEngine, IQubit, ICommand } from '@/interfaces';
 
 /**
- * @class MainEngine
  * @desc
 The MainEngine class provides all functionality of the main compiler
 engine.
@@ -43,7 +42,7 @@ dirty_qubits (Set): Containing all dirty qubit ids
 backend (BasicEngine): Access the back-end.
 mapper (BasicMapperEngine): Access to the mapper if there is one.
  */
-export default class MainEngine extends BasicEngine {
+export class MainEngine extends BasicEngine {
   backend: IEngine;
   private _qubitIdx: number;
   mapper: BasicMapperEngine;

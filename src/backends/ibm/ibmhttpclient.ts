@@ -17,7 +17,7 @@
 import axios from 'axios'
 const _api_url = 'https://quantumexperience.ng.bluemix.net/api/';
 
-export default class IBMHTTPClient {
+export class IBMHTTPClient {
   static async isOnline(device: string) {
     const url = `Backends/${device}/queue/status`
     const result = await axios.get(`${_api_url}${url}`)

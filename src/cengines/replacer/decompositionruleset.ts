@@ -19,10 +19,9 @@ import { ICommand } from '@/interfaces';
 import DecompositionRule, { CheckFunction } from './decompositionrule';
 
 /**
- * @class DecompositionRuleSet
  * A collection of indexed decomposition rules.
  */
-export default class DecompositionRuleSet {
+export class DecompositionRuleSet {
   decompositions: { [key: string]: Decomposition[] };
   /**
     @param rules Initial decomposition rules.

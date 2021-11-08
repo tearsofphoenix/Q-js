@@ -19,7 +19,7 @@ import { BasicEngine } from './basics'
 import { LogicalQubitIDTag } from '../meta/tag'
 import { dropEngineAfter, insertEngine } from '../meta/util'
 import { MeasureGate } from '@/ops/gates';
-import CommandModifier from './cmdmodifier';
+import { CommandModifier } from './cmdmodifier';
 import { ICommand, IQubit, IQureg } from '@/interfaces';
 
 /**
@@ -30,7 +30,7 @@ Defines the parent class from which all mappers should be derived.
 BasicMapperEngine. This allows the simulator to automatically translate
 logical qubit ids to mapped ids.
 */
-export default class BasicMapperEngine extends BasicEngine {
+export class BasicMapperEngine extends BasicEngine {
   _currentMapping: {
     [key: number]: number
   };

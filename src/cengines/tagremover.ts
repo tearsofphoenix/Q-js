@@ -28,7 +28,7 @@ Removing tags is important (after having handled them if necessary) in
 order to enable optimizations across meta-function boundaries (compute/
 action/uncompute or loops after unrolling)
  */
-export default class TagRemover extends BasicEngine {
+export class TagRemover extends BasicEngine {
   private _tags: any[];
   /**
     @param tags A list of meta tag classes (e.g., [ComputeTag, UncomputeTag])

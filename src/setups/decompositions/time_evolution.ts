@@ -13,7 +13,7 @@ import { len, setEqual, setFromRange } from '@/libs/polyfill';
 import { Compute, Control, Uncompute } from '@/meta';
 import TimeEvolution from '@/ops/timeevolution';
 import { tuple } from '@/libs/util';
-import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { DecompositionRule } from '@/cengines/replacer/decompositionrule';
 import { CNOT, Rx, Ry, Rz, H } from '@/ops';
 import { ICommand } from '@/interfaces';
 import { arrayFromHash as ah } from '@/libs/term';

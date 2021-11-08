@@ -11,13 +11,13 @@ uses Swap gates in order to move qubits next to each other.
 import assert from 'assert'
 import * as math from 'mathjs'
 import { permutations } from 'itertools'
-import BasicMapperEngine from './basicmapper';
+import { BasicMapperEngine } from './basicmapper';
 import { return_swap_depth } from './linearmapper'
 import NativeImpl from '../backends/simulators/cppsim'
 import {
   arrayFromRange, len, randomSample, setDifference, setEqual, setFromRange
 } from '../libs/polyfill';
-import LinearMapper from './linearmapper';
+import { LinearMapper } from './linearmapper';
 import {
   AllocateQubitGate, DeallocateQubitGate, FlushGate, Swap
 } from '../ops';
@@ -92,7 +92,7 @@ num_of_swaps_per_mapping (dict): Key are the number of swaps per
 mapping, value is the number of such
 mappings which have been applied
  */
-export default class GridMapper extends BasicMapperEngine {
+export class GridMapper extends BasicMapperEngine {
   num_rows: number;
   num_columns: number;
   num_qubits: number;

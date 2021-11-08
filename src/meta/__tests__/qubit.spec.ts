@@ -17,7 +17,7 @@
 import { assert, expect } from 'chai'
 import { BasicQubit, Qubit, Qureg } from '@/meta/qubit'
 import { BasicEngine } from '@/cengines/basics'
-import MainEngine from '@/cengines/main'
+import { MainEngine } from '@/cengines/main'
 import { DummyEngine } from '@/cengines/testengine'
 import { Deallocate } from '@/ops/gates'
 import { ICommand, IEngine, IQubit } from '@/interfaces';

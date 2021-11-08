@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import deepEqual from 'deep-eql'
 import { return_swap_depth } from '@/cengines/linearmapper'
-import LinearMapper from '@/cengines/linearmapper';
+import { LinearMapper } from '@/cengines/linearmapper';
 import { BasicQubit } from '@/meta/qubit';
 import Command from '@/ops/command';
 import { tuple } from '@/libs/util';

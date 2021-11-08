@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import math from 'mathjs';
-import MainEngine from '@/cengines/main';
+import { MainEngine } from '@/cengines/main';
 import { AutoReplacer, DummyEngine, InstructionFilter } from '@/cengines';
 import QubitOperator from '@/ops/qubitoperator';
 import TimeEvolution from '@/ops/timeevolution';
@@ -9,9 +9,9 @@ import { len } from '@/libs/polyfill';
 import {
   All, ClassicalInstructionGate, Measure, Ph, Rx, Ry, Rz
 } from '@/ops';
-import DecompositionRuleSet from '@/cengines/replacer/decompositionruleset';
+import { DecompositionRuleSet } from '@/cengines/replacer/decompositionruleset';
 import { Control } from '@/meta';
-import Simulator from '@/backends/simulators/simulator';
+import { Simulator } from '@/backends/simulators/simulator';
 
 function convertNativeMatrix(vec) {
   const m = math.zeros(vec.length)

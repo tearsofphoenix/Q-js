@@ -8,6 +8,8 @@
     "esModuleInterop": true,
     "module": "commonjs",
     "target": "es5",
+    "baseUrl": "./",
+    "outDir": "build",
     "lib": [
       "es2015",
       "es2016",
@@ -37,6 +39,7 @@
   "exclude": [
     "node_modules",
     "build",
-    "vendor"
+    "vendor",
+    "src/**/__tests__/*"
   ]
 }

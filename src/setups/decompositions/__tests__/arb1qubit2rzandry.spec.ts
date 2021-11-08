@@ -1,15 +1,15 @@
 import { expect } from 'chai'
 import math, { Matrix } from 'mathjs'
 import { AutoReplacer, DummyEngine, InstructionFilter } from '@/cengines';
-import MainEngine from '@/cengines/main'
+import { MainEngine } from '@/cengines/main'
 import {
   BasicGate, ClassicalInstructionGate,
   Ph, R, Rx, Ry, Rz, X, Measure
 } from '@/ops';
 import arb1q, { _recognize_arb1qubit } from '@/setups/decompositions/arb1qubit2rzandry';
 import { Control } from '@/meta';
-import Simulator from '@/backends/simulators/simulator';
-import DecompositionRuleSet from '@/cengines/replacer/decompositionruleset';
+import { Simulator } from '@/backends/simulators/simulator';
+import { DecompositionRuleSet } from '@/cengines/replacer/decompositionruleset';
 import { IEngine, ICommand } from '@/interfaces';
 
 /*

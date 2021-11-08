@@ -28,22 +28,22 @@ verbose (bool): If true, display intermediate measurement results.
 r (float): Potential period of a.
  */
 import math from 'mathjs'
-import {AddConstant, AddConstantModN, MultiplyByConstantModN} from '../src/libs/math/gates';
+import { AddConstant, AddConstantModN, MultiplyByConstantModN } from '../src/libs/math/gates';
 import {
   All, H, Measure, X, R, BasicMathGate, QFT, Swap
 } from '../src/ops';
-import {Control} from '../src/meta';
-import {getInverse} from '../src/ops/_cycle';
+import { Control } from '../src/meta';
+import { getInverse } from '../src/ops/_cycle';
 import ResourceCounter from '../src/backends/resource';
-import DecompositionRuleSet from '../src/cengines/replacer/decompositionruleset';
-import {AutoReplacer, InstructionFilter} from '../src/cengines';
-import TagRemover from '../src/cengines/tagremover';
-import LocalOptimizer from '../src/cengines/optimize';
-import MainEngine from '../src/cengines/main';
-import Simulator from '../src/backends/simulators/simulator';
+import { DecompositionRuleSet } from '../src/cengines/replacer/decompositionruleset';
+import { AutoReplacer, InstructionFilter } from '../src/cengines';
+import { TagRemover } from '../src/cengines/tagremover';
+import { LocalOptimizer } from '../src/cengines/optimize';
+import { MainEngine } from '../src/cengines/main';
+import { Simulator } from '../src/backends/simulators/simulator';
 import decompositions from '../src/setups/decompositions'
 import mathRules from '../src/libs/math/defaultrules'
-import {expmod} from '../src/libs/polyfill';
+import { expmod } from '../src/libs/polyfill';
 
 function run_shor(eng, N, a, verbose = false) {
   const n = Math.ceil(Math.log2(N))
@@ -153,7 +153,7 @@ if (g !== 1) {
   console.log('\n\n\tOoops, we were lucky: Chose non relative prime by accident :)')
   console.log(`\tFactor: ${g}`)
 } else {
-// run the quantum subroutine
+  // run the quantum subroutine
   let r = run_shor(eng, N, a, true)
 
   // try to determine the factors

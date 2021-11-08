@@ -1,11 +1,11 @@
 
 // create a main compiler engine with a simulator backend:
-import {CircuitDrawer} from '../src/backends/circuits/drawer';
-import MainEngine from '../src/cengines/main';
-import {run_teleport} from './teleport';
+import { CircuitDrawer } from '../src/backends/circuits/drawer';
+import { MainEngine } from '../src/cengines/main';
+import { run_teleport } from './teleport';
 
 const drawing_engine = new CircuitDrawer()
-const locations = {0: 1, 1: 2, 2: 0}
+const locations = { 0: 1, 1: 2, 2: 0 }
 drawing_engine.setQubitLocations(locations)
 const eng = new MainEngine(drawing_engine)
 

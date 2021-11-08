@@ -15,7 +15,7 @@
  */
 
 import { expect } from 'chai'
-import DecompositionRule from '@/cengines/replacer/decompositionrule'
+import { DecompositionRule } from '@/cengines/replacer/decompositionrule'
 
 describe('decomposition rule set test', () => {
   it('should test_decomposition_rule_wrong_input', () => {

@@ -15,8 +15,8 @@
  */
 
 import { expect } from 'chai'
-import BasicMapperEngine from '@/cengines/basicmapper'
-import MainEngine from '@/cengines/main'
+import { BasicMapperEngine } from '@/cengines/basicmapper'
+import { MainEngine } from '@/cengines/main'
 import ClassicalSimulator from '@/backends/simulators/classicalsimulator'
 import { tuple } from '@/libs/util'
 import {
@@ -25,7 +25,7 @@ import {
 import { All, C } from '@/ops/metagates'
 import { BasicMathGate } from '@/ops/basics'
 import { AutoReplacer } from '@/cengines/replacer/replacer'
-import DecompositionRuleSet from '@/cengines/replacer/decompositionruleset'
+import { DecompositionRuleSet } from '@/cengines/replacer/decompositionruleset'
 import { BasicQubit } from '@/meta/qubit'
 import { DummyEngine } from '@/cengines/testengine'
 import { TrivialMapper } from './shared'

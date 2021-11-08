@@ -9,6 +9,7 @@
   "scripts": {
     "install": "node scripts/install.js",
     "test": "jest",
+    "tsc": "tsc -p tsconfig.json",
     "build": "node scripts/build.js --force",
     "doc": "npx typedoc --exclude \"**/__tests__/*.ts\" src/index.ts",
     "prepublishOnly": "rimraf dist/* && babel ./src -d ./dist"

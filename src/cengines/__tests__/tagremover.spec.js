@@ -15,7 +15,7 @@
  */
 
 import { expect } from 'chai'
-import TagRemover from '@/cengines/tagremover'
+import { TagRemover } from '@/cengines/tagremover'
 import { ComputeTag, UncomputeTag } from '@/meta/tag'
 import { tuple } from '@/libs/util'
 import { H } from '@/ops/gates'

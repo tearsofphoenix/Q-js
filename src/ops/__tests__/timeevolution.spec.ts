@@ -20,7 +20,7 @@ import QubitOperator from '@/ops/qubitoperator'
 import TimeEvolution from '@/ops/timeevolution'
 import { tuple } from '@/libs/util'
 import { BasicGate } from '@/ops/basics'
-import MainEngine from '@/cengines/main'
+import { MainEngine } from '@/cengines/main'
 import { DummyEngine } from '@/cengines/testengine'
 import { Ph } from '@/ops/gates';
 import { hashArray as ha, arrayFromHash as ah } from '@/libs/term';

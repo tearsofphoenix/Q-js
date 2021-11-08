@@ -1,12 +1,12 @@
 import { expect } from 'chai'
 import math from 'mathjs'
 import { DummyEngine } from '@/cengines/testengine';
-import MainEngine from '@/cengines/main';
+import { MainEngine } from '@/cengines/main';
 import { Measure, Rx } from '@/ops/gates';
 import { Control } from '@/meta/control';
 import { _recognize_RxNoCtrl } from '@/setups/decompositions/rx2rz';
-import DecompositionRuleSet from '@/cengines/replacer/decompositionruleset';
-import Simulator from '@/backends/simulators/simulator';
+import { DecompositionRuleSet } from '@/cengines/replacer/decompositionruleset';
+import { Simulator } from '@/backends/simulators/simulator';
 import { AutoReplacer, InstructionFilter } from '@/cengines/replacer/replacer';
 import rx2rz from '@/setups/decompositions/rx2rz';
 

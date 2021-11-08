@@ -1,9 +1,9 @@
 
-import DecompositionRuleSet from '../cengines/replacer/decompositionruleset'
+import { DecompositionRuleSet } from '../cengines/replacer/decompositionruleset'
 import { AutoReplacer, InstructionFilter } from '../cengines'
-import TagRemover from '../cengines/tagremover'
-import LocalOptimizer from '../cengines/optimize'
-import GridMapper from '../cengines/twodmapper'
+import { TagRemover } from '../cengines/tagremover'
+import { LocalOptimizer } from '../cengines/optimize'
+import { GridMapper } from '../cengines/twodmapper'
 import math from '../libs/math/defaultrules'
 import decompositions from './decompositions'
 import SwapAndCNOTFlipper from '../cengines/swapandcnotflipper';

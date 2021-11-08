@@ -1,6 +1,6 @@
 import math, { complex, multiply, Matrix } from 'mathjs'
 import assert from 'assert'
-import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { DecompositionRule } from '@/cengines/replacer/decompositionrule';
 import {
   BasicGate, Ph, Ry, Rz, X
 } from '@/ops';

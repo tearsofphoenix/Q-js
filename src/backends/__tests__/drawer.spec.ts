@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import ToLatex from '@/backends/circuits/tolatex'
 import { CircuitDrawer, CircuitItem } from '@/backends/circuits/drawer'
-import MainEngine from '@/cengines/main'
+import { MainEngine } from '@/cengines/main'
 import { tuple } from '@/libs/util'
 import { len } from '@/libs/polyfill'
 import {

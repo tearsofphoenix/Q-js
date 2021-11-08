@@ -1,13 +1,13 @@
 import { expect } from 'chai'
 import math from 'mathjs'
 import { DummyEngine } from '@/cengines/testengine';
-import MainEngine from '@/cengines/main';
+import { MainEngine } from '@/cengines/main';
 import { Measure, Ry } from '@/ops/gates';
 import ry2rz, { _recognize_RyNoCtrl } from '@/setups/decompositions/ry2rz';
 import { Control } from '@/meta/control';
-import DecompositionRuleSet from '@/cengines/replacer/decompositionruleset';
+import { DecompositionRuleSet } from '@/cengines/replacer/decompositionruleset';
 import { AutoReplacer, InstructionFilter } from '@/cengines/replacer/replacer';
-import Simulator from "@/backends/simulators/simulator";
+import { Simulator } from "@/backends/simulators/simulator";
 
 describe('ry2rz test', () => {
   it('should test_recognize_correct_gates', () => {

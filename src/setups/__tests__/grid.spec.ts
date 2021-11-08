@@ -1,8 +1,8 @@
 import { expect } from 'chai'
 import { getEngineList } from '@/setups/grid';
-import GridMapper from '@/cengines/twodmapper';
+import { GridMapper } from '@/cengines/twodmapper';
 import { DummyEngine } from '@/cengines';
-import MainEngine from '@/cengines/main';
+import { MainEngine } from '@/cengines/main';
 import {
   BasicGate, CNOT, Swap, H, Rx, Rz, X, Measure
 } from '@/ops';

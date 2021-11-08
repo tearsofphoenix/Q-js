@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import math from 'mathjs'
 import { AutoReplacer, DummyEngine, InstructionFilter } from '@/cengines';
-import MainEngine from '@/cengines/main';
+import { MainEngine } from '@/cengines/main';
 import { Control } from '@/meta';
 import {
   All,
@@ -10,8 +10,8 @@ import {
 import carb1q, { _recognize_carb1qubit, _recognize_v } from '@/setups/decompositions/carb1qubit2cnotrzandry';
 import { instanceOf } from '@/libs/util';
 import { create_test_matrices } from './arb1qubit2rzandry.spec';
-import Simulator from '@/backends/simulators/simulator';
-import DecompositionRuleSet from '@/cengines/replacer/decompositionruleset'
+import { Simulator } from '@/backends/simulators/simulator';
+import { DecompositionRuleSet } from '@/cengines/replacer/decompositionruleset'
 
 describe('carb1qubit to cnot rz & ry test', () => {
   it('should test_recognize_correct_gates', () => {

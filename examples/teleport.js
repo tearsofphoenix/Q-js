@@ -29,9 +29,9 @@ bell_pair (tuple<Qubits>): The Bell-pair.
 import {
   CNOT, H, Measure, Rz, X, Z
 } from '../src/ops'
-import {tuple} from '../src/libs/util'
-import MainEngine from '../src/cengines/main';
-import {Control, Dagger} from '../src/meta';
+import { tuple } from '../src/libs/util'
+import { MainEngine } from '../src/cengines/main';
+import { Control, Dagger } from '../src/meta';
 
 function create_bell_pair(eng) {
   const b1 = eng.allocateQubit()
@@ -59,7 +59,7 @@ state that Alice would like to send to Bob.
 verbose (bool): If true, info messages will be printed.
  */
 export function run_teleport(eng, state_creation_function, verbose = false) {
-// make a Bell-pair
+  // make a Bell-pair
   const [b1, b2] = create_bell_pair(eng)
 
   // Alice creates a nice state to send

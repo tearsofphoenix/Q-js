@@ -1,7 +1,7 @@
 import math, { Complex, Matrix } from 'mathjs'
 import { Control } from '@/meta';
 import { len, productLoop, productLoop3 } from '@/libs/polyfill';
-import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { DecompositionRule } from '@/cengines/replacer/decompositionrule';
 import {
   BasicGate, Rz, Ry, Ph
 } from '@/ops';

@@ -16,7 +16,7 @@
 
 import { BasicEngine, ForwarderEngine } from '../basics'
 import { FlushGate } from '@/ops/gates'
-import CommandModifier from '../cmdmodifier'
+import { CommandModifier } from '../cmdmodifier'
 import { classHierachy } from '@/libs/util';
 import { getInverse } from '@/ops/_cycle';
 import { NoGateDecompositionError } from '@/meta/error';

@@ -1,7 +1,7 @@
 import math from 'mathjs'
 import { Control } from '@/meta/control';
 import { H, R } from '@/ops/gates';
-import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { DecompositionRule } from '@/cengines/replacer/decompositionrule';
 import QFTGate from '@/ops/qftgate';
 import { ICommand } from '@/interfaces';
 const _decompose_QFT = (cmd: ICommand) => {

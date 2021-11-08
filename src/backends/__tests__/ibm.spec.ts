@@ -21,17 +21,17 @@ import Gates, {
   Allocate, Barrier, Deallocate, Entangle, Measure, NOT, Rx, Ry, Rz, S, T, X, Y, Z
 } from '@/ops/gates';
 import { DummyEngine } from '@/cengines/testengine';
-import IBMBackend from '@/backends/ibm/ibm';
+import { IBMBackend } from '@/backends/ibm/ibm';
 import Command from '@/ops/command';
 import { tuple } from '@/libs/util';
-import MainEngine from '@/cengines/main';
+import { MainEngine } from '@/cengines/main';
 import IBM5QubitMapper, { ibmqx4_connections } from '@/cengines/ibm5qubitmapper';
 import SwapAndCNOTFlipper from '@/cengines/swapandcnotflipper'
-import IBMHTTPClient from '@/backends/ibm/ibmhttpclient'
-import DecompositionRuleSet from '@/cengines/replacer/decompositionruleset'
+import { IBMHTTPClient } from '@/backends/ibm/ibmhttpclient'
+import { DecompositionRuleSet } from '@/cengines/replacer/decompositionruleset'
 import decompositions from '@/setups/decompositions'
-import TagRemover from '@/cengines/tagremover';
-import LocalOptimizer from '@/cengines/optimize';
+import { TagRemover } from '@/cengines/tagremover';
+import { LocalOptimizer } from '@/cengines/optimize';
 import { AutoReplacer } from '@/cengines/replacer/replacer';
 import { All } from '@/ops/metagates';
 

@@ -19,7 +19,7 @@ import { ClassicalInstructionGate, FastForwardingGate } from '@/ops/basics'
 import { H } from '@/ops/gates'
 import { DummyEngine } from '@/cengines/testengine'
 import MainEngine from '@/cengines/main'
-import CommandModifier from '@/cengines/cmdmodifier'
+import { CommandModifier } from '@/cengines/cmdmodifier'
 
 describe('cmdmodifier test', () => {
   it('should test_command_modifier', () => {

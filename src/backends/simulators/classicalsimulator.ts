@@ -40,7 +40,7 @@ A simple introspective simulator that only permits classical operations.
   controls, NOTs, and any BasicMathGate. Supports reading/writing directly
 from/to bits and registers of bits.
  */
-export default class ClassicalSimulator extends BasicEngine {
+export class ClassicalSimulator extends BasicEngine {
   _state: BigInteger;
   _bit_positions: {
     [key: number]: number;

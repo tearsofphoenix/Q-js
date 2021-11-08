@@ -27,12 +27,11 @@ import { LastEngineError } from '../meta/error'
 import { ICommand, ILogicalQubitIDTag } from '@/interfaces';
 
 /**
- * @class CommandPrinter
  * @desc
  * CommandPrinter is a compiler engine which prints commands to stdout prior
  * to sending them on to the next compiler engine.
  */
-export default class CommandPrinter extends BasicEngine {
+export class CommandPrinter extends BasicEngine {
   _acceptInput: boolean;
   _defaultMeasure: boolean;
   _inPlace: boolean;

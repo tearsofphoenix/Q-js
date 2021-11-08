@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import BasicMapperEngine from '@/cengines/basicmapper';
+import { BasicMapperEngine } from '@/cengines/basicmapper';
 import { ICommand } from '@/interfaces';
 
 export class TrivialMapper extends BasicMapperEngine {

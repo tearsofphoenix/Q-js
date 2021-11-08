@@ -16,7 +16,7 @@
 
 import { add_constant, add_constant_modN, mul_by_constant_modN } from './constantmath';
 import { Control } from '@/meta/control';
-import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { DecompositionRule } from '@/cengines/replacer/decompositionrule';
 import { AddConstant, AddConstantModN, MultiplyByConstantModN } from './gates';
 import { ICommand, IMathGate } from '@/interfaces';
 

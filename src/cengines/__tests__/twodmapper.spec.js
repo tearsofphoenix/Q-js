@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { permutations } from 'itertools'
 import deepEqual from 'deep-eql'
-import GridMapper from '@/cengines/twodmapper';
+import { GridMapper } from '@/cengines/twodmapper';
 import { BasicQubit } from '@/meta/qubit';
 import {
   Allocate, BasicGate, Deallocate, FlushGate, X
@@ -12,7 +12,7 @@ import MainEngine from '@/cengines/main';
 import { DummyEngine } from '@/cengines/testengine';
 import { arrayFromRange, len, randomSample } from '@/libs/polyfill';
 import { LogicalQubitIDTag } from '@/meta';
-import LocalOptimizer from '@/cengines/optimize';
+import { LocalOptimizer } from '@/cengines/optimize';
 
 describe('twodmapper test', () => {
   it('should test_is_available', () => {

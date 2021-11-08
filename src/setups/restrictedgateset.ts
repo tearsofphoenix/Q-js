@@ -3,12 +3,12 @@ import {
   BasicMathGate, ClassicalInstructionGate, CNOT, ControlledGate, QFT, Swap
 } from '../ops';
 import { getInverse } from '../ops/_cycle';
-import DecompositionRuleSet from '../cengines/replacer/decompositionruleset';
+import { DecompositionRuleSet } from '../cengines/replacer/decompositionruleset';
 import { instanceOf, isKindclassOf } from '../libs/util';
 import { len } from '../libs/polyfill';
 import { AutoReplacer, InstructionFilter } from '../cengines';
-import TagRemover from '../cengines/tagremover'
-import LocalOptimizer from '../cengines/optimize'
+import { TagRemover } from '../cengines/tagremover'
+import { LocalOptimizer } from '../cengines/optimize'
 import math from '../libs/math/defaultrules'
 import decompositions from './decompositions'
 import { IEngine, ICommand, IGate, GateClass, IQubit } from '@/interfaces';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { DecompositionRule } from '@/cengines/replacer/decompositionrule';
 import { BarrierGate } from '@/ops/gates';
 import { ICommand } from '@/interfaces';
 

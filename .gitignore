@@ -13,3 +13,4 @@ log.txt
 dist/
 .DS_Store
 utReport
+tsconfig.tsbuildinfo

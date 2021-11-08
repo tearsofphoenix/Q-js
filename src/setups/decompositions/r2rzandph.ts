@@ -1,5 +1,5 @@
 import { Control } from '@/meta/control';
-import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { DecompositionRule } from '@/cengines/replacer/decompositionrule';
 import { R, Rz, Ph } from '@/ops/gates';
 import { ICommand, IMathGate } from '@/interfaces';
 

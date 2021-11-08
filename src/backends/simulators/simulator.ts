@@ -45,7 +45,7 @@ OMP_NUM_THREADS environment variable, i.e.
 export OMP_NUM_THREADS=4 # use 4 threads
 export OMP_PROC_BIND=spread # bind threads to processors by spreading
  */
-export default class Simulator extends BasicEngine {
+export class Simulator extends BasicEngine {
   private _simulator: ISimulator;
   private _gate_fusion: boolean;
   /**

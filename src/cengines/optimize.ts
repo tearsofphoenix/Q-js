@@ -34,7 +34,7 @@ gates using the get_merged and getInverse functions of the gate (if
     available). For examples, see BasicRotationGate. Once a list corresponding
 to a qubit contains >=m gates, the pipeline is sent on to the next engine.
  */
-export default class LocalOptimizer extends BasicEngine {
+export class LocalOptimizer extends BasicEngine {
   private _l: { [key: number]: ICommand[] };
   private _m: number;
   /**

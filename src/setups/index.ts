@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import DecompositionRuleSet from '../cengines/replacer/decompositionruleset'
-import TagRemover from '../cengines/tagremover'
+import { DecompositionRuleSet } from '../cengines/replacer/decompositionruleset'
+import { TagRemover } from '../cengines/tagremover'
 import decompositions from './decompositions'
-import LocalOptimizer from '../cengines/optimize'
+import { LocalOptimizer } from '../cengines/optimize'
 import { AutoReplacer } from '../cengines/replacer/replacer'
 
 export function getEngineList() {

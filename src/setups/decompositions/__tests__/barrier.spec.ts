@@ -17,7 +17,7 @@
 import { expect } from 'chai'
 import { _recognize_barrier } from '@/setups/decompositions/barrier'
 import { DummyEngine } from '@/cengines/testengine'
-import MainEngine from '@/cengines/main'
+import { MainEngine } from '@/cengines/main'
 import { R, Barrier } from '@/ops/gates';
 import { ICommand } from '@/interfaces';
 

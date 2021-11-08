@@ -21,10 +21,9 @@ import { ICommand } from '@/interfaces';
 export type CheckFunction = (cmd: ICommand) => boolean;
 
 /**
- * @class DecompositionRule
  * @desc A rule for breaking down specific gates into sequences of simpler gates.
  */
-export default class DecompositionRule {
+export class DecompositionRule {
   gateClass: Function;
   gateDecomposer: Function;
   gateRecognizer: CheckFunction;

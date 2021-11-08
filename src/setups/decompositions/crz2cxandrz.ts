@@ -2,7 +2,7 @@
 import { NOT, Rz } from '@/ops/gates';
 import { C } from '@/ops/metagates';
 import { tuple } from '@/libs/util';
-import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { DecompositionRule } from '@/cengines/replacer/decompositionrule';
 import { ICommand, IMathGate } from '@/interfaces';
 
 const _decompose_CRz = (cmd: ICommand) => {

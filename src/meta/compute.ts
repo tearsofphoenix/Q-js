@@ -23,7 +23,7 @@ controls). This file also defines the corresponding meta tags.
 */
 import assert from 'assert'
 import { BasicEngine } from '../cengines/basics'
-import CommandModifier from '../cengines/cmdmodifier'
+import { CommandModifier } from '../cengines/cmdmodifier'
 import { ComputeTag, UncomputeTag } from './tag'
 import { dropEngineAfter, insertEngine } from './util'
 import { Allocate, Deallocate } from '../ops/gates'

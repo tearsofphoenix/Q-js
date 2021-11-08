@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { ICommand } from '@/interfaces';
-import BasicMapperEngine from './basicmapper'
+import { BasicMapperEngine } from './basicmapper'
 
 /**
  * @desc
@@ -23,7 +23,7 @@ according to a user-specified mapping.
     @property map The function which maps a given qubit id to its
     location. It gets set when initializing the mapper.
  */
-export default class ManualMapper extends BasicMapperEngine {
+export class ManualMapper extends BasicMapperEngine {
   private map: Function;
   /**
     Initialize the mapper to a given mapping. If no mapping function is

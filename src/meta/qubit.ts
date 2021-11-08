@@ -23,7 +23,6 @@ import { IEngine, IQubit, IQureg } from '@/interfaces';
     scope and intented to be used within Qureg objects in user code.
 
  @example
-      import MainEngine
       const eng = new MainEngine()
       const qubit = eng.allocateQubit()
 

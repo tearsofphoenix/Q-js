@@ -22,11 +22,11 @@ import { Control } from '@/meta/control';
 import { Measure, X, Z } from '@/ops/gates';
 import { _recognize_cnot } from '@/setups/decompositions/cnot2cz'
 import { DummyEngine } from '@/cengines/testengine';
-import MainEngine from '@/cengines/main';
+import { MainEngine } from '@/cengines/main';
 import { All } from '@/ops/metagates';
-import DecompositionRuleSet from '@/cengines/replacer/decompositionruleset';
+import { DecompositionRuleSet } from '@/cengines/replacer/decompositionruleset';
 import { AutoReplacer, InstructionFilter } from '@/cengines/replacer/replacer';
-import Simulator from '@/backends/simulators/simulator';
+import { Simulator } from '@/backends/simulators/simulator';
 import cnot2cz from '@/setups/decompositions/cnot2cz';
 
 describe('cnot2cz test', () => {

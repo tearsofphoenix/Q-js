@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import {getEngineList} from '../src/setups/ibm';
-import MainEngine from '../src/cengines/main';
-import IBMBackend from '../src/backends/ibm/ibm';
-import {All, Entangle, Measure} from '../src/ops';
+import { getEngineList } from '../src/setups/ibm';
+import { MainEngine } from '../src/cengines/main';
+import { IBMBackend } from '../src/backends/ibm/ibm';
+import { All, Entangle, Measure } from '../src/ops';
 
 function run_entangle(eng, num_qubits = 5) {
   /*
@@ -30,7 +30,7 @@ function run_entangle(eng, num_qubits = 5) {
       @returns
   measurement (list<int>): List of measurement outcomes.
   */
-// allocate the quantum register to entangle
+  // allocate the quantum register to entangle
   const qureg = eng.allocateQureg(num_qubits)
 
   // entangle the qureg
@@ -57,7 +57,7 @@ const eng = new MainEngine(new IBMBackend({
   verbose: false,
   device: 'ibmqx4'
 }),
-getEngineList())
+  getEngineList())
 
 // run the circuit and print the result
 console.log(run_entangle(eng))

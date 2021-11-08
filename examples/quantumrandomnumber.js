@@ -16,8 +16,8 @@
  */
 
 // create a main compiler engine
-import MainEngine from '../src/cengines/main'
-import {H, Measure} from '../src/ops/gates'
+import { MainEngine } from '../src/cengines/main'
+import { H, Measure } from '../src/ops/gates'
 
 const eng = new MainEngine()
 

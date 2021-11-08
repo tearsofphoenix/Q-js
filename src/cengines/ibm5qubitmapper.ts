@@ -15,10 +15,10 @@
  */
 
 import { permutations } from 'itertools'
-import BasicMapperEngine from './basicmapper'
+import { BasicMapperEngine } from './basicmapper'
 import { Allocate, FlushGate, NOT } from '../ops/gates'
 
-import IBMBackend from '../backends/ibm/ibm'
+import { IBMBackend } from '../backends/ibm/ibm'
 import { ICommand } from '@/interfaces';
 import { hashArray as ha } from '@/libs/term';
 
@@ -46,7 +46,7 @@ If the provided circuit cannot be mapped to the hardware layout
 without performing Swaps, the mapping procedure
 **raises an Exception**.
  */
-export default class IBM5QubitMapper extends BasicMapperEngine {
+export class IBM5QubitMapper extends BasicMapperEngine {
   _cmds: ICommand[];
   _interactions: {
     [key: string]: number

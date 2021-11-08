@@ -21,7 +21,7 @@ import { tuple } from '@/libs/util'
 import {
   BasicGate, C, CNOT, H, Measure, SqrtSwap, SqrtX, Swap, X, Z
 } from '@/ops'
-import MainEngine from '@/cengines/main'
+import { MainEngine } from '@/cengines/main'
 import '@/libs/polyfill'
 import { getInverse } from '@/ops/_cycle';
 import { Control } from '@/meta';

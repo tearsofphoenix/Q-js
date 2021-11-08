@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { getEngineList } from '@/setups/ibm'
-import IBM5QubitMapper from '@/cengines/ibm5qubitmapper';
+import { IBM5QubitMapper } from '@/cengines/ibm5qubitmapper';
 import SwapAndCNOTFlipper from '@/cengines/swapandcnotflipper';
 
 describe('ibm test', () => {

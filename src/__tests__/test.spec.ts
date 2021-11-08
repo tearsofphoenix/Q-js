@@ -27,7 +27,7 @@ import {
 } from '@/cengines/index'
 import { MultiplyByConstantModN } from '@/libs/math/gates'
 import { Control } from '@/meta/index'
-import Simulator from '@/backends/simulators/simulator'
+import { Simulator } from '@/backends/simulators/simulator'
 import decompositions from '@/setups/decompositions/index'
 import mathrules from '@/libs/math/defaultrules'
 import { expmod } from '@/libs/polyfill'

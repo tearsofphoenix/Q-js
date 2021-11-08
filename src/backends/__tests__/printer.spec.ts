@@ -17,7 +17,7 @@
 import { expect } from 'chai'
 import CommandPrinter from '@/backends/printer'
 import { InstructionFilter } from '@/cengines/replacer/replacer'
-import MainEngine from '@/cengines/main'
+import { MainEngine } from '@/cengines/main'
 import { DummyEngine } from '@/cengines/testengine'
 import Command from '@/ops/command'
 import { tuple } from '@/libs/util'

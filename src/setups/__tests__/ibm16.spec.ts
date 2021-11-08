@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 import { getEngineList } from '@/setups/ibm16';
-import GridMapper from '@/cengines/twodmapper';
+import { GridMapper } from '@/cengines/twodmapper';
 import SwapAndCNOTFlipper from '@/cengines/swapandcnotflipper';
 import { DummyEngine } from '@/cengines';
-import MainEngine from '@/cengines/main';
+import { MainEngine } from '@/cengines/main';
 import { AddConstant } from '@/libs/math/gates';
 import { QFT } from '@/ops';
 import { getInverse } from '@/ops/_cycle';

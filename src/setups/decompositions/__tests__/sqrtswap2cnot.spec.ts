@@ -5,7 +5,7 @@ import {
 import {
   DummyEngine, MainEngine, DecompositionRuleSet, AutoReplacer, InstructionFilter
 } from '@/cengines'
-import Simulator from '@/backends/simulators/simulator'
+import { Simulator } from '@/backends/simulators/simulator'
 import sqrtswap2cnot from '@/setups/decompositions/sqrtswap2cnot'
 import { tuple } from '@/libs/util'
 import { len } from '@/libs/polyfill'

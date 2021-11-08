@@ -15,9 +15,9 @@
  */
 
 
-import DecompositionRuleSet from '../cengines/replacer/decompositionruleset'
-import TagRemover from '../cengines/tagremover'
-import LocalOptimizer from '../cengines/optimize'
+import { DecompositionRuleSet } from '../cengines/replacer/decompositionruleset'
+import { TagRemover } from '../cengines/tagremover'
+import { LocalOptimizer } from '../cengines/optimize'
 import { AutoReplacer } from '../cengines/replacer/replacer'
 import SwapAndCNOTFlipper from '../cengines/swapandcnotflipper'
 import decompositions from './decompositions'

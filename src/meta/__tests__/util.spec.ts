@@ -16,7 +16,7 @@
 
 import { expect } from 'chai'
 import { DummyEngine } from '@/cengines/testengine'
-import MainEngine from '@/cengines/main'
+import { MainEngine } from '@/cengines/main'
 import { dropEngineAfter, insertEngine } from '@/meta/util'
 
 describe('util test', () => {

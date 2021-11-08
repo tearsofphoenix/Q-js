@@ -15,7 +15,7 @@
  */
 
 import { expect } from 'chai'
-import LocalOptimizer from '@/cengines/optimize'
+import { LocalOptimizer } from '@/cengines/optimize'
 import { DummyEngine } from '@/cengines/testengine'
 import MainEngine from '@/cengines/main'
 import { tuple, instanceOf } from '@/libs/util';

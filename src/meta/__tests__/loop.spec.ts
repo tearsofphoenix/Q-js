@@ -18,7 +18,7 @@ import { expect } from 'chai'
 import { LoopTag, Loop } from '@/meta/loop'
 import { ComputeTag } from '@/meta/tag'
 import { DummyEngine } from '@/cengines/testengine'
-import MainEngine from '@/cengines/main'
+import { MainEngine } from '@/cengines/main'
 import {
   Allocate, Deallocate, H, X, FlushGate
 } from '@/ops/gates'

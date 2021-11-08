@@ -20,11 +20,11 @@ import { Matrix, Complex, zeros, identity } from 'mathjs'
 import { TrivialMapper } from './shared'
 import { BasicGate, BasicMathGate } from '@/ops/basics'
 import { DummyEngine } from '@/cengines/testengine';
-import MainEngine from '@/cengines/main';
+import { MainEngine } from '@/cengines/main';
 import {
   Allocate, H, Measure, X, Y, Rx, Ry, Rz, Z, S
 } from '@/ops/gates';
-import Simulator from '@/backends/simulators/simulator'
+import { Simulator } from '@/backends/simulators/simulator'
 import { len } from '@/libs/polyfill';
 import { CNOT, Toffoli } from '@/ops/shortcuts';
 import { tuple } from '@/libs/util';
@@ -35,9 +35,9 @@ import { LogicalQubitIDTag } from '@/meta/tag';
 import { NotYetMeasuredError } from '@/meta/error';
 import { Control } from '@/meta/control';
 import { Dagger } from '@/meta/dagger';
-import LocalOptimizer from '@/cengines/optimize';
+import { LocalOptimizer } from '@/cengines/optimize';
 import QubitOperator, { stringToArray } from '@/ops/qubitoperator';
-import BasicMapperEngine from '@/cengines/basicmapper'
+import { BasicMapperEngine } from '@/cengines/basicmapper'
 import TimeEvolution from '@/ops/timeevolution';
 import { ICommand } from '@/interfaces';
 

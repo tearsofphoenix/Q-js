@@ -15,7 +15,7 @@
  */
 
 import { expect } from 'chai'
-import BasicMapperEngine from '@/cengines/basicmapper'
+import { BasicMapperEngine } from '@/cengines/basicmapper'
 import { DummyEngine } from '@/cengines/testengine'
 import { BasicQubit } from '@/meta/qubit'
 import Command from '@/ops/command'

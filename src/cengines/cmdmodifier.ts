@@ -27,7 +27,7 @@ import { ICommand, CommandModifyFunction } from '@/interfaces';
 CommandModifier is a compiler engine which applies a function to all
 incoming commands, sending on the resulting command instead of the original one.
  */
-export default class CommandModifier extends BasicEngine {
+export class CommandModifier extends BasicEngine {
   private _cmdModFunc: CommandModifyFunction;
   /**
   Initialize the CommandModifier.

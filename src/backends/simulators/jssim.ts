@@ -45,7 +45,7 @@ NodeJS implementation of a quantum computer simulator.
 not an option (for some reason). It has the same features but is much
 slower, so please consider building the c++ version for larger experiments.
  */
-export default class Simulator {
+export class Simulator {
   _state: Matrix;
   _map: {
     [key: number]: number;

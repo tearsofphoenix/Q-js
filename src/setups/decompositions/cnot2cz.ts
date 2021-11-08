@@ -20,7 +20,7 @@ import { H, XGate } from '@/ops/gates';
 import { tuple } from '@/libs/util';
 
 import { CZ } from '@/ops/shortcuts'
-import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { DecompositionRule } from '@/cengines/replacer/decompositionrule';
 import { ICommand } from '@/interfaces';
 
 const _decompose_cnot = (cmd: ICommand) => {

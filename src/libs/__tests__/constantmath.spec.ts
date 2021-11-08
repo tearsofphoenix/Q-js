@@ -18,7 +18,7 @@ import { expect } from 'chai'
 import * as math from 'mathjs'
 import { BasicMathGate, ClassicalInstructionGate } from '@/ops/basics';
 import { len } from '@/libs/polyfill';
-import DecompositionRuleSet from '@/cengines/replacer/decompositionruleset';
+import { DecompositionRuleSet } from '@/cengines/replacer/decompositionruleset';
 import qft2crandhadamard from '@/setups/decompositions/qft2crandhadamard';
 import swap2cnot from '@/setups/decompositions/swap2cnot';
 import defaultrules from '@/libs/math/defaultrules'
@@ -26,8 +26,8 @@ import { AutoReplacer, InstructionFilter } from '@/cengines/replacer/replacer';
 import { AddConstant, AddConstantModN, MultiplyByConstantModN } from '@/libs/math/gates';
 import { All } from '@/ops/metagates';
 import { Measure, X } from '@/ops/gates';
-import Simulator from '@/backends/simulators/simulator';
-import MainEngine from '@/cengines/main';
+import { Simulator } from '@/backends/simulators/simulator';
+import { MainEngine } from '@/cengines/main';
 import { IEngine, ICommand, IQureg, IMathGate } from '@/interfaces';
 
 function init(engine: IEngine, quint: IQureg, value: number): void {

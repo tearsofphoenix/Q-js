@@ -1,6 +1,6 @@
 import { Control } from '@/meta/control'
 import { Ph, R } from '@/ops/gates';
-import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { DecompositionRule } from '@/cengines/replacer/decompositionrule';
 import { ICommand, IMathGate } from '@/interfaces';
 
 // Decompose the controlled phase gate (C^nPh(phase)).

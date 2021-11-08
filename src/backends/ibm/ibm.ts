@@ -20,7 +20,7 @@ import Gates, {
   Allocate, Barrier, Deallocate, FlushGate, H, Measure, NOT, Rx, Ry, Rz, S, T, Y, Z
 } from '@/ops/gates'
 import { LogicalQubitIDTag } from '@/meta/tag';
-import IBMHTTPClient from './ibmhttpclient'
+import { IBMHTTPClient } from './ibmhttpclient'
 import { instanceOf } from '@/libs/util'
 import '@/ops/metagates'
 
@@ -30,7 +30,7 @@ const { Tdag, Sdag } = Gates
 The IBM Backend class, which stores the circuit, transforms it to JSON
 QASM, and sends the circuit through the IBM API.
  */
-export default class IBMBackend extends BasicEngine {
+export class IBMBackend extends BasicEngine {
   /**
   @param {{use_hardware: boolean, num_runs: number, verbose: boolean, user: string, password: string, device: string, retrieve_execution: ?string}} args
     use_hardware: If true, the code is run on the IBM quantum chip (instead of using the IBM simulator)

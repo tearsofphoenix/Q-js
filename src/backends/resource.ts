@@ -46,7 +46,7 @@ Properties:
   depth_of_dag (int): It is the longest path in the directed
 acyclic graph (DAG) of the program.
  */
-export default class ResourceCounter extends BasicEngine {
+export class ResourceCounter extends BasicEngine {
   _previous_max_depth: number;
   max_width: number;
   private _active_qubits: number;
@@ -190,7 +190,7 @@ export default class ResourceCounter extends BasicEngine {
       Object.keys(this.gate_class_counts).forEach((gate_class_description) => {
         const num = this.gate_class_counts[gate_class_description]
         const [gate_class, ctrl_cnt] = parseStringKey(gate_class_description)
-        const name = genString('C', ctrl_cnt) + gate_class
+        const name = genString('C', ctrl_cnt as number) + gate_class
         gate_class_list.push(`${name} : ${num}`)
       })
 
@@ -198,7 +198,7 @@ export default class ResourceCounter extends BasicEngine {
       Object.keys(this.gate_counts).forEach((gate_description) => {
         const num = this.gate_counts[gate_description]
         const [gate, ctrl_cnt] = parseStringKey(gate_description)
-        const name = genString('C', ctrl_cnt) + gate.toString()
+        const name = genString('C', ctrl_cnt as number) + gate.toString()
         gate_list.push(`${name} : ${num}`)
       })
 

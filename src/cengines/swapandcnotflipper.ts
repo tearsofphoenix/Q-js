@@ -20,7 +20,7 @@ import { NOT, H, Swap } from '../ops/gates'
 import { All } from '../ops/metagates'
 import { instanceOf, tuple } from '../libs/util';
 import { CNOT } from '../ops/shortcuts'
-import CommandModifier from './cmdmodifier'
+import { CommandModifier } from './cmdmodifier'
 import { ICommand, IQubit } from '@/interfaces';
 
 /**
@@ -34,7 +34,7 @@ the following engines.
     Warning:
 This engine cannot be used as a backend.
  */
-export default class SwapAndCNOTFlipper extends BasicEngine {
+export class SwapAndCNOTFlipper extends BasicEngine {
   connectivity: {};
   /**
    * @param connectivity Set of tuples (c, t) where if (c, t) is an

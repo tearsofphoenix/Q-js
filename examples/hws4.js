@@ -16,8 +16,8 @@
  */
 
 // phase function
-import MainEngine from '../src/cengines/main'
-import {Compute, Uncompute} from '../src/meta'
+import { MainEngine } from '../src/cengines/main'
+import { Compute, Uncompute } from '../src/meta'
 import {
   All, H, X, Measure
 } from '../src/ops'

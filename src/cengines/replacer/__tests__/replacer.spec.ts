@@ -19,11 +19,11 @@ import { H, X, Rx } from '@/ops/gates';
 import { tuple } from '@/libs/util';
 import Command from '@/ops/command';
 import { DummyEngine } from '@/cengines/testengine';
-import MainEngine from '@/cengines/main';
+import { MainEngine } from '@/cengines/main';
 import { InstructionFilter, AutoReplacer } from '@/cengines/replacer/replacer';
 import { BasicGate, ClassicalInstructionGate } from '@/ops/basics';
-import DecompositionRuleSet from '@/cengines/replacer/decompositionruleset'
-import DecompositionRule from '@/cengines/replacer/decompositionrule'
+import { DecompositionRuleSet } from '@/cengines/replacer/decompositionruleset'
+import { DecompositionRule } from '@/cengines/replacer/decompositionrule'
 import '@/ops/metagates'
 import { NoGateDecompositionError } from '@/meta/error';
 

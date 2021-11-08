@@ -1,7 +1,7 @@
 
 // Throw out global phases (no controls).
 ;
-import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { DecompositionRule } from '@/cengines/replacer/decompositionrule';
 import { Ph } from '@/ops/gates';
 import { ICommand } from '@/interfaces';
 

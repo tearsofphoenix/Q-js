@@ -20,10 +20,10 @@ import { DummyEngine } from '@/cengines/testengine'
 import {
   H, AllocateQubitGate, FlushGate, DeallocateQubitGate
 } from '@/ops/gates'
-import BasicMapperEngine from '@/cengines/basicmapper'
-import Simulator from '@/backends/simulators/simulator';
+import { BasicMapperEngine } from '@/cengines/basicmapper'
+import { Simulator } from '@/backends/simulators/simulator';
 import { getEngineList } from '@/setups';
-import LocalOptimizer from '@/cengines/optimize';
+import { LocalOptimizer } from '@/cengines/optimize';
 
 describe('main engine test', () => {
   it('should test_main_engine_init', () => {

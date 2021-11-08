@@ -1,7 +1,7 @@
 
 import { Control } from '@/meta/control'
 import { XGate } from '@/ops/gates';
-import DecompositionRule from '@/cengines/replacer/decompositionrule';
+import { DecompositionRule } from '@/cengines/replacer/decompositionrule';
 import { BasicGate } from '@/ops/basics';
 import { Compute, Uncompute } from '@/meta/compute';
 import { Toffoli } from '@/ops/shortcuts';

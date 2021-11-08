@@ -6,9 +6,9 @@ import Gates, {
   Entangle, Ph, Rz, T, X, Measure, H, R
 } from '@/ops/gates';
 import { AutoReplacer, InstructionFilter } from '@/cengines/replacer/replacer';
-import DecompositionRuleSet from '@/cengines/replacer/decompositionruleset';
-import Simulator from '@/backends/simulators/simulator';
-import MainEngine from '@/cengines/main'
+import { DecompositionRuleSet } from '@/cengines/replacer/decompositionruleset';
+import { Simulator } from '@/backends/simulators/simulator';
+import { MainEngine } from '@/cengines/main'
 import entangle from '@/setups/decompositions/entangle'
 import { All } from '@/ops/metagates'
 import globalphase from '@/setups/decompositions/globalphase'

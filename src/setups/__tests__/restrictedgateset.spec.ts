@@ -4,7 +4,7 @@ import { DummyEngine } from '@/cengines';
 import {
   BasicGate, Rx, Rz, H, CNOT, Measure, Swap, X, Toffoli, QFT
 } from '@/ops';
-import MainEngine from '@/cengines/main';
+import { MainEngine } from '@/cengines/main';
 import { tuple } from '@/libs/util';
 import { AddConstant, AddConstantModN, MultiplyByConstantModN } from '@/libs/math/gates';
 import TimeEvolution from '@/ops/timeevolution';

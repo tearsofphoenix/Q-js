@@ -34,7 +34,7 @@ import {
 import {
   All, Measure, H, X, Z
 } from '../src/ops';
-import MainEngine from '../src/cengines/main';
+import { MainEngine } from '../src/cengines/main';
 
 function run_grover(eng, n, oracle) {
   const x = eng.allocateQureg(n)

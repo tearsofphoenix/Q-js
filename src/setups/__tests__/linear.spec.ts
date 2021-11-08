@@ -1,11 +1,11 @@
 import { expect } from 'chai'
 import { getEngineList } from '@/setups/linear'
-import LinearMapper from '@/cengines/linearmapper';
+import { LinearMapper } from '@/cengines/linearmapper';
 import { DummyEngine } from '@/cengines';
 import {
   BasicGate, Rx, Rz, H, CNOT, Measure, Swap, X
 } from '@/ops';
-import MainEngine from '@/cengines/main';
+import { MainEngine } from '@/cengines/main';
 import { tuple } from '@/libs/util';
 import { AddConstant } from '@/libs/math/gates';
 
