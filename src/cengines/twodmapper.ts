@@ -132,7 +132,7 @@ export default class GridMapper extends BasicMapperEngine {
     const {
       num_rows, num_columns, mapped_ids_to_backend_ids,
       storage = 1000,
-      optimization_function = x => return_swap_depth(x),
+      optimization_function = (x: number[][]) => return_swap_depth(x),
       num_optimization_steps = 50
     } = args
 
@@ -235,7 +235,7 @@ export default class GridMapper extends BasicMapperEngine {
     this.num_of_swaps_per_mapping = {}
   }
 
-  get currentMapping() {
+  public get currentMapping() {
     return super.currentMapping;
   }
 
@@ -639,7 +639,7 @@ which don't store any information.
     // final_positions contains info containers
     // final_position[i][j] contains info container with
     // current_row == i and current_column == j
-    const final_positions = new Array(this.num_rows)
+    const final_positions: Position[][] = new Array(this.num_rows);
     for (let i = 0; i < this.num_rows; ++i) {
       final_positions[i] = new Array(this.num_columns)
     }
@@ -679,7 +679,7 @@ which don't store any information.
     }
 
     assert(len(not_used_mapped_ids) === 0)
-    const positions = []
+    const positions: number[][] = [];
     final_positions.forEach(row => positions.push(row.map(item => item.final_column)))
     const matchings = NativeImpl.returnNewSwap(this.num_rows, this.num_columns, positions)
     const offset = this.num_columns

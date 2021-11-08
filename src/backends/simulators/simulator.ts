@@ -15,7 +15,7 @@
  */
 
 import assert from 'assert'
-import math from 'mathjs'
+import math, { Complex } from 'mathjs'
 import { BasicEngine } from '@/cengines/basics'
 import SimulatorBackend from './jssim'
 import CPPSimulatorBackend from './cppsim'
@@ -30,7 +30,7 @@ import { stringToArray } from '@/ops/qubitoperator'
 import { LogicalQubitIDTag } from '@/meta/tag'
 import { instanceOf } from '@/libs/util';
 import { len, stringToBitArray } from '@/libs/polyfill';
-import { ICommand, IEngine, IMathGate, IQubit, IQubitOperator, IQureg } from '@/interfaces';
+import { ICommand, ISimulator, IMathGate, IQubit, IQubitOperator, IQureg } from '@/interfaces';
 
 /**
  * @desc
@@ -46,7 +46,7 @@ export OMP_NUM_THREADS=4 # use 4 threads
 export OMP_PROC_BIND=spread # bind threads to processors by spreading
  */
 export default class Simulator extends BasicEngine {
-  private _simulator: IEngine;
+  private _simulator: ISimulator;
   private _gate_fusion: boolean;
   /**
   Construct the C++/JavaScript-simulator object and initialize it with a
@@ -75,7 +75,7 @@ quantum algorithms.
 the docs which gives futher hints on how to build the C++
 extension.
    */
-  constructor(gate_fusion: boolean = false, rnd_seed: number = null, forceSimulation: boolean = false) {
+  constructor(gate_fusion: boolean = false, rnd_seed?: number, forceSimulation: boolean = false) {
     super()
     if (!rnd_seed) {
       rnd_seed = Math.random()
@@ -282,7 +282,7 @@ Note:
 automatically converts from logical qubits to mapped qubits for
     the qureg argument.
    */
-  setWavefunction(wavefunction, qureg) {
+  setWavefunction(wavefunction: Complex[], qureg) {
     qureg = this.convertLogicalToMappedQureg(qureg)
     this._simulator.setWavefunction(wavefunction, qureg.map(qb => qb.id))
   }
@@ -421,7 +421,7 @@ deallocation, and (controlled) single-qubit gate.
 (simulate them classically) prior to sending them on to the next
 engine.
 
-    @param {Command[]} commandList List of commands to execute on the simulator.
+    @param commandList List of commands to execute on the simulator.
    */
   receive(commandList: ICommand[]) {
     commandList.forEach((cmd) => {

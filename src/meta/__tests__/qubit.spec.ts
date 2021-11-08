@@ -217,7 +217,7 @@ describe('Qubit test', () => {
     const q3 = new Qureg(...q)
     expect(q.equal(q2)).to.equal(false)
     expect(q.equal(q3)).to.equal(true)
-    expect(q.equal(new Array(...q))).to.equal(false)
+    expect(q.equal(new Array(...q) as any)).to.equal(false)
   });
 
   it('should test basic qubit array copy', () => {

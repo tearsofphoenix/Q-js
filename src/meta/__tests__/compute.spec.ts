@@ -145,6 +145,7 @@ describe('compute test', () => {
 
       })
     }).to.throw(QubitManagementError)
+    // @ts-ignore
     H.or(a)
   })
 
@@ -159,7 +160,8 @@ describe('compute test', () => {
       CustomUncompute(eng, () => {
         a = eng.allocateQubit()
       })
-    }).to.throw(QubitManagementError)
+    }).to.throw(QubitManagementError);
+    // @ts-ignore
     H.or(a);
   })
 
@@ -238,8 +240,8 @@ describe('compute test', () => {
     const compare_engine0 = new CompareEngine()
     // Allow dirty qubits
     const dummy_cengine = new DummyEngine()
-    const allow_dirty_qubits = meta_tag => (meta_tag === DirtyQubitTag)
-
+    const allow_dirty_qubits = (meta_tag: any) => (meta_tag === DirtyQubitTag)
+    // @ts-ignore
     dummy_cengine.isMetaTagHandler = allow_dirty_qubits
     const eng = new MainEngine(backend, [compare_engine0, dummy_cengine])
     let qubit = eng.allocateQubit()
@@ -352,11 +354,12 @@ describe('compute test', () => {
     const compare_engine1 = new CompareEngine()
     //     # Allow dirty qubits
     const dummy_cengine1 = new DummyEngine()
+    // @ts-ignore
     dummy_cengine1.isMetaTagHandler = allow_dirty_qubits
 
     const eng1 = new MainEngine(backend1, [compare_engine1, dummy_cengine1])
     qubit = eng1.allocateQubit()
-    let ancilla2
+    let ancilla2: IQureg;
     Compute(eng1, () => {
       new Rx(0.9).or(qubit)
       const ancilla = eng1.allocateQubit(true)

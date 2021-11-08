@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import _ from 'lodash';
 import { expect } from 'chai'
 import ToLatex from '@/backends/circuits/tolatex'
 import { CircuitDrawer } from '@/backends/circuits/drawer'
@@ -24,6 +25,8 @@ import MainEngine from '@/cengines/main'
 import '@/libs/polyfill'
 import { getInverse } from '@/ops/_cycle';
 import { Control } from '@/meta';
+
+const cs = (str: string, pattern: string) => _.sumBy(str, x => x === pattern ? 1 : 0);
 
 describe('tolatex test', () => {
   it('should test_tolatex', () => {
@@ -121,10 +124,10 @@ describe('tolatex test', () => {
     settings.gates.AllocateQubitGate.draw_id = true
     const code = ToLatex._body(circuit_lines, settings)
 
-    expect(code.count('large_gate')).to.equal(1) // 1 large gate was applied
+    expect(cs(code, 'large_gate')).to.equal(1) // 1 large gate was applied
     // check that large gate draws lines, also for qubits it does not act upon
-    expect(code.count('edge\\[')).to.equal(5)
-    expect(code.count('{H};')).to.equal(2)
+    expect(cs(code, 'edge\\[')).to.equal(5)
+    expect(cs(code, '{H};')).to.equal(2)
   });
 
   it('should test_body', () => {
@@ -166,18 +169,18 @@ describe('tolatex test', () => {
     console.log(c)
     // swap draws 2 nodes + 2 lines each, so is sqrtswap gate, csqrtswap,
     // inv(sqrt_swap), and cswap.
-    expect(code.count('swapstyle')).to.equal(36)
+    expect(cs(code, 'swapstyle')).to.equal(36)
     // CZ is two phases plus 2 from CNOTs + 2 from cswap + 2 from csqrtswap
-    expect(code.count('phase')).to.equal(8)
-    expect(code.count(`{${H.toString()}}`)).to.equal(2) // 2 hadamard gates
+    expect(cs(code, 'phase')).to.equal(8)
+    expect(cs(code, `{${H.toString()}}`)).to.equal(2) // 2 hadamard gates
     const exp = new RegExp(/\{\$\\Ket\{0\}/g)
     const count = code.match(exp).length
     expect(count).to.equal(3) // 3 qubits allocated
     // 1 cnot, 1 not gate, 3 SqrtSwap, 1 inv(SqrtSwap)
-    expect(code.count('xstyle')).to.equal(7)
-    expect(code.count('measure')).to.equal(1) // 1 measurement
-    expect(code.count(`{${Z.toString()}}`)).to.equal(1) // 1 Z gate
-    expect(code.count('{red}')).to.equal(3)
+    expect(cs(code, 'xstyle')).to.equal(7)
+    expect(cs(code, 'measure')).to.equal(1) // 1 measurement
+    expect(cs(code, `{${Z.toString()}}`)).to.equal(1) // 1 Z gate
+    expect(cs(code, '{red}')).to.equal(3)
   });
 
   it('should test_qubit_allocations_at_zero', () => {
@@ -211,15 +214,15 @@ describe('tolatex test', () => {
     const settings = ToLatex.get_default_settings()
     settings.gates.AllocateQubitGate.allocate_at_zero = true
     let code = ToLatex._body(copyLines(circuit_lines), settings)
-    expect(code.count('gate0\\) at \\(0')).to.equal(4)
+    expect(cs(code, 'gate0\\) at \\(0')).to.equal(4)
 
     settings.gates.AllocateQubitGate.allocate_at_zero = false
     code = ToLatex._body(copyLines(circuit_lines), settings)
-    expect(code.count('gate0\\) at \\(0')).to.equal(3)
+    expect(cs(code, 'gate0\\) at \\(0')).to.equal(3)
 
     delete settings.gates.AllocateQubitGate.allocate_at_zero
     code = ToLatex._body(copyLines(circuit_lines), settings)
-    expect(code.count('gate0\\) at \\(0')).to.equal(3)
+    expect(cs(code, 'gate0\\) at \\(0')).to.equal(3)
   });
 
   it('should test_qubit_lines_classicalvsquantum1', () => {
@@ -240,7 +243,7 @@ describe('tolatex test', () => {
     const settings = ToLatex.get_default_settings()
     const code = ToLatex._body(circuit_lines, settings)
 
-    expect(code.count('edge\\[')).to.equal(4)
+    expect(cs(code, 'edge\\[')).to.equal(4)
   });
 
   it('should test_qubit_lines_classicalvsquantum2', () => {
@@ -253,9 +256,9 @@ describe('tolatex test', () => {
     Control(eng, controls, () => H.or(action))
 
     const code = drawer.getLatex()
-    expect(code.count(`{${H.toString()}`)).to.equal(1) // 1 Hadamard
-    expect(code.count('\\{\\$')).to.equal(4) // four allocate gates
-    expect(code.count('node\\[phase\\]')).to.equal(3) // 3 controls
+    expect(cs(code, `{${H.toString()}`)).to.equal(1) // 1 Hadamard
+    expect(cs(code, '\\{\\$')).to.equal(4) // four allocate gates
+    expect(cs(code, 'node\\[phase\\]')).to.equal(3) // 3 controls
   });
 
   it('should test_qubit_lines_classicalvsquantum3', () => {
@@ -271,11 +274,11 @@ describe('tolatex test', () => {
     Control(eng, control0.concat(control1).concat(control2), () => H.or(tuple(action1, action2)))
 
     const code = drawer.getLatex()
-    expect(code.count(`{${H.toString()}}`)).to.equal(1) // 1 Hadamard
-    expect(code.count('\\{\\$')).to.equal(7) // 8 allocate gates
-    expect(code.count('node\\[phase\\]')).to.equal(3) // 1 control
+    expect(cs(code, `{${H.toString()}}`)).to.equal(1) // 1 Hadamard
+    expect(cs(code, '\\{\\$')).to.equal(7) // 8 allocate gates
+    expect(cs(code, 'node\\[phase\\]')).to.equal(3) // 1 control
     // (other controls are within the gate -> are not drawn)
-    expect(code.count('edge\\[')).to.equal(10) // 7 qubit lines + 3 from controls
+    expect(cs(code, 'edge\\[')).to.equal(10) // 7 qubit lines + 3 from controls
   });
 
   it('should test_quantum_lines_cnot', () => {
@@ -293,7 +296,7 @@ describe('tolatex test', () => {
     qubit1.deallocate()
     qubit2.deallocate()
     let code = drawer.getLatex()
-    expect(code.count('edge\\[')).to.equal(12) // all lines are classical
+    expect(cs(code, 'edge\\[')).to.equal(12) // all lines are classical
 
     drawer = new CircuitDrawer()
     eng = new MainEngine(drawer, [])
@@ -308,6 +311,6 @@ describe('tolatex test', () => {
     qubit1.deallocate()
     qubit2.deallocate()
     code = drawer.getLatex()
-    expect(code.count('edge\\[')).to.equal(7) // all lines are quantum
+    expect(cs(code, 'edge\\[')).to.equal(7) // all lines are quantum
   });
 })

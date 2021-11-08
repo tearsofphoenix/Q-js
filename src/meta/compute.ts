@@ -32,6 +32,7 @@ import {
 } from '../libs/polyfill'
 import { QubitManagementError } from './error'
 import { ICommand, IEngine } from '@/interfaces';
+import _ from 'lodash';
 
 /**
  * @class ComputeEngine
@@ -74,8 +75,7 @@ uncompute.
   runUnCompute() {
     // No qubits allocated during Compute section -> do standard uncompute
     if (this.allocatedQubitIDs.size === 0) {
-      // @ts-ignore
-      const cmds = this._l.rmap((cmd: ICommand) => this.addUnComputeTag(cmd.getInverse()))
+      const cmds = this._l.map((cmd: ICommand) => this.addUnComputeTag(cmd.getInverse())).reverse();
       this.send(cmds)
       return
     }
@@ -92,8 +92,7 @@ uncompute.
     // Don't inspect each command as below -> faster uncompute
     // Just find qubits which have been allocated and deallocate them
     if (ids_local_to_compute.size === 0) {
-      // @ts-ignore
-      this._l.rforEach((cmd: ICommand) => {
+      _.eachRight(this._l, (cmd: ICommand) => {
         if (cmd.gate.equal(Allocate)) {
           const qubit_id = cmd.qubits[0][0].id
           // Remove this qubit from MainEngine.active_qubits and
@@ -117,15 +116,14 @@ uncompute.
         } else {
           this.send([this.addUnComputeTag(cmd.getInverse())])
         }
-      })
+      });
       return
     }
 
     // There was at least one qubit allocated and deallocated within
     // compute section. Handle uncompute in most general case
     const new_local_id = {}
-    // @ts-ignore
-    this._l.slice(0).rforEach((cmd: ICommand) => {
+    _.eachRight(this._l.slice(0), (cmd: ICommand) => {
       if (cmd.gate.equal(Deallocate)) {
         assert(ids_local_to_compute.has(cmd.qubits[0][0].id))
         // Create new local qubit which lives within uncompute section
@@ -190,7 +188,7 @@ uncompute.
         }
         this.send([this.addUnComputeTag(cmd.getInverse())])
       }
-    })
+    });
   }
 
   /**

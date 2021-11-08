@@ -22,8 +22,9 @@ Contains a (slow) JavaScript simulator.
 import assert from 'assert'
 import {
   abs, add, complex, divide, index, clone, im, re, exp,
-  matrix, multiply, ones, zeros, sqrt,
+  matrix, multiply, ones, zeros, sqrt, norm,
   Complex,
+  Matrix,
 } from 'mathjs'
 import {
   matrixDot,
@@ -33,7 +34,8 @@ import {
 import {
   len, setEqual, complexVectorDot
 } from '@/libs/polyfill'
-import { stringToArray } from '@/ops/qubitoperator'
+import { arrayFromHash as ah } from '@/libs/term';
+import { TermType } from '@/interfaces';
 
 /**
  * @desc
@@ -44,14 +46,14 @@ not an option (for some reason). It has the same features but is much
 slower, so please consider building the c++ version for larger experiments.
  */
 export default class Simulator {
-  _state: number[];
+  _state: Matrix;
   _map: {
     [key: number]: number;
   }
   _numQubits: number;
   constructor() {
     // ignore seed
-    this._state = ones(1) as number[];
+    this._state = ones(1) as Matrix;
     this._map = {}
     this._numQubits = 0
   }
@@ -67,7 +69,8 @@ export default class Simulator {
     vector
    */
   cheat() {
-    return [this._map, this._state._data.slice(0)]
+    // TODO
+    return [this._map, this._state._data.slice(0)];
   }
 
   /**
@@ -101,7 +104,7 @@ outcomes (true/false).
     pos.forEach((looper, i) => {
       res[i] = ((i_picked >> looper) & 1) === 1
       mask |= (1 << looper)
-      val |= ((res[i] & 1) << looper)
+      val |= ((Number(res[i]) & 1) << looper)
     })
 
     let nrm = 0.0
@@ -178,7 +181,7 @@ whether the qubit is indeed classical.
   deallocateQubit(ID: number) {
     const pos = this._map[ID]
     const cv = this.getClassicalValue(ID)
-    const newstate = zeros(1 << (this._numQubits - 1))
+    const newstate = zeros(1 << (this._numQubits - 1)) as Matrix;
     let k = 0
     for (let i = (1 << pos) * cv; i < len(this._state); i += 1 << (pos + 1)) {
       matrixRangeIndicesAssign(newstate, k, k + (1 << pos), this._state, i)
@@ -234,7 +237,7 @@ whether the qubit is indeed classical.
       })
     })
 
-    const newstate = zeros(len(this._state))
+    const newstate = zeros(len(this._state)) as Matrix;
 
     this._state.forEach((looper, _i) => {
       const i = _i[0]
@@ -336,19 +339,19 @@ whether the qubit is indeed classical.
       bit_str |= (bitString[i] << this._map[IDs[i]])
     }
 
-    let probability = 0.0
+    let probability: number = 0.0
 
     this._state.forEach((val, _i) => {
       const i = _i[0]
       if ((i & mask) === bit_str) {
-        const e = val
-        probability += re(e) ** 2 + im(e) ** 2
+        const e = val as Complex;
+        probability += (re(e) as number) ** 2 + (im(e) as number) ** 2
       }
     })
     return probability
   }
 
-  _getState(i: number) {
+  _getState(i: number): number {
     return this._state.subset(index(i))
   }
 
@@ -361,7 +364,7 @@ whether the qubit is indeed classical.
     The ordering is given by the list of qubit ids.
   
    @param {boolean[]|number[]} bitString Computational basis state
-   @param {number[]} IDs List of qubit ids determining the ordering. Must contain all allocated qubits.
+   @param IDs List of qubit ids determining the ordering. Must contain all allocated qubits.
   
     @return Probability amplitude of the provided bit string.
   
@@ -378,7 +381,6 @@ whether the qubit is indeed classical.
     }
     let index = 0
     IDs.forEach((item, i) => {
-      item = parseInt(item, 10)
       index |= (bitString[i] << this._map[item])
     })
     const ret = this._getState(index)
@@ -399,13 +401,16 @@ whether the qubit is indeed classical.
    @param ids A list of qubit IDs to which to apply the evolution.
    @param ctrlids A list of control qubit IDs.
   */
-  emulateTimeEvolution(terms_dict: number[][], time: number, ids: number[], ctrlids: number[]): void {
+  emulateTimeEvolution(terms_dict: {
+    [key: string]: number;
+  }, time: number, ids: number[], ctrlids: number[]): void {
     // Determine the (normalized) trace, which is nonzero only for identity
     // terms:
     let tr = 0
     let sum = 0
     const newTerms: number[][] = [];
-    terms_dict.forEach(([t, c]) => {
+    terms_dict.forEach((key) => {
+      const [t, c] = ah(key);
       if (t.length === 0) {
         tr += c
       } else {
@@ -425,7 +430,7 @@ whether the qubit is indeed classical.
     for (let i = 0; i < s; ++i) {
       let j = 0
       let nrm_change = 1.0
-      let update;
+      let update: Matrix;
       while (nrm_change > 1.e-12) {
         const coeff = divide(complex(0, -time), s * (j + 1))
         const current_state = clone(this._state)
@@ -477,7 +482,7 @@ whether the qubit is indeed classical.
     @param ids Term index to Qubit ID mapping
     @param controlIDs Control qubit IDs
   */
-  applyTerm(term, ids: number[], controlIDs: number[] = []) {
+  applyTerm(term: TermType, ids: number[], controlIDs: number[] = []) {
     const X = [[0.0, 1.0], [1.0, 0.0]]
     const Y = [[0.0, complex(0, -1)], [complex(0, 1), 0.0]]
     const Z = [[1.0, 0.0], [0.0, -1.0]]

@@ -20,6 +20,7 @@ import { Allocate, FlushGate, NOT } from '../ops/gates'
 
 import IBMBackend from '../backends/ibm/ibm'
 import { ICommand } from '@/interfaces';
+import { hashArray as ha } from '@/libs/term';
 
 function stringKeyToIntArray(key: string) {
   return key.split(',').map(i => parseInt(i, 10))
@@ -169,7 +170,7 @@ down the pipeline.
   @param cmd A command to store
    */
   _store(cmd: ICommand) {
-    let target: number;
+    let target: number = -1;
     if (!(cmd.gate instanceof FlushGate)) {
       target = cmd.qubits[0][0].id
     }
@@ -177,7 +178,7 @@ down the pipeline.
     if (this._isCNOT(cmd)) {
       // CNOT encountered
       const ctrl = cmd.controlQubits[0].id
-      const key = [ctrl, target]
+      const key = ha([ctrl, target]);
       const v = this._interactions[key]
       if (typeof v === 'undefined') {
         this._interactions[key] = 0

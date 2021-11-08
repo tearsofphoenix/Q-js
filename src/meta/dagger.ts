@@ -23,7 +23,7 @@ Tools to easily invert a sequence of gates.
   new Rz(0.5).or(qubit2)
 })
 */
-
+import _ from 'lodash';
 import { BasicEngine } from '../cengines/basics'
 import { Allocate, Deallocate } from '../ops/gates'
 import { insertEngine, dropEngineAfter } from './util'
@@ -64,10 +64,9 @@ export class DaggerEngine extends BasicEngine {
         + '    del qubit[0]\n'
       )
     }
-    // @ts-ignore
-    this.commands.rforEach((cmd: ICommand) => {
+    _.eachRight(this.commands, (cmd: ICommand) => {
       this.send([cmd.getInverse()])
-    })
+    });
   }
 
   /**

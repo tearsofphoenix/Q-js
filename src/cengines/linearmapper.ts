@@ -26,7 +26,7 @@ nearest neighbour qubits can perform a 2 qubit gate. The mapper uses
 Swap gates in order to move qubits next to each other.
 */
 
-
+import _ from 'lodash';
 import assert from 'assert'
 import BasicMapperEngine from './basicmapper'
 import {
@@ -106,7 +106,8 @@ export default class LinearMapper extends BasicMapperEngine {
   _currently_allocated_ids: Set<number>;
   // Statistics:
   num_mappings: number;
-
+  depth_of_swaps: {};
+  num_of_swaps_per_mapping: {};
   /**
   Initialize a LinearMapper compiler engine.
   
@@ -167,7 +168,7 @@ export default class LinearMapper extends BasicMapperEngine {
     const active_qubits = new Set(currently_allocated_ids)
     // Segments contains a list of segments. A segment is a list of
     // neighouring qubit ids
-    const segments = []
+    const segments: number[][] = []
     // neighbour_ids only used to speedup the lookup process if qubits
     // are already connected. key: qubit_id, value: set of neighbour ids
     const neighbour_ids = {}
@@ -179,7 +180,7 @@ export default class LinearMapper extends BasicMapperEngine {
         break
       }
 
-      const qubit_ids = []
+      const qubit_ids: number[] = [];
       cmd.allQubits.forEach(qureg => qureg.forEach(qubit => qubit_ids.push(qubit.id)))
 
       if (len(qubit_ids) > 2 || len(qubit_ids) === 0) {
@@ -515,12 +516,12 @@ possible or updates the segements such that the gate is possible.
     if (swaps.length > 0) { // first mapping requires no swaps
       // Allocate all mapped qubit ids (which are not already allocated,
       // i.e., contained in this._currently_allocated_ids)
-      let mapped_ids_used = new Set()
+      let mapped_ids_used = new Set<number>()
       for (const logical_id of this._currently_allocated_ids) {
         mapped_ids_used.add(this._currentMapping[logical_id])
       }
-      const tmpSet = setFromRange(this.numQubits)
-      const not_allocated_ids = setDifference(tmpSet, mapped_ids_used)
+      const tmpSet: Set<number> = setFromRange(this.numQubits)
+      const not_allocated_ids = setDifference<number>(tmpSet, mapped_ids_used)
       for (const mapped_id of not_allocated_ids) {
         const qb = new BasicQubit(this, mapped_id)
         const cmd = new Command(this, Allocate, tuple([qb]))
@@ -577,9 +578,9 @@ possible or updates the segements such that the gate is possible.
   Receives a command list and, for each command, stores it until
   we do a mapping (FlushGate or Cache of stored commands is full).
   
-  @param {Command[]} command_list list of commands to receive.
+  @param command_list list of commands to receive.
   */
-  receive(command_list) {
+  receive(command_list: ICommand[]) {
     command_list.forEach((cmd) => {
       if (cmd.gate instanceof FlushGate) {
         while (this._stored_commands.length > 0) {
@@ -608,18 +609,18 @@ possible or updates the segements such that the gate is possible.
   but helps if currently the qubits can be divided into independent
   groups without interactions between the groups.
 
-   @param {number} numQubits Total number of qubits in the linear chain
-   @param {Array} segments List of segments. A segment is a list of qubit ids which
+   @param numQubits Total number of qubits in the linear chain
+   @param segments List of segments. A segment is a list of qubit ids which
     should be nearest neighbour in the new map. Individual qubits are in allocated_qubits
     but not in any segment
-   @param {Object} allocated_qubits A set of all qubit ids which need to be present in the new map
-   @param {Object} current_mapping A current mapping as a dict. key is logical qubit
+   @param allocated_qubits A set of all qubit ids which need to be present in the new map
+   @param current_mapping A current mapping as a dict. key is logical qubit
   id, value is placement id. If there are different possible maps, this current mapping is used to
   minimize the swaps to go to the new mapping by a heuristic.
   @returns
       A new mapping as a dict. key is logical qubit id, value is placement id
    */
-  static _returnNewMappingFromSegments(numQubits, segments, allocated_qubits, current_mapping) {
+  static _returnNewMappingFromSegments(numQubits: number, segments: number[][], allocated_qubits: Set<number>, current_mapping: {}) {
     const remaining_segments = segments.slice(0)
     const individual_qubits = new Set(allocated_qubits)
     let num_unused_qubits = numQubits - len(allocated_qubits)
@@ -644,7 +645,7 @@ possible or updates the segements such that the gate is possible.
 
     let current_position_to_fill = 0
     while (len(remaining_segments)) {
-      let best_segment = []
+      let best_segment: number[] = []
       let best_padding = numQubits
       let highest_overlap_fraction = 0
       remaining_segments.forEach((segment) => {
@@ -655,9 +656,10 @@ possible or updates the segements such that the gate is possible.
           const previous_chain_ids = new Set(previous_chain.slice(idx0, idx1))
           previous_chain_ids.delete(undefined)
           const segment_ids = new Set(segment)
+          // @ts-ignore
           segment_ids.delete(undefined)
-
-          const overlap = len(intersection(previous_chain_ids, segment_ids)) + previous_chain.slice(idx0, idx1).count(undefined)
+          const undefinedCount = _.countBy(previous_chain.slice(idx0, idx1), item => item === undefined);
+          const overlap = len(intersection(previous_chain_ids, segment_ids)) + undefinedCount;
           let overlap_fraction
           if (overlap === 0) {
             overlap_fraction = 0
@@ -682,7 +684,7 @@ possible or updates the segements such that the gate is possible.
         new_chain[start + i] = best_segment[i]
       }
 
-      remaining_segments.remove(best_segment)
+      _.remove(remaining_segments, (item) => _.isEqual(item, best_segment));
       current_position_to_fill += best_padding + len(best_segment)
       num_unused_qubits -= best_padding
     }

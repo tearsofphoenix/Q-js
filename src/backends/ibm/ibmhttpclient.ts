@@ -15,31 +15,30 @@
  */
 
 import axios from 'axios'
-const _api_url = 'https://quantumexperience.ng.bluemix.net/api/'
-/**
- * @class IBMHTTPClient
- */
+const _api_url = 'https://quantumexperience.ng.bluemix.net/api/';
+
 export default class IBMHTTPClient {
-  static async isOnline(device) {
+  static async isOnline(device: string) {
     const url = `Backends/${device}/queue/status`
     const result = await axios.get(`${_api_url}${url}`)
-    return result.state
+    // @ts-ignore
+    return result.state;
   }
 
   /**
   Retrieves a previously run job by its ID.
 
-    @param {string} device Device on which the code was run / is running.
-    @param {string} user IBM quantum experience user (e-mail)
-    @param {string} password IBM quantum experience password
-    @param {string} jobid Id of the job to retrieve
+    @param device Device on which the code was run / is running.
+    @param user IBM quantum experience user (e-mail)
+    @param password IBM quantum experience password
+    @param jobid Id of the job to retrieve
   */
-  static async retrieve(device, user, password, jobid) {
+  static async retrieve(device: string, user: string, password: string, jobid: string) {
     const [user_id, access_token] = await IBMHTTPClient.authenticate(user, password)
     return IBMHTTPClient.getResult(device, jobid, access_token)
   }
 
-  static async sleep(interval) {
+  static async sleep(interval: number) {
     return new Promise((resolve) => {
       setTimeout(resolve, interval)
     })
@@ -48,16 +47,17 @@ export default class IBMHTTPClient {
   /**
   Sends QASM through the IBM API and runs the quantum circuit.
 
-   @param {string} info Contains QASM representation of the circuit to run.
-   @param {string} device Either 'simulator', 'ibmqx4', or 'ibmqx5'.
-   @param {string} user IBM quantum experience user.
-   @param {string} password IBM quantum experience user password.
-   @param {number} shots Number of runs of the same circuit to collect statistics.
-   @param {boolean} verbose If true, additional information is printed, such as
+   @param info Contains QASM representation of the circuit to run.
+   @param device Either 'simulator', 'ibmqx4', or 'ibmqx5'.
+   @param user IBM quantum experience user.
+   @param password IBM quantum experience user password.
+   @param shots Number of runs of the same circuit to collect statistics.
+   @param verbose If true, additional information is printed, such as
 measurement statistics. Otherwise, the backend simply registers
 one measurement result (same behavior as the projectq Simulator).
    */
-  static async send(info, device = 'sim_trivial_2', user = '', password = '', shots = 1, verbose = false) {
+  static async send(info: string, device: string = 'sim_trivial_2', user: string = '',
+    password: string = '', shots: number = 1, verbose: boolean = false) {
     try {
       // check if the device is online
       if (['ibmqx4', 'ibmqx5'].includes(device)) {
@@ -95,7 +95,7 @@ one measurement result (same behavior as the projectq Simulator).
     return [userId, id]
   }
 
-  static async run(qasm, device, user_id, access_token, shots) {
+  static async run(qasm: string, device: string, user_id: string, access_token: string, shots: number) {
     const suffix = 'Jobs'
     const params = {
       'access_token': access_token,
@@ -114,8 +114,8 @@ one measurement result (same behavior as the projectq Simulator).
     return resp.data.id
   }
 
-  static async getResult(device, execution_id, access_token, num_retries = 3000,
-    interval = 1) {
+  static async getResult(device: string, execution_id: string, access_token: string, num_retries: number = 3000,
+    interval: number = 1) {
     const suffix = `Jobs/${execution_id}`
     const status_url = `${_api_url}Backends/${device}/queue/status`
 
